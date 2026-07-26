@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peirce — The Probability of Induction (interactive)</title>
+<style>
+  body {
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 16px;
+    background-color: #fafafa;
+    color: #212529;
+  }
+
+  .article-container {
+    background-color: white;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 4px;
+  }
+
+  h3 {
+    text-align: center;
+    font-variant: small-caps;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+  }
+
+  h4 {
+    text-align: center;
+    font-weight: normal;
+    margin-bottom: 10px;
+  }
+
+  h5 { font-size: 1.05em; margin: 12px 0 8px 0; }
+
+  .section-number {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 40px 0 20px 0;
+    font-weight: bold;
+  }
+
+  .example-trigger {
+    background-color: #e8f4f8;
+    border-left: 3px solid #2c7fb8;
+    padding: 2px 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+
+  .example-trigger:hover {
+    background-color: #b3d9ed;
+    border-left-color: #1565c0;
+  }
+
+  .example-container {
+    margin: 25px 0;
+    padding: 25px;
+    background-color: #f8f9fa;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+
+  .example-header {
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-bottom: 20px;
+    color: #1565c0;
+    cursor: pointer;
+    user-select: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .example-header:before {
+    content: '\25BC';
+    margin-right: 10px;
+    transition: transform 0.2s;
+  }
+
+  .example-header.collapsed:before {
+    content: '\25B6';
+  }
+
+  .example-content {
+    margin-top: 20px;
+  }
+
+  /* Highlighting for probability concepts */
+  .hl-antecedent {
+    background-color: #fff3cd;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+  .hl-consequent {
+    background-color: #d1ecf1;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-weight: 500;
+  }
+  .hl-consequence {
+    background-color: #d4edda;
+    padding: 2px 4px;
+    border-radius: 2px;
+    font-weight: 600;
+  }
+
+  /* For addition/multiplication rules */
+  .hl-event-a { background-color: #fee5d9; padding: 2px 4px; }
+  .hl-event-b { background-color: #deebf7; padding: 2px 4px; }
+  .hl-combined { background-color: #d4e4c4; padding: 2px 4px; font-weight: 500; }
+
+  .formula {
+    text-align: center;
+    margin: 20px 0;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1em;
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 4px;
+  }
+
+  .arrow-diagram {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 4px;
+  }
+
+  p {
+    text-align: justify;
+    margin-bottom: 15px;
+  }
+
+  .plot-container {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+
+  .calc-output {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 4px;
+    border-left: 4px solid #6c757d;
+    font-family: 'Courier New', monospace;
+    margin-top: 15px;
+    white-space: pre-wrap;
+    font-size: 0.82em;
+    line-height: 1.5;
+    overflow-x: auto;
+  }
+
+  .control-panel {
+    background-color: #fff;
+    padding: 15px;
+    border-radius: 4px;
+    border: 1px solid #dee2e6;
+    margin-bottom: 15px;
+  }
+
+  /* Mode toggle tabs (Theoretical / Long-Run Frequency) */
+  .mode-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .mode-tab {
+    padding: 10px 20px;
+    background-color: #e9ecef;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-family: inherit;
+    font-size: 1em;
+  }
+  .mode-tab.active {
+    background-color: #2c7fb8;
+    color: white;
+    border-color: #2c7fb8;
+  }
+
+  /* Key insight callout box */
+  .key-insight {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 15px;
+    margin: 15px 0;
+    border-radius: 4px;
+  }
+
+  /* Formula display box */
+  .formula-box {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f0f0f0;
+    border-radius: 6px;
+    font-weight: bold;
+  }
+
+  /* Metal box for Ex6 (Known/Unknown metal scenario) */
+  .metal-box {
+    width: 120px; height: 120px;
+    border: 4px solid #333; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2em; font-weight: bold; margin: 10px auto;
+  }
+  .metal-box.gold   { background-color: #d4af37; color: #000; }
+  .metal-box.lead   { background-color: #808080; color: #fff; }
+  .metal-box.opaque { background-color: #555;    color: #fff; }
+
+  /* Click-info box (used in ex14, ex15, ex18) */
+  .click-info {
+    padding: 15px;
+    background-color: #fff3cd;
+    border: 1px solid #ffc107;
+    border-radius: 5px;
+    margin-top: 15px;
+    font-size: 0.95em;
+  }
+
+  /* Sequence box (used in ex14 sequence display) */
+  .sequence-box {
+    display: inline-block;
+    padding: 3px 6px;
+    margin: 2px;
+    background-color: #e9ecef;
+    border: 1px solid #adb5bd;
+    border-radius: 3px;
+    font-family: monospace;
+    font-size: 0.9em;
+  }
+
+  /* Group box (used in ex16) */
+  .group-box {
+    padding: 15px;
+    margin: 10px 0;
+    border: 1px solid #dee2e6;
+    border-radius: 5px;
+    background-color: #ffffff;
+  }
+
+  /* Result box (used in ex16) */
+  .result-box {
+    padding: 20px;
+    margin-top: 20px;
+    background-color: #e7f3ff;
+    border: 2px solid #2c7fb8;
+    border-radius: 8px;
+  }
+
+  /* Yellow trigger (stub/coming-soon examples) */
+  .example-trigger-yellow {
+    background-color: #fff9e6;
+    border-left: 3px solid #e6ac00;
+    padding: 2px 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 2px;
+  }
+  .example-trigger-yellow:hover {
+    background-color: #ffe066;
+    border-left-color: #b8860b;
+  }
+
+  /* ---- controls (replacing Shiny widgets) ---- */
+  .ctl { margin-bottom: 14px; }
+  .ctl > label {
+    display: block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.88em;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .ctl select, .ctl input[type=number] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.95em;
+    background: #fff;
+  }
+  .ctl input[type=range] { width: 100%; }
+  .ctl .slider-val {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.85em;
+    color: #2c7fb8;
+    font-weight: 700;
+  }
+  .ctl.checkbox label {
+    display: flex; align-items: center; gap: 8px; font-weight: 500;
+  }
+  .ctl.checkbox input { width: auto; }
+  .ctl .radio-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .ctl .radio-row.stacked { flex-direction: column; gap: 4px; }
+  .ctl .radio-row label {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.9em; font-weight: 500; cursor: pointer;
+  }
+
+  button.btn {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.9em;
+    padding: 7px 14px;
+    margin: 3px 4px 3px 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #e7e7e7;
+    border-color: #ccc;
+  }
+  button.btn:hover { filter: brightness(0.94); }
+  button.btn-primary   { background-color: #2c7fb8; color: #fff; border-color: #2c7fb8; }
+  button.btn-success   { background-color: #28a745; color: #fff; border-color: #28a745; }
+  button.btn-warning   { background-color: #ffc107; color: #212529; border-color: #ffc107; }
+  button.btn-danger    { background-color: #dc3545; color: #fff; border-color: #dc3545; }
+  button.btn-info      { background-color: #17a2b8; color: #fff; border-color: #17a2b8; }
+  button.btn-secondary { background-color: #6c757d; color: #fff; border-color: #6c757d; }
+  button.btn-block     { display: block; width: 100%; margin: 4px 0; }
+  button.btn-lg        { font-size: 1.05em; padding: 10px 18px; }
+  button.btn-sm        { font-size: 0.82em; padding: 5px 10px; }
+
+  /* ---- layout ---- */
+  .row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
+  .row > .col { padding: 0 10px; box-sizing: border-box; }
+  .col-3  { flex: 0 0 25%;     max-width: 25%; }
+  .col-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
+  .col-5  { flex: 0 0 41.6667%; max-width: 41.6667%; }
+  .col-6  { flex: 0 0 50%;     max-width: 50%; }
+  .col-7  { flex: 0 0 58.3333%; max-width: 58.3333%; }
+  .col-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
+  .col-12 { flex: 0 0 100%;    max-width: 100%; }
+  @media (max-width: 720px) {
+    .row > .col { flex: 0 0 100%; max-width: 100%; }
+    .article-container { padding: 18px; }
+    body { padding: 8px; }
+  }
+
+  canvas.plot { width: 100%; display: block; }
+
+  hr { border: none; border-top: 1px solid #dee2e6; margin: 18px 0; }
+
+  table.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.86em;
+    margin-top: 15px;
+    background: #fff;
+  }
+  table.tbl th, table.tbl td {
+    border: 1px solid #dee2e6;
+    padding: 6px 8px;
+    text-align: center;
+  }
+  table.tbl th { background-color: #f1f3f5; }
+  table.tbl tbody tr:nth-child(odd) { background-color: #f9f9f9; }
+  table.tbl tr.highlighted-row-90 { background-color: #d1ecf1 !important; font-weight: 700; }
+  .table-scroll { overflow-x: auto; }
+
+  /* inline fraction rendering (replaces MathJax) */
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 0.85em;
+    line-height: 1.25;
+    margin: 0 3px;
+  }
+  .frac > .num { border-bottom: 1px solid currentColor; padding: 0 4px; }
+  .frac > .den { padding: 0 4px; }
+  .math { font-family: 'Times New Roman', Georgia, serif; font-style: italic; }
+  .math .op, .math .num-lit { font-style: normal; }
+
+  /* displayed tables carried over from the printed article */
+  .peirce-table {
+    margin: 20px auto;
+    border-collapse: collapse;
+    font-size: 0.92em;
+    max-width: 560px;
+  }
+  .peirce-table td { padding: 5px 10px; vertical-align: middle; }
+  .peirce-table td.lbl { text-align: right; color: #333; }
+  .peirce-table td:last-child { text-align: left; white-space: nowrap; }
+  @media (max-width: 720px) {
+    .peirce-table { font-size: 0.8em; }
+    .peirce-table td { padding: 4px 5px; }
+  }
+  .rad {
+    border-top: 1px solid currentColor;
+    padding: 2px 3px 0 3px;
+    display: inline-block;
+  }
+
+  sup.fn { font-size: 0.7em; line-height: 0; }
+  sup.fn a { text-decoration: none; color: #2c7fb8; }
+  .footnotes {
+    margin-top: 36px;
+    padding-top: 16px;
+    border-top: 1px solid #ccc;
+    font-size: 0.88em;
+    color: #444;
+  }
+  .footnotes p { text-align: left; margin-bottom: 8px; }
+  .footnotes a { text-decoration: none; color: #2c7fb8; }
+
+  .note-block {
+    font-size: 0.85em;
+    color: #555;
+    background: #f1f3f5;
+    border-left: 3px solid #adb5bd;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+
+  .footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+    font-size: 0.85em;
+    color: #555;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: justify;
+  }
+</style>
+</head>
+<body>
+<div class="article-container">
