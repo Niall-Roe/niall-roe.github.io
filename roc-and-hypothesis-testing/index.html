@@ -1,0 +1,2418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Signal Detection &amp; Hypothesis Testing: An Interactive Explorer</title>
+<style>
+  body {
+    font-family: 'Georgia', serif;
+    line-height: 1.7;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 16px;
+    background-color: #fafafa;
+    color: #212529;
+  }
+
+  .article-container {
+    background-color: white;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 4px;
+  }
+
+  h1.page-title {
+    text-align: center;
+    font-variant: small-caps;
+    letter-spacing: 1px;
+    margin-top: 0;
+    margin-bottom: 4px;
+    font-size: 1.9em;
+  }
+  p.lede {
+    text-align: justify;
+    color: #444;
+    margin: 0 auto 28px auto;
+    max-width: 46em;
+  }
+
+  .citation {
+    font-size: 0.82em;
+    color: #666;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    margin-top: 12px;
+    text-align: left;
+  }
+
+  h3 {
+    text-align: center;
+    font-variant: small-caps;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+  }
+  h4 { margin: 18px 0 10px 0; }
+  h5 { font-size: 1.05em; margin: 12px 0 8px 0; }
+
+  p { text-align: justify; margin-bottom: 15px; }
+
+  hr { border: none; border-top: 1px solid #dee2e6; margin: 22px 0; }
+
+  /* ---- top-level mode / tab switchers ---- */
+  .mode-tabs {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .mode-tab {
+    padding: 10px 20px;
+    background-color: #e9ecef;
+    border: 2px solid #dee2e6;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95em;
+  }
+  .mode-tab.active {
+    background-color: #2c7fb8;
+    color: white;
+    border-color: #2c7fb8;
+  }
+  .tab-row {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #dee2e6;
+  }
+  .tab-btn {
+    padding: 10px 18px;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95em;
+    font-weight: 600;
+    color: #555;
+    margin-bottom: -2px;
+  }
+  .tab-btn.active {
+    color: #2c7fb8;
+    border-bottom-color: #2c7fb8;
+  }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ---- controls ---- */
+  .ctl { margin-bottom: 14px; }
+  .ctl > label {
+    display: block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.88em;
+    font-weight: 600;
+    margin-bottom: 4px;
+    line-height: 1.4;
+  }
+  .ctl select, .ctl input[type=number] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-family: inherit;
+    font-size: 0.95em;
+    background: #fff;
+  }
+  .ctl input[type=range] { width: 100%; }
+  .ctl .slider-val {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.85em;
+    color: #2c7fb8;
+    font-weight: 700;
+  }
+  .ctl.checkbox label {
+    display: flex; align-items: center; gap: 8px; font-weight: 500;
+  }
+  .ctl.checkbox input { width: auto; }
+  .ctl .radio-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .ctl .radio-row.stacked { flex-direction: column; gap: 4px; }
+  .ctl .radio-row label {
+    display: flex; align-items: center; gap: 6px;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.9em; font-weight: 500; cursor: pointer;
+  }
+  .ctl.disabled { opacity: 0.5; pointer-events: none; }
+  .readonly-val {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.95em;
+    font-weight: 700;
+    color: #2c7fb8;
+    background: #eef2f5;
+    border: 1px solid #dde3e8;
+    border-radius: 4px;
+    padding: 5px 8px;
+  }
+  .readonly-val .ro-note { font-weight: 400; color: #6c757d; font-size: 0.85em; }
+  .help-text {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82em;
+    color: #6c757d;
+    margin: -8px 0 12px 0;
+  }
+
+  button.btn {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.9em;
+    padding: 7px 14px;
+    margin: 3px 4px 3px 0;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    background-color: #e7e7e7;
+    border-color: #ccc;
+  }
+  button.btn:hover { filter: brightness(0.94); }
+  button.btn-primary   { background-color: #2c7fb8; color: #fff; border-color: #2c7fb8; }
+  button.btn-warning   { background-color: #ffc107; color: #212529; border-color: #ffc107; }
+  button.btn-info      { background-color: #17a2b8; color: #fff; border-color: #17a2b8; }
+  button.btn-sm        { font-size: 0.82em; padding: 5px 10px; }
+
+  /* ---- layout ---- */
+  .row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
+  .row > .col { padding: 0 10px; box-sizing: border-box; }
+  .col-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
+  .col-6  { flex: 0 0 50%;     max-width: 50%; }
+  .col-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
+  .col-12 { flex: 0 0 100%;    max-width: 100%; }
+  @media (max-width: 800px) {
+    .row > .col { flex: 0 0 100%; max-width: 100%; }
+    .article-container { padding: 18px; }
+    body { padding: 8px; }
+  }
+
+  .sidebar {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 6px;
+    padding: 18px;
+  }
+
+  canvas.plot { width: 100%; display: block; }
+  .plot-container {
+    margin: 16px 0;
+    padding: 12px;
+    background-color: white;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+  }
+
+  table.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.86em;
+    margin-top: 10px;
+    background: #fff;
+  }
+  table.tbl th, table.tbl td {
+    border: 1px solid #dee2e6;
+    padding: 6px 8px;
+    text-align: center;
+  }
+  table.tbl th { background-color: #f1f3f5; }
+  table.tbl tbody tr:nth-child(odd) { background-color: #f9f9f9; }
+  table.tbl td.lbl { text-align: left; }
+
+  /* confusion / decision matrix */
+  .conf-table { border-collapse: collapse; width: 100%; text-align: center; table-layout: fixed; margin-top: 10px; }
+  .conf-table td, .conf-table th { border: 2px solid #fff; padding: 16px 8px; font-weight: bold; font-family: 'Helvetica Neue', Arial, sans-serif; }
+  .conf-table th.label-cell { background-color: #f1f3f5; color: #333; font-size: 0.85em; font-weight: 600; }
+  .conf-table td { font-size: 0.9em; color: #222; }
+
+  /* comparison table */
+  .comparison-table { width: 100%; border-collapse: collapse; margin: 16px 0; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.88em; }
+  .comparison-table th, .comparison-table td { border: 1px solid #ddd; padding: 10px 12px; text-align: left; }
+  .comparison-table th { background-color: #f8f9fa; }
+  .comparison-table tr:nth-child(even) { background-color: #f9f9f9; }
+  .sdt-col { background-color: #e3f2fd !important; }
+  .ht-col  { background-color: #fff3e0 !important; }
+
+  /* decision / interpretation boxes */
+  .result-box { padding: 14px 16px; margin: 10px 0; border-radius: 5px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.92em; }
+  .reject-h0          { background-color: #ffcccc; border: 2px solid #d62728; }
+  .fail-reject         { background-color: #cce5ff; border: 2px solid #1f77b4; }
+  .correct-decision    { background-color: #d4edda; border: 2px solid #28a745; }
+  .incorrect-decision  { background-color: #f8d7da; border: 2px solid #dc3545; }
+
+  /* severity boxes */
+  .severity-box { padding: 14px 16px; margin: 10px 0; border-radius: 5px; background-color: #f5f5f5; border: 1px solid #ddd; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.92em; }
+  .severity-high   { background-color: #c8e6c9; border-color: #4caf50; }
+  .severity-medium { background-color: #fff9c4; border-color: #fbc02d; }
+  .severity-low    { background-color: #ffcdd2; border-color: #e53935; }
+  .severity-bar { height: 18px; border-radius: 3px; margin: 6px 0; }
+
+  .key-insight {
+    background-color: #fff3cd;
+    border-left: 4px solid #ffc107;
+    padding: 14px 16px;
+    margin: 15px 0;
+    border-radius: 4px;
+    font-size: 0.95em;
+  }
+
+  /* severity assessment badges */
+  .assess { font-weight: 700; }
+  .assess-pass { color: #2e7d32; }
+  .assess-weak { color: #ef6c00; }
+  .assess-bent { color: #c62828; }
+  tr.claim-current td { background-color: #fff3cd !important; font-weight: 700; }
+
+  /* dual-label rows on the Comparison page */
+  .dual-label {
+    display: flex;
+    gap: 10px;
+    align-items: stretch;
+    margin: 6px 0 14px 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.88em;
+  }
+  .dual-label > div { flex: 1 1 0; padding: 10px 12px; border-radius: 5px; }
+  .dual-label .lab-name { font-weight: 700; display: block; margin-bottom: 2px; }
+  .dual-label .lab-val { font-variant-numeric: tabular-nums; }
+  .equals {
+    align-self: center;
+    font-weight: 700;
+    color: #666;
+    font-size: 1.1em;
+  }
+  .compare-legend {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.85em;
+    color: #555;
+    text-align: center;
+    margin-top: -6px;
+  }
+  .swatch-sdt, .swatch-ht {
+    display: inline-block; width: 11px; height: 11px;
+    border-radius: 2px; vertical-align: baseline; margin-right: 4px;
+  }
+  .swatch-sdt { background: #90caf9; }
+  .swatch-ht  { background: #ffcc80; }
+  .note-block {
+    font-size: 0.85em;
+    color: #555;
+    background: #f1f3f5;
+    border-left: 3px solid #adb5bd;
+    padding: 10px 14px;
+    margin: 12px 0;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+  }
+  .provenance-box {
+    background-color: #e8f4f8;
+    border-left: 3px solid #2c7fb8;
+    padding: 14px 16px;
+    margin: 15px 0 30px 0;
+    border-radius: 4px;
+    font-size: 0.92em;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #333;
+  }
+  .provenance-box a { color: #1565c0; }
+
+  .footer {
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid #ccc;
+    font-size: 0.85em;
+    color: #555;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    text-align: justify;
+  }
+</style>
+</head>
+<body>
+<div class="article-container">
+<h1 class="page-title">Signal Detection &amp; Hypothesis Testing</h1>
+<p class="lede">
+An app for exploring signal detection theory and Neyman&ndash;Pearson hypothesis testing, set out
+to show that the underlying mathematics is essentially the same. Use the Parameters and
+Simulation tabs to see how moving the threshold trades one kind of error against the other, and
+how observed frequencies settle towards the theoretical rates. Switching between the SDT and
+Neyman&ndash;Pearson views keeps the same picture and changes only the labels. The Comparison tab
+makes that correspondence explicit.
+</p>
+
+<div class="mode-tabs" id="mode-switcher"></div>
+
+<div class="tab-row" id="tab-switcher"></div>
+
+<div id="tab1" class="tab-panel active"></div>
+<div id="tab2" class="tab-panel"></div>
+<div id="tab3" class="tab-panel"></div>
+<div id="tab-compare" class="tab-panel"></div>
+
+<div class="footer">
+  <p id="finley-note" style="display:none;">
+  Finley's tornado forecasts, 1884: 2803 occasions, 51 of them tornadoes. Peirce wrote about
+  this data the same year, arguing that a forecaster's accuracy tells you little when the
+  event being forecast is rare, and proposing the measure now known as the Peirce Skill Score.
+  </p>
+</div>
+<script>
+/* ============================================================================
+   Signal Detection & Hypothesis Testing — interactive edition
+   Port of "ROC and Hypothesis Testing.R" (R/Shiny) to a self-contained page.
+
+   Part 1: statistical primitives (replacing R's stats package)
+   Part 2: a small canvas renderer that mimics R base graphics
+   Part 3: tiny DOM / control-building utilities
+   Shared lineage with ../probability-of-induction/src/03_lib.js, trimmed to
+   what this app needs and extended with rnorm (used by both simulation tabs).
+   ==========================================================================*/
+
+/* ---------------------------------------------------------------- MATH --- */
+
+function dnorm(x, mean = 0, sd = 1) {
+  const z = (x - mean) / sd;
+  return Math.exp(-0.5 * z * z) / (sd * Math.sqrt(2 * Math.PI));
+}
+
+// Chebyshev erfc (NR 6.2) — accurate enough for the tail probabilities used
+// by severity calculations, unlike the cruder A&S 7.1.26 approximation.
+function erfc(x) {
+  const z = Math.abs(x), t = 2 / (2 + z);
+  const ty = 4 * t - 2;
+  const cof = [-1.3026537197817094, 6.4196979235649026e-1, 1.9476473204185836e-2,
+    -9.561514786808631e-3, -9.46595344482036e-4, 3.66839497852761e-4,
+    4.2523324806907e-5, -2.0278578112534e-5, -1.624290004647e-6,
+    1.303655835580e-6, 1.5626441722e-8, -8.5238095915e-8,
+    6.529054439e-9, 5.059343495e-9, -9.91364156e-10,
+    -2.27365122e-10, 9.6467911e-11, 2.394038e-12,
+    -6.886027e-12, 8.94487e-13, 3.13092e-13,
+    -1.12708e-13, 3.81e-16, 7.106e-15];
+  let d = 0, dd = 0, tmp;
+  for (let j = cof.length - 1; j > 0; j--) { tmp = d; d = ty * d - dd + cof[j]; dd = tmp; }
+  const ans = t * Math.exp(-z * z + 0.5 * (cof[0] + ty * d) - dd);
+  return x >= 0 ? ans : 2 - ans;
+}
+
+function pnorm(x, mean = 0, sd = 1) { return 0.5 * erfc(-((x - mean) / sd) / Math.SQRT2); }
+
+// Wichura AS241-quality inverse normal (Acklam + one Halley refinement)
+function qnorm(p, mean = 0, sd = 1) {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
+    1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+    6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+    -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+    3.754408661907416e+00];
+  const pl = 0.02425, ph = 1 - pl;
+  let q, r, x;
+  if (p < pl) {
+    q = Math.sqrt(-2 * Math.log(p));
+    x = (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  } else if (p <= ph) {
+    q = p - 0.5; r = q * q;
+    x = (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+        (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+  } else {
+    q = Math.sqrt(-2 * Math.log(1 - p));
+    x = -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+  const e = pnorm(x) - p, u = e * Math.sqrt(2 * Math.PI) * Math.exp(x * x / 2);
+  x = x - u / (1 + x * u / 2);
+  return mean + sd * x;
+}
+
+// Inverse-CDF normal draw: reuses the qnorm above rather than a second
+// (Box-Muller) code path, so simulated trials and theoretical curves share
+// exactly one implementation of "what normal means" throughout the app.
+function rnorm(n, mean = 0, sd = 1) {
+  const out = new Array(n);
+  for (let i = 0; i < n; i++) out[i] = qnorm(Math.random(), mean, sd);
+  return out;
+}
+
+/* ---------------------------------------------------------- FORMATTING --- */
+
+// R's round(x, d) then default printing: 0.5 -> "0.5", not "0.5000"
+function rround(x, d) {
+  if (!Number.isFinite(x)) return String(x);
+  const r = Number(x.toFixed(d));
+  return String(r);
+}
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+/* ------------------------------------------------------------ PLOTTING --- */
+/* A minimal re-implementation of the parts of R base graphics the app uses:
+   plot(NULL)/rect/text/lines/points/segments/polygon/abline/axis/legend.
+   Coordinates passed to these methods are USER (data) coordinates.          */
+
+const BASE_FONT = 12;
+
+class RPlot {
+  constructor(ctx, cssW, cssH) {
+    this.ctx = ctx; this.W = cssW; this.H = cssH;
+    this.mar = [40, 45, 32, 16];   // bottom, left, top, right, in px
+    this.xlim = [0, 1]; this.ylim = [0, 1];
+  }
+  setup(opts) {
+    const o = opts || {};
+    if (o.mar) this.mar = o.mar.map((m) => m * 13);
+    let xlim = (o.xlim || [0, 1]).slice(), ylim = (o.ylim || [0, 1]).slice();
+    if (o.ext !== false) {
+      const dx = (xlim[1] - xlim[0]) * 0.04, dy = (ylim[1] - ylim[0]) * 0.04;
+      xlim = [xlim[0] - dx, xlim[1] + dx];
+      ylim = [ylim[0] - dy, ylim[1] + dy];
+    }
+    const [mb, ml, mt, mr] = this.mar;
+    let px0 = ml, px1 = this.W - mr, py0 = this.H - mb, py1 = mt;
+    /* `square` shrinks the PLOT REGION to a square and centres it, so a 1:1
+       plot really looks 1:1. (R's coord_fixed instead widens the roomier
+       axis's limits, which leaves the box itself a rectangle — not what an
+       ROC square wants.) Assumes xlim and ylim already span equal ranges. */
+    if (o.square) {
+      const side = Math.min(px1 - px0, py0 - py1);
+      const cx = (px0 + px1) / 2;
+      px0 = cx - side / 2; px1 = cx + side / 2;
+      py1 = py0 - side;
+    }
+    this.xlim = xlim; this.ylim = ylim;
+    this.px0 = px0; this.px1 = px1; this.py0 = py0; this.py1 = py1;
+    return this;
+  }
+  X(x) { return this.px0 + (x - this.xlim[0]) / (this.xlim[1] - this.xlim[0]) * (this.px1 - this.px0); }
+  Y(y) { return this.py0 + (y - this.ylim[0]) / (this.ylim[1] - this.ylim[0]) * (this.py1 - this.py0); }
+  invX(px) { return this.xlim[0] + (px - this.px0) / (this.px1 - this.px0) * (this.xlim[1] - this.xlim[0]); }
+  invY(py) { return this.ylim[0] + (py - this.py0) / (this.py1 - this.py0) * (this.ylim[1] - this.ylim[0]); }
+
+  _font(cex, font) {
+    const size = BASE_FONT * (cex || 1);
+    const weight = (font === 2) ? "bold " : "";
+    const style = (font === 3) ? "italic " : "";
+    this.ctx.font = `${style}${weight}${size}px "Helvetica Neue", Arial, sans-serif`;
+    return size;
+  }
+  _lty(lty) {
+    const c = this.ctx;
+    if (lty === 2) c.setLineDash([7, 5]);
+    else if (lty === 3) c.setLineDash([2, 3]);
+    else c.setLineDash([]);
+  }
+  text(x, y, str, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex, o.font);
+    c.fillStyle = o.col || "black";
+    c.textBaseline = "middle";
+    c.textAlign = o.adj === 0 ? "left" : (o.adj === 1 ? "right" : "center");
+    const lines = String(str).split("\n");
+    const lh = BASE_FONT * (o.cex || 1) * 1.25;
+    const y0 = this.Y(y) - lh * (lines.length - 1) / 2;
+    lines.forEach((ln, i) => c.fillText(ln, this.X(x), y0 + i * lh));
+  }
+  lines(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+    c.beginPath();
+    let started = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (!Number.isFinite(ys[i])) { started = false; continue; }
+      const px = this.X(xs[i]), py = this.Y(ys[i]);
+      if (!started) { c.moveTo(px, py); started = true; } else c.lineTo(px, py);
+    }
+    c.stroke(); c.setLineDash([]);
+  }
+  points(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.fillStyle = o.col || "black"; c.strokeStyle = o.col || "black";
+    const r = 2.4 * (o.cex || 1);
+    for (let i = 0; i < xs.length; i++) {
+      c.beginPath(); c.arc(this.X(xs[i]), this.Y(ys[i]), r, 0, 2 * Math.PI);
+      if (o.pch === 21) { c.fillStyle = o.fill || "white"; c.fill(); c.stroke(); } else c.fill();
+    }
+  }
+  segments(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+    c.beginPath(); c.moveTo(this.X(x0), this.Y(y0)); c.lineTo(this.X(x1), this.Y(y1));
+    c.stroke(); c.setLineDash([]);
+  }
+  abline(o = {}) {
+    if (o.h !== undefined) this.segments(this.xlim[0], o.h, this.xlim[1], o.h, o);
+    if (o.v !== undefined) this.segments(o.v, this.ylim[0], o.v, this.ylim[1], o);
+    if (o.slope !== undefined) {
+      const y0 = o.intercept + o.slope * this.xlim[0], y1 = o.intercept + o.slope * this.xlim[1];
+      this.segments(this.xlim[0], y0, this.xlim[1], y1, o);
+    }
+  }
+  polygon(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.beginPath();
+    c.moveTo(this.X(xs[0]), this.Y(ys[0]));
+    for (let i = 1; i < xs.length; i++) c.lineTo(this.X(xs[i]), this.Y(ys[i]));
+    c.closePath();
+    if (o.col) { c.fillStyle = o.col; c.fill(); }
+    if (o.border) { c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; c.stroke(); }
+  }
+  // filled area between a curve and a horizontal baseline, clipped to x in [x0,x1]
+  ribbon(xs, ys, baseline, o = {}) {
+    const pts = [];
+    for (let i = 0; i < xs.length; i++) pts.push([xs[i], ys[i]]);
+    const top = pts.map((p) => p);
+    const bottom = pts.slice().reverse().map((p) => [p[0], baseline]);
+    const all = top.concat(bottom);
+    this.polygon(all.map((p) => p[0]), all.map((p) => p[1]), o);
+  }
+  arrow(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    this.segments(x0, y0, x1, y1, o);
+    const P0 = [this.X(x0), this.Y(y0)], P1 = [this.X(x1), this.Y(y1)];
+    const len = o.length || 8;
+    const ang = Math.atan2(P1[1] - P0[1], P1[0] - P0[0]);
+    const spread = (o.angle || 20) * Math.PI / 180;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1;
+    c.beginPath();
+    c.moveTo(P1[0], P1[1]); c.lineTo(P1[0] - len * Math.cos(ang - spread), P1[1] - len * Math.sin(ang - spread));
+    c.moveTo(P1[0], P1[1]); c.lineTo(P1[0] - len * Math.cos(ang + spread), P1[1] - len * Math.sin(ang + spread));
+    c.stroke();
+  }
+  static ticks(lo, hi, n = 5) {
+    const span = hi - lo;
+    if (!(span > 0)) return [lo];
+    const raw = span / n;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw / mag;
+    const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+    const out = [];
+    for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+  axes(o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = "black"; c.fillStyle = "black"; c.lineWidth = 1; c.setLineDash([]);
+    this._font(0.85, 1);
+    const xt = o.xat || RPlot.ticks(this.xlim[0], this.xlim[1], o.nx || 5);
+    const yt = o.yat || RPlot.ticks(this.ylim[0], this.ylim[1], o.ny || 5);
+    c.beginPath(); c.moveTo(this.px0, this.py0); c.lineTo(this.px1, this.py0); c.stroke();
+    c.textAlign = "center"; c.textBaseline = "top";
+    xt.forEach((v, i) => {
+      const px = this.X(v);
+      if (px < this.px0 - 0.5 || px > this.px1 + 0.5) return;
+      c.beginPath(); c.moveTo(px, this.py0); c.lineTo(px, this.py0 + 5); c.stroke();
+      c.fillText(o.xlabels ? o.xlabels[i] : String(v), px, this.py0 + 7);
+    });
+    c.beginPath(); c.moveTo(this.px0, this.py0); c.lineTo(this.px0, this.py1); c.stroke();
+    c.textAlign = "right"; c.textBaseline = "middle";
+    yt.forEach((v, i) => {
+      const py = this.Y(v);
+      if (py > this.py0 + 0.5 || py < this.py1 - 0.5) return;
+      c.beginPath(); c.moveTo(this.px0, py); c.lineTo(this.px0 - 5, py); c.stroke();
+      c.fillText(o.ylabels ? o.ylabels[i] : String(v), this.px0 - 7, py);
+    });
+  }
+  box() {
+    const c = this.ctx;
+    c.strokeStyle = "black"; c.lineWidth = 1; c.setLineDash([]);
+    c.strokeRect(this.px0, this.py1, this.px1 - this.px0, this.py0 - this.py1);
+  }
+  title(main, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex || 1.1, 2);
+    c.fillStyle = "black"; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillText(main, (this.px0 + this.px1) / 2, Math.max(12, this.py1 - 24));
+  }
+  subtitle(sub, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex || 0.85, 1);
+    c.fillStyle = "#555"; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillText(sub, (this.px0 + this.px1) / 2, Math.max(24, this.py1 - 8));
+  }
+  axisLabels(xlab, ylab) {
+    const c = this.ctx;
+    if (xlab) {
+      this._font(0.95, 1); c.fillStyle = "black"; c.textAlign = "center"; c.textBaseline = "alphabetic";
+      c.fillText(xlab, (this.px0 + this.px1) / 2, this.H - 6);
+    }
+    if (ylab) {
+      c.save(); this._font(0.95, 1); c.fillStyle = "black";
+      c.translate(11, (this.py0 + this.py1) / 2); c.rotate(-Math.PI / 2);
+      c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(ylab, 0, 0); c.restore();
+    }
+  }
+  legend(pos, o = {}) {
+    const c = this.ctx;
+    const cex = o.cex || 0.82;
+    this._font(cex, 1);
+    const items = o.legend;
+    const pad = 6, sw = 20, gap = 6;
+    const lh = BASE_FONT * cex * 1.5;
+    const boxW = 2 * pad + sw + gap + Math.max(...items.map((t) => c.measureText(t).width));
+    const boxH = 2 * pad + items.length * lh;
+    let x, y;
+    if (pos === "topright") { x = this.px1 - boxW - 4; y = this.py1 + 4; }
+    else if (pos === "topleft") { x = this.px0 + 4; y = this.py1 + 4; }
+    else if (pos === "bottomright") { x = this.px1 - boxW - 4; y = this.py0 - boxH - 4; }
+    else { x = this.px0 + 4; y = this.py0 - boxH - 4; }
+    c.fillStyle = "rgba(255,255,255,0.9)"; c.fillRect(x, y, boxW, boxH);
+    c.strokeStyle = "#999"; c.lineWidth = 1; c.setLineDash([]); c.strokeRect(x, y, boxW, boxH);
+    let cy = y + pad + lh / 2;
+    items.forEach((t, i) => {
+      const cx = x + pad;
+      const pick = (v) => Array.isArray(v) ? v[i] : v;
+      if (o.fill) {
+        c.fillStyle = pick(o.fill); c.fillRect(cx, cy - 6, sw - 4, 12);
+        c.strokeStyle = "#333"; c.lineWidth = 0.8; c.strokeRect(cx, cy - 6, sw - 4, 12);
+      } else {
+        c.strokeStyle = pick(o.col) || "black"; c.lineWidth = pick(o.lwd) || 1;
+        this._lty(pick(o.lty) || 1);
+        c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + sw - 4, cy); c.stroke(); c.setLineDash([]);
+      }
+      c.fillStyle = "black"; c.textAlign = "left"; c.textBaseline = "middle";
+      this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
+      cy += lh;
+    });
+  }
+}
+
+/* ---- canvas plumbing: responsive sizing, redraw registry, click mapping -- */
+
+const CANVASES = [];
+
+function mkCanvas(height, drawFn, opts = {}) {
+  const el = document.createElement("canvas");
+  el.className = "plot";
+  el.style.height = height + "px";
+  el._draw = drawFn;
+  el._h = height;
+  CANVASES.push(el);
+  if (opts.onclick) {
+    el.style.cursor = "pointer";
+    el.addEventListener("click", (ev) => {
+      const r = el.getBoundingClientRect();
+      const pl = el._pl;
+      if (!pl) return;
+      opts.onclick(pl.invX(ev.clientX - r.left), pl.invY(ev.clientY - r.top), pl);
+    });
+  }
+  requestAnimationFrame(() => drawCanvas(el));
+  return el;
+}
+
+function drawCanvas(el) {
+  const cssW = el.clientWidth || (el.parentElement && el.parentElement.clientWidth) || 600;
+  const cssH = el._h;
+  if (!cssW) return;
+  const dpr = window.devicePixelRatio || 1;
+  el.width = Math.round(cssW * dpr);
+  el.height = Math.round(cssH * dpr);
+  const ctx = el.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, cssW, cssH);
+  const pl = new RPlot(ctx, cssW, cssH);
+  el._pl = pl;
+  try { el._draw(pl, cssW, cssH); } catch (e) { console.error(e); }
+}
+
+// Rebuilding a tab throws its old canvases away; drop them from the registry
+// so repeated mode switches don't accumulate detached nodes forever.
+function pruneCanvases() {
+  for (let i = CANVASES.length - 1; i >= 0; i--) if (!CANVASES[i].isConnected) CANVASES.splice(i, 1);
+}
+
+function redrawAll() {
+  pruneCanvases();
+  CANVASES.forEach((el) => { if (el.offsetParent !== null) drawCanvas(el); });
+}
+
+let _rzT = null;
+window.addEventListener("resize", () => { clearTimeout(_rzT); _rzT = setTimeout(redrawAll, 120); });
+
+/* ------------------------------------------------- tiny DOM utilities --- */
+
+function h(html) {
+  const t = document.createElement("template");
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+function slider(id, label, min, max, value, step, fmtFn) {
+  const d = document.createElement("div");
+  d.className = "ctl";
+  d.innerHTML = `<label for="${id}">${label} <span class="slider-val" id="${id}_val"></span></label>
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">`;
+  const inp = d.querySelector("input"), out = d.querySelector(".slider-val");
+  const show = () => { out.textContent = fmtFn ? fmtFn(+inp.value) : inp.value; };
+  inp.addEventListener("input", show);
+  show();
+  return d;
+}
+function select(id, label, choices, selected) {
+  const opts = choices.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(selected) ? " selected" : ""}>${esc(t)}</option>`).join("");
+  return h(`<div class="ctl"><label for="${id}">${label}</label><select id="${id}">${opts}</select></div>`);
+}
+function checkbox(id, label, checked) {
+  return h(`<div class="ctl checkbox"><label><input type="checkbox" id="${id}"${checked ? " checked" : ""}> ${label}</label></div>`);
+}
+function radios(name, label, choices, selected, stacked) {
+  const items = choices.map(([v, t]) =>
+    `<label><input type="radio" name="${name}" value="${esc(v)}"${v === selected ? " checked" : ""}> ${esc(t)}</label>`).join("");
+  return h(`<div class="ctl"><label>${label}</label><div class="radio-row${stacked ? " stacked" : ""}">${items}</div></div>`);
+}
+function helpText(str) { return h(`<p class="help-text">${str}</p>`); }
+function numberInput(id, label, value, min, max, step) {
+  return h(`<div class="ctl"><label for="${id}">${label}</label>
+    <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}"></div>`);
+}
+function readonlyRow(label, value, id, note) {
+  return h(`<div class="ctl"><label>${label}</label>
+    <div class="readonly-val"${id ? ` id="${id}"` : ''}>${value}${note ? ` <span class="ro-note">${note}</span>` : ''}</div></div>`);
+}
+// update a slider's position and its printed value together
+function setSliderValue(id, v, fmtFn) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.value = v;
+  const out = document.getElementById(id + '_val');
+  if (out) out.textContent = fmtFn ? fmtFn(+v) : v;
+}
+const val = (id) => { const e = document.getElementById(id); return e ? e.value : null; };
+const num = (id) => +val(id);
+const chk = (id) => { const e = document.getElementById(id); return e ? e.checked : false; };
+const radioVal = (name) => { const e = document.querySelector(`input[name="${name}"]:checked`); return e ? e.value : null; };
+</script>
+<script>
+/* ============================================================================
+   Shared core.
+
+   SDT and Neyman-Pearson are the SAME two normal distributions and the SAME
+   threshold; only the vocabulary differs. So there is one set of parameters
+   here, and switching mode swaps a label table — the curves do not move.
+
+   Each mode still adds its own apparatus on top (the NP simulation has a
+   "reality" distribution the SDT one has no use for, the SDT simulation has a
+   trial-by-trial confusion matrix); that lives in the per-tab files.
+   ==========================================================================*/
+
+const State = {
+  mode: 'sdt',           // 'sdt' | 'np' | 'compare'
+  tab: 1,                // 1 = Parameters, 2 = Simulation, 3 = Severity
+
+  /* ---- the shared distributions ----
+     dist2 ("noise" / H0) is always N(0, 1) and anchors the scale.
+     dist1 ("signal" / H1) is N(separation, spread). */
+  separation: 1.5,
+  threshold: 1.0,
+  spread: 1.0,
+
+  constraint: 'none',    // none | lr | hit | fa
+  targetLr: 1,
+  targetHit: 0.75,
+  targetFa: 0.05,
+
+  preset: { sdt: 'custom', np: 'custom' },
+
+  /* NP-only. Which of these two is the master decides what n does:
+       npHold 'separation' — d√n is fixed, so n only reinterprets it as
+                             d = (d√n)/√n and the curves never move;
+       npHold 'd'          — Cohen's d is fixed, so raising n pushes the
+                             alternative rightward (separation = d√n) and
+                             power climbs. */
+  nInterp: 25,
+  npHold: 'separation',
+  effectD: 0.3,            // = separation / sqrt(nInterp)
+
+  showLr: false,
+  showLrSlope: false,
+  showSkill: false,
+  separateDists: false,
+
+  core: { d: 1.5, t: 1.0, s: 1.0 },
+};
+
+/* ------------------------------------------------------------- LABELS --- */
+
+const LABELS = {
+  sdt: {
+    modeName: 'Signal Detection Theory',
+    separation: 'Sensitivity (d′)',
+    threshold: 'Criterion (c)',
+    spread: 'Signal Std Dev (σ)',
+    thresholdShort: 'c',
+    separationShort: 'd′',
+    dist1: 'Signal', dist2: 'Noise',
+    state1: 'Signal PRESENT', state2: 'Signal ABSENT',
+    resp1: 'Response: YES', resp2: 'Response: NO',
+    cells: ['Hit', 'Miss', 'False Alarm', 'Correct Rejection'],
+    hitName: 'Hit Rate', faName: 'False Alarm Rate',
+    curveTitle: 'ROC Space',
+    curveX: 'P(False Alarm)', curveY: 'P(Hit)',
+    distTitle: 'Evidence Distributions',
+    distTitleSep: 'Evidence Distributions (Separated by True State)',
+    distX: 'Evidence (x)',
+    skill: 'PSS (Peirce Skill Score)',
+    matrixTitle: 'Magnitude-Aware Confusion Matrix',
+    fixHit: 'Fix hit rate', fixFa: 'Fix false-alarm rate',
+    metricsTitle: 'Metrics',
+    accent: '#1f77b4',
+  },
+  np: {
+    modeName: 'Neyman–Pearson',
+    separation: 'Standardized effect (d√n)',
+    threshold: 'Critical value (z_crit)',
+    spread: 'Alternative Std Dev',
+    thresholdShort: 'z_crit',
+    separationShort: 'd√n',
+    dist1: 'H₁ (alternative)', dist2: 'H₀ (null)',
+    state1: 'H₁ True (effect exists)', state2: 'H₀ True (no effect)',
+    resp1: 'Reject H₀', resp2: 'Fail to Reject H₀',
+    cells: ['Power (1−β)', 'Type II Error (β)', 'Type I Error (α)', 'Correct Retention'],
+    hitName: 'Power (1−β)', faName: 'Alpha (α)',
+    curveTitle: 'Power Function',
+    curveX: 'α  (Type I Error Rate)', curveY: 'Power (1−β)',
+    distTitle: 'Sampling Distributions of the Test Statistic',
+    distTitleSep: 'Sampling Distributions (Separated by Hypothesis)',
+    distX: 'Z-statistic',
+    skill: 'Power − α',
+    matrixTitle: 'Decision Outcome Probabilities',
+    fixHit: 'Fix power', fixFa: 'Fix α',
+    metricsTitle: 'Test Characteristics',
+    accent: '#e07b1a',
+  },
+};
+
+// Comparison mode borrows SDT's labels for anything that needs a single name.
+const L = () => LABELS[State.mode === 'compare' ? 'sdt' : State.mode];
+
+/* ------------------------------------------------------------ SOLVERS --- */
+
+// golden-section search for the minimum of a unimodal fn on [lo, hi]
+function minimize1D(fn, lo, hi, iters = 200) {
+  const gr = (Math.sqrt(5) - 1) / 2;
+  let a = lo, b = hi;
+  let c = b - gr * (b - a), d = a + gr * (b - a);
+  for (let i = 0; i < iters; i++) {
+    if (fn(c) < fn(d)) b = d; else a = c;
+    c = b - gr * (b - a); d = a + gr * (b - a);
+    if (Math.abs(b - a) < 1e-10) break;
+  }
+  return (a + b) / 2;
+}
+
+function computeCore() {
+  const S = State;
+  const d = S.separation, s = S.spread;
+  let t;
+  if (S.constraint === 'lr') {
+    const target = S.targetLr;
+    if (Math.abs(target - 1) < 0.01 && Math.abs(s - 1) < 0.01) {
+      t = d / 2;                       // equal-variance shortcut
+    } else {
+      t = minimize1D((cv) => {
+        const lr = dnorm(cv, d, s) / dnorm(cv, 0, 1);
+        return (lr - target) * (lr - target);
+      }, -3, 6);
+    }
+  } else if (S.constraint === 'hit') {
+    // hit = 1 - pnorm((t - d)/s)  =>  t = d + s * qnorm(1 - hit)
+    // (the R original had this sign inverted, which silently gave 1 - the
+    //  requested hit rate; corrected here.)
+    t = d + s * qnorm(1 - S.targetHit);
+  } else if (S.constraint === 'fa') {
+    t = qnorm(1 - S.targetFa);
+  } else {
+    t = S.threshold;
+  }
+  S.core = { d, t, s };
+  return S.core;
+}
+
+const syncEffectD = () => { State.effectD = State.separation / Math.sqrt(State.nInterp); };
+
+/* The distribution controls, built once and reused by the Parameters tab and
+   the Simulation tab so you can steer from wherever you happen to be looking.
+   `prefix` keeps element ids unique between the two copies. */
+function appendCoreControls(root, prefix, onChange, opts = {}) {
+  const S = State, lab = L();
+  const id = (k) => `${prefix}_${k}`;
+  const useD = (S.mode === 'np' && S.npHold === 'd');
+  const refresh = () => { computeCore(); updateDerivedRow(prefix); onChange(); };
+
+  if (useD) {
+    const dSl = slider(id('effect_d'), "Effect size (Cohen's d):", 0, 1.5, S.effectD, 0.01, (v) => v.toFixed(2));
+    dSl.querySelector('input').addEventListener('input', (e) => {
+      S.effectD = +e.target.value;
+      S.separation = S.effectD * Math.sqrt(S.nInterp);
+      refresh();
+    });
+    root.appendChild(dSl);
+    root.appendChild(readonlyRow(lab.separation, rround(S.separation, 3), id('sep_derived'), '= d√n'));
+  } else {
+    const sepSl = slider(id('separation'), lab.separation + ':', -2, 5, S.separation, 0.01, (v) => v.toFixed(2));
+    sepSl.querySelector('input').addEventListener('input', (e) => {
+      S.separation = +e.target.value; syncEffectD(); refresh();
+    });
+    root.appendChild(sepSl);
+  }
+
+  if (S.constraint === 'none') {
+    const thSl = slider(id('threshold'), lab.threshold + ':', -2, 5, S.threshold, 0.01, (v) => v.toFixed(2));
+    thSl.querySelector('input').addEventListener('input', (e) => { S.threshold = +e.target.value; refresh(); });
+    root.appendChild(thSl);
+  } else {
+    computeCore();
+    root.appendChild(readonlyRow(lab.threshold, rround(S.core.t, 3), id('thr_fixed'), 'fixed by constraint'));
+  }
+
+  if (opts.spread) {
+    const spSl = slider(id('spread'), lab.spread + ':', 0.5, 2.0, S.spread, 0.1, (v) => v.toFixed(1));
+    spSl.querySelector('input').addEventListener('input', (e) => { S.spread = +e.target.value; refresh(); });
+    root.appendChild(spSl);
+  }
+
+  if (opts.n && S.mode === 'np') {
+    const nSl = slider(id('n'), 'Sample size (n):', 5, 200, S.nInterp, 5, (v) => v);
+    nSl.querySelector('input').addEventListener('input', (e) => {
+      S.nInterp = +e.target.value;
+      if (S.npHold === 'd') S.separation = S.effectD * Math.sqrt(S.nInterp); else syncEffectD();
+      refresh();
+    });
+    root.appendChild(nSl);
+    root.appendChild(helpText(S.npHold === 'd'
+      ? 'Holding d fixed, so more data pushes the alternative away from the null and power climbs.'
+      : 'Holding d√n fixed, so n only re-expresses the separation as an effect size — the curves stay put.'));
+  }
+}
+
+function updateDerivedRow(prefix) {
+  const el = document.getElementById(`${prefix}_sep_derived`);
+  if (el) el.innerHTML = `${rround(State.separation, 3)} <span class="ro-note">= d√n</span>`;
+}
+
+function metrics() {
+  const { d, t, s } = State.core;
+  const fa = 1 - pnorm(t);
+  const hit = 1 - pnorm((t - d) / s);
+  const lr = dnorm(t, d, s) / dnorm(t, 0, 1);
+  return {
+    fa, hit,
+    skill: hit - fa,
+    lr,
+    lrPlus: hit / fa,
+    lrMinus: (1 - hit) / (1 - fa),
+  };
+}
+
+/* ------------------------------------------------------------ PRESETS --- */
+
+const PRESETS = {
+  sdt: [
+    ['custom', 'Custom'],
+    ['finley', "Finley's Tornado Data (1884)"],
+  ],
+  np: [
+    ['custom', 'Custom'],
+    ['drug_trial', 'Drug Trial (d = 0.8, n = 25)'],
+    ['ab_test', 'A/B Test (d = 0.3, n = 100)'],
+    ['psych', 'Classic Psychology (d = 0.5, n = 30)'],
+  ],
+};
+
+/* Finley's 1884 tornado verification, the data Peirce wrote about:
+   28 hits, 23 misses, 72 false alarms, 2680 correct rejections.
+   So 51 tornadoes in 2803 occasions — a 1.8% base rate, which is the whole
+   point of the example and why raw accuracy flatters him so badly. */
+const FINLEY = { hits: 28, misses: 23, falseAlarms: 72, correctRejections: 2680 };
+FINLEY.signal = FINLEY.hits + FINLEY.misses;              // 51
+FINLEY.noise = FINLEY.falseAlarms + FINLEY.correctRejections; // 2752
+FINLEY.total = FINLEY.signal + FINLEY.noise;              // 2803
+
+function applyPreset(key) {
+  const S = State;
+  if (key === 'finley') {
+    const hit = Math.min(Math.max(FINLEY.hits / FINLEY.signal, 0.001), 0.999);
+    const fa = Math.min(Math.max(FINLEY.falseAlarms / FINLEY.noise, 0.001), 0.999);
+    S.threshold = qnorm(1 - fa);
+    S.separation = qnorm(hit) + qnorm(1 - fa);
+    S.spread = 1.0;
+    S.constraint = 'none';
+    // carry the actual trial structure into the simulation, base rate and all
+    S.simNTotal = FINLEY.total;
+    S.simPropSignal = FINLEY.signal / FINLEY.total;
+    S.simSpeed = 100;
+    S.simRandomize = true;
+  } else if (key === 'drug_trial' || key === 'ab_test' || key === 'psych') {
+    const spec = { drug_trial: [0.8, 25], ab_test: [0.3, 100], psych: [0.5, 30] }[key];
+    const [d, n] = spec;
+    S.separation = d * Math.sqrt(n);
+    S.spread = 1.0;
+    S.nInterp = n;
+    S.constraint = 'fa';
+    S.targetFa = 0.05;
+  }
+}
+
+/* ------------------------------------------------------------- COLORS --- */
+
+function hexToRgb(hex) {
+  const m = hex.replace('#', '');
+  const full = m.length === 3 ? m.split('').map((c) => c + c).join('') : m;
+  const n = parseInt(full, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function rgba(hex, a) { const [r, g, b] = hexToRgb(hex); return `rgba(${r},${g},${b},${a})`; }
+
+// hit/power, miss/type II, false alarm/type I, correct rejection/retention
+const OUTCOME_COLORS = ['#2ca02c', '#d62728', '#ff7f0e', '#1f77b4'];
+const OUTCOME_RGB = ['44,160,44', '214,39,40', '255,127,14', '31,119,180'];
+
+/* -------------------------------------------------------- SHARED VIEWS --- */
+
+function tableHtml(headers, rows) {
+  return `<table class="tbl"><thead><tr>${headers.map((x) => `<th>${x}</th>`).join('')}</tr></thead>
+    <tbody>${rows.map((r) => `<tr><td class="lbl">${r[0]}</td><td>${r[1]}</td></tr>`).join('')}</tbody></table>`;
+}
+
+// filled region under `ys` down to `baseline`, for x-indices [i0, i1)
+function fillRegion(pl, xs, ys, i0, i1, baseline, color) {
+  if (i1 <= i0) return;
+  pl.ribbon(xs.slice(i0, i1), ys.slice(i0, i1), baseline, { col: color });
+}
+
+/* The outcome matrix. Identical arithmetic in both modes — only the row,
+   column and cell captions change. */
+function buildMatrixHtml(hit, fa, counts) {
+  const lab = L();
+  const tp = hit, fn = 1 - hit, fp = fa, tn = 1 - fa;
+  const cell = (i, prop, count) => {
+    const body = counts
+      ? `${count}<br>(${rround(prop, 3)})`
+      : rround(prop, 3);
+    return `<td style="background-color: rgba(${OUTCOME_RGB[i]},${prop});">${lab.cells[i]}<br>${body}</td>`;
+  };
+  return `<table class="conf-table">
+    <tr><th class="label-cell"></th><th class="label-cell">${lab.resp1}</th><th class="label-cell">${lab.resp2}</th></tr>
+    <tr><th class="label-cell">${lab.state1}</th>
+      ${cell(0, tp, counts && counts[0])}${cell(1, fn, counts && counts[1])}</tr>
+    <tr><th class="label-cell">${lab.state2}</th>
+      ${cell(2, fp, counts && counts[2])}${cell(3, tn, counts && counts[3])}</tr>
+  </table>`;
+}
+
+function buildMetricsTableHtml() {
+  const lab = L(), m = metrics(), S = State;
+  const rows = [
+    [lab.separation, rround(S.core.d, 3)],
+    [lab.threshold, rround(S.core.t, 3)],
+    [lab.faName, rround(m.fa, 4)],
+    [lab.hitName, rround(m.hit, 3)],
+    ['LR (at threshold)', rround(m.lr, 3)],
+    ['LR+', rround(m.lrPlus, 3)],
+    ['LR−', rround(m.lrMinus, 3)],
+    [lab.skill, rround(m.skill, 3)],
+  ];
+  if (State.mode === 'np') {
+    rows.splice(1, 0, ["Effect size (Cohen's d)", rround(S.core.d / Math.sqrt(S.nInterp), 3)]);
+    rows.push(['Beta (β)', rround(1 - m.hit, 3)]);
+    rows.push(['Standard error (1/√n)', rround(1 / Math.sqrt(S.nInterp), 4)]);
+  }
+  return tableHtml(['Metric', 'Value'], rows);
+}
+</script>
+<script>
+/* ============================================================================
+   Tab 1: Parameters. One set of controls, relabelled per mode.
+   ==========================================================================*/
+
+/* ------------------------------------------------------- ROC / POWER --- */
+
+function drawCurvePlot(pl) {
+  const lab = L();
+  const { d, s } = State.core;
+  const m = metrics();
+  // `square` keeps the plot region 1:1 so ROC space actually looks square.
+  pl.setup({ xlim: [0, 1], ylim: [0, 1], square: true, mar: [4, 4.2, 5, 1.5] });
+
+  const xs = [], ys = [];
+  for (let i = 0; i <= 160; i++) {
+    const x = 0.0005 + (i / 160) * 0.999;
+    xs.push(x);
+    ys.push(1 - pnorm((qnorm(1 - x) - d) / s));
+  }
+  pl.lines(xs, ys, { col: 'steelblue', lwd: 2.2 });
+  pl.abline({ slope: 1, intercept: 0, lty: 2, col: '#999' });
+
+  if (State.showSkill) pl.segments(m.fa, m.fa, m.fa, m.hit, { col: 'purple', lwd: 2 });
+  if (State.showLr && State.showLrSlope) {
+    const slope = m.lr, intercept = m.hit - slope * m.fa;
+    pl.abline({ slope, intercept, col: 'darkgreen', lwd: 1.5 });
+    pl.text(0.68, 0.12, `slope = LR = ${rround(m.lr, 2)}`, { col: 'darkgreen', font: 2, cex: 0.8 });
+  }
+  pl.points([m.fa], [m.hit], { col: 'red', cex: 1.7 });
+  pl.axes(); pl.box();
+  pl.axisLabels(lab.curveX, lab.curveY);
+  pl.title(lab.curveTitle);
+  pl.subtitle('click anywhere to move the threshold', {});
+}
+
+function onCurveClick(faRaw, hitRaw) {
+  const fa = Math.min(Math.max(faRaw, 0.001), 0.999);
+  const hit = Math.min(Math.max(hitRaw, 0.001), 0.999);
+  const t = qnorm(1 - fa);
+  State.threshold = t;
+  State.separation = t - qnorm(1 - hit) * State.spread;
+  State.constraint = 'none';
+  State.preset[State.mode] = 'custom';
+  rebuildParamsSidebar();
+}
+
+/* ------------------------------------------------------- DISTRIBUTIONS --- */
+
+function drawDistPlot(pl) {
+  const lab = L();
+  const { d, t, s } = State.core;
+  const xMin = -4, xMax = Math.max(8, d + 4 * s);
+  const n = 400;
+  const xs = new Array(n);
+  for (let i = 0; i < n; i++) xs[i] = xMin + (i / (n - 1)) * (xMax - xMin);
+  const noise = xs.map((x) => dnorm(x, 0, 1));
+  const signal = xs.map((x) => dnorm(x, d, s));
+  let split = xs.findIndex((x) => x > t);
+  if (split === -1) split = n;
+
+  /* Anchor the y-axis to the (fixed) noise peak rather than autoscaling to
+     whichever curve is currently tallest. Otherwise widening the spread
+     lowers the signal peak, which rescales the axis, which makes the
+     *unchanged* noise curve appear to move too. */
+  const noisePeak = dnorm(0, 0, 1);
+  const alpha = 0.55;
+
+  if (State.separateDists) {
+    const yTop = Math.max(noisePeak, Math.max(...signal)) * 1.25;
+    const off = -0.45 * (yTop / 0.5);
+    const noiseOff = noise.map((v) => v + off);
+    pl.setup({ xlim: [xMin, xMax], ylim: [off - 0.05, yTop], mar: [4, 4.2, 4, 1.5] });
+    fillRegion(pl, xs, signal, split, n, 0, rgba(OUTCOME_COLORS[0], alpha));
+    fillRegion(pl, xs, signal, 0, split, 0, rgba(OUTCOME_COLORS[1], alpha));
+    pl.lines(xs, signal, { col: 'steelblue', lwd: 2 });
+    fillRegion(pl, xs, noiseOff, split, n, off, rgba(OUTCOME_COLORS[2], alpha));
+    fillRegion(pl, xs, noiseOff, 0, split, off, rgba(OUTCOME_COLORS[3], alpha));
+    pl.lines(xs, noiseOff, { col: 'steelblue', lwd: 2, lty: 2 });
+    pl.abline({ v: t, col: 'black', lwd: 2 });
+    pl.abline({ h: off, col: '#999', lty: 3 });
+    pl.abline({ h: 0, col: 'black', lwd: 0.7 });
+    pl.text(xMin + 0.5, yTop * 0.86, lab.state1, { adj: 0, font: 2, cex: 0.85 });
+    pl.text(xMin + 0.5, off * 0.28, lab.state2, { adj: 0, font: 2, cex: 0.85 });
+    pl.axes({ yat: [] }); pl.box();
+    pl.title(lab.distTitleSep, { cex: 1.0 });
+    pl.axisLabels(lab.distX, 'Density');
+  } else {
+    const yMax = Math.max(noisePeak, Math.max(...signal)) * 1.2;
+    pl.setup({ xlim: [xMin, xMax], ylim: [0, yMax], mar: [4, 4.2, 4, 1.5] });
+    fillRegion(pl, xs, signal, split, n, 0, rgba(OUTCOME_COLORS[0], alpha));
+    fillRegion(pl, xs, signal, 0, split, 0, rgba(OUTCOME_COLORS[1], alpha));
+    fillRegion(pl, xs, noise, split, n, 0, rgba(OUTCOME_COLORS[2], alpha));
+    fillRegion(pl, xs, noise, 0, split, 0, rgba(OUTCOME_COLORS[3], alpha));
+    pl.lines(xs, noise, { col: 'steelblue', lwd: 2, lty: 2 });
+    pl.lines(xs, signal, { col: 'steelblue', lwd: 2 });
+    pl.abline({ v: t, col: 'black', lwd: 2 });
+    pl.abline({ h: 0, col: 'black', lwd: 0.7 });
+    if (State.showLr) {
+      const m = metrics();
+      pl.points([t], [dnorm(t, 0, 1)], { pch: 21, col: 'black', fill: 'white', cex: 1.3 });
+      pl.points([t], [dnorm(t, d, s)], { pch: 21, col: 'black', fill: 'white', cex: 1.3 });
+      pl.text(t + 0.95, yMax * 0.85, `LR = ${rround(m.lr, 2)}`, { font: 2, cex: 0.85 });
+    }
+    pl.axes(); pl.box();
+    pl.title(lab.distTitle, { cex: 1.0 });
+    pl.axisLabels(lab.distX, 'Density');
+  }
+  pl.legend('topright', { legend: lab.cells, fill: OUTCOME_COLORS, cex: 0.7 });
+}
+
+/* -------------------------------------------------------------- BUILD --- */
+
+const Params = { curveCanvas: null, distCanvas: null, matrixEl: null, metricsEl: null };
+
+function renderParams() {
+  computeCore();
+  const lab = L(), m = metrics();
+  if (Params.curveCanvas) drawCanvas(Params.curveCanvas);
+  if (Params.distCanvas) drawCanvas(Params.distCanvas);
+  if (Params.matrixEl) Params.matrixEl.innerHTML = buildMatrixHtml(m.hit, m.fa);
+  if (Params.metricsEl) Params.metricsEl.innerHTML = buildMetricsTableHtml();
+  const mt = $('#matrix-title'); if (mt) mt.textContent = lab.matrixTitle;
+  const mh = $('#metrics-header'); if (mh) mh.textContent = lab.metricsTitle;
+}
+
+function rebuildParamsSidebar() {
+  const root = $('#params-sidebar');
+  if (!root) return;
+  const S = State, lab = L();
+  root.innerHTML = '';
+
+  root.appendChild(h('<h4>Preset Scenarios</h4>'));
+  const presetSel = select('preset', 'Load Preset:', PRESETS[S.mode], S.preset[S.mode]);
+  presetSel.querySelector('select').addEventListener('change', (e) => {
+    S.preset[S.mode] = e.target.value;
+    if (e.target.value !== 'custom') applyPreset(e.target.value);
+    rebuildParamsSidebar();
+    updateFinleyNote();
+  });
+  root.appendChild(presetSel);
+  root.appendChild(h('<hr>'));
+
+  // ---- constraint mode: the same four options, named for the mode ----
+  const cmode = radios('constraint', 'Constraint Mode:', [
+    ['none', 'None (set threshold directly)'],
+    ['lr', 'Fix likelihood ratio'],
+    ['hit', lab.fixHit],
+    ['fa', lab.fixFa],
+  ], S.constraint, true);
+  cmode.querySelectorAll('input').forEach((r) => r.addEventListener('change', (e) => {
+    S.constraint = e.target.value; rebuildParamsSidebar();
+  }));
+  root.appendChild(cmode);
+
+  if (S.constraint === 'lr') {
+    const ni = numberInput('target_lr', 'Target likelihood ratio:', S.targetLr, 0.01, 50, 0.1);
+    ni.querySelector('input').addEventListener('input', (e) => { S.targetLr = +e.target.value; renderParams(); });
+    root.appendChild(ni);
+  } else if (S.constraint === 'hit') {
+    const sl = slider('target_hit', `Target ${lab.hitName}:`, 0.01, 0.99, S.targetHit, 0.01, (v) => v.toFixed(2));
+    sl.querySelector('input').addEventListener('input', (e) => { S.targetHit = +e.target.value; renderParams(); });
+    root.appendChild(sl);
+  } else if (S.constraint === 'fa') {
+    const sl = slider('target_fa', `Target ${lab.faName}:`, 0.001, 0.5, S.targetFa, 0.001, (v) => v.toFixed(3));
+    sl.querySelector('input').addEventListener('input', (e) => { S.targetFa = +e.target.value; renderParams(); });
+    root.appendChild(sl);
+  }
+  root.appendChild(h('<hr>'));
+
+  // ---- the shared distribution parameters ----
+  root.appendChild(h('<h4>Distribution Parameters</h4>'));
+  appendCoreControls(root, 'p', renderParams, { spread: true });
+
+  // ---- NP-only: sample size, and what it is allowed to move ----
+  if (S.mode === 'np') {
+    root.appendChild(h('<hr>'));
+    root.appendChild(h('<h4>Sample Size</h4>'));
+    const hold = radios('np_hold', 'When n changes, hold fixed:', [
+      ['separation', 'Standardized effect (d√n)'],
+      ['d', "Effect size (Cohen's d)"],
+    ], S.npHold, true);
+    hold.querySelectorAll('input').forEach((r) => r.addEventListener('change', (e) => {
+      S.npHold = e.target.value;
+      syncEffectD();          // adopt the current picture; nothing jumps
+      rebuildParamsSidebar();
+    }));
+    root.appendChild(hold);
+    appendCoreControls(root, 'pn', renderParams, { n: true });
+  }
+  root.appendChild(h('<hr>'));
+
+  const cbLr = checkbox('show_lr', 'Show likelihood ratios', S.showLr);
+  cbLr.querySelector('input').addEventListener('change', (e) => { S.showLr = e.target.checked; rebuildParamsSidebar(); });
+  root.appendChild(cbLr);
+  if (S.showLr) {
+    const cbSlope = checkbox('show_lr_slope', 'Show LR as slope on the curve', S.showLrSlope);
+    cbSlope.querySelector('input').addEventListener('change', (e) => { S.showLrSlope = e.target.checked; renderParams(); });
+    root.appendChild(cbSlope);
+  }
+  const cbSkill = checkbox('show_skill', `Show ${lab.skill}`, S.showSkill);
+  cbSkill.querySelector('input').addEventListener('change', (e) => { S.showSkill = e.target.checked; renderParams(); });
+  root.appendChild(cbSkill);
+  const cbSep = checkbox('separate_dists', 'Separate the two distributions', S.separateDists);
+  cbSep.querySelector('input').addEventListener('change', (e) => { S.separateDists = e.target.checked; renderParams(); });
+  root.appendChild(cbSep);
+
+  root.appendChild(h('<hr>'));
+  root.appendChild(h(`<h4 id="metrics-header">${lab.metricsTitle}</h4>`));
+  const metricsDiv = h('<div></div>');
+  root.appendChild(metricsDiv);
+  Params.metricsEl = metricsDiv;
+
+  renderParams();
+}
+
+function buildParamsTab() {
+  const container = $('#tab1');
+  container.innerHTML = '';
+  const row = h('<div class="row"></div>');
+  const sidebarCol = h('<div class="col col-4"><div class="sidebar" id="params-sidebar"></div></div>');
+  const mainCol = h('<div class="col col-8"></div>');
+
+  const curveWrap = h('<div class="plot-container"></div>');
+  Params.curveCanvas = mkCanvas(400, drawCurvePlot, { onclick: onCurveClick });
+  curveWrap.appendChild(Params.curveCanvas);
+  mainCol.appendChild(curveWrap);
+
+  const distWrap = h('<div class="plot-container"></div>');
+  Params.distCanvas = mkCanvas(340, drawDistPlot);
+  distWrap.appendChild(Params.distCanvas);
+  mainCol.appendChild(distWrap);
+
+  mainCol.appendChild(h('<h4 id="matrix-title"></h4>'));
+  const matrixDiv = h('<div></div>');
+  mainCol.appendChild(matrixDiv);
+  Params.matrixEl = matrixDiv;
+
+  row.appendChild(sidebarCol); row.appendChild(mainCol);
+  container.appendChild(row);
+  rebuildParamsSidebar();
+}
+</script>
+<script>
+/* ============================================================================
+   Tab 2: Simulation.
+
+   Both modes sample from the SAME two distributions set on the Parameters
+   tab. What differs is the apparatus each mode needs on top:
+     SDT — a stream of trials, classified into the four outcome cells.
+     NP  — one sample of size n, plus a "reality" distribution that may sit
+           anywhere (not just on H0 or H1), so you can watch a Type I/II
+           error actually happen.
+   ==========================================================================*/
+
+Object.assign(State, {
+  simNTotal: 200, simPropSignal: 0.5, simRandomize: false, simSpeed: 10, simSeparate: false,
+  trueMeanSim: 0, simSpeedNp: 5, showSeverityShading: false,
+  simSdt: { observations: [], labels: [], idx: 0, running: false, timer: null },
+  simNp: {
+    sampleData: [], idx: 0, running: false, timer: null, completed: false,
+    trueMean: null, se: null, zCrit: null, n: null,
+    sampleMean: null, zStatistic: null, pValue: null, decision: null,
+  },
+});
+
+function shuffleIdx(n) {
+  const a = Array.from({ length: n }, (_, i) => i);
+  for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+function severityClass(sev) {
+  if (sev >= 0.95) return ['severity-high', 'Very High'];
+  if (sev >= 0.84) return ['severity-high', 'High'];
+  if (sev >= 0.5) return ['severity-medium', 'Moderate'];
+  return ['severity-low', 'Low (BENT)'];
+}
+const effectSize = () => State.core.d / Math.sqrt(State.nInterp);
+
+/* The proportion slider is coarse next to a base rate like Finley's 51/2803
+   (1.82%), so the split is always computed from State — which keeps the exact
+   fraction a preset put there — and shown as counts. */
+function trialSplit() {
+  const nSig = Math.round(State.simNTotal * State.simPropSignal);
+  return { nSig, nNoi: State.simNTotal - nSig };
+}
+function updateTrialCounts() {
+  const el = document.getElementById('trial-counts');
+  if (!el) return;
+  const { nSig, nNoi } = trialSplit(), lab = L();
+  el.textContent = `${nSig} ${lab.dist1.toLowerCase()} · ${nNoi} ${lab.dist2.toLowerCase()}`
+    + ` — base rate ${rround(State.simPropSignal * 100, 2)}%`;
+}
+
+/* ========================================================== SDT BRANCH === */
+
+function classifyOutcome(v, lab, t) { return lab === 'signal' ? (v > t ? 0 : 1) : (v > t ? 2 : 3); }
+
+function drawSimHist(pl) {
+  const S = State.simSdt, lab = L();
+  if (!S.observations.length || S.idx === 0) {
+    pl.setup({ xlim: [0, 1], ylim: [0, 1], mar: [2, 2, 2, 2] });
+    pl.text(0.5, 0.5, "Click ‘Run Simulation’ to begin", { col: '#999' });
+    return;
+  }
+  const obs = S.observations.slice(0, S.idx), labels = S.labels.slice(0, S.idx);
+  const { d, t, s } = State.core;
+  const xMin = -4, xMax = Math.max(8, d + 4 * s), nbins = 50, bw = (xMax - xMin) / nbins;
+  const binIndex = (v) => Math.max(0, Math.min(nbins - 1, Math.floor((v - xMin) / bw)));
+  const n = 400; const tx = new Array(n);
+  for (let i = 0; i < n; i++) tx[i] = xMin + (i / (n - 1)) * (xMax - xMin);
+  /* The bars are relative frequencies, so the overlaid curves have to be
+     densities × bin width — and, in the pooled view, × each class's share of
+     the sample. Without the share the curves float far above the bars as soon
+     as the base rate is lopsided (Finley's tornadoes are 1.8% of trials).
+     The R original omitted both factors; it only looked right at 50/50. */
+  const tNoise = tx.map((x) => dnorm(x, 0, 1));
+  const tSignal = tx.map((x) => dnorm(x, d, s));
+
+  if (State.simSeparate) {
+    const sig = [new Array(nbins).fill(0), new Array(nbins).fill(0)];
+    const noi = [new Array(nbins).fill(0), new Array(nbins).fill(0)];
+    let nSig = 0, nNoi = 0;
+    for (let i = 0; i < obs.length; i++) {
+      const k = classifyOutcome(obs[i], labels[i], t), b = binIndex(obs[i]);
+      if (labels[i] === 'signal') { sig[k][b]++; nSig++; } else { noi[k - 2][b]++; nNoi++; }
+    }
+    // each panel is normalised within its own class, so bin width alone
+    const cSignal = tSignal.map((v) => v * bw);
+    const cNoise = tNoise.map((v) => v * bw);
+    const sigMax = Math.max(...sig[0], ...sig[1]) / Math.max(nSig, 1);
+    const noiMax = Math.max(...noi[0], ...noi[1]) / Math.max(nNoi, 1);
+    const yTop = Math.max(sigMax, Math.max(...cSignal)) * 1.25;
+    const yBot = Math.max(noiMax, Math.max(...cNoise)) * 1.25;
+    pl.setup({ xlim: [xMin, xMax], ylim: [-yBot, yTop], mar: [4, 4.2, 4, 1.5] });
+    [0, 1].forEach((k) => {
+      for (let i = 0; i < nbins; i++) {
+        const f = sig[k][i] / Math.max(nSig, 1);
+        if (f > 0) pl.ribbon([xMin + i * bw, xMin + (i + 1) * bw], [f, f], 0, { col: rgba(OUTCOME_COLORS[k], 0.7) });
+      }
+    });
+    [0, 1].forEach((k) => {
+      for (let i = 0; i < nbins; i++) {
+        const f = noi[k][i] / Math.max(nNoi, 1);
+        if (f > 0) pl.ribbon([xMin + i * bw, xMin + (i + 1) * bw], [-f, -f], 0, { col: rgba(OUTCOME_COLORS[k + 2], 0.7) });
+      }
+    });
+    pl.lines(tx, cSignal, { col: 'black', lwd: 1.6 });
+    pl.lines(tx, cNoise.map((v) => -v), { col: 'black', lwd: 1.6, lty: 2 });
+    pl.abline({ v: t, col: 'black', lwd: 2 });
+    pl.abline({ h: 0, col: '#999', lty: 3 });
+    pl.text(xMin + 0.5, yTop * 0.86, lab.state1, { adj: 0, font: 2, cex: 0.8 });
+    pl.text(xMin + 0.5, -yBot * 0.86, lab.state2, { adj: 0, font: 2, cex: 0.8 });
+    pl.axes({ yat: [] }); pl.box();
+  } else {
+    const counts = [0, 1, 2, 3].map(() => new Array(nbins).fill(0));
+    for (let i = 0; i < obs.length; i++) counts[classifyOutcome(obs[i], labels[i], t)][binIndex(obs[i])]++;
+    const total = obs.length || 1;
+    // pooled view: weight each curve by its class's share of the sample
+    let nSig = 0;
+    for (let i = 0; i < labels.length; i++) if (labels[i] === 'signal') nSig++;
+    const cSignal = tSignal.map((v) => v * bw * (nSig / total));
+    const cNoise = tNoise.map((v) => v * bw * ((total - nSig) / total));
+    const yMax = Math.max(
+      Math.max(...counts.flat()) / total,
+      Math.max(...cSignal, ...cNoise)
+    ) * 1.25;
+    pl.setup({ xlim: [xMin, xMax], ylim: [0, yMax], mar: [4, 4.2, 4, 1.5] });
+    [3, 2, 1, 0].forEach((k) => {
+      for (let i = 0; i < nbins; i++) {
+        const f = counts[k][i] / total;
+        if (f > 0) pl.ribbon([xMin + i * bw, xMin + (i + 1) * bw], [f, f], 0, { col: rgba(OUTCOME_COLORS[k], 0.65) });
+      }
+    });
+    pl.lines(tx, cNoise, { col: 'black', lwd: 1.6, lty: 2 });
+    pl.lines(tx, cSignal, { col: 'black', lwd: 1.6 });
+    pl.abline({ v: t, col: 'black', lwd: 2 });
+    pl.axes(); pl.box();
+  }
+  pl.title(`Simulated Trials (n = ${S.idx})`, { cex: 1.0 });
+  pl.axisLabels(lab.distX, 'Relative Frequency');
+  pl.legend('topright', { legend: lab.cells, fill: OUTCOME_COLORS, cex: 0.7 });
+}
+
+function sdtSimCounts() {
+  const S = State.simSdt, { t } = State.core;
+  const obs = S.observations.slice(0, S.idx), labels = S.labels.slice(0, S.idx);
+  const c = [0, 0, 0, 0];
+  for (let i = 0; i < obs.length; i++) c[classifyOutcome(obs[i], labels[i], t)]++;
+  return { c, totalSignal: c[0] + c[1], totalNoise: c[2] + c[3] };
+}
+function buildSdtSimMatrixHtml() {
+  const S = State.simSdt;
+  if (!S.observations.length || S.idx === 0) return '<p class="help-text">No trials yet.</p>';
+  const { c, totalSignal, totalNoise } = sdtSimCounts();
+  const hit = totalSignal ? c[0] / totalSignal : 0;
+  const fa = totalNoise ? c[2] / totalNoise : 0;
+  return buildMatrixHtml(hit, fa, c);
+}
+function buildSdtCountsTableHtml() {
+  const S = State.simSdt, lab = L();
+  if (!S.observations.length || S.idx === 0) return '<p class="help-text">No trials yet.</p>';
+  const { c } = sdtSimCounts();
+  return tableHtml(['Outcome', 'Count'], lab.cells.map((name, i) => [name, c[i]]));
+}
+
+/* =========================================================== NP BRANCH === */
+
+function drawNpSimPlot(pl) {
+  const S = State.simNp, lab = L();
+  const n = State.nInterp, se = 1 / Math.sqrt(n);
+  const zCrit = State.core.t, mu1 = effectSize();
+
+  const previewing = !S.sampleData.length || S.idx === 0;
+  const trueMean = previewing ? State.trueMeanSim : S.trueMean;
+  const seUsed = previewing ? se : S.se;
+  const xCrit = (previewing ? zCrit : S.zCrit) * seUsed;
+
+  let xMin, xMax, data = [], currentMean = 0;
+  if (previewing) {
+    xMin = Math.min(-3.2 * seUsed, trueMean - 3.2 * seUsed);
+    xMax = Math.max(3.2 * seUsed, mu1 + 3.2 * seUsed, trueMean + 3.2 * seUsed);
+  } else {
+    data = S.sampleData.slice(0, S.idx);
+    currentMean = data.reduce((a, b) => a + b, 0) / data.length;
+    xMin = Math.min(-3 * seUsed, Math.min(...data) - seUsed, currentMean - 2 * seUsed);
+    xMax = Math.max(3 * seUsed + Math.max(trueMean, mu1), Math.max(...data) + seUsed);
+  }
+
+  const N = 400; const xs = new Array(N);
+  for (let i = 0; i < N; i++) xs[i] = xMin + (i / (N - 1)) * (xMax - xMin);
+  const h0 = xs.map((x) => dnorm(x, 0, seUsed));
+  const h1 = xs.map((x) => dnorm(x, mu1, seUsed));
+  const reality = xs.map((x) => dnorm(x, trueMean, seUsed));
+  const peak = Math.max(...h0);
+  const yMax = peak * 1.4;
+  const floor = previewing ? 0 : -yMax * 0.14;
+
+  pl.setup({ xlim: [xMin, xMax], ylim: [floor, yMax], mar: [4, 4.2, 5, 1.5] });
+
+  if (State.showSeverityShading) {
+    let split = xs.findIndex((x) => x > xCrit); if (split === -1) split = N;
+    fillRegion(pl, xs, h0, split, N, 0, rgba('#ff7f0e', 0.28));
+    fillRegion(pl, xs, reality, split, N, 0, rgba('#2ca02c', 0.28));
+    if (!previewing) fillRegion(pl, xs, reality, 0, split, 0, rgba('#d62728', 0.22));
+  }
+  pl.lines(xs, h0, { col: 'steelblue', lwd: 2, lty: 2 });
+  pl.lines(xs, h1, { col: 'orange', lwd: 2, lty: 3 });
+  pl.lines(xs, reality, { col: 'darkgreen', lwd: 2.4 });
+  pl.abline({ v: xCrit, col: 'black', lwd: 2, lty: 2 });
+
+  pl.text(0, peak * 1.12, 'H₀', { col: 'steelblue', font: 2, cex: 0.85 });
+  pl.text(mu1, Math.max(...h1) * 1.12, 'H₁', { col: 'orange', font: 2, cex: 0.85 });
+  pl.text(trueMean, Math.max(...reality) * 1.26, 'REALITY', { col: 'darkgreen', font: 2, cex: 0.85 });
+
+  if (previewing) {
+    pl.axes(); pl.box();
+    pl.axisLabels('Sample Mean', 'Density');
+    pl.title('Preview: Sampling Distributions', { cex: 1.0 });
+    pl.subtitle(`Reality = ${rround(trueMean, 2)}  |  H₁ = ${rround(mu1, 2)}  |  run the simulation to draw a sample`, { cex: 0.75 });
+    return;
+  }
+
+  const zCurrent = currentMean / S.se;
+  pl.abline({ v: currentMean, col: 'red', lwd: 2.2 });
+  pl.points(data, data.map(() => floor * 0.5), { col: 'rgba(20,20,20,0.45)', cex: 0.9 });
+  pl.text(xCrit, peak * 1.3, `critical\n${rround(S.zCrit, 2)}`, { cex: 0.65 });
+  pl.text(currentMean, peak * 0.72, `x̄ = ${rround(currentMean, 3)}\nz = ${rround(zCurrent, 2)}`, { col: 'red', cex: 0.72 });
+  pl.axes(); pl.box();
+  pl.axisLabels('Sample Mean', 'Density');
+  pl.title(`Hypothesis Test (n = ${S.idx} of ${S.sampleData.length})`, { cex: 1.0 });
+  pl.subtitle(`z = ${rround(zCurrent, 3)}  |  Reality = ${rround(S.trueMean, 2)}`, { cex: 0.75 });
+}
+
+function buildNpSampleStatsHtml() {
+  const S = State.simNp;
+  if (!S.sampleData.length || S.idx === 0) return '<p class="help-text">No sample yet.</p>';
+  const data = S.sampleData.slice(0, S.idx);
+  const mean = data.reduce((a, b) => a + b, 0) / data.length;
+  const variance = data.length > 1 ? data.reduce((a, b) => a + (b - mean) * (b - mean), 0) / (data.length - 1) : 0;
+  const z = mean / S.se, p = 1 - pnorm(z);
+  return tableHtml(['Statistic', 'Value'], [
+    ['Sample size so far', S.idx],
+    ['Sample mean', rround(mean, 4)],
+    ['Sample SD', rround(Math.sqrt(variance), 4)],
+    ['Standard error', rround(S.se, 4)],
+    ['Z-statistic', rround(z, 4)],
+    ['P-value (one-tailed)', p < 0.0001 ? p.toExponential(3) : rround(p, 4)],
+  ]);
+}
+function buildNpDecisionHtml() {
+  const S = State.simNp;
+  if (S.decision == null) return '<p class="help-text">Run the simulation to see the test decision.</p>';
+  const alpha = 1 - pnorm(S.zCrit);
+  const pStr = S.pValue < 0.0001 ? S.pValue.toExponential(3) : rround(S.pValue, 4);
+  if (S.decision === 'reject') {
+    return `<div class="result-box reject-h0"><strong>Decision: REJECT H₀</strong><br>
+      z = ${rround(S.zStatistic, 3)} &gt; ${rround(S.zCrit, 3)} (critical value)<br>
+      p = ${pStr} &lt; α = ${rround(alpha, 4)}</div>`;
+  }
+  return `<div class="result-box fail-reject"><strong>Decision: FAIL TO REJECT H₀</strong><br>
+    z = ${rround(S.zStatistic, 3)} ≤ ${rround(S.zCrit, 3)} (critical value)<br>
+    p = ${pStr} ≥ α = ${rround(alpha, 4)}</div>`;
+}
+function buildNpInterpretationHtml() {
+  const S = State.simNp;
+  if (S.decision == null) return '';
+  const h0True = Math.abs(S.trueMean) < 0.001;
+  let outcome, explanation, cls;
+  if (h0True) {
+    if (S.decision === 'reject') { outcome = 'TYPE I ERROR (False Positive)'; explanation = 'H₀ was true (true mean = 0) but we rejected it.'; cls = 'incorrect-decision'; }
+    else { outcome = 'CORRECT RETENTION'; explanation = 'H₀ was true (true mean = 0) and we correctly failed to reject it.'; cls = 'correct-decision'; }
+  } else if (S.decision === 'reject') {
+    outcome = 'CORRECT DETECTION (Power)'; explanation = `The true mean was ${rround(S.trueMean, 2)}, and we correctly rejected H₀.`; cls = 'correct-decision';
+  } else {
+    outcome = 'TYPE II ERROR (False Negative)'; explanation = `The true mean was ${rround(S.trueMean, 2)}, but we failed to reject H₀.`; cls = 'incorrect-decision';
+  }
+  return `<div class="result-box ${cls}"><strong>Reality: true mean = ${rround(S.trueMean, 2)}</strong><br>
+    <strong>Outcome: ${outcome}</strong><br><br>${explanation}</div>`;
+}
+function buildNpSeverityHtml() {
+  const S = State.simNp;
+  if (S.decision == null) return '<p class="help-text">Run the simulation to see the severity analysis.</p>';
+  const { zStatistic: z, zCrit, se, n } = S;
+  if (S.decision === 'reject') {
+    const sev = pnorm(z), discrepancy = (z - zCrit) * se;
+    const [cls, level] = severityClass(sev);
+    return `<div class="severity-box ${cls}">
+      <strong>Severity for rejecting H₀:</strong> ${rround(sev, 3)} (${level})
+      <div class="severity-bar" style="background: linear-gradient(to right, #4caf50 ${Math.round(sev * 100)}%, #eee ${Math.round(sev * 100)}%);"></div>
+      <p>${rround(sev * 100, 1)}% probability of a less extreme result if H₀ were true.</p>
+      <p><strong>Warranted:</strong> claims of an effect ≥ ${rround(discrepancy, 3)} are severely tested.</p>
+      <p><em>Severity = 1 − p-value when we reject.</em></p>
+    </div>`;
+  }
+  const levels = [[0.2, 'small'], [0.5, 'medium'], [0.8, 'large']];
+  const sevs = levels.map(([dv]) => 1 - pnorm(zCrit - dv * Math.sqrt(n)));
+  let cls, level, msg;
+  if (sevs[2] >= 0.80) { cls = 'severity-high'; level = 'High'; msg = 'Good power for large effects — this is real evidence against them.'; }
+  else if (sevs[1] >= 0.80) { cls = 'severity-medium'; level = 'Moderate'; msg = 'Power for medium effects, but small ones could be missed.'; }
+  else { cls = 'severity-low'; level = 'Low'; msg = 'Low power — failing to reject does NOT rule out an effect.'; }
+  return `<div class="severity-box ${cls}">
+    <strong>Severity for failing to reject H₀:</strong> ${level}
+    <p>Power to have detected an effect of size:</p>
+    ${tableHtml(['Effect', 'Power'], levels.map(([dv, name], i) => [`d = ${dv} (${name})`, `${rround(sevs[i] * 100, 1)}%`]))}
+    <p><strong>Interpretation:</strong> ${msg}</p>
+  </div>`;
+}
+
+/* ------------------------------------------------------------ RUN/RESET --- */
+
+function simProgressText() {
+  if (State.mode === 'sdt') {
+    const S = State.simSdt;
+    if (!S.observations.length) return "Click ‘Run Simulation’ to begin";
+    if (S.running) return `Simulating… ${S.idx} of ${S.observations.length} trials`;
+    return `Simulation complete: ${S.idx} trials`;
+  }
+  const S = State.simNp;
+  if (!S.sampleData.length) return 'Set the true mean (Reality) above, then run the simulation';
+  if (S.running) return `Collecting sample… ${S.idx} of ${S.sampleData.length} observations`;
+  return `Sample complete: ${S.idx} observations`;
+}
+
+function startSim() {
+  computeCore();
+  if (State.mode === 'sdt') {
+    const S = State.simSdt;
+    clearInterval(S.timer);
+    const { nSig, nNoi } = trialSplit();
+    let obs = rnorm(nSig, State.core.d, State.core.s).concat(rnorm(nNoi, 0, 1));
+    let labels = new Array(nSig).fill('signal').concat(new Array(nNoi).fill('noise'));
+    if (State.simRandomize) {
+      const order = shuffleIdx(obs.length);
+      obs = order.map((i) => obs[i]); labels = order.map((i) => labels[i]);
+    }
+    S.observations = obs; S.labels = labels; S.idx = 0; S.running = true;
+    S.timer = setInterval(() => {
+      S.idx += Math.min(State.simSpeed, S.observations.length - S.idx);
+      if (S.idx >= S.observations.length) { S.running = false; clearInterval(S.timer); }
+      renderSim();
+    }, 100);
+  } else {
+    const S = State.simNp;
+    clearInterval(S.timer);
+    const n = State.nInterp, se = 1 / Math.sqrt(n);
+    S.trueMean = State.trueMeanSim; S.se = se; S.zCrit = State.core.t; S.n = n; S.completed = false;
+    S.sampleData = rnorm(n, S.trueMean, 1);
+    S.idx = 0; S.running = true;
+    S.sampleMean = null; S.zStatistic = null; S.pValue = null; S.decision = null;
+    S.timer = setInterval(() => {
+      S.idx += Math.min(State.simSpeedNp, S.sampleData.length - S.idx);
+      if (S.idx >= S.sampleData.length) {
+        S.running = false; S.completed = true; clearInterval(S.timer);
+        const mean = S.sampleData.reduce((a, b) => a + b, 0) / S.sampleData.length;
+        S.sampleMean = mean; S.zStatistic = mean / S.se;
+        S.pValue = 1 - pnorm(S.zStatistic);
+        S.decision = S.zStatistic > S.zCrit ? 'reject' : 'fail';
+      }
+      renderSim();
+    }, 100);
+  }
+  renderSim();
+}
+
+function resetSim() {
+  clearInterval(State.simSdt.timer); clearInterval(State.simNp.timer);
+  State.simSdt = { observations: [], labels: [], idx: 0, running: false, timer: null };
+  State.simNp = {
+    sampleData: [], idx: 0, running: false, timer: null, completed: false,
+    trueMean: null, se: null, zCrit: null, n: null,
+    sampleMean: null, zStatistic: null, pValue: null, decision: null,
+  };
+  renderSim();
+}
+
+/* ------------------------------------------------------------ ASSEMBLY --- */
+
+const Sim = { canvas: null, matrixEl: null, statsEl: null, severityEl: null, decisionEl: null, interpEl: null, progressEl: null };
+
+function renderSim() {
+  if (Sim.canvas) drawCanvas(Sim.canvas);
+  if (State.mode === 'sdt') {
+    if (Sim.matrixEl) Sim.matrixEl.innerHTML = buildSdtSimMatrixHtml();
+    if (Sim.statsEl) Sim.statsEl.innerHTML = buildSdtCountsTableHtml();
+    updateTrialCounts();
+  } else {
+    if (Sim.statsEl) Sim.statsEl.innerHTML = buildNpSampleStatsHtml();
+    if (Sim.decisionEl) Sim.decisionEl.innerHTML = buildNpDecisionHtml();
+    if (Sim.interpEl) Sim.interpEl.innerHTML = buildNpInterpretationHtml();
+    if (Sim.severityEl) Sim.severityEl.innerHTML = buildNpSeverityHtml();
+    refreshNpReadout();
+  }
+  if (Sim.progressEl) Sim.progressEl.textContent = simProgressText();
+}
+
+function refreshNpReadout() {
+  const el = document.getElementById('np-readout');
+  if (!el) return;
+  const m = metrics();
+  el.innerHTML = `d = <strong>${rround(effectSize(), 3)}</strong> ·`
+    + ` α = <strong>${rround(m.fa, 4)}</strong> ·`
+    + ` power = <strong>${rround(m.hit, 3)}</strong>`;
+}
+
+function syncTrueMeanSlider() {
+  const e = document.getElementById('true_mean_sim');
+  if (e) e.value = State.trueMeanSim;
+  const disp = document.getElementById('true_mean_sim_val');
+  if (disp) disp.textContent = (+State.trueMeanSim).toFixed(2);
+}
+
+function buildSimTab() {
+  computeCore();
+  const container = $('#tab2'), S = State, lab = L();
+  container.innerHTML = '';
+  const row = h('<div class="row"></div>');
+  const sidebarCol = h('<div class="col col-4"><div class="sidebar" id="sim-sidebar"></div></div>');
+  const mainCol = h('<div class="col col-8"></div>');
+  const sidebar = sidebarCol.querySelector('#sim-sidebar');
+
+  if (S.mode === 'sdt') {
+    // the same distribution controls as the Parameters tab, so you can steer
+    // from here rather than tabbing back and forth
+    sidebar.appendChild(h('<h4>Distributions</h4>'));
+    appendCoreControls(sidebar, 's', () => renderSim(), { spread: true });
+    sidebar.appendChild(h('<hr>'));
+
+    sidebar.appendChild(h('<h4>Trial Simulation</h4>'));
+    // step 1 so odd totals from a preset (Finley's 2803) land exactly
+    const nSl = slider('n_total', 'Total number of trials:', 10, 3000, S.simNTotal, 1, (v) => v);
+    nSl.querySelector('input').addEventListener('input', (e) => { S.simNTotal = +e.target.value; updateTrialCounts(); });
+    sidebar.appendChild(nSl);
+    const pSl = slider('prop_signal', `Proportion ${lab.dist1.toLowerCase()} trials:`, 0, 1, S.simPropSignal, 0.001, (v) => v.toFixed(3));
+    pSl.querySelector('input').addEventListener('input', (e) => { S.simPropSignal = +e.target.value; updateTrialCounts(); });
+    sidebar.appendChild(pSl);
+    sidebar.appendChild(h('<p class="help-text" id="trial-counts"></p>'));
+    const cbRand = checkbox('randomize_order', 'Randomize trial order', S.simRandomize);
+    cbRand.querySelector('input').addEventListener('change', (e) => { S.simRandomize = e.target.checked; });
+    sidebar.appendChild(cbRand);
+    const spSl = slider('speed', 'Animation speed (trials/frame):', 1, 200, S.simSpeed, 1, (v) => v);
+    spSl.querySelector('input').addEventListener('input', (e) => { S.simSpeed = +e.target.value; });
+    sidebar.appendChild(spSl);
+    const cbSep = checkbox('separate_dists_sim', 'Separate the two distributions', S.simSeparate);
+    cbSep.querySelector('input').addEventListener('change', (e) => { S.simSeparate = e.target.checked; renderSim(); });
+    sidebar.appendChild(cbSep);
+  } else {
+    sidebar.appendChild(h('<h4>Test Parameters</h4>'));
+    appendCoreControls(sidebar, 's', () => { renderSim(); refreshNpReadout(); }, { n: true });
+    sidebar.appendChild(h('<p id="np-readout" class="help-text"></p>'));
+    sidebar.appendChild(h('<hr>'));
+    sidebar.appendChild(h('<h4>The True State of Reality</h4>'));
+    sidebar.appendChild(helpText('Reality need not equal H₀ or H₁ — put it anywhere and watch what the test concludes.'));
+    const btnRow = h('<div></div>');
+    const btnH0 = h('<button class="btn btn-info btn-sm">Snap to H₀</button>');
+    const btnH1 = h('<button class="btn btn-warning btn-sm">Snap to H₁</button>');
+    btnH0.addEventListener('click', () => { S.trueMeanSim = 0; syncTrueMeanSlider(); renderSim(); });
+    btnH1.addEventListener('click', () => { S.trueMeanSim = +effectSize().toFixed(2); syncTrueMeanSlider(); renderSim(); });
+    btnRow.appendChild(btnH0); btnRow.appendChild(btnH1);
+    sidebar.appendChild(btnRow);
+    const tmSl = slider('true_mean_sim', 'True population mean:', -1, 3, S.trueMeanSim, 0.05, (v) => v.toFixed(2));
+    tmSl.querySelector('input').addEventListener('input', (e) => { S.trueMeanSim = +e.target.value; renderSim(); });
+    sidebar.appendChild(tmSl);
+    sidebar.appendChild(h('<hr>'));
+    const cbSev = checkbox('show_severity_shading', 'Show severity shading', S.showSeverityShading);
+    cbSev.querySelector('input').addEventListener('change', (e) => { S.showSeverityShading = e.target.checked; renderSim(); });
+    sidebar.appendChild(cbSev);
+    const spSl = slider('speed_np', 'Animation speed:', 1, 50, S.simSpeedNp, 1, (v) => v);
+    spSl.querySelector('input').addEventListener('input', (e) => { S.simSpeedNp = +e.target.value; });
+    sidebar.appendChild(spSl);
+  }
+
+  sidebar.appendChild(h('<hr>'));
+  const btnRow = h('<div></div>');
+  const runBtn = h('<button class="btn btn-primary">Run Simulation</button>');
+  const resetBtn = h('<button class="btn btn-warning">Reset</button>');
+  runBtn.addEventListener('click', startSim);
+  resetBtn.addEventListener('click', resetSim);
+  btnRow.appendChild(runBtn); btnRow.appendChild(resetBtn);
+  sidebar.appendChild(btnRow);
+  sidebar.appendChild(h('<hr>'));
+
+  const plotWrap = h('<div class="plot-container"></div>');
+  Sim.canvas = mkCanvas(390, S.mode === 'sdt' ? drawSimHist : drawNpSimPlot);
+  plotWrap.appendChild(Sim.canvas);
+  mainCol.appendChild(plotWrap);
+
+  if (S.mode === 'sdt') {
+    sidebar.appendChild(h('<h4>Current Counts</h4>'));
+    const countsDiv = h('<div></div>');
+    sidebar.appendChild(countsDiv); Sim.statsEl = countsDiv;
+
+    mainCol.appendChild(h(`<h4>${lab.matrixTitle} (observed)</h4>`));
+    const matrixDiv = h('<div></div>');
+    mainCol.appendChild(matrixDiv); Sim.matrixEl = matrixDiv;
+    // No severity panel here: severity is about how well a particular result
+    // tested a claim, which does not fit a stream of independent trials.
+    Sim.decisionEl = null; Sim.interpEl = null; Sim.severityEl = null;
+  } else {
+    sidebar.appendChild(h('<h4>Sample Statistics</h4>'));
+    const statsDiv = h('<div></div>');
+    sidebar.appendChild(statsDiv); Sim.statsEl = statsDiv;
+
+    mainCol.appendChild(h('<h4>Test Decision</h4>'));
+    const decDiv = h('<div></div>');
+    mainCol.appendChild(decDiv); Sim.decisionEl = decDiv;
+    mainCol.appendChild(h('<h4>Interpretation</h4>'));
+    const interpDiv = h('<div></div>');
+    mainCol.appendChild(interpDiv); Sim.interpEl = interpDiv;
+    Sim.matrixEl = null;
+
+    mainCol.appendChild(h('<h4>Severity (Mayo)</h4>'));
+    const sevDiv = h('<div></div>');
+    mainCol.appendChild(sevDiv); Sim.severityEl = sevDiv;
+  }
+
+  mainCol.appendChild(h('<hr>'));
+  const progP = h('<p id="sim-progress"></p>');
+  mainCol.appendChild(progP); Sim.progressEl = progP;
+
+  row.appendChild(sidebarCol); row.appendChild(mainCol);
+  container.appendChild(row);
+  renderSim();
+}
+</script>
+<script>
+/* ============================================================================
+   Tab 3: Severity (after Mayo).
+
+   The other two tabs ask what a test does in the long run. This one asks
+   what a PARTICULAR result licenses you to say. A result that barely clears
+   the critical value warrants almost nothing; one far past it warrants a lot.
+
+   Ported from Severity.R's continuous case, in the standardized units the
+   rest of this page uses (H0 at 0, population SD 1, so SE = 1/√n).
+   ==========================================================================*/
+
+Object.assign(State, {
+  sevObserved: 0.40,
+  sevClaim: 0.30,
+  sevAlpha: 0.05,
+  sevN: 25,
+});
+
+const SEV_LABELS = {
+  sdt: {
+    nullName: 'Noise', nullShort: 'noise',
+    claimName: 'Claimed signal strength',
+    observedName: 'Observed evidence',
+    aboveClaim: 'true signal >', belowClaim: 'true signal ≤',
+    xAxis: 'Mean evidence value',
+  },
+  np: {
+    nullName: 'H₀ (μ = 0)', nullShort: 'H₀',
+    claimName: 'Claim μ₁',
+    observedName: 'Observed mean',
+    aboveClaim: 'μ >', belowClaim: 'μ ≤',
+    xAxis: 'Sample mean',
+  },
+};
+const SL = () => SEV_LABELS[State.mode === 'compare' ? 'sdt' : State.mode];
+
+function sevCompute() {
+  const S = State;
+  const se = 1 / Math.sqrt(S.sevN);
+  const critical = qnorm(1 - S.sevAlpha) * se;
+  const reject = S.sevObserved >= critical;
+  const z = (S.sevObserved - S.sevClaim) / se;
+  const severity = reject ? pnorm(z) : 1 - pnorm(z);
+  return { se, critical, reject, z, severity };
+}
+
+function assessLabel(sev) {
+  if (sev >= 0.84) return ['Pass', 'assess-pass'];
+  if (sev >= 0.5) return ['Weak', 'assess-weak'];
+  return ['BENT', 'assess-bent'];
+}
+
+/* ---------------------------------------------------------------- PLOT --- */
+
+function drawSeverityPlot(pl) {
+  const S = State, lab = SL();
+  const { se, critical, reject } = sevCompute();
+  const xMin = Math.min(-4 * se, S.sevClaim - 4 * se, S.sevObserved - 2 * se);
+  const xMax = Math.max(5 * se, S.sevClaim + 4 * se, S.sevObserved + 2 * se);
+  const n = 500; const xs = new Array(n);
+  for (let i = 0; i < n; i++) xs[i] = xMin + (i / (n - 1)) * (xMax - xMin);
+  const h0 = xs.map((x) => dnorm(x, 0, se));
+  const claim = xs.map((x) => dnorm(x, S.sevClaim, se));
+  const peak = Math.max(...h0);
+  const yMax = peak * 1.35;
+
+  pl.setup({ xlim: [xMin, xMax], ylim: [0, yMax], mar: [4, 4.2, 5, 1.5] });
+
+  // rejection region: the tail of the null beyond the critical value
+  let iCrit = xs.findIndex((x) => x >= critical); if (iCrit === -1) iCrit = n;
+  fillRegion(pl, xs, h0, iCrit, n, 0, rgba('#d62728', 0.20));
+
+  /* severity region: under the CLAIM distribution, the outcomes that would
+     have counted against the claim. Rejecting: results no more extreme than
+     what we saw. Not rejecting: results at least as extreme. */
+  let iObs = xs.findIndex((x) => x >= S.sevObserved); if (iObs === -1) iObs = n;
+  if (reject) fillRegion(pl, xs, claim, 0, iObs, 0, rgba('#2ca02c', 0.28));
+  else fillRegion(pl, xs, claim, iObs, n, 0, rgba('#2ca02c', 0.28));
+
+  pl.lines(xs, h0, { col: '#d62728', lwd: 2.2 });
+  pl.lines(xs, claim, { col: '#1565c0', lwd: 2.2, lty: 2 });
+  pl.abline({ v: critical, col: '#ef6c00', lwd: 1.8, lty: 3 });
+  pl.abline({ v: S.sevObserved, col: '#6a1b9a', lwd: 2.4 });
+
+  /* claim, critical and observed often sit within a fraction of an SE of one
+     another, so stagger them by height and hang each off its own side of its
+     line rather than centring on it. */
+  const dx = (xMax - xMin) * 0.015;
+  pl.text(0, peak * 1.10, lab.nullShort, { col: '#d62728', font: 2, cex: 0.85 });
+  pl.text(S.sevClaim - dx, Math.max(...claim) * 1.06, `claim ${rround(S.sevClaim, 2)}`, { col: '#1565c0', adj: 1, font: 2, cex: 0.72 });
+  pl.text(critical - dx, yMax * 0.95, `critical ${rround(critical, 3)}`, { col: '#ef6c00', adj: 1, cex: 0.66 });
+  pl.text(S.sevObserved + dx, yMax * 0.85, `observed ${rround(S.sevObserved, 3)}`, { col: '#6a1b9a', adj: 0, font: 2, cex: 0.7 });
+
+  pl.axes(); pl.box();
+  pl.axisLabels(lab.xAxis, 'Density');
+  pl.title('Rejection region (red) and severity region (green)', { cex: 0.95 });
+  pl.subtitle(`n = ${S.sevN}, SE = ${rround(se, 3)}`, { cex: 0.78 });
+}
+
+/* --------------------------------------------------------------- PANELS --- */
+
+function buildSevDecisionHtml() {
+  const S = State, lab = SL();
+  const { critical, reject } = sevCompute();
+  if (reject) {
+    return `<div class="result-box reject-h0">
+      <strong>Decision: REJECT ${lab.nullShort}</strong><br>
+      observed ${rround(S.sevObserved, 3)} ≥ critical ${rround(critical, 3)}<br>
+      Indication of a real effect above 0.</div>`;
+  }
+  return `<div class="result-box fail-reject">
+    <strong>Decision: DO NOT REJECT ${lab.nullShort}</strong><br>
+    observed ${rround(S.sevObserved, 3)} &lt; critical ${rround(critical, 3)}</div>`;
+}
+
+function buildSevReadoutHtml() {
+  const S = State, lab = SL();
+  const { se, reject, severity } = sevCompute();
+  const [cls, level] = severityClass(severity);
+  const claimText = `${reject ? lab.aboveClaim : lab.belowClaim} ${rround(S.sevClaim, 2)}`;
+  return `<div class="severity-box ${cls}">
+    <strong>Claim:</strong> ${claimText}<br>
+    <strong>Severity:</strong> ${rround(severity, 3)} (${level})
+    <div class="severity-bar" style="background: linear-gradient(to right, #4caf50 ${Math.round(severity * 100)}%, #eee ${Math.round(severity * 100)}%);"></div>
+    <strong>SE:</strong> ${rround(se, 3)}
+  </div>`;
+}
+
+/* The canonical table: claims placed at fixed multiples of the standard
+   error either side of what was actually observed. Because severity depends
+   only on that distance, the column of numbers is the same shape whatever n
+   is — n just changes how much ground each step covers. */
+function buildSevTableHtml() {
+  const S = State, lab = SL();
+  const { se, reject, severity } = sevCompute();
+  const offsets = [-2, -1.5, -1, -0.5, 0, 0.5, 1, 1.5, 2];
+  const rows = offsets.map((k) => {
+    const claimVal = S.sevObserved + k * se;
+    const sev = reject ? pnorm(-k) : pnorm(k);
+    const [assess, cls] = assessLabel(sev);
+    const near = Math.abs(claimVal - S.sevClaim) < se * 0.25;
+    return `<tr class="${near ? 'claim-current' : ''}">
+      <td class="lbl">${reject ? lab.aboveClaim : lab.belowClaim} ${rround(claimVal, 3)}</td>
+      <td>${k === 0 ? '0' : (k > 0 ? '+' : '') + k} SE</td>
+      <td>${rround(sev, 3)}</td>
+      <td class="assess ${cls}">${assess}</td>
+    </tr>`;
+  }).join('');
+  return `<table class="tbl">
+    <thead><tr><th>Claim</th><th>vs observed</th><th>Severity</th><th>Assessment</th></tr></thead>
+    <tbody>${rows}</tbody></table>
+    <p class="help-text">Pass ≥ 0.84 &nbsp;·&nbsp; Weak ≥ 0.5 &nbsp;·&nbsp; below that the claim is
+    <em>BENT</em> — the data would look like this even if it were false.</p>`;
+}
+
+function buildSevInterpretationHtml() {
+  const S = State, lab = SL();
+  const { se, critical, reject, severity } = sevCompute();
+  if (reject) {
+    return `<p>The result cleared the critical value, so ${lab.nullShort} is rejected. How far past
+      it the result fell then matters. Severity for the claim ${lab.aboveClaim}
+      ${rround(S.sevClaim, 2)} is <strong>${rround(severity, 3)}</strong>, the probability of having
+      seen a result no larger than ${rround(S.sevObserved, 3)} if the true value were
+      ${rround(S.sevClaim, 2)}.</p>
+      <p>Raising the claim lowers severity, since a result of this size gives little reason to
+      believe a discrepancy that large. Lowering it raises severity. One rejection therefore
+      supports modest claims well and ambitious ones poorly.</p>
+      <p class="note-block">For the claim tested at the critical value itself, severity is
+      1 − p-value. Observed = ${rround(S.sevObserved, 3)}, critical = ${rround(critical, 3)},
+      SE = ${rround(se, 3)}.</p>`;
+  }
+  return `<p>The result fell short of the critical value, so ${lab.nullShort} is not rejected. On
+    its own that is not evidence that the effect is absent; it depends on whether the test was
+    capable of detecting one.</p>
+    <p>Severity for ${lab.belowClaim} ${rround(S.sevClaim, 2)} is
+    <strong>${rround(severity, 3)}</strong>, the probability of having seen a result at least as
+    large as ${rround(S.sevObserved, 3)} if the true value were ${rround(S.sevClaim, 2)}. High
+    severity means an effect of that size would probably have shown up, so its absence counts
+    against it. Low severity means the test was too imprecise to distinguish the two.</p>
+    <p class="note-block">Raising n shrinks SE (currently ${rround(se, 3)}), which sharpens every
+    claim in the table at once.</p>`;
+}
+
+/* --------------------------------------------------------------- BUILD --- */
+
+const Sev = { canvas: null, decisionEl: null, readoutEl: null, tableEl: null, interpEl: null };
+
+function renderSeverity() {
+  if (Sev.canvas) drawCanvas(Sev.canvas);
+  if (Sev.decisionEl) Sev.decisionEl.innerHTML = buildSevDecisionHtml();
+  if (Sev.readoutEl) Sev.readoutEl.innerHTML = buildSevReadoutHtml();
+  if (Sev.tableEl) Sev.tableEl.innerHTML = buildSevTableHtml();
+  if (Sev.interpEl) Sev.interpEl.innerHTML = buildSevInterpretationHtml();
+}
+
+function buildSeverityTab() {
+  const container = $('#tab3'), S = State, lab = SL();
+  container.innerHTML = '';
+
+  container.appendChild(h(`<div>
+    <p>Severity is Deborah Mayo's criterion for when data count as evidence for a hypothesis.
+    On her account a hypothesis passes a severe test when two conditions are met: the data agree
+    with the hypothesis, and the test was such that, were the hypothesis false, it would very
+    probably have produced data agreeing less well with it than the data actually obtained. The
+    severity of a passing result is the probability attaching to that second condition.</p>
+    <p>This is a question about the particular result rather than about the test's long-run error
+    rates. A result that only just clears the critical value passes an ambitious claim with very
+    little severity, though its reject/do-not-reject verdict is the same as one that clears the
+    critical value comfortably.</p>
+    <p class="citation">Mayo, D. (1996), <em>Error and the Growth of Experimental Knowledge</em>,
+    University of Chicago Press. Mayo, D. &amp; Spanos, A. (2006), &lsquo;Severe Testing as a Basic
+    Concept in a Neyman&ndash;Pearson Philosophy of Induction&rsquo;, <em>British Journal for the
+    Philosophy of Science</em> 57(2), 323&ndash;57. Mayo, D. (2018), <em>Statistical Inference as
+    Severe Testing</em>, Cambridge University Press.</p>
+  </div>`));
+
+  const row = h('<div class="row"></div>');
+  const sidebarCol = h('<div class="col col-4"><div class="sidebar" id="sev-sidebar"></div></div>');
+  const mainCol = h('<div class="col col-8"></div>');
+  const sidebar = sidebarCol.querySelector('#sev-sidebar');
+
+  sidebar.appendChild(h('<h4>The Result</h4>'));
+  const obsSl = slider('sev_observed', lab.observedName + ':', -0.5, 2, S.sevObserved, 0.01, (v) => v.toFixed(2));
+  obsSl.querySelector('input').addEventListener('input', (e) => { S.sevObserved = +e.target.value; renderSeverity(); });
+  sidebar.appendChild(obsSl);
+
+  const claimSl = slider('sev_claim', lab.claimName + ':', -0.5, 2, S.sevClaim, 0.01, (v) => v.toFixed(2));
+  claimSl.querySelector('input').addEventListener('input', (e) => { S.sevClaim = +e.target.value; renderSeverity(); });
+  sidebar.appendChild(claimSl);
+  sidebar.appendChild(h('<hr>'));
+
+  sidebar.appendChild(h('<h4>The Test</h4>'));
+  const alphaSl = slider('sev_alpha', 'Significance level α:', 0.005, 0.20, S.sevAlpha, 0.005, (v) => v.toFixed(3));
+  alphaSl.querySelector('input').addEventListener('input', (e) => { S.sevAlpha = +e.target.value; renderSeverity(); });
+  sidebar.appendChild(alphaSl);
+
+  const nSl = slider('sev_n', 'Sample size (n):', 5, 500, S.sevN, 5, (v) => v);
+  nSl.querySelector('input').addEventListener('input', (e) => { S.sevN = +e.target.value; renderSeverity(); });
+  sidebar.appendChild(nSl);
+  sidebar.appendChild(helpText('Population SD is fixed at 1, so SE = 1/√n.'));
+  sidebar.appendChild(h('<hr>'));
+
+  sidebar.appendChild(h('<h4>Decision</h4>'));
+  const decDiv = h('<div></div>');
+  sidebar.appendChild(decDiv); Sev.decisionEl = decDiv;
+
+  sidebar.appendChild(h('<h4>Severity</h4>'));
+  const readDiv = h('<div></div>');
+  sidebar.appendChild(readDiv); Sev.readoutEl = readDiv;
+
+  const plotWrap = h('<div class="plot-container"></div>');
+  Sev.canvas = mkCanvas(400, drawSeverityPlot);
+  plotWrap.appendChild(Sev.canvas);
+  mainCol.appendChild(plotWrap);
+
+  mainCol.appendChild(h('<h4>Which claims pass severely?</h4>'));
+  const tableDiv = h('<div class="table-scroll"></div>');
+  mainCol.appendChild(tableDiv); Sev.tableEl = tableDiv;
+
+  mainCol.appendChild(h('<h4>Interpretation</h4>'));
+  const interpDiv = h('<div></div>');
+  mainCol.appendChild(interpDiv); Sev.interpEl = interpDiv;
+
+  row.appendChild(sidebarCol); row.appendChild(mainCol);
+  container.appendChild(row);
+  renderSeverity();
+}
+</script>
+<script>
+/* ============================================================================
+   Comparison mode. Not a third framework — the same picture, captioned twice.
+   It reads the shared parameters, so whatever you set in either mode is what
+   you see here.
+   ==========================================================================*/
+
+const SDT_C = '#1565c0';   // blue  = signal-detection vocabulary
+const NP_C = '#e07b1a';    // amber = Neyman-Pearson vocabulary
+
+function drawCompareDist(pl) {
+  const { d, t, s } = State.core;
+  const xMin = -4, xMax = Math.max(7, d + 4 * s);
+  const n = 400; const xs = new Array(n);
+  for (let i = 0; i < n; i++) xs[i] = xMin + (i / (n - 1)) * (xMax - xMin);
+  const noise = xs.map((x) => dnorm(x, 0, 1));
+  const signal = xs.map((x) => dnorm(x, d, s));
+  let split = xs.findIndex((x) => x > t);
+  if (split === -1) split = n;
+  // extra headroom so the threshold captions clear the curve captions
+  const yMax = Math.max(dnorm(0, 0, 1), Math.max(...signal)) * 1.62;
+
+  pl.setup({ xlim: [xMin, xMax], ylim: [0, yMax], mar: [4, 4.2, 4, 1.5] });
+  fillRegion(pl, xs, signal, split, n, 0, rgba(OUTCOME_COLORS[0], 0.45));
+  fillRegion(pl, xs, signal, 0, split, 0, rgba(OUTCOME_COLORS[1], 0.45));
+  fillRegion(pl, xs, noise, split, n, 0, rgba(OUTCOME_COLORS[2], 0.45));
+  fillRegion(pl, xs, noise, 0, split, 0, rgba(OUTCOME_COLORS[3], 0.45));
+  pl.lines(xs, noise, { col: '#555', lwd: 2, lty: 2 });
+  pl.lines(xs, signal, { col: '#555', lwd: 2 });
+  pl.abline({ v: t, col: 'black', lwd: 2 });
+
+  /* The same two curves, named twice. Each pair sits above its own peak; the
+     threshold pair straddles the vertical line (SDT name to its left, NP name
+     to its right) so nothing lands on top of anything else at any spread. */
+  const dx = (xMax - xMin) * 0.015;
+  pl.text(0, dnorm(0, 0, 1) * 1.13, 'Noise', { col: SDT_C, font: 2, cex: 0.8 });
+  pl.text(0, dnorm(0, 0, 1) * 1.27, 'H₀ (null)', { col: NP_C, font: 2, cex: 0.8 });
+  pl.text(d, Math.max(...signal) * 1.13, 'Signal', { col: SDT_C, font: 2, cex: 0.8 });
+  pl.text(d, Math.max(...signal) * 1.27, 'H₁ (alternative)', { col: NP_C, font: 2, cex: 0.8 });
+  pl.text(t - dx, yMax * 0.96, `criterion c = ${rround(t, 2)}`, { col: SDT_C, adj: 1, font: 2, cex: 0.68 });
+  pl.text(t + dx, yMax * 0.96, `critical value z = ${rround(t, 2)}`, { col: NP_C, adj: 0, font: 2, cex: 0.68 });
+
+  pl.axes(); pl.box();
+  pl.axisLabels('Evidence  /  Test statistic', 'Density');
+  pl.title('One threshold, two vocabularies', { cex: 1.0 });
+}
+
+function drawCompareCurve(pl) {
+  const { d, s } = State.core;
+  const m = metrics();
+  pl.setup({ xlim: [0, 1], ylim: [0, 1], square: true, mar: [4, 4.2, 4, 1.5] });
+  const xs = [], ys = [];
+  for (let i = 0; i <= 160; i++) {
+    const x = 0.0005 + (i / 160) * 0.999;
+    xs.push(x); ys.push(1 - pnorm((qnorm(1 - x) - d) / s));
+  }
+  pl.lines(xs, ys, { col: 'steelblue', lwd: 2.2 });
+  pl.abline({ slope: 1, intercept: 0, lty: 2, col: '#999' });
+  pl.segments(m.fa, m.fa, m.fa, m.hit, { col: 'purple', lwd: 2 });
+  pl.points([m.fa], [m.hit], { col: 'red', cex: 1.7 });
+  pl.text(Math.min(m.fa + 0.34, 0.82), (m.fa + m.hit) / 2 + 0.10,
+    `PSS  /  power − α\n= ${rround(m.skill, 3)}`, { col: 'purple', font: 2, cex: 0.68 });
+  pl.axes(); pl.box();
+  pl.axisLabels('P(False Alarm)   /   α', 'P(Hit)   /   Power');
+  pl.title('ROC curve  =  power function', { cex: 1.0 });
+}
+
+function dualRow(sdtName, npName, value) {
+  return `<div class="dual-label">
+    <div class="sdt-col"><span class="lab-name" style="color:${SDT_C}">${sdtName}</span></div>
+    <span class="equals">=</span>
+    <div class="ht-col"><span class="lab-name" style="color:${NP_C}">${npName}</span></div>
+    <div style="flex:0 0 5.5em;text-align:right;align-self:center;" class="lab-val"><strong>${value}</strong></div>
+  </div>`;
+}
+
+function buildCompareMappingHtml() {
+  const { d, t } = State.core;
+  const m = metrics();
+  return [
+    dualRow('Sensitivity (d′)', 'Standardized effect (d√n)', rround(d, 3)),
+    dualRow('Criterion (c)', 'Critical value (z_crit)', rround(t, 3)),
+    dualRow('Hit rate', 'Power (1 − β)', rround(m.hit, 3)),
+    dualRow('False alarm rate', 'Type I error (α)', rround(m.fa, 3)),
+    dualRow('Miss rate', 'Type II error (β)', rround(1 - m.hit, 3)),
+    dualRow('Correct rejection rate', 'Correct retention (1 − α)', rround(1 - m.fa, 3)),
+    dualRow('Likelihood ratio at c', 'Likelihood ratio at z_crit', rround(m.lr, 3)),
+    dualRow('Peirce Skill Score', 'Power − α', rround(m.skill, 3)),
+  ].join('');
+}
+
+const Compare = { distCanvas: null, curveCanvas: null, mapEl: null };
+
+function renderCompare() {
+  computeCore();
+  if (Compare.distCanvas) drawCanvas(Compare.distCanvas);
+  if (Compare.curveCanvas) drawCanvas(Compare.curveCanvas);
+  if (Compare.mapEl) Compare.mapEl.innerHTML = buildCompareMappingHtml();
+}
+
+function buildCompareTab() {
+  const container = $('#tab-compare');
+  container.innerHTML = '';
+
+  container.appendChild(h(`<p class="compare-legend">
+    <span class="swatch-sdt"></span>Signal detection &nbsp;&nbsp;
+    <span class="swatch-ht"></span>Neyman&ndash;Pearson</p>`));
+
+  const ctlRow = h('<div class="row"></div>');
+  const c1 = h('<div class="col col-6"></div>');
+  const c2 = h('<div class="col col-6"></div>');
+  const sepSl = slider('cmp_sep', 'Separation &nbsp;<span style="color:' + SDT_C + '">d′</span> / <span style="color:' + NP_C + '">d√n</span>:', 0, 4, State.separation, 0.05, (v) => v.toFixed(2));
+  sepSl.querySelector('input').addEventListener('input', (e) => {
+    State.separation = +e.target.value; State.constraint = 'none'; renderCompare();
+  });
+  c1.appendChild(sepSl);
+  const thSl = slider('cmp_thr', 'Threshold &nbsp;<span style="color:' + SDT_C + '">c</span> / <span style="color:' + NP_C + '">z_crit</span>:', -1, 4, State.threshold, 0.05, (v) => v.toFixed(2));
+  thSl.querySelector('input').addEventListener('input', (e) => {
+    State.threshold = +e.target.value; State.constraint = 'none'; renderCompare();
+  });
+  c2.appendChild(thSl);
+  ctlRow.appendChild(c1); ctlRow.appendChild(c2);
+  container.appendChild(ctlRow);
+
+  const plotRow = h('<div class="row"></div>');
+  const pc1 = h('<div class="col col-6"></div>');
+  const pc2 = h('<div class="col col-6"></div>');
+  const w1 = h('<div class="plot-container"></div>');
+  Compare.distCanvas = mkCanvas(360, drawCompareDist);
+  w1.appendChild(Compare.distCanvas); pc1.appendChild(w1);
+  const w2 = h('<div class="plot-container"></div>');
+  Compare.curveCanvas = mkCanvas(360, drawCompareCurve);
+  w2.appendChild(Compare.curveCanvas); pc2.appendChild(w2);
+  plotRow.appendChild(pc1); plotRow.appendChild(pc2);
+  container.appendChild(plotRow);
+
+  container.appendChild(h('<h3>Corresponding terms</h3>'));
+  const mapDiv = h('<div></div>');
+  container.appendChild(mapDiv); Compare.mapEl = mapDiv;
+
+  container.appendChild(h(`<p>The likelihood ratio equals the slope of the ROC curve at the
+    operating point. Where the slope is 1 the curve runs parallel to the diagonal and the
+    evidence does not discriminate between the two states. Steeper slopes indicate stronger
+    evidence at that threshold.</p>`));
+
+  renderCompare();
+}
+</script>
+<script>
+/* ============================================================================
+   Wiring. Switching between SDT and Neyman-Pearson rebuilds the panels
+   against the SAME State, so the distributions stay exactly where they were
+   and only the captions change.
+   ==========================================================================*/
+
+const MODES = [
+  ['sdt', 'Signal Detection Theory'],
+  ['np', 'Neyman–Pearson'],
+  ['compare', 'Comparison'],
+];
+// Severity is a Neyman-Pearson idea about what a particular result licenses;
+// it has no natural home in the signal-detection view, so that mode gets two
+// tabs rather than three.
+const tabsFor = (mode) => (mode === 'np'
+  ? ['Parameters', 'Simulation', 'Severity']
+  : ['Parameters', 'Simulation']);
+
+function rebuildAll() {
+  if (State.tab > tabsFor(State.mode).length) State.tab = 1;
+  if (State.mode === 'compare') {
+    buildCompareTab();
+  } else {
+    buildParamsTab();
+    buildSimTab();
+    if (State.mode === 'np') buildSeverityTab(); else $('#tab3').innerHTML = '';
+  }
+  buildTabSwitcher();
+  pruneCanvases();
+  updateFinleyNote();
+  updateVisibility();
+}
+
+// The Finley provenance note only means anything once that preset is loaded.
+function updateFinleyNote() {
+  const el = $('#finley-note');
+  if (el) el.style.display = (State.mode === 'sdt' && State.preset.sdt === 'finley') ? '' : 'none';
+}
+
+function setMode(mode) {
+  if (State.mode === mode) return;
+  // Leaving a running simulation behind would keep repainting a detached canvas.
+  clearInterval(State.simSdt.timer); clearInterval(State.simNp.timer);
+  State.simSdt.running = false; State.simNp.running = false;
+  State.mode = mode;
+  $$('.mode-tab').forEach((b, i) => b.classList.toggle('active', MODES[i][0] === mode));
+  rebuildAll();
+}
+
+/* Rebuild the panel being entered. Its controls are built from State, and
+   State may have moved since (a preset loaded on the Parameters tab changes
+   the trial count and base rate the Simulation tab shows). Rebuilding on
+   entry keeps every panel honest without wiring cross-tab updates. */
+function setTab(n) {
+  State.tab = n;
+  if (State.mode !== 'compare') {
+    if (n === 2) buildSimTab();
+    else if (n === 3 && State.mode === 'np') buildSeverityTab();
+  }
+  pruneCanvases();
+  updateVisibility();
+  redrawAll();
+}
+
+function updateVisibility() {
+  const isCompare = State.mode === 'compare';
+  $('#tab-switcher').style.display = isCompare ? 'none' : '';
+  $('#tab-compare').classList.toggle('active', isCompare);
+  ['#tab1', '#tab2', '#tab3'].forEach((sel, i) => {
+    $(sel).classList.toggle('active', !isCompare && State.tab === i + 1);
+  });
+  $$('.tab-btn').forEach((b, i) => b.classList.toggle('active', State.tab === i + 1));
+}
+
+function buildSwitchers() {
+  const modeEl = $('#mode-switcher');
+  modeEl.innerHTML = '';
+  MODES.forEach(([key, label]) => {
+    const btn = h(`<button class="mode-tab">${label}</button>`);
+    btn.addEventListener('click', () => setMode(key));
+    modeEl.appendChild(btn);
+  });
+  $$('.mode-tab').forEach((b, i) => b.classList.toggle('active', MODES[i][0] === State.mode));
+  buildTabSwitcher();
+}
+
+function buildTabSwitcher() {
+  const tabEl = $('#tab-switcher');
+  tabEl.innerHTML = '';
+  tabsFor(State.mode).forEach((label, i) => {
+    const btn = h(`<button class="tab-btn">${label}</button>`);
+    btn.addEventListener('click', () => setTab(i + 1));
+    tabEl.appendChild(btn);
+  });
+}
+
+buildSwitchers();
+computeCore();
+rebuildAll();
+</script>
+</body>
+</html>
