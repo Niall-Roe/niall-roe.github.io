@@ -194,6 +194,33 @@ const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six",
   "seven", "eight", "nine", "ten"];
 const numberWord = (n) => (n >= 0 && n <= 10 ? NUMBER_WORDS[n] : String(n));
 
+/* Peirce writes his figures out in words ("Ninety-nine Cretans in a hundred"),
+   so a number standing in for one of those has to be spelled as well. */
+const TEENS = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+  "sixteen", "seventeen", "eighteen", "nineteen"];
+const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+  "eighty", "ninety"];
+function spellNumber(n) {
+  n = Math.round(n);
+  if (n < 0 || n > 99) return String(n);
+  if (n <= 9) return NUMBER_WORDS[n];
+  if (n <= 19) return TEENS[n - 10];
+  const t = TENS[Math.floor(n / 10)], u = n % 10;
+  return u ? `${t}-${NUMBER_WORDS[u]}` : t;
+}
+const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* "one-third", "two-thirds", "one-half" — Peirce writes his fractions out in
+   the granary paragraphs, so a fraction standing in for one of his has to be
+   spelled the same way. */
+const FRAC_ORDINALS = ["", "", "half", "third", "fourth", "fifth", "sixth",
+  "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth"];
+function fracWord(n, d) {
+  const ord = FRAC_ORDINALS[d];
+  if (!ord) return `${n}&frasl;${d}`;
+  return `${spellNumber(n)}-${ord}${n === 1 ? "" : "s"}`;
+}
+
 function decimalToFraction(x) {
   const common = { "1/2": 0.5, "1/3": 1/3, "2/3": 2/3, "1/4": 0.25, "3/4": 0.75,
     "1/5": 0.2, "2/5": 0.4, "3/5": 0.6, "4/5": 0.8,
@@ -224,7 +251,25 @@ const frac = (n, d) => `<span class="frac"><span class="num">${n}</span><span cl
    plot(NULL)/rect/text/lines/points/segments/polygon/abline/axis/legend.
    Coordinates passed to these methods are USER (data) coordinates.          */
 
+/* The plots share the page's palette and its typeface. Canvases paint their
+   own background, which is the same white as the article, so with the frames
+   off the plot sits on the page rather than in a panel on it. Names match the
+   CSS custom properties in the head. */
+const PAL = {
+  paper:    "#ffffff",
+  ink:      "#1f2328",
+  inkSoft:  "#575d66",
+  inkFaint: "#8a9099",
+  rule:     "#dbd6cb",
+  ruleSoft: "#ece8df",
+  accent:   "#2f6f9f",
+  accent2:  "#b0563f",
+  accent3:  "#4a7c59",
+  accent4:  "#9a7b3f"
+};
+
 const BASE_FONT = 12;
+const PLOT_FACE = 'Georgia, "Times New Roman", serif';
 
 class RPlot {
   constructor(ctx, cssW, cssH) {
@@ -271,7 +316,7 @@ class RPlot {
     const size = BASE_FONT * (cex || 1);
     const weight = (font === 2) ? "bold " : "";
     const style = (font === 3) ? "italic " : "";
-    this.ctx.font = `${style}${weight}${size}px "Helvetica Neue", Arial, sans-serif`;
+    this.ctx.font = `${style}${weight}${size}px ${PLOT_FACE}`;
     return size;
   }
   _lty(lty) {
@@ -370,17 +415,17 @@ class RPlot {
   title(main, o = {}) {
     const c = this.ctx;
     this._font(o.cex || 1.1, 2);
-    c.fillStyle = "black"; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillStyle = PAL.ink; c.textAlign = "center"; c.textBaseline = "middle";
     c.fillText(main, (this.px0 + this.px1) / 2, Math.max(12, this.py1 - 14));
   }
   axisLabels(xlab, ylab) {
     const c = this.ctx;
     if (xlab) {
-      this._font(0.95, 1); c.fillStyle = "black"; c.textAlign = "center"; c.textBaseline = "alphabetic";
+      this._font(0.95, 1); c.fillStyle = PAL.inkSoft; c.textAlign = "center"; c.textBaseline = "alphabetic";
       c.fillText(xlab, (this.px0 + this.px1) / 2, this.H - 6);
     }
     if (ylab) {
-      c.save(); this._font(0.95, 1); c.fillStyle = "black";
+      c.save(); this._font(0.95, 1); c.fillStyle = PAL.inkSoft;
       c.translate(11, (this.py0 + this.py1) / 2); c.rotate(-Math.PI / 2);
       c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(ylab, 0, 0); c.restore();
     }
@@ -388,7 +433,7 @@ class RPlot {
   /* full numeric axes with automatic ticks (side 1 = bottom, 2 = left) */
   box() {
     const c = this.ctx;
-    c.strokeStyle = "black"; c.lineWidth = 1; c.setLineDash([]);
+    c.strokeStyle = PAL.rule; c.lineWidth = 1; c.setLineDash([]);
     c.strokeRect(this.px0, this.py1, this.px1 - this.px0, this.py0 - this.py1);
   }
   static ticks(lo, hi, n = 5) {
@@ -404,7 +449,7 @@ class RPlot {
   }
   axes(o = {}) {
     const c = this.ctx;
-    c.strokeStyle = "black"; c.fillStyle = "black"; c.lineWidth = 1; c.setLineDash([]);
+    c.strokeStyle = PAL.inkFaint; c.fillStyle = PAL.inkSoft; c.lineWidth = 1; c.setLineDash([]);
     this._font(0.85, 1);
     const xt = o.xat || RPlot.ticks(this.xlim[0], this.xlim[1], o.nx || 5);
     const yt = o.yat || RPlot.ticks(this.ylim[0], this.ylim[1], o.ny || 5);
@@ -428,7 +473,7 @@ class RPlot {
   /* bare label rows, like R's axis(side, at, labels, tick = FALSE) */
   axisPlain(side, at, labels, o = {}) {
     const c = this.ctx;
-    this._font(o.cex || 0.8, 1); c.fillStyle = "black";
+    this._font(o.cex || 0.8, 1); c.fillStyle = PAL.inkSoft;
     at.forEach((v, i) => {
       const lab = String(labels[i]);
       if (side === 1) { c.textAlign = "center"; c.textBaseline = "top"; c.fillText(lab, this.X(v), this.py0 + 4); }
@@ -438,7 +483,7 @@ class RPlot {
   }
   grid(o = {}) {
     const c = this.ctx;
-    c.strokeStyle = o.col || "#c8c8c8"; c.lineWidth = 1; this._lty(3);
+    c.strokeStyle = o.col || "#cfcabf"; c.lineWidth = 1; this._lty(3);
     if (o.ny !== null) RPlot.ticks(this.ylim[0], this.ylim[1], 5).forEach((v) => {
       const py = this.Y(v);
       if (py > this.py0 || py < this.py1) return;
@@ -472,18 +517,18 @@ class RPlot {
     else if (pos === "bottomright") { x = this.px1 - boxW - 4; y = this.py0 - boxH - 4; }
     else { /* bottom */ x = (this.px0 + this.px1) / 2 - boxW / 2; y = this.py0 + (o.inset || 20); }
     if (o.bg !== "n") { c.fillStyle = o.bg || "rgba(255,255,255,0.88)"; c.fillRect(x, y, boxW, boxH); }
-    if (o.bty !== "n" && o.bg !== "n") { c.strokeStyle = "#999"; c.lineWidth = 1; c.setLineDash([]); c.strokeRect(x, y, boxW, boxH); }
+    if (o.bty !== "n" && o.bg !== "n") { c.strokeStyle = PAL.ruleSoft; c.lineWidth = 1; c.setLineDash([]); c.strokeRect(x, y, boxW, boxH); }
     let cx = x + pad, cy = y + pad + lh / 2;
     items.forEach((t, i) => {
       if (o.horiz) {
         const w = sw + gap + c.measureText(t).width + 12;
         this._drawKey(cx, cy, sw, o, i);
-        c.fillStyle = "black"; c.textAlign = "left"; c.textBaseline = "middle";
+        c.fillStyle = PAL.ink; c.textAlign = "left"; c.textBaseline = "middle";
         this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
         cx += w;
       } else {
         this._drawKey(cx, cy, sw, o, i);
-        c.fillStyle = "black"; c.textAlign = "left"; c.textBaseline = "middle";
+        c.fillStyle = PAL.ink; c.textAlign = "left"; c.textBaseline = "middle";
         this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
         cy += lh;
       }
@@ -494,7 +539,7 @@ class RPlot {
     const pick = (v) => Array.isArray(v) ? v[i] : v;
     if (o.fill) {
       c.fillStyle = pick(o.fill); c.fillRect(cx, cy - 6, sw - 4, 12);
-      c.strokeStyle = "#333"; c.lineWidth = 0.8; c.setLineDash([]); c.strokeRect(cx, cy - 6, sw - 4, 12);
+      c.strokeStyle = "#3a3f45"; c.lineWidth = 0.8; c.setLineDash([]); c.strokeRect(cx, cy - 6, sw - 4, 12);
     } else {
       c.strokeStyle = pick(o.col) || "black";
       c.lineWidth = pick(o.lwd) || 1;
@@ -540,20 +585,28 @@ function drawCanvas(el) {
   const ctx = el.getContext("2d");
   ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
   ctx.clearRect(0, 0, cssW, cssH);
-  ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, cssW, cssH);
+  ctx.fillStyle = PAL.paper; ctx.fillRect(0, 0, cssW, cssH);
   const pl = new RPlot(ctx, cssW, cssH);
   el._pl = pl;
   try { el._draw(pl, cssW, cssH); } catch (e) { /* eslint-disable-line */ console.error(e); }
 }
 
-function redrawAll() { CANVASES.forEach((el) => { if (el.isConnected && el.offsetParent !== null) drawCanvas(el); }); }
+/* A shut example is clipped to zero height rather than display:none, so it
+   still has an offsetParent; skip anything inside one. */
+function redrawAll() {
+  CANVASES.forEach((el) => {
+    if (!el.isConnected || el.offsetParent === null) return;
+    if (el.closest(".example-container:not(.open)")) return;
+    drawCanvas(el);
+  });
+}
 
 let _rzT = null;
 window.addEventListener("resize", () => { clearTimeout(_rzT); _rzT = setTimeout(redrawAll, 120); });
 
 function blankPlot(pl, msg) {
   pl.setup({ xlim: [0, 1], ylim: [0, 1], mar: [1, 1, 1, 1] });
-  pl.text(0.5, 0.5, msg, { cex: 1.15, col: "gray" });
+  pl.text(0.5, 0.5, msg, { cex: 1.15, col: PAL.inkFaint });
 }
 
 /* ------------------------------------------------- tiny DOM utilities --- */
@@ -566,9 +619,36 @@ function h(html) {
 const $ = (sel, root) => (root || document).querySelector(sel);
 const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
 
-function slider(id, label, min, max, value, step, fmtFn) {
+/* `key` is a colour key, k1..k4. A slider given one is drawn in that hue, and
+   so is every figure in the text it moves — see registerLive. */
+/* ---- number lines -------------------------------------------------------
+   A rule with ticks and a travelling marker, laid out by .nl-grid so that
+   several of them share one axis. `ticks` are {pos 0..1, major, label}. Used
+   by ex8, ex9 and ex26; the marker is omitted where a real slider supplies it.
+   -----------------------------------------------------------------------*/
+function nlDraw(el, ticks, withMarker) {
+  if (!el) return;
+  el.innerHTML =
+    (withMarker ? '<div class="nl-rule"></div><div class="nl-dot"></div>' : "") +
+    ticks.map((t) =>
+      `<div class="nl-tick${t.major ? " major" : ""}" style="left:${t.pos * 100}%"></div>` +
+      (t.label == null ? "" : `<div class="nl-ticklab" style="left:${t.pos * 100}%">${t.label}</div>`)
+    ).join("");
+}
+
+/* the next 1, 2 or 5 of a decade at or above v — for a ruler that has to grow
+   to keep its marker on it */
+function niceMax(v, floor) {
+  const lo = floor === undefined ? 2 : floor;
+  if (!(v > 0) || v <= lo) return lo;   // the floor is a floor, not just a minimum
+  const base = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 2, 5, 10]) if (v <= m * base) return Math.max(lo, m * base);
+  return Math.max(lo, 10 * base);
+}
+
+function slider(id, label, min, max, value, step, fmtFn, key) {
   const d = document.createElement("div");
-  d.className = "ctl";
+  d.className = "ctl" + (key ? " " + key : "");
   d.innerHTML = `<label for="${id}">${label} <span class="slider-val" id="${id}_val"></span></label>
     <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">`;
   const inp = d.querySelector("input"), out = d.querySelector(".slider-val");

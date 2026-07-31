@@ -9,17 +9,150 @@ const BUILT = {};
 
 function registerExample(id, builder) { BUILDERS[id] = builder; }
 
+/* --------------------------------------------------------------------------
+   Live numbers in Peirce's own text.
+
+   A figure in the prose carries data-live="<driver>:<key>", where <driver> is
+   the id of the example whose controls move it. While that example is shut the
+   span shows exactly what Peirce printed; while it is open the span shows what
+   the sliders say, in the colour of the slider saying it. Closing the example
+   restores his text — the document is his unless you are actively driving it.
+
+   Nothing here knows about any particular example: each one registers its own
+   set of getters, and any input/change/click inside its container re-reads
+   them. #peirce-table-block is always on the page, so it passes an engaged()
+   of its own (its sliders being off Peirce's figures) instead of open/shut.
+   ------------------------------------------------------------------------*/
+const LIVE = {};
+const LIVE_OPEN = new Set();
+
+function registerLive(driverId, bindings, opts) {
+  LIVE[driverId] = { get: bindings, opts: opts || {} };
+  refreshLive(driverId);
+}
+
+function liveEngaged(driverId) {
+  const rec = LIVE[driverId];
+  if (!rec) return false;
+  return rec.opts.engaged ? !!rec.opts.engaged() : LIVE_OPEN.has(driverId);
+}
+
+/* `also` lets one driver pull another along, for the case where two adjacent
+   demonstrations are working the same pair of numbers and either may be the
+   one being driven. The guard is because those relations are mutual. */
+const REFRESHING = new Set();
+
+function refreshLive(driverId) {
+  const rec = LIVE[driverId];
+  if (!rec || REFRESHING.has(driverId)) return;
+  REFRESHING.add(driverId);
+  try { refreshLiveInner(driverId, rec); (rec.opts.also || []).forEach(refreshLive); }
+  finally { REFRESHING.delete(driverId); }
+}
+
+function refreshLiveInner(driverId, rec) {
+  const on = liveEngaged(driverId);
+  const prefix = driverId + ":";
+  $$(`[data-live^="${prefix}"]`).forEach((el) => {
+    if (el.dataset.peirce === undefined) el.dataset.peirce = el.innerHTML;
+    const key = el.getAttribute("data-live").slice(prefix.length);
+    let out = null;
+    if (on && rec.get[key]) {
+      try { out = rec.get[key](); } catch (e) { out = null; }
+    }
+    if (out === null || out === undefined) {
+      if (el.innerHTML !== el.dataset.peirce) el.innerHTML = el.dataset.peirce;
+      el.classList.remove("is-live");
+      return;
+    }
+    const s = String(out);
+    if (el.innerHTML !== s) el.innerHTML = s;
+    el.classList.add("is-live");
+  });
+  if (rec.opts.onRefresh) rec.opts.onRefresh(on);
+}
+
+/* Any control touched inside a driver's container re-reads that driver's
+   getters. Bubble phase, so the example's own handlers have already run. */
+["input", "change", "click"].forEach((type) => {
+  document.addEventListener(type, (ev) => {
+    const t = ev.target;
+    if (!t || !t.closest) return;
+    const host = t.closest(".example-container[id], #peirce-table-block");
+    if (host && LIVE[host.id]) refreshLive(host.id);
+  });
+});
+
+/* --------------------------------------------------------------------------
+   Opening an example. The container is a one-row grid whose row goes 0fr ->
+   1fr, which animates to the content's own height without measuring anything;
+   .ex-inner does the clipping. The prose below is pushed down by the growth
+   rather than being covered over, so the example takes its place in the column
+   instead of arriving on top of it.
+   ------------------------------------------------------------------------*/
+function exInner(box) {
+  let inner = box.querySelector(":scope > .ex-inner");
+  if (!inner) {
+    inner = document.createElement("div");
+    inner.className = "ex-inner";
+    box.appendChild(inner);
+  }
+  return inner;
+}
+
 document.addEventListener("click", (ev) => {
   const trg = ev.target.closest("[data-toggle]");
   if (!trg) return;
   const id = trg.getAttribute("data-toggle");
   const box = document.getElementById(id);
   if (!box) return;
-  if (!BUILT[id] && BUILDERS[id]) { BUILDERS[id](box); BUILT[id] = true; }
-  const open = box.style.display !== "none";
-  box.style.display = open ? "none" : "block";
-  if (!open) { redrawAll(); box.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+
+  const inner = exInner(box);
+  if (!BUILT[id] && BUILDERS[id]) { BUILDERS[id](inner); BUILT[id] = true; }
+
+  const opening = !box.classList.contains("open");
+  box.classList.toggle("open", opening);
+  if (opening) box.removeAttribute("inert"); else box.setAttribute("inert", "");
+  $$(`[data-toggle="${id}"]`).forEach((t) => t.classList.toggle("is-open", opening));
+
+  $$(`[data-hl-for="${id}"]`).forEach((el) => el.classList.toggle("hl-on", opening));
+
+  if (opening) { LIVE_OPEN.add(id); requestAnimationFrame(redrawAll); }
+  else LIVE_OPEN.delete(id);
+  refreshLive(id);
 });
+
+/* Plots are sized from clientWidth, so they want a redraw once the row has
+   finished growing; and the example is nudged into view only if the growth
+   left it hanging off the bottom. */
+document.addEventListener("transitionend", (ev) => {
+  if (ev.propertyName !== "grid-template-rows") return;
+  const box = ev.target;
+  if (!box.classList || !box.classList.contains("example-container")) return;
+  if (!box.classList.contains("open")) return;
+  redrawAll();
+  const r = box.getBoundingClientRect();
+  if (r.top < 0 || r.top > window.innerHeight * 0.75) {
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+});
+
+$$(".example-container").forEach((box) => box.setAttribute("inert", ""));
+
+/* Each example's number in the gutter beside the passage that opens it, taken
+   from its own id so it matches the part files in src/. The granary table has
+   no trigger — it is always on the page — so it is labelled directly. */
+$$("[data-toggle]").forEach((trg) => {
+  const m = /(\d+)$/.exec(trg.getAttribute("data-toggle") || "");
+  if (!m || $(".ex-num", trg)) return;
+  trg.insertBefore(h(`<span class="ex-num" aria-hidden="true">${m[1]}</span>`), trg.firstChild);
+});
+(function numberGranary() {
+  const host = document.getElementById("peirce-table-block");
+  if (host && !$(".ex-num", host)) {
+    host.insertBefore(h(`<span class="ex-num" aria-hidden="true">14</span>`), host.firstChild);
+  }
+})();
 
 /* collapsible inner header, as in the Shiny version */
 function exHeader(title, contentId) {
@@ -210,13 +343,13 @@ function renderGridPlot(pl, grid, matched, scheme, title, matched2) {
 
   cells.forEach((cell, i) => {
     let col = "white";
-    if (scheme === "single") { if (matched[i]) col = "#d4edda"; }
+    if (scheme === "single") { if (matched[i]) col = "#dde9dc"; }
     else if (scheme === "double" && matched2) {
-      if (matched[i] && matched2[i]) col = "#c8b2d8";
-      else if (matched[i]) col = "#fee5d9";
-      else if (matched2[i]) col = "#deebf7";
+      if (matched[i] && matched2[i]) col = "#bdb0cf";
+      else if (matched[i]) col = "#f5e2d8";
+      else if (matched2[i]) col = "#dfe8f1";
     }
-    pl.rect(cell.x - 0.4, cell.y - 0.4, cell.x + 0.4, cell.y + 0.4, { col: col, border: "black", lwd: 0.5 });
+    pl.rect(cell.x - 0.4, cell.y - 0.4, cell.x + 0.4, cell.y + 0.4, { col: col, border: PAL.inkFaint, lwd: 0.5 });
     pl.text(cell.x, cell.y, cell.label, { cex: 0.6 });
   });
 
@@ -255,66 +388,169 @@ function antecedentDesc(deckType, short) {
 /* ==========================================================================
    EXAMPLE 1 — Antecedent, Consequent, Consequence
    ========================================================================*/
+/* --------------------------------------------------------------------------
+   A word in an argument that can be changed. It is set in bold with a dotted
+   rule under it so it reads as clickable, and clicking opens a short list under
+   it rather than cycling — with five suits to choose from, cycling is four
+   clicks to get back to where you were.
+   ------------------------------------------------------------------------*/
+function argChip(key, label) {
+  return `<button class="arg-pick" data-pick="${key}">${label}</button>`;
+}
+
+function argMenu(chip, options, current, onPick) {
+  $$(".arg-menu").forEach((m) => m.remove());
+  const menu = h(`<div class="arg-menu">${options.map(([v, lab]) =>
+    `<button class="arg-opt${v === current ? " on" : ""}" data-val="${esc(v)}">${lab}</button>`
+  ).join("")}</div>`);
+  chip.parentNode.insertBefore(menu, chip.nextSibling);
+  menu.style.left = `${chip.offsetLeft}px`;
+  menu.style.top = `${chip.offsetTop + chip.offsetHeight + 2}px`;
+  menu.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-val]");
+    if (!b) return;
+    menu.remove();
+    onPick(b.getAttribute("data-val"));
+  });
+  setTimeout(() => document.addEventListener("click", function away(e) {
+    if (!menu.contains(e.target)) { menu.remove(); document.removeEventListener("click", away); }
+  }), 0);
+}
+
 registerExample("example-ex1", (box) => {
   box.appendChild(exHeader("Interactive Example: Antecedent, Consequent, Consequence", "ex1-content"));
   const content = h(`<div id="ex1-content" class="example-content">
-    <p><strong>Peirce's Framework:</strong></p>
-    <ul>
-      <li><span class="hl-antecedent">ANTECEDENT</span> = Experimental conditions ("draw top card from well-shuffled deck")</li>
-      <li><span class="hl-consequent">CONSEQUENT</span> = Target outcome ("the card is red")</li>
-      <li><span class="hl-consequence">CONSEQUENCE</span> = The inference rule relating them</li>
-    </ul>
-    <div class="arrow-diagram">
-      <span class="hl-antecedent">ANTECEDENT</span> <span style="color:#28a745;font-weight:bold;">&rarr;</span>
-      <span class="hl-consequent">CONSEQUENT</span><br>
-      <span style="font-size:0.9em;">The arrow (<span class="hl-consequence">CONSEQUENCE</span>) has the probability!</span>
-    </div>
-    <p><strong>Formula:</strong> P(A &rarr; C) = (# times A and C both occur) / (# times A occurs)</p>
+    <p class="arg-line" id="ex1-arg"></p>
     <div class="row">
-      <div class="col col-6"><div class="control-panel" id="ex1-controls"></div></div>
-      <div class="col col-6"><div style="margin-top:20px;">
-        <h5 style="text-align:center;">Formula with values:</h5>
-        <div id="ex1_formula_display"></div>
-      </div></div>
+      <div class="col col-6"><div id="ex1-rank-slider"></div></div>
+      <div class="col col-6"><div id="ex1_formula_display"></div></div>
     </div>
     <div class="plot-container" id="ex1-plot"></div>
+    <div class="note-block">Probabilities do not apply to events. There is no probability of
+      <span class="math">C</span>. They apply to arguments, and so always depend on how some set of
+      antecedent facts relate to the consequent fact.</div>
     <div class="calc-output" id="ex1_calc"></div>
   </div>`);
   box.appendChild(content);
 
-  const controls = $("#ex1-controls", content);
-  controls.appendChild(select("ex1_deck_type",
-    '<span class="hl-antecedent">Antecedent - Draw top card from:</span>', DECK_CHOICES, "shuffled_standard"));
-  controls.appendChild(buildConsequentUI("ex1", "Consequent - The card is", "hl-consequent", () => update()));
-  controls.addEventListener("change", () => update());
+  /* Every choice is a word in the sentence rather than a control beside it, so
+     what is being set is read in place: click a word to change it. */
+  const OPTS = {
+    pos:   [["top", "top"], ["middle", "middle"], ["bottom", "bottom"]],
+    state: [["shuffled", "well shuffled"], ["new", "brand new"]],
+    deck:  [["standard", "deck of standard playing cards"], ["piquet", "piquet pack"],
+            ["trick", "trick pack, in which every card is the ace of spades"]],
+    op:    [["exactly", "exactly"], ["higher_than", "higher than"], ["lower_than", "lower than"]],
+    suit:  [["any", "any suit"], ["H", "hearts"], ["D", "diamonds"], ["C", "clubs"], ["S", "spades"]]
+  };
+  const pick = { pos: "top", state: "shuffled", deck: "standard", op: "exactly", suit: "any" };
+  let rank = "A";
+
+  const labelOf = (k) => (OPTS[k].find((o) => o[0] === pick[k]) || OPTS[k][0])[1];
+  const ranksNow = () => (pick.deck === "piquet"
+    ? ["7", "8", "9", "10", "J", "Q", "K", "A"]
+    : ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]);
+
+  $("#ex1-rank-slider", content).appendChild(
+    slider("ex1_rank_i", "Rank:", 0, 12, 0, 1, () => rank, "k1"));
+
+  /* The layout of the pack is the shared one; what changes is which of its
+     cards can come up. A brand-new pack settles the question before the draw —
+     one card is certain and the rest impossible — and a trick pack settles it
+     the other way, every card being the same card. */
+  const NEW_ORDER = (ranks) => {
+    const out = [];
+    ["S", "D"].forEach((su) => ranks.forEach((r) => out.push(r + su)));
+    ["C", "H"].forEach((su) => ranks.slice().reverse().forEach((r) => out.push(r + su)));
+    return out;
+  };
+
+  function grid() {
+    const g = createGrid(pick.deck === "piquet" ? "shuffled_piquet" : "shuffled_standard");
+    if (pick.deck === "trick") {
+      g.cells.forEach((c) => { c.rank = "A"; c.suit = "S"; c.label = "AS"; });
+      return g;
+    }
+    if (pick.state === "new") {
+      const order = NEW_ORDER(ranksNow());
+      const idx = pick.pos === "top" ? 0
+        : pick.pos === "middle" ? Math.floor(order.length / 2) : order.length - 1;
+      const only = order[idx];
+      g.cells.forEach((c) => { c.prob = (c.label === only) ? 1 : 0; });
+    }
+    return g;
+  }
+
+  const rule = () => ({ operator: pick.op, rank: rank, suit: pick.suit });
 
   const canvas = mkCanvas(400, (pl) => {
-    const grid = createGrid(val("ex1_deck_type"));
-    renderGridPlot(pl, grid, evaluateConsequent(grid, getConsequentRule("ex1")), "single",
-      "Possibility Space: Each Card in the Deck");
+    const g = grid();
+    renderGridPlot(pl, g, evaluateConsequent(g, rule()), "single",
+      "Every card that could come up");
+    /* A brand-new pack settles which card it is before the draw, so the rest
+       are still shown — they are cards in the pack — but faded, because none
+       of them can come up. The whole space is there; only one of it is live. */
+    g.cells.forEach((c) => {
+      if (c.prob > 0) return;
+      pl.rect(c.x - 0.4, c.y - 0.4, c.x + 0.4, c.y + 0.4,
+        { col: "rgba(255,255,255,0.80)", border: PAL.ruleSoft, lwd: 0.5 });
+    });
   });
   $("#ex1-plot", content).appendChild(canvas);
 
+  content.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-pick]");
+    if (!b) return;
+    const k = b.getAttribute("data-pick");
+    argMenu(b, OPTS[k], pick[k], (v) => {
+      pick[k] = v;
+      if (k === "deck") {                    // the piquet pack has no low cards
+        const rs = ranksNow();
+        if (!rs.includes(rank)) rank = rs[0];
+        setSlider("ex1_rank_i", rs.indexOf(rank));
+      }
+      update();
+    });
+  });
+  content.addEventListener("input", (ev) => {
+    if (ev.target.id !== "ex1_rank_i") return;
+    const rs = ranksNow();
+    rank = rs[Math.min(rs.length - 1, Math.round(num("ex1_rank_i")))];
+    update();
+  });
+
   function update() {
-    const deckType = val("ex1_deck_type");
-    const grid = createGrid(deckType);
-    const matched = evaluateConsequent(grid, getConsequentRule("ex1"));
-    const { successes, total, prob } = possibleSummary(grid, matched);
+    const rs = ranksNow();
+    const sl = document.getElementById("ex1_rank_i");
+    if (sl) { sl.max = rs.length - 1; if (+sl.value > rs.length - 1) sl.value = rs.length - 1; }
+    rank = rs[Math.min(rs.length - 1, Math.round(num("ex1_rank_i")))];
+    const lab = document.getElementById("ex1_rank_i_val");
+    if (lab) lab.textContent = rank;
 
+    const chip = (k) => argChip(k, labelOf(k));
+    $("#ex1-arg", content).innerHTML =
+      `<span class="math">P</span>(` +
+      `<span class="hl-text a hl-on">If I were to draw the ${chip("pos")} card ` +
+      `from a ${chip("state")} ${chip("deck")}</span>, ` +
+      `<span class="hl-then">then</span> ` +
+      `<span class="hl-text c hl-on">that card would be ${chip("op")} ` +
+      `<strong>${rank}</strong> of ${chip("suit")}</span>)`;
+
+    const g = grid();
+    const matched = evaluateConsequent(g, rule());
+    const { successes, total, prob } = possibleSummary(g, matched);
     $("#ex1_formula_display", content).innerHTML =
-      `<div style="text-align:center;font-size:18px;margin-top:20px;">
-         <div style="margin-bottom:10px;font-weight:bold;">P(A &rarr; C) = ${successes}/${total} = ${rround(prob, 4)}</div>
-       </div>`;
+      `<div class="formula-box" style="margin:0;">P(<span class="hl-text a hl-on">A</span>
+         <span class="hl-then">&rarr;</span> <span class="hl-text c hl-on">C</span>) =
+         ${frac(String(successes), String(total))} = <strong>${rround(prob, 4)}</strong></div>`;
 
-    const ad = antecedentDesc(deckType, false);
     $("#ex1_calc", content).textContent =
-      `ANTECEDENT: ${ad}\n` +
-      `CONSEQUENT: [See selections above]\n\n` +
-      `CONSEQUENCE: "IF ${ad}, THEN [consequent]"\n\n` +
-      `THEORETICAL PROBABILITY:\n` +
-      `  P(A → C) = ${successes} / ${total} = ${rround(prob, 4)}\n\n` +
-      `NOTE: Probability belongs to the CONSEQUENCE (the arrow),\n` +
-      `not to individual facts. There is no P(E), only P(A → C).`;
+      `ANTECEDENT   drawing the ${labelOf("pos")} card from a ${labelOf("state")} ${labelOf("deck")}\n` +
+      `CONSEQUENT   the card is ${labelOf("op")} ${rank} of ${labelOf("suit")}\n` +
+      `CONSEQUENCE  if the first, then the second\n\n` +
+      `P(A -> C) = ${successes} / ${total} = ${rround(prob, 4)}\n\n` +
+      `The number is a property of the consequence — of arguments of this form —\n` +
+      `and not of any card. There is no P(this card is an ace).`;
     drawCanvas(canvas);
   }
   update();
@@ -362,108 +598,140 @@ function flatDeck(deckType) {
 }
 
 registerExample("example-ex2", (box) => {
-  box.appendChild(exHeader("Interactive Example: Addition Rule for Consequences", "ex2-content"));
+  box.appendChild(exHeader("Interactive Example: The Rule for the Addition of Probabilities", "ex2-content"));
   const content = h(`<div id="ex2-content" class="example-content">
-    <p><strong>The Rule:</strong> Given two consequences with the <em>same antecedent</em> but
-       <em>incompatible consequents</em>, we add their probabilities:</p>
-    <p>P(A &rarr; C&#8321;) + P(A &rarr; C&#8322;) = P(A &rarr; [C&#8321; or C&#8322;])</p>
-    <div class="control-panel" id="ex2-controls"></div>
+    <p class="arg-line" id="ex2-a1"></p>
+    <p class="arg-line" id="ex2-a2"></p>
+    <div class="arg-rule" id="ex2-rule"></div>
     <div class="plot-container" id="ex2-plot"></div>
-    <div class="calc-output" id="ex2_calc"></div>
+    <div id="ex2-verdict"></div>
+    <div class="note-block">Two consequences from the same antecedent. The rule adds them, and adding
+      them is right only while they cannot both come true &mdash; while nothing counts towards both.
+      Set them so that something does, and the sum counts it twice.</div>
   </div>`);
   box.appendChild(content);
 
-  const controls = $("#ex2-controls", content);
-  controls.appendChild(select("ex2_deck_type",
-    '<span class="hl-antecedent">Antecedent - Draw top card from:</span>', DECK_CHOICES, "shuffled_standard"));
-  controls.appendChild(select("ex2_target1",
-    '<span class="hl-event-a">CONSEQUENT A - Card is:</span>', TARGET_CHOICES, "ace_spades"));
-  controls.appendChild(select("ex2_target2",
-    '<span class="hl-event-b">CONSEQUENT B - Card is:</span>', TARGET_CHOICES, "even"));
-  controls.appendChild(slider("ex2_n_trials", "Number of trials (n):", 10, 10000, 520, 10));
-  controls.addEventListener("input", () => update());
-  controls.addEventListener("change", () => update());
+  const A_OPTS = {
+    pos:   [["top", "top"], ["middle", "middle"], ["bottom", "bottom"]],
+    state: [["shuffled", "well shuffled"], ["new", "brand new"]],
+    deck:  [["standard", "deck of standard playing cards"], ["piquet", "piquet pack"]]
+  };
+  const C_OPTS = {
+    op:   [["exactly", "exactly"], ["higher_than", "higher than"], ["lower_than", "lower than"]],
+    suit: [["any", "any suit"], ["H", "hearts"], ["D", "diamonds"], ["C", "clubs"], ["S", "spades"]]
+  };
+  const ante = { pos: "top", state: "shuffled", deck: "standard" };
+  const cons = [{ op: "exactly", rank: "A", suit: "H" }, { op: "exactly", rank: "A", suit: "S" }];
+
+  // evaluateConsequent names the field `operator`, not `op`
+  const ruleOf = (c) => ({ operator: c.op, rank: c.rank, suit: c.suit });
+
+  const lab = (opts, k, v) => (opts[k].find((o) => o[0] === v) || opts[k][0])[1];
+  const ranks = () => (ante.deck === "piquet"
+    ? ["7", "8", "9", "10", "J", "Q", "K", "A"]
+    : ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K"]);
+
+  const NEW_ORDER = (rs) => {
+    const out = [];
+    ["S", "D"].forEach((su) => rs.forEach((r) => out.push(r + su)));
+    ["C", "H"].forEach((su) => rs.slice().reverse().forEach((r) => out.push(r + su)));
+    return out;
+  };
+
+  function grid() {
+    const g = createGrid(ante.deck === "piquet" ? "shuffled_piquet" : "shuffled_standard");
+    if (ante.state === "new") {
+      const order = NEW_ORDER(ranks());
+      const idx = ante.pos === "top" ? 0
+        : ante.pos === "middle" ? Math.floor(order.length / 2) : order.length - 1;
+      g.cells.forEach((c) => { c.prob = (c.label === order[idx]) ? 1 : 0; });
+    }
+    return g;
+  }
+
+  const anteText = () =>
+    `If I were to draw the ${argChip("a:pos", lab(A_OPTS, "pos", ante.pos))} card from a ` +
+    `${argChip("a:state", lab(A_OPTS, "state", ante.state))} ` +
+    `${argChip("a:deck", lab(A_OPTS, "deck", ante.deck))}`;
+
+  const consText = (n) =>
+    `that card would be ${argChip(`c${n}:op`, lab(C_OPTS, "op", cons[n].op))} ` +
+    `${argChip(`c${n}:rank`, cons[n].rank)} of ${argChip(`c${n}:suit`, lab(C_OPTS, "suit", cons[n].suit))}`;
 
   const canvas = mkCanvas(400, (pl) => {
-    const deckType = val("ex2_deck_type"), t1 = val("ex2_target1"), t2 = val("ex2_target2");
-    const ranks = deckRanks(deckType), nR = ranks.length, nS = 4;
-    pl.setup({ xlim: [0.5, nR + 0.5], ylim: [0.5, nS + 0.5], mar: [4, 4, 3, 2], asp: 1 });
-    pl.title("Possibility Space: Each Card in the Deck", { cex: 1.1 });
-    let c1 = 0, c2 = 0, cOv = 0, cEither = 0;
-    for (let i = 1; i <= nS; i++) {
-      for (let j = 1; j <= nR; j++) {
-        const suit = SUITS[i - 1], rank = ranks[j - 1];
-        const m1 = cardMatchesGrid(suit, rank, t1), m2 = cardMatchesGrid(suit, rank, t2);
-        if (m1 && m2) cOv++;
-        if (m1) c1++;
-        if (m2) c2++;
-        if (m1 || m2) cEither++;
-        const col = (m1 && m2) ? "#9370DB" : m1 ? "#fee5d9" : m2 ? "#deebf7" : "white";
-        pl.rect(j - 0.4, i - 0.4, j + 0.4, i + 0.4, { col: col, border: "black", lwd: 0.5 });
-        pl.text(j, i, rank + suit, { cex: 0.6 });
+    const g = grid();
+    const m1 = evaluateConsequent(g, ruleOf(cons[0])), m2 = evaluateConsequent(g, ruleOf(cons[1]));
+    renderGridPlot(pl, g, m1.map((v, i) => v || m2[i]), "single", "Every card that could come up");
+    g.cells.forEach((c, i) => {
+      if (!(c.prob > 0)) {
+        pl.rect(c.x - 0.4, c.y - 0.4, c.x + 0.4, c.y + 0.4,
+          { col: "rgba(255,255,255,0.80)", border: PAL.ruleSoft, lwd: 0.5 });
+      } else if (m1[i] && m2[i]) {
+        // counted by both consequents, and so counted twice by the sum
+        pl.rect(c.x - 0.4, c.y - 0.4, c.x + 0.4, c.y + 0.4,
+          { col: "rgba(176,86,63,0.45)", border: "#8a4331", lwd: 1.4 });
       }
-    }
-    ranks.forEach((lab, i) => pl.text(i + 1, 0.15, lab, { cex: 0.85 }));
-    pl.axisPlain(2, [1, 2, 3, 4], SUIT_NAMES, { cex: 0.8 });
-    const total = nS * nR, p1 = c1 / total, p2 = c2 / total, pComb = cEither / total;
-    const ly = nS + 0.8;
-    pl.text(nR / 2, ly + 0.6,
-      `P(C₁) = ${c1}/${total} = ${rround(p1, 3)}   P(C₂) = ${c2}/${total} = ${rround(p2, 3)}`, { cex: 0.9 });
-    if (cOv > 0) {
-      pl.text(nR / 2, ly + 0.2,
-        `OVERLAP: ${cOv} cards → P(C₁) + P(C₂) = ${rround(p1 + p2, 3)} ≠ P(C₁ or C₂) = ${rround(pComb, 3)}`,
-        { cex: 0.85, col: "red" });
-    } else {
-      pl.text(nR / 2, ly + 0.2,
-        `NO OVERLAP → P(C₁) + P(C₂) = ${rround(p1 + p2, 3)} = P(C₁ or C₂) = ${rround(pComb, 3)}`,
-        { cex: 0.85, col: "#28a745" });
-    }
-    pl.rect(1, -0.5, 2, -0.2, { col: "#fee5d9", border: "black" });
-    pl.text(2.5, -0.35, "C₁ only", { adj: 0, cex: 0.8 });
-    pl.rect(4, -0.5, 5, -0.2, { col: "#deebf7", border: "black" });
-    pl.text(5.5, -0.35, "C₂ only", { adj: 0, cex: 0.8 });
-    if (cOv > 0) {
-      pl.rect(7, -0.5, 8, -0.2, { col: "#9370DB", border: "black" });
-      pl.text(8.5, -0.35, "Both (overlap)", { adj: 0, cex: 0.8 });
-    }
+    });
   });
   $("#ex2-plot", content).appendChild(canvas);
 
+  content.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-pick]");
+    if (!b) return;
+    const [who, k] = b.getAttribute("data-pick").split(":");
+    const opts = who === "a" ? A_OPTS[k]
+      : k === "rank" ? ranks().map((r) => [r, r]) : C_OPTS[k];
+    const cur = who === "a" ? ante[k] : cons[+who[1]][k];
+    argMenu(b, opts, cur, (v) => {
+      if (who === "a") {
+        ante[k] = v;
+        if (k === "deck") cons.forEach((c) => { if (!ranks().includes(c.rank)) c.rank = ranks()[0]; });
+      } else cons[+who[1]][k] = v;
+      update();
+    });
+  });
+
   function update() {
-    const deckType = val("ex2_deck_type"), t1 = val("ex2_target1"), t2 = val("ex2_target2");
-    const n = num("ex2_n_trials");
-    const ad = antecedentDesc(deckType, false);
-    const deck = flatDeck(deckType), size = deckSize(deckType);
-    const rng = mulberry32(42);             // stands in for set.seed(42)
-    let c1 = 0, c2 = 0, cEither = 0;
-    if (deckType === "new_standard") {
-      c1 = cardMatchesGrid("S", "A", t1) ? n : 0;
-      c2 = cardMatchesGrid("S", "A", t2) ? n : 0;
-      cEither = (cardMatchesGrid("S", "A", t1) || cardMatchesGrid("S", "A", t2)) ? n : 0;
-    } else {
-      for (let i = 0; i < n; i++) { const c = deck[Math.floor(rng() * size)]; if (cardMatchesGrid(c.suit, c.rank, t1)) c1++; }
-      for (let i = 0; i < n; i++) { const c = deck[Math.floor(rng() * size)]; if (cardMatchesGrid(c.suit, c.rank, t2)) c2++; }
-      for (let i = 0; i < n; i++) {
-        const c = deck[Math.floor(rng() * size)];
-        if (cardMatchesGrid(c.suit, c.rank, t1) || cardMatchesGrid(c.suit, c.rank, t2)) cEither++;
-      }
-    }
-    const p1 = c1 / n, p2 = c2 / n, pComb = cEither / n;
-    $("#ex2_calc", content).textContent =
-      `SAME ANTECEDENT: ${ad}\n\n` +
-      `CONSEQUENCE A: "IF ${ad}, THEN ${TARGET_DESC[t1]}"\n` +
-      `  - C₁ occurs: ${c1} / ${n} times\n` +
-      `  - P(A → C₁) = ${rround(p1, 4)}\n\n` +
-      `CONSEQUENCE B: "IF ${ad}, THEN ${TARGET_DESC[t2]}"\n` +
-      `  - C₂ occurs: ${c2} / ${n} times\n` +
-      `  - P(A → C₂) = ${rround(p2, 4)}\n\n` +
-      `COMBINED CONSEQUENCE: "IF A, THEN (C₁ OR C₂)"\n` +
-      `  - Either consequent: ${cEither} / ${n} times\n` +
-      `  - P(A → [C₁ or C₂]) = ${rround(pComb, 4)}\n\n` +
-      `ADDITION RULE:\n` +
-      `  P(A → C₁) + P(A → C₂) = ${rround(p1, 4)} + ${rround(p2, 4)} = ${rround(p1 + p2, 4)}\n` +
-      `  P(A → [C₁ or C₂]) = ${rround(pComb, 4)}\n\n` +
-      `This works when C₁ and C₂ are INCOMPATIBLE (no card matches both).`;
+    $("#ex2-a1", content).innerHTML =
+      `<span class="math">P</span>(<span class="hl-text a hl-on">${anteText()}</span>, ` +
+      `<span class="hl-then">then</span> <span class="hl-text c hl-on">${consText(0)}</span>)`;
+    $("#ex2-a2", content).innerHTML =
+      `<span class="math">P</span>(<span class="hl-text a hl-on">the same</span>, ` +
+      `<span class="hl-then">then</span> <span class="hl-text c hl-on">${consText(1)}</span>)`;
+
+    const g = grid();
+    const m1 = evaluateConsequent(g, ruleOf(cons[0])), m2 = evaluateConsequent(g, ruleOf(cons[1]));
+    const live = g.cells.filter((c) => c.prob > 0);
+    const total = live.length;
+    const n = (m) => g.cells.filter((c, i) => c.prob > 0 && m[i]).length;
+    const n1 = n(m1), n2 = n(m2);
+    const both = g.cells.filter((c, i) => c.prob > 0 && m1[i] && m2[i]).length;
+    const either = n1 + n2 - both;
+    const ok = both === 0;
+
+    $("#ex2-rule", content).innerHTML =
+      `<span class="math">P(<span class="hl-text a hl-on">A</span>
+         <span class="hl-then">&rarr;</span> <span class="hl-text c hl-on">C<sub>1</sub></span>)</span>
+       ${frac(String(n1), String(total))}
+       &nbsp;+&nbsp;
+       <span class="math">P(<span class="hl-text a hl-on">A</span>
+         <span class="hl-then">&rarr;</span> <span class="hl-text c hl-on">C<sub>2</sub></span>)</span>
+       ${frac(String(n2), String(total))}
+       &nbsp;=&nbsp;
+       <span class="math">P(<span class="hl-text a hl-on">A</span>
+         <span class="hl-then">&rarr;</span>
+         <span class="hl-text c hl-on">C<sub>1</sub> or C<sub>2</sub></span>)</span>
+       ${frac(String(n1 + n2), String(total))}`;
+
+    $("#ex2-verdict", content).innerHTML = ok
+      ? `<div class="key-insight"><p style="margin-bottom:0;">Nothing answers to both consequents, so
+           the sum is the answer: <strong>${fmt(either / total, 4)}</strong>. That is the rule.</p></div>`
+      : `<div class="key-insight"><p style="margin-bottom:0;"><strong>${bigmark(both)}</strong>
+           ${both === 1 ? "card answers" : "cards answer"} to both consequents &mdash; ringed above &mdash;
+           so the sum counts ${both === 1 ? "it" : "them"} twice. It gives
+           ${frac(String(n1 + n2), String(total))} = ${fmt((n1 + n2) / total, 4)} where the truth is
+           ${frac(String(either), String(total))} = <strong>${fmt(either / total, 4)}</strong>. The rule
+           holds only for consequents that cannot both come true.</p></div>`;
     drawCanvas(canvas);
   }
   update();
@@ -478,9 +746,9 @@ registerExample("example-ex3", (box) => {
     <p><strong>The Rule:</strong> Given two consequences where the antecedent of the second includes the consequent of the first:</p>
     <p>P(A &rarr; B) &times; P(A&and;B &rarr; C) = P(A &rarr; [B &and; C])</p>
     <div class="arrow-diagram">
-      <span class="hl-antecedent">A</span> <span style="color:#28a745;font-weight:bold;">&rarr;</span> <span class="hl-consequent">B</span> (prob P&#8321;)<br>
-      <span class="hl-antecedent">A &and; B</span> <span style="color:#28a745;font-weight:bold;">&rarr;</span> <span class="hl-consequent">C</span> (prob P&#8322;)<br>
-      <span style="color:#666;">Therefore:</span> <span class="hl-antecedent">A</span> <span style="color:#28a745;font-weight:bold;">&rarr;</span> <span class="hl-combined">B &and; C</span> (prob P&#8321; &times; P&#8322;)
+      <span class="hl-antecedent">A</span> <span style="color:#4a7c59;font-weight:bold;">&rarr;</span> <span class="hl-consequent">B</span> (prob P&#8321;)<br>
+      <span class="hl-antecedent">A &and; B</span> <span style="color:#4a7c59;font-weight:bold;">&rarr;</span> <span class="hl-consequent">C</span> (prob P&#8322;)<br>
+      <span style="color:#6b7178;">Therefore:</span> <span class="hl-antecedent">A</span> <span style="color:#4a7c59;font-weight:bold;">&rarr;</span> <span class="hl-combined">B &and; C</span> (prob P&#8321; &times; P&#8322;)
     </div>
     <div class="control-panel" id="ex3-controls"></div>
     <div class="plot-container" id="ex3-plot1"></div>
@@ -521,20 +789,20 @@ registerExample("example-ex3", (box) => {
     pl.setup({ xlim: [0, 1], ylim: [0, 4.5], mar: [3, 1, 3, 1] });
     pl.title(`Multiplication Rule: n = ${r.n} trials`, { cex: 1.2 });
     pl.text(0, 4.0, "P(A → B):", { cex: 0.9, adj: 0 });
-    pl.rect(0.2, 3.8, 1, 4.1, { col: "white", border: "black", lwd: 1.5 });
-    pl.rect(0.2, 3.8, 0.2 + r.pB * 0.8, 4.1, { col: "#fee5d9", border: null });
+    pl.rect(0.2, 3.8, 1, 4.1, { col: "white", border: PAL.inkFaint, lwd: 1.5 });
+    pl.rect(0.2, 3.8, 0.2 + r.pB * 0.8, 4.1, { col: "#f5e2d8", border: null });
     pl.text(0.6, 3.95, rround(r.pB, 4), { cex: 1, font: 2 });
     pl.text(0, 3.3, "P(A∧B → C):", { cex: 0.9, adj: 0 });
-    pl.rect(0.2, 3.1, 1, 3.4, { col: "white", border: "black", lwd: 1.5 });
-    pl.rect(0.2, 3.1, 0.2 + r.pCgivenB * 0.8, 3.4, { col: "#deebf7", border: null });
+    pl.rect(0.2, 3.1, 1, 3.4, { col: "white", border: PAL.inkFaint, lwd: 1.5 });
+    pl.rect(0.2, 3.1, 0.2 + r.pCgivenB * 0.8, 3.4, { col: "#dfe8f1", border: null });
     pl.text(0.6, 3.25, rround(r.pCgivenB, 4), { cex: 1, font: 2 });
-    pl.text(0.5, 2.7, `Product: ${rround(r.pB * r.pCgivenB, 4)}`, { cex: 1, col: "#666666" });
+    pl.text(0.5, 2.7, `Product: ${rround(r.pB * r.pCgivenB, 4)}`, { cex: 1, col: "#6b7178" });
     pl.text(0, 2.2, "P(A → [B∧C]):", { cex: 0.9, adj: 0 });
-    pl.rect(0.2, 2.0, 1, 2.3, { col: "white", border: "black", lwd: 1.5 });
-    pl.rect(0.2, 2.0, 0.2 + r.pBoth * 0.8, 2.3, { col: "#d4e4c4", border: null });
+    pl.rect(0.2, 2.0, 1, 2.3, { col: "white", border: PAL.inkFaint, lwd: 1.5 });
+    pl.rect(0.2, 2.0, 0.2 + r.pBoth * 0.8, 2.3, { col: "#dfe6d4", border: null });
     pl.text(0.6, 2.15, rround(r.pBoth, 4), { cex: 1, font: 2 });
     pl.text(0.5, 1.2, `Chaining: ${r.countB} times B holds, of those ${r.countBoth} also have C`,
-      { cex: 0.85, col: "#666666", font: 3 });
+      { cex: 0.85, col: "#6b7178", font: 3 });
   });
   $("#ex3-plot1", content).appendChild(barCanvas);
 
@@ -550,8 +818,8 @@ registerExample("example-ex3", (box) => {
         const hasB = cardMatchesGrid(suit, rank, bCond), hasC = cardMatchesGrid(suit, rank, cCond);
         if (hasB) countB++;
         if (hasB && hasC) countBoth++;
-        const col = (hasB && hasC) ? "#9370DB" : hasB ? "#fee5d9" : "white";
-        pl.rect(j - 0.4, i - 0.4, j + 0.4, i + 0.4, { col: col, border: "black", lwd: 0.5 });
+        const col = (hasB && hasC) ? "#8a7aa8" : hasB ? "#f5e2d8" : "white";
+        pl.rect(j - 0.4, i - 0.4, j + 0.4, i + 0.4, { col: col, border: PAL.inkFaint, lwd: 0.5 });
         pl.text(j, i, rank + suit, { cex: 0.6 });
       }
     }

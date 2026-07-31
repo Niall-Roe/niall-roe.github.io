@@ -1,0 +1,1266 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fechner's laboratory — the three methods</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Karla:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ground:#E9E9E1; --panel:#F7F7F2; --ink:#1D201B; --soft:#5A5E56; --faint:#8C9086;
+  --rule:#CECEC3; --rule2:#DEDED4; --data:#35566B; --data2:#7C9AAB; --live:#5F7333; --flag:#8C4A2F;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:Karla,system-ui,sans-serif; font-weight:300; font-size:16.5px; line-height:1.65;
+}
+.mono,code{font-family:"Space Mono",ui-monospace,monospace}
+.shell{display:grid; grid-template-columns:238px minmax(0,1fr); gap:52px; max-width:1160px; margin:0 auto; padding:0 30px 140px}
+@media(max-width:900px){.shell{grid-template-columns:1fr; gap:0}}
+
+/* ---- notebook rail ---- */
+aside{position:sticky; top:0; align-self:start; padding:44px 0 40px; max-height:100vh; overflow-y:auto}
+@media(max-width:900px){aside{position:static; max-height:none; border-bottom:1px solid var(--rule); margin-bottom:20px}}
+aside h4{
+  font-family:"Space Mono",monospace; font-size:10.5px; letter-spacing:.15em; text-transform:uppercase;
+  color:var(--faint); font-weight:400; margin:0 0 18px; padding-bottom:12px; border-bottom:1px solid var(--rule)
+}
+.rail{list-style:none; margin:0; padding:0}
+.rail li{
+  padding:11px 0 11px 20px; border-left:2px solid var(--rule2); position:relative;
+  font-size:13.5px; line-height:1.45; color:var(--faint); transition:color .3s
+}
+.rail li::before{
+  content:''; position:absolute; left:-5px; top:17px; width:8px; height:8px; border-radius:50%;
+  background:var(--ground); border:2px solid var(--rule2)
+}
+.rail li.done{color:var(--ink); border-left-color:var(--live)}
+.rail li.done::before{background:var(--live); border-color:var(--live)}
+.rail li b{display:block; font-family:"Space Mono",monospace; font-size:10px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--faint); font-weight:400; margin-bottom:3px}
+.rail li.done b{color:var(--live)}
+.rail .num{font-family:"Space Mono",monospace}
+
+/* ---- masthead ---- */
+header.mast{padding:64px 0 34px}
+h1{
+  font-family:Fraunces,Georgia,serif; font-weight:400; font-size:52px; line-height:1.04;
+  letter-spacing:-.02em; margin:0 0 22px; max-width:15ch
+}
+.stand{font-size:18.5px; color:var(--soft); max-width:58ch; margin:0}
+.stand em{font-style:italic; color:var(--ink)}
+
+/* ---- acts ---- */
+article{padding:54px 0; border-top:1px solid var(--rule)}
+article.tight{padding:38px 0}
+.act-n{font-family:"Space Mono",monospace; font-size:11px; letter-spacing:.16em; color:var(--live); margin:0 0 12px}
+h2{font-family:Fraunces,Georgia,serif; font-weight:400; font-size:31px; line-height:1.2; margin:0 0 14px; letter-spacing:-.01em}
+h3.step{font-family:Fraunces,Georgia,serif; font-weight:400; font-size:22px; line-height:1.25; margin:44px 0 10px}
+p{max-width:62ch}
+p.q{font-size:17.5px; color:var(--soft)}
+.ask{font-family:Fraunces,serif; font-style:italic; font-size:20px; color:var(--ink); max-width:56ch; margin:26px 0 18px}
+
+.panel{background:var(--panel); border:1px solid var(--rule2); padding:20px; margin:26px 0}
+.panel h3{font-family:"Space Mono",monospace; font-weight:400; font-size:10.5px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--faint); margin:0 0 14px}
+canvas{display:block; width:100%}
+
+/* ---- tabs ---- */
+.tabs{display:flex; gap:0; border-bottom:1px solid var(--rule); margin:0 0 4px; flex-wrap:wrap}
+.tabs button{
+  background:none; border:none; border-bottom:2px solid transparent; margin-bottom:-1px;
+  padding:15px 20px 13px; font-size:14.5px; color:var(--faint); text-align:left; line-height:1.3
+}
+.tabs button:hover:not(:disabled){background:rgba(95,115,51,.06); color:var(--ink)}
+.tabs button b{display:block; font-family:"Space Mono",monospace; font-size:9.5px; letter-spacing:.13em;
+  text-transform:uppercase; font-weight:400; margin-bottom:4px; color:var(--faint)}
+.tabs button.on{color:var(--ink); border-bottom-color:var(--live)}
+.tabs button.on b{color:var(--live)}
+@media(max-width:600px){.tabs button{flex:1 1 100%; padding:12px 14px}}
+.tabpanel{display:none}
+.tabpanel.on{display:block}
+.tabpanel > article:first-of-type{border-top:none}
+
+.row{display:flex; gap:11px; flex-wrap:wrap; align-items:center; margin:18px 0}
+button{
+  font-family:Karla,sans-serif; font-size:14.5px; font-weight:400; background:var(--panel);
+  border:1px solid var(--ink); color:var(--ink); padding:9px 17px; cursor:pointer
+}
+button:hover:not(:disabled){background:var(--ink); color:var(--panel)}
+button:disabled{opacity:.32; cursor:default}
+button.go{background:var(--live); border-color:var(--live); color:#fff}
+button.go:hover:not(:disabled){background:var(--ink); border-color:var(--ink)}
+button.ghost{border-color:var(--rule); color:var(--soft)}
+button:focus-visible{outline:2px solid var(--flag); outline-offset:3px}
+
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(132px,1fr)); gap:1px; background:var(--rule2); border:1px solid var(--rule2); margin:20px 0}
+.stat{background:var(--panel); padding:13px 15px}
+.stat .k{font-family:"Space Mono",monospace; font-size:9.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--faint); display:block; margin-bottom:5px}
+.stat .v{font-family:"Space Mono",monospace; font-size:21px; letter-spacing:-.02em}
+.stat .v.d{color:var(--data)}
+
+.reveal{
+  border-left:2px solid var(--live); background:rgba(95,115,51,.07); padding:15px 19px; margin:24px 0 0;
+  max-width:64ch; font-size:15.5px; display:none
+}
+.reveal.on{display:block}
+.reveal strong{font-weight:500}
+.note{border-left:2px solid var(--rule); padding:2px 0 2px 19px; margin:22px 0; max-width:62ch;
+  font-size:15px; color:var(--soft)}
+.note b{font-weight:500; color:var(--ink)}
+
+.log{font-family:"Space Mono",monospace; font-size:11.5px; line-height:1.75; color:var(--soft);
+  max-height:118px; overflow-y:auto; background:var(--panel); border:1px solid var(--rule2); padding:12px 15px}
+.log .hit{color:var(--live)} .log .miss{color:var(--flag)}
+
+.ctl{display:grid; grid-template-columns:170px 1fr 86px; align-items:center; gap:15px; margin:14px 0}
+@media(max-width:600px){.ctl{grid-template-columns:1fr}}
+.ctl label{font-size:14px; color:var(--soft)}
+.ctl .v{font-family:"Space Mono",monospace; font-size:13.5px; text-align:right}
+input[type=range]{-webkit-appearance:none; appearance:none; width:100%; height:20px; background:transparent; cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:1px; background:var(--ink)}
+input[type=range]::-moz-range-track{height:1px; background:var(--ink)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none; width:14px; height:14px; border-radius:50%;
+  background:var(--live); border:none; margin-top:-6.5px}
+input[type=range]::-moz-range-thumb{width:14px; height:14px; border-radius:50%; background:var(--live); border:none}
+
+/* ---- self-test stage ---- */
+.stage{background:#7A7A7A; padding:46px 30px; display:flex; gap:44px; justify-content:center; align-items:center; margin:22px 0}
+.patch{width:150px; height:150px; border-radius:2px}
+@media(max-width:600px){.patch{width:112px; height:112px} .stage{gap:24px; padding:32px 18px}}
+.keys{display:flex; gap:14px; justify-content:center; margin:16px 0 0}
+.keys button{min-width:132px; font-size:15px}
+.prog{height:3px; background:var(--rule2); margin:20px 0 8px}
+.prog i{display:block; height:100%; background:var(--live); width:0}
+.small{font-size:13.5px; color:var(--faint); max-width:60ch}
+.hidden{display:none}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="shell">
+<aside>
+  <h4>Notebook</h4>
+  <ul class="rail" id="rail"></ul>
+</aside>
+
+<main>
+<header class="mast">
+  <h1>Fechner's laboratory</h1>
+  <p class="stand">A subject sits at a bench lifting brass weights. Fechner wanted a number for the smallest difference that subject can feel — and devised three procedures to get one. Each tab below walks one method through: what it asks the subject to do, what it records, how a threshold is squeezed out of that, and then <em>the same method run on you</em>.</p>
+</header>
+
+<article class="tight">
+  <p class="act-n">BEFORE YOU START</p>
+  <h2>One quantity, three procedures</h2>
+  <p class="q">The target is the <strong>difference threshold</strong>: how much heavier a comparison weight must be before the subject can tell it apart from a 100&nbsp;g standard. It sounds like a single fact about him. Fechner's three methods each go after it differently, and none of them observes it directly — every one produces some other raw quantity (a proportion, a crossing point, a spread of settings) and then applies a rule to turn that into a threshold.</p>
+  <p class="q">Work through the tabs in any order. Each ends with you as the subject, so by the closing section you will have three numbers of your own to compare.</p>
+</article>
+
+<div class="tabs" role="tablist">
+  <button id="tab-rw" class="on" role="tab"><b>Method one</b>Right and wrong cases</button>
+  <button id="tab-lim" role="tab"><b>Method two</b>Limits</button>
+  <button id="tab-adj" role="tab"><b>Method three</b>Adjustment</button>
+</div>
+
+<!-- ============ TAB 1 : RIGHT AND WRONG CASES ============ -->
+<div class="tabpanel on" id="panel-rw" role="tabpanel">
+<article>
+  <p class="act-n">METHOD ONE</p>
+  <h2>Right and wrong cases</h2>
+  <p class="q">Fix a small set of differences in advance. Present them over and over in random order. Score every response simply right or wrong, and count. The subject is never asked how much heavier, never asked to adjust anything — he classifies, and you tally.</p>
+
+  <h3 class="step">Step one — a single judgement carries almost nothing</h3>
+  <p class="q">Your subject lifts the 100&nbsp;g standard in one hand and a 103&nbsp;g comparison in the other, and says which feels heavier. That is the entire task. Run it.</p>
+  <div class="row">
+    <button class="go" id="a1-1">Run one trial</button>
+    <button id="a1-10">Run 10</button>
+    <button id="a1-100">Run 100</button>
+    <button class="ghost" id="a1-r">Reset</button>
+  </div>
+  <div class="log" id="a1-log">No trials yet.</div>
+  <div class="stats">
+    <div class="stat"><span class="k">Trials</span><span class="v" id="a1-n">0</span></div>
+    <div class="stat"><span class="k">Correct</span><span class="v" id="a1-c">0</span></div>
+    <div class="stat"><span class="k">Proportion</span><span class="v d" id="a1-p">—</span></div>
+  </div>
+  <div class="panel"><h3>Running proportion correct</h3><canvas id="a1-plot" height="180"></canvas></div>
+  <div class="reveal" id="a1-rev"><strong>Notice what a single trial contained.</strong> Not a magnitude — just a direction. Yet after a few hundred trials the proportion has settled to a stable number that no individual judgement carried. Fechner saw this clearly: in this method "each individual observation has next to no meaning," and a handful of trials, however carefully made, give nothing at all. Compare an astronomer's transit timing, where every observation is already a measurement and averaging merely sharpens it.</div>
+
+  <h3 class="step">Step two — vary the difference</h3>
+  <p class="q">Repeat that procedure at several comparison weights. Each button runs 120 trials at one difference and plots the result.</p>
+  <div class="row" id="a2-btns"></div>
+  <div class="row"><button class="ghost" id="a2-r">Reset</button></div>
+  <div class="panel"><h3>Proportion correct against difference</h3><canvas id="a2-plot" height="250"></canvas></div>
+  <p class="ask">Before reading on — if the subject had a genuine threshold, a difference below which he truly cannot tell, what shape should these points make?</p>
+  <div class="row">
+    <button id="a2-step">Overlay: a real threshold</button>
+    <button id="a2-smooth">Overlay: no threshold</button>
+    <button class="ghost" id="a2-clear">Clear overlay</button>
+  </div>
+  <div class="reveal" id="a2-rev"><strong>A true threshold predicts a corner.</strong> Below it, chance performance — a flat line at 0.5. Above it, rising. The data have no corner: performance climbs smoothly out of chance from the very smallest difference. A hard cutoff cannot produce that shape, which is why the next step reaches for a probability curve instead of a step — and why this method will need a <em>stipulated</em> percentage to point at and call "the threshold."</div>
+
+  <h3 class="step">Step three — what would produce that curve?</h3>
+  <p class="q">Suppose each lift registers internally as the true weight plus a random error. Then two lifts give two noisy values, and the subject simply reports whichever felt larger. He is right whenever the noise doesn't overturn the true ordering. Tune the noise until the prediction matches what you collected.</p>
+  <div class="row">
+    <button id="a3-two">View: two lifts</button>
+    <button id="a3-diff">View: their difference</button>
+  </div>
+  <div class="panel"><h3 id="a3-h">Internal values for the two lifts</h3><canvas id="a3-plot" height="215"></canvas></div>
+  <div class="ctl"><label for="a3-s">Noise per lift, σ</label><input type="range" id="a3-s" min="1" max="14" step=".05" value="11"><span class="v" id="a3-sv"></span></div>
+  <div class="panel"><h3>Prediction against your data</h3><canvas id="a3-fit" height="230"></canvas></div>
+  <div class="stats">
+    <div class="stat"><span class="k">σ per lift</span><span class="v d" id="a3-r1">—</span></div>
+    <div class="stat"><span class="k">σ of the difference</span><span class="v d" id="a3-r2">—</span></div>
+    <div class="stat"><span class="k">Threshold (PE)</span><span class="v d" id="a3-r5">—</span></div>
+    <div class="stat"><span class="k">Misfit</span><span class="v" id="a3-r4">—</span></div>
+  </div>
+  <div class="reveal" id="a3-rev"><strong>You have just measured something invisible.</strong> The spread of the subject's internal noise, in grams, recovered entirely from counts of right and wrong. But note where the number came from: not from any observation, but from a curve you assumed and then adjusted until its predictions matched proportions. Change the assumed shape and the number changes.</div>
+  <div class="note"><b>The convention.</b> A spread is not yet a threshold. To get one you must nominate a point on the curve and declare it the boundary. The figure above uses the <em>probable error</em> — 0.6745 × the spread, the difference the subject gets right 75% of the time. That choice is not in the data; it is imposed on the data. Pick a different percentage and every threshold on this page moves.</div>
+
+  <h3 class="step">Step four — now you are the subject</h3>
+  <p class="q">The right-hand patch is slightly lighter than the left, by one of four amounts, shuffled and repeated. Say whether you can see a difference — no "not sure." Guess when you have to: that instruction is doing real work.</p>
+  <p class="small">Best in a dim room at normal screen brightness. 32 trials, about a minute.</p>
+  <div class="row" id="t1-intro"><button class="go" id="t1-start">Begin</button></div>
+  <div id="t1-run" class="hidden">
+    <div class="stage"><div class="patch" id="t1-ref"></div><div class="patch" id="t1-test"></div></div>
+    <div class="keys"><button id="t1-yes">Yes, different</button><button id="t1-no">Looks the same</button></div>
+    <div class="prog"><i id="t1-bar"></i></div>
+    <p class="small mono" id="t1-count"></p>
+  </div>
+  <div id="t1-done" class="hidden">
+    <div class="panel"><h3>Your psychometric function</h3><canvas id="t1-plot" height="220"></canvas></div>
+    <div class="stats">
+      <div class="stat"><span class="k">Your spread</span><span class="v d" id="t1-sd">—</span></div>
+      <div class="stat"><span class="k">Your threshold</span><span class="v d" id="t1-th">—</span></div>
+    </div>
+    <div class="reveal on" id="t1-rev"></div>
+    <div class="row"><button class="ghost" id="t1-again">Run it again</button></div>
+  </div>
+</article>
+</div>
+
+<!-- ============ TAB 2 : LIMITS ============ -->
+<div class="tabpanel" id="panel-lim" role="tabpanel">
+<article>
+  <p class="act-n">METHOD TWO</p>
+  <h2>Limits</h2>
+  <p class="q">Now the experimenter holds the controls. Instead of scattering fixed differences at random, he moves the comparison in <strong>ordered steps</strong> and asks after each one: different, or the same? The subject never sees a random jump — he feels a ladder being climbed or descended beneath him. That single change to the procedure changes what the raw data are, what can go wrong, and what rule is needed to reach a threshold.</p>
+
+  <h3 class="step">Step one — walk down a single series</h3>
+  <p class="q">Start the comparison well above the standard, where the difference is obvious, and step it down half a gram at a time. After each step the subject answers. Present the steps one at a time and watch for the moment his answer flips.</p>
+  <div class="panel">
+    <h3>One descending series, step by step</h3>
+    <canvas id="lim-ladder" height="250"></canvas>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="k">Step</span><span class="v" id="lim-k">—</span></div>
+    <div class="stat"><span class="k">Difference now</span><span class="v" id="lim-d">—</span></div>
+    <div class="stat"><span class="k">He says</span><span class="v" id="lim-say">—</span></div>
+    <div class="stat"><span class="k">Crossing</span><span class="v d" id="lim-cross">—</span></div>
+  </div>
+  <div class="row">
+    <button class="go" id="lim-step">Present the next step</button>
+    <button id="lim-finish">Finish this series</button>
+    <button class="ghost" id="lim-restart">Start over</button>
+  </div>
+  <div class="reveal" id="lim-rev1"><strong>One series yields exactly one number.</strong> Not a proportion — a <em>transition point</em>, and by convention it is the midpoint between the last "different" and the first "same", because the truth lies somewhere in the half-gram you stepped over. Note how little you had to do: a handful of trials, and a threshold-shaped number falls out immediately. That economy is the method's great attraction, and its trap. You have one observation of one crossing on one occasion, and nothing yet tells you how much it would move if you did it again.</p></div>
+
+  <h3 class="step">Step two — the direction you came from matters</h3>
+  <p class="q">Run the mirror image: start below anything detectable and step <em>up</em> until he first says "different." If the crossing were a fixed property of the subject, the two directions would land on the same number.</p>
+  <div class="row">
+    <button class="go" id="lim-asc">Run an ascending series</button>
+  </div>
+  <div class="panel">
+    <h3>Crossings so far, by direction</h3>
+    <canvas id="lim-cross-plot" height="190"></canvas>
+  </div>
+  <div class="reveal" id="lim-rev2"><strong>They disagree, and not randomly.</strong> Descending series cross low; ascending series cross high. The subject carries momentum: having said "different" four times he is disposed to say it once more, and having said "same" he keeps saying it. That is the <em>habituation error</em>. Its opposite, <em>anticipation</em>, appears when he knows what is coming and jumps early. Both are artifacts of presenting stimuli in a known order — the price of the method's economy.</div>
+
+  <h3 class="step">Step three — build up a set</h3>
+  <p class="q">One series of each is not evidence. Run fourteen more, alternating direction, and watch two distinct clouds form. The slider lets you dial the subject's habituation up and down; re-run and see what moves.</p>
+  <div class="ctl"><label for="lim-bias">His habituation bias</label><input type="range" id="lim-bias" min="0" max="2.5" step=".05" value="1"><span class="v" id="lim-biasv"></span></div>
+  <div class="row">
+    <button class="go" id="lim-many">Run 14 more series</button>
+    <button class="ghost" id="lim-reset">Clear all series</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="k">Series run</span><span class="v" id="lim-n">0</span></div>
+    <div class="stat"><span class="k">Ascending mean</span><span class="v d" id="lim-am">—</span></div>
+    <div class="stat"><span class="k">Descending mean</span><span class="v d" id="lim-dm">—</span></div>
+    <div class="stat"><span class="k">Gap</span><span class="v" id="lim-gap">—</span></div>
+  </div>
+  <div class="reveal" id="lim-rev3"><strong>Push the bias slider and the two clouds slide apart — in opposite directions, by the same amount.</strong> That symmetry is the whole design rationale. Neither direction alone estimates anything you want; each is the threshold plus a bias, with the sign flipped between them. Average them and the bias cancels.</div>
+
+  <h3 class="step">Step four — extracting a threshold</h3>
+  <p class="q">The rule: take the mean of all crossings, both directions pooled. The green line is that average.</p>
+  <div class="stats">
+    <div class="stat"><span class="k">Threshold</span><span class="v d" id="lim-th">—</span></div>
+    <div class="stat"><span class="k">Bias cancelled</span><span class="v" id="lim-canc">—</span></div>
+  </div>
+  <div class="note"><b>What was assumed.</b> This method never computes a proportion, so it never needs a stipulated percentage the way method one did. In its place it assumes the two directions err <em>symmetrically</em> — that habituation pushes ascending up exactly as far as it pushes descending down. Nothing in the data establishes that. Method one smuggled in a curve and a criterion; limits smuggles in a symmetry. Both are the experimenter's contribution, not the subject's.</div>
+
+  <h3 class="step">Step five — the same procedure, three different quantities</h3>
+  <p class="q">Now allow a third answer. Sweep the comparison from well below the standard to well above — and, for the reason you just established, back down again on alternate runs — letting the subject say <em>less</em>, <em>equal</em>, or <em>greater</em>. Each sweep now turns over twice, and those two transitions bracket something new.</p>
+  <div class="row"><button class="go" id="gel-run">Run 10 sweeps</button></div>
+  <div class="panel">
+    <h3>Where the answers change, over ten sweeps</h3>
+    <canvas id="gel-plot" height="215"></canvas>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="k">Lower limen</span><span class="v d" id="gel-lo">—</span></div>
+    <div class="stat"><span class="k">Upper limen</span><span class="v d" id="gel-hi">—</span></div>
+    <div class="stat"><span class="k">Interval of uncertainty</span><span class="v d" id="gel-iu">—</span></div>
+    <div class="stat"><span class="k">PSE</span><span class="v d" id="gel-pse">—</span></div>
+    <div class="stat"><span class="k">JND</span><span class="v d" id="gel-jnd">—</span></div>
+  </div>
+  <div class="reveal" id="gel-rev"><strong>One procedure, three quantities — and they are not the same quantity in different clothes.</strong> The band where he answers "equal" is the <em>interval of uncertainty</em>: the whole zone in which the comparison is indistinguishable from the standard. Its <em>midpoint</em> is the <strong>point of subjective equality</strong> — where "equal" sits for him, which need not be where physics puts it. Half its <em>width</em> is the <strong>JND</strong>. So the same twenty minutes at the bench yields a location (PSE), a width (IU), and a sensitivity (JND), each read off the same two transition points by a different arithmetic rule. Change the rule and you have changed which threshold you measured.</div>
+
+  <h3 class="step">Step six — now you are the subject</h3>
+  <p class="q">The difference between the two patches steps up or down on its own. Press the button — or hit the space bar — the instant your answer changes. Six series, alternating direction, exactly as above.</p>
+  <p class="small">Don't deliberate. The method wants your first crossing, not your considered one.</p>
+  <div class="row" id="t2-intro"><button class="go" id="t2-start">Begin</button></div>
+  <div id="t2-run" class="hidden">
+    <p class="q" id="t2-instr"></p>
+    <div class="stage"><div class="patch" id="t2-ref"></div><div class="patch" id="t2-test"></div></div>
+    <div class="row"><button class="go" id="t2-resp">I notice it now</button></div>
+    <p class="small mono" id="t2-count"></p>
+  </div>
+  <div id="t2-done" class="hidden">
+    <div class="panel"><h3>Your crossings</h3><canvas id="t2-plot" height="185"></canvas></div>
+    <div class="stats">
+      <div class="stat"><span class="k">Your ascending</span><span class="v d" id="t2-a">—</span></div>
+      <div class="stat"><span class="k">Your descending</span><span class="v d" id="t2-d">—</span></div>
+      <div class="stat"><span class="k">Your threshold</span><span class="v d" id="t2-th">—</span></div>
+    </div>
+    <div class="reveal on" id="t2-rev"></div>
+    <div class="row"><button class="ghost" id="t2-again">Run it again</button></div>
+  </div>
+</article>
+</div>
+
+<!-- ============ TAB 3 : ADJUSTMENT ============ -->
+<div class="tabpanel" id="panel-adj" role="tabpanel">
+<article>
+  <p class="act-n">METHOD THREE</p>
+  <h2>Adjustment</h2>
+  <p class="q">Hand the controls to the subject. No fixed levels, no ladder, no yes-or-no: he turns a screw that moves the comparison continuously, and stops when it seems equal to the standard. You write down where he stopped. The raw datum is a <strong>setting</strong> — not a judgement about a stimulus you chose, but an action he produced.</p>
+
+  <h3 class="step">Step one — take a single setting</h3>
+  <p class="q">He adjusts until the two feel the same, and stops. One number. Take it.</p>
+  <div class="panel">
+    <h3>Settings against the 100 g standard</h3>
+    <canvas id="adj-plot" height="205"></canvas>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="k">Settings</span><span class="v" id="adj-n">0</span></div>
+    <div class="stat"><span class="k">This setting</span><span class="v d" id="adj-last">—</span></div>
+    <div class="stat"><span class="k">Error</span><span class="v" id="adj-err">—</span></div>
+  </div>
+  <div class="row">
+    <button class="go" id="adj-one">Take one setting</button>
+    <button id="adj-few">Take 4 more</button>
+    <button id="adj-many">Take 35 more</button>
+    <button class="ghost" id="adj-reset">Clear</button>
+  </div>
+  <div class="reveal" id="adj-rev1"><strong>He did not stop at 100.</strong> He stopped near it, and he was certain it looked right. On its own that number tells you almost nothing: you cannot say whether the miss is a quirk of this one attempt or something systematic about him. Unlike method one, where a single trial was obviously worthless, here a single observation looks like a measurement — which makes it more misleading, not less.</div>
+
+  <div class="reveal" id="adj-rev2"><strong>Now the shape of the data appears.</strong> Every setting misses, and they miss by different amounts in different directions. This is the astronomer's situation exactly: repeated observations of one quantity, scattering. Fechner's move is to treat the subject as an instrument and read the scatter the way an astronomer reads the scatter of transit timings — which is why this method's older name is the <em>method of average error</em>.</div>
+
+  <h3 class="step">Step two — two numbers from one scatter</h3>
+  <p class="q">With forty settings there is a distribution to describe, and it takes two numbers to describe it. They answer different questions and neither substitutes for the other.</p>
+  <div class="stats">
+    <div class="stat"><span class="k">Mean (PSE)</span><span class="v d" id="adj-mean">—</span></div>
+    <div class="stat"><span class="k">Constant error</span><span class="v d" id="adj-ce">—</span></div>
+    <div class="stat"><span class="k">Spread (SD)</span><span class="v d" id="adj-sd">—</span></div>
+    <div class="stat"><span class="k">Threshold</span><span class="v d" id="adj-th">—</span></div>
+  </div>
+  <div class="reveal" id="adj-rev3"><strong>The centre is a location; the width is a sensitivity.</strong> The <em>mean</em> is the point of subjective equality — where "equal" sits for him. Its gap from the true 100&nbsp;g is a <strong>constant error</strong>, and it is stubbornly reproducible: which hand held the standard, which weight he lifted first. The <em>spread</em> is the sensitivity measure, and the threshold is taken as a fixed multiple of it. The two are independent. A subject can be beautifully precise and reliably wrong about where equality lies, and this method is the one that shows you both at once.</div>
+
+  <div class="note"><b>What was assumed.</b> The same move as method one wearing different clothes: a dispersion becomes a threshold only by multiplying it by 0.6745 — the probable error, the distance containing the middle half of the settings. Method one needed a percentage on a curve; this needs a multiple of a spread. Note also what this method cannot do at all: "adjust until it matches" presupposes something to match, so there is no way here to find the faintest detectable weight. It gives a difference threshold and a PSE, and no absolute threshold whatever.</div>
+
+  <div class="note"><b>The contamination it invites.</b> A setting is a produced movement, so motor error rides into the number alongside sensory error, and nothing in the data separates them. A subject with a heavy hand on the screw looks less sensitive than he is.</div>
+
+  <h3 class="step">Step three — now you are the subject</h3>
+  <p class="q">Drag the slider until the two patches look <em>identical</em>, then set it. The slider runs both ways, so you can overshoot in either direction — and each setting starts from a new random point, so you cannot simply repeat your last answer. Seven settings.</p>
+  <p class="small">Your mean will show where "identical" sits for you; your scatter will give your threshold.</p>
+  <div class="row" id="t3-intro"><button class="go" id="t3-start">Begin</button></div>
+  <div id="t3-run" class="hidden">
+    <div class="stage"><div class="patch" id="t3-ref"></div><div class="patch" id="t3-test"></div></div>
+    <div class="ctl"><label for="t3-slider">Right patch</label><input type="range" id="t3-slider" min="-25" max="25" step=".5" value="12"><span class="v" id="t3-sv">—</span></div>
+    <div class="row"><button class="go" id="t3-set">They look the same — set it</button></div>
+    <p class="small mono" id="t3-count"></p>
+  </div>
+  <div id="t3-done" class="hidden">
+    <div class="panel"><h3>Your settings</h3><canvas id="t3-plot" height="175"></canvas></div>
+    <div class="stats">
+      <div class="stat"><span class="k">Your PSE</span><span class="v d" id="t3-m">—</span></div>
+      <div class="stat"><span class="k">Your constant error</span><span class="v d" id="t3-ce">—</span></div>
+      <div class="stat"><span class="k">Your spread</span><span class="v d" id="t3-s">—</span></div>
+      <div class="stat"><span class="k">Your threshold</span><span class="v d" id="t3-th">—</span></div>
+    </div>
+    <div class="reveal on" id="t3-rev"></div>
+    <div class="row"><button class="ghost" id="t3-again">Run it again</button></div>
+  </div>
+</article>
+</div>
+
+<!-- ============ CLOSING ============ -->
+<article>
+  <p class="act-n">PUTTING THEM SIDE BY SIDE</p>
+  <h2>Three procedures, one subject</h2>
+  <p class="q">Whatever you have run so far appears below — the simulated subject in grams, you in grey levels. The two panels are separate because the units are: the point is not that the numbers match across modalities but that within each subject three different procedures land in the same neighbourhood without ever measuring the same thing.</p>
+  <div class="panel"><h3>The simulated subject (grams)</h3><canvas id="cmp-sim" height="150"></canvas></div>
+  <div class="panel"><h3>You (grey levels)</h3><canvas id="cmp-you" height="150"></canvas></div>
+  <div class="reveal" id="cmp-rev"></div>
+  <div class="note"><b>Why they are close, and why that is not proof of anything.</b> The simulated subject converges because he was built with one criterion written into him — a single σ that all three procedures interrogate. A real subject offers no such guarantee, and your own three numbers may well disagree more. What separates the methods is what each asks the subject to do (classify, report a crossing, produce a setting) and what each then needs before its raw data will yield a threshold at all: a stipulated percentage, an assumption of symmetric error, or a multiple of a dispersion. Those rules were chosen by the experimenter, not discovered in the subject.</div>
+</article>
+
+<article>
+  <p class="act-n">WHAT A THRESHOLD BUYS YOU</p>
+  <h2>Does the noise stay put?</h2>
+  <p class="q">Nothing so far says the subject behaves the same at other weights. Run the whole procedure again at each standard and see.</p>
+  <div class="row" id="a4-btns"></div>
+  <div class="panel"><h3>Threshold, and threshold as a fraction of the standard</h3><canvas id="a4-plot" height="265"></canvas></div>
+  <div class="stats" id="a4-stats"></div>
+  <div class="reveal" id="a4-rev"><strong>The absolute figures scatter across an order of magnitude; the ratio does not move.</strong> That constancy is Weber's law, and it is an empirical finding, not a definition — this subject could have come out otherwise. It is also what makes a general scale possible: if the threshold were an arbitrary function of the standard there would be nothing to count. Fechner named the law after Weber and then built everything on top of it.</div>
+</article>
+
+<article>
+  <p class="act-n">WHAT A THRESHOLD BUYS YOU</p>
+  <h2>Counting your way to a scale</h2>
+  <p class="q">Here is Fechner's move. Declare one threshold to be one unit of sensation — the same size wherever it occurs, because a just noticeable difference is a just noticeable difference. Now start at the faintest detectable weight and climb, one unit at a time.</p>
+  <div class="row">
+    <button class="go" id="a5-1">Add one unit</button>
+    <button id="a5-10">Add 10</button>
+    <button id="a5-100">Climb to 100 g</button>
+    <button class="ghost" id="a5-r">Back to the start</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="k">Units climbed</span><span class="v d" id="a5-n">0</span></div>
+    <div class="stat"><span class="k">Weight now</span><span class="v" id="a5-w">1.00 g</span></div>
+    <div class="stat"><span class="k">Size of this step</span><span class="v" id="a5-st">—</span></div>
+  </div>
+  <div class="panel"><h3>Each unit is a fixed ratio, so the steps grow</h3><canvas id="a5-plot" height="285"></canvas></div>
+  <div class="reveal" id="a5-rev"><strong>You did not assume a logarithm; you counted, and a logarithm appeared.</strong> Equal sensation steps are equal <em>ratios</em> of stimulus, so the physical steps stretch as you climb, and the count against the weight traces a log curve. That is Fechner's law. Notice also what fixed the bottom of the scale: the absolute threshold, the faintest detectable weight. Move that starting point and every sensation magnitude in the system moves with it.</div>
+</article>
+
+<article style="border-bottom:1px solid var(--rule)">
+  <p class="act-n">CLOSING</p>
+  <h2>What you built, and what you assumed</h2>
+  <p class="q">Reading down the notebook: judgements gave proportions; proportions plus an assumed error curve gave a dispersion; a dispersion plus a chosen criterion gave a threshold; a threshold plus Weber's law gave a unit; a unit plus a starting point gave a scale of sensation running to about a hundred units at 100&nbsp;g.</p>
+  <p class="q">Two of those links are measurements and three are decisions. The subject supplied the proportions, the constancy of the ratio, and the transition points. The experimenter supplied the shape of the error curve, the criterion that turns a smooth function into a threshold, and the stipulation that a just noticeable difference is everywhere the same size. All five are needed to reach a number, and the number does not announce which of its parents was which.</p>
+</article>
+</main>
+</div>
+
+<script>
+/* ---------- maths ---------- */
+function ncdf(z){const t=1/(1+.2316419*Math.abs(z)),d=.3989423*Math.exp(-z*z/2);
+  let p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p;}
+function npdf(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*Math.sqrt(2*Math.PI));}
+function ninv(p){const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.3577518672690,-30.66479806614716,2.506628277459239],
+ b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],
+ c=[-.007784894002430293,-.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],
+ d=[.007784695709041462,.3224671290700398,2.445134137142996,3.754408661907416];
+ const pl=.02425;let q,r;
+ if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ q=p-.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+let spare=null;
+function randn(){if(spare!==null){const s=spare;spare=null;return s;}
+  let u,v,s2;do{u=Math.random()*2-1;v=Math.random()*2-1;s2=u*u+v*v;}while(s2>=1||s2===0);
+  const f=Math.sqrt(-2*Math.log(s2)/s2);spare=v*f;return u*f;}
+const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
+const sdev=a=>{const m=mean(a);return Math.sqrt(mean(a.map(v=>(v-m)**2)));};
+
+/* ---------- the simulated subject ---------- */
+const WEBER=0.0715;                        /* sigma of the difference = WEBER x standard */
+const sigD=W=>WEBER*W, sigL=W=>sigD(W)/Math.SQRT2;
+function lift(W,delta){const s=sigL(W);return (W+delta+randn()*s)>(W+randn()*s);}
+const PEZ=0.6745, W0=1;
+
+/* ---------- canvas helper ---------- */
+const C={ink:'#1D201B',soft:'#5A5E56',faint:'#8C9086',rule:'#CECEC3',rule2:'#DEDED4',
+  data:'#35566B',data2:'#7C9AAB',live:'#5F7333',flag:'#8C4A2F',panel:'#F7F7F2'};
+function cv(id,h){const el=document.getElementById(id);if(!el)return null;
+  if(!el.clientWidth)return null;                     /* hidden tab: skip, replot on show */
+  const dpr=window.devicePixelRatio||1,w=el.clientWidth;
+  el.width=w*dpr;el.height=h*dpr;el.style.height=h+'px';
+  const x=el.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,w,h);
+  x.font='10px "Space Mono", monospace';return{x,w,h};}
+function grid(x,L,R,T,B,w,h,yt,yf,xt,xf,xlab){
+  x.strokeStyle=C.rule2;x.lineWidth=1;x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';
+  x.textAlign='right';x.textBaseline='middle';
+  yt.forEach(([v,py])=>{x.beginPath();x.moveTo(L,py);x.lineTo(w-R,py);x.stroke();x.fillText(yf(v),L-8,py);});
+  x.textAlign='center';x.textBaseline='top';
+  xt.forEach(([v,px])=>x.fillText(xf(v),px,h-B+8));
+  x.strokeStyle=C.rule;x.beginPath();x.moveTo(L,h-B);x.lineTo(w-R,h-B);x.stroke();
+  if(xlab){x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.fillText(xlab,(L+w-R)/2,h-11);}
+}
+const $=id=>document.getElementById(id);
+const show=(id,on)=>$(id).classList.toggle('on',on!==false);
+
+/* ---------- notebook rail ---------- */
+const FIND=[
+  ['01','Right and wrong cases',null],
+  ['02','Limits',null],
+  ['03','Adjustment',null],
+  ['04','Your three numbers',null],
+  ['05','Weber fraction',null],
+  ['06','Sensation of 100 g',null]];
+function rail(){
+  $('rail').innerHTML=FIND.map(([n,lab,val])=>
+    `<li class="${val?'done':''}"><b>${n} · ${lab}</b>${val?'<span class="num">'+val+'</span>':'pending'}</li>`).join('');
+}
+function note(i,v){FIND[i][2]=v;rail();}
+rail();
+
+/* ---------- grey patches for the self-tests ---------- */
+const GBASE=128;
+function patchColor(v){const c=Math.max(0,Math.min(255,Math.round(v)));return `rgb(${c},${c},${c})`;}
+function setPatches(refId,testId,delta){
+  $(refId).style.background=patchColor(GBASE);
+  $(testId).style.background=patchColor(GBASE+delta);
+}
+/* least-squares probit slope through (level, proportion) points -> spread */
+function probitSpread(pts){
+  let num=0,den=0;
+  pts.forEach(([L,pr])=>{const z=ninv(Math.min(.995,Math.max(.505,pr)));num+=L*z;den+=L*L;});
+  return den/num;
+}
+
+/* ================= TAB 1 · step 1 ================= */
+const A1={n:0,c:0,hist:[],lines:[]};
+function a1run(k){
+  for(let i=0;i<k;i++){const ok=lift(100,3);A1.n++;if(ok)A1.c++;A1.hist.push(A1.c/A1.n);
+    if(A1.lines.length<400)A1.lines.push(`trial ${String(A1.n).padStart(4)} · 100 g vs 103 g · <span class="${ok?'hit':'miss'}">${ok?'correct':'wrong'}</span>`);}
+  $('a1-n').textContent=A1.n;$('a1-c').textContent=A1.c;
+  $('a1-p').textContent=A1.n?(A1.c/A1.n).toFixed(3):'—';
+  const lg=$('a1-log');lg.innerHTML=A1.lines.slice(-120).reverse().join('<br>')||'No trials yet.';
+  a1plot();
+  if(A1.n>=50)show('a1-rev');
+}
+function a1plot(){
+  const p=cv('a1-plot',180);if(!p)return;const{x,w,h}=p,L=42,R=12,T=14,B=28;
+  const N=Math.max(A1.hist.length,20);
+  const X=i=>L+i/(N-1||1)*(w-L-R),Y=v=>h-B-(v-.3)/.6*(h-T-B);
+  grid(x,L,R,T,B,w,h,[[.3,Y(.3)],[.5,Y(.5)],[.7,Y(.7)],[.9,Y(.9)]],v=>v.toFixed(1),[],()=>'','trial number');
+  x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(L,Y(.5));x.lineTo(w-R,Y(.5));x.stroke();x.setLineDash([]);
+  if(!A1.hist.length)return;
+  x.beginPath();A1.hist.forEach((v,i)=>{const px=X(i),py=Y(Math.max(.3,Math.min(.9,v)));i?x.lineTo(px,py):x.moveTo(px,py);});
+  x.strokeStyle=C.data;x.lineWidth=1.6;x.stroke();
+  const last=A1.hist[A1.hist.length-1];
+  x.beginPath();x.arc(X(A1.hist.length-1),Y(Math.max(.3,Math.min(.9,last))),3.5,0,7);x.fillStyle=C.data;x.fill();
+}
+$('a1-1').onclick=()=>a1run(1);$('a1-10').onclick=()=>a1run(10);$('a1-100').onclick=()=>a1run(100);
+$('a1-r').onclick=()=>{A1.n=A1.c=0;A1.hist=[];A1.lines=[];a1run(0);};
+
+/* ================= TAB 1 · step 2 ================= */
+const LV=[1,2,3,4,6,8,10],A2={d:{},ov:null};
+$('a2-btns').innerHTML=LV.map(v=>`<button data-l="${v}">${v} g</button>`).join('');
+$('a2-btns').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  const L=+b.dataset.l;let c=0;for(let i=0;i<120;i++)if(lift(100,L))c++;
+  A2.d[L]=(A2.d[L]||{n:0,c:0});A2.d[L].n+=120;A2.d[L].c+=c;a2plot();a3fit();
+  if(Object.keys(A2.d).length>=4)show('a2-rev');
+});
+$('a2-r').onclick=()=>{A2.d={};A2.ov=null;a2plot();a3fit();};
+$('a2-step').onclick=()=>{A2.ov='step';a2plot();};
+$('a2-smooth').onclick=()=>{A2.ov='smooth';a2plot();};
+$('a2-clear').onclick=()=>{A2.ov=null;a2plot();};
+function a2frame(w,h){const L=44,R=14,T=16,B=34;
+  return{L,R,T,B,X:v=>L+v/11*(w-L-R),Y:p=>h-B-(p-.4)/.62*(h-T-B)};}
+function a2plot(){
+  const p=cv('a2-plot',250);if(!p)return;const{x,w,h}=p,f=a2frame(w,h);
+  grid(x,f.L,f.R,f.T,f.B,w,h,[[.5,f.Y(.5)],[.6,f.Y(.6)],[.7,f.Y(.7)],[.8,f.Y(.8)],[.9,f.Y(.9)],[1,f.Y(1)]],
+    v=>v.toFixed(1),[0,2,4,6,8,10].map(v=>[v,f.X(v)]),v=>v,'difference between the weights (g)');
+  x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(f.L,f.Y(.5));x.lineTo(w-f.R,f.Y(.5));x.stroke();x.setLineDash([]);
+  if(A2.ov==='step'){const th=4.8;
+    x.strokeStyle=C.flag;x.lineWidth=1.7;x.setLineDash([5,4]);x.beginPath();
+    x.moveTo(f.X(0),f.Y(.5));x.lineTo(f.X(th),f.Y(.5));
+    for(let v=th;v<=11;v+=.1)x.lineTo(f.X(v),f.Y(Math.min(1,.5+(v-th)*.075)));
+    x.stroke();x.setLineDash([]);
+    x.fillStyle=C.flag;x.textAlign='left';x.font='10px "Space Mono", monospace';
+    x.fillText('predicted if a real threshold',f.X(.3),f.Y(.53));}
+  if(A2.ov==='smooth'){x.strokeStyle=C.live;x.lineWidth=1.7;x.setLineDash([5,4]);x.beginPath();
+    for(let v=0;v<=11;v+=.1){const px=f.X(v),py=f.Y(ncdf(v/sigD(100)));v?x.lineTo(px,py):x.moveTo(px,py);}
+    x.stroke();x.setLineDash([]);
+    x.fillStyle=C.live;x.textAlign='left';x.font='10px "Space Mono", monospace';
+    x.fillText('predicted if no threshold',f.X(.3),f.Y(.53));}
+  Object.entries(A2.d).forEach(([L,o])=>{const pr=o.c/o.n;
+    x.beginPath();x.arc(f.X(+L),f.Y(pr),4.5,0,7);x.fillStyle=C.panel;x.fill();
+    x.strokeStyle=C.data;x.lineWidth=1.8;x.stroke();
+    x.fillStyle=C.soft;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='bottom';
+    x.fillText(pr.toFixed(2),f.X(+L),f.Y(pr)-8);});
+}
+
+/* ================= TAB 1 · step 3 ================= */
+const A3={s:11,view:'two',fitted:false};
+$('a3-two').onclick=()=>{A3.view='two';$('a3-h').textContent='Internal values for the two lifts';a3plot();};
+$('a3-diff').onclick=()=>{A3.view='diff';$('a3-h').textContent='The difference between them';a3plot();};
+$('a3-s').oninput=e=>{A3.s=+e.target.value;a3plot();a3fit();};
+function a3plot(){
+  const p=cv('a3-plot',215);if(!p)return;const{x,w,h}=p,L=16,R=16,T=16,B=30;
+  const s=A3.s,sd=s*Math.SQRT2;
+  if(A3.view==='two'){
+    const lo=100-34,hi=100+37,pk=npdf(0,0,s);
+    const X=v=>L+(v-lo)/(hi-lo)*(w-L-R),Y=v=>h-B-v/(pk*1.15)*(h-T-B);
+    x.strokeStyle=C.rule;x.beginPath();x.moveTo(L,h-B);x.lineTo(w-R,h-B);x.stroke();
+    [[100,C.data2,'standard 100 g'],[103,C.data,'comparison 103 g']].forEach(([m,col,lab],i)=>{
+      x.beginPath();for(let v=lo;v<=hi;v+=.2){const px=X(v),py=Y(npdf(v,m,s));v===lo?x.moveTo(px,py):x.lineTo(px,py);}
+      x.strokeStyle=col;x.lineWidth=1.8;x.stroke();
+      x.fillStyle=col;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='bottom';
+      x.fillText(lab,X(m),Y(npdf(m,m,s))-6-i*13);});
+    x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+    [80,90,100,110,120].forEach(v=>{if(v>=lo&&v<=hi)x.fillText(v,X(v),h-B+8);});
+    x.fillText('felt weight of a single lift (g)',(L+w-R)/2,h-12);
+  }else{
+    const lo=-40,hi=40,pk=npdf(0,0,sd);
+    const X=v=>L+(v-lo)/(hi-lo)*(w-L-R),Y=v=>h-B-v/(pk*1.15)*(h-T-B);
+    x.beginPath();x.moveTo(X(0),h-B);
+    for(let v=0;v<=hi;v+=.2)x.lineTo(X(v),Y(npdf(v,3,sd)));
+    x.lineTo(X(hi),h-B);x.closePath();x.fillStyle='rgba(53,86,107,.13)';x.fill();
+    x.beginPath();for(let v=lo;v<=hi;v+=.2){const px=X(v),py=Y(npdf(v,3,sd));v===lo?x.moveTo(px,py):x.lineTo(px,py);}
+    x.strokeStyle=C.data;x.lineWidth=1.8;x.stroke();
+    x.strokeStyle=C.ink;x.lineWidth=1.2;x.beginPath();x.moveTo(X(0),T);x.lineTo(X(0),h-B);x.stroke();
+    x.fillStyle=C.ink;x.font='10px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+    x.fillText('correct: '+(ncdf(3/sd)*100).toFixed(1)+'%',X(0)+8,T+2);
+    x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='center';
+    [-30,-15,0,15,30].forEach(v=>x.fillText(v,X(v),h-B+8));
+    x.fillText('comparison minus standard, as felt (g)',(L+w-R)/2,h-12);
+  }
+}
+function a3fit(){
+  const sd=A3.s*Math.SQRT2;
+  $('a3-sv').textContent=A3.s.toFixed(2)+' g';
+  $('a3-r1').textContent=A3.s.toFixed(2);
+  $('a3-r2').textContent=sd.toFixed(2);
+  $('a3-r5').textContent=(PEZ*sd).toFixed(2)+' g';
+  /* Misfit is judged against the data's own sampling noise, not an absolute
+     number: with n trials a proportion wobbles by sqrt(p(1-p)/n) even under a
+     perfect model, so a fixed cutoff would be unreachable at small n. */
+  let ss=0,vv=0,k=0;
+  Object.entries(A2.d).forEach(([L,o])=>{const pr=o.c/o.n;
+    ss+=(pr-ncdf(+L/sd))**2; vv+=pr*(1-pr)/o.n; k++;});
+  const rms=k?Math.sqrt(ss/k):null, floor=k?Math.sqrt(vv/k):null;
+  $('a3-r4').textContent=k?rms.toFixed(4):'—';
+  if(k>=4&&rms<Math.max(0.02,1.6*floor)){A3.fitted=true;show('a3-rev');}
+  if(A3.fitted){note(0,(PEZ*sd).toFixed(2)+' g');cmpPlot();}
+  const p=cv('a3-fit',230);if(!p)return;const{x,w,h}=p,f=a2frame(w,h);
+  grid(x,f.L,f.R,f.T,f.B,w,h,[[.5,f.Y(.5)],[.6,f.Y(.6)],[.7,f.Y(.7)],[.8,f.Y(.8)],[.9,f.Y(.9)],[1,f.Y(1)]],
+    v=>v.toFixed(1),[0,2,4,6,8,10].map(v=>[v,f.X(v)]),v=>v,'difference between the weights (g)');
+  x.beginPath();for(let v=0;v<=11;v+=.1){const px=f.X(v),py=f.Y(ncdf(v/sd));v?x.lineTo(px,py):x.moveTo(px,py);}
+  x.strokeStyle=C.live;x.lineWidth=1.8;x.stroke();
+  Object.entries(A2.d).forEach(([L,o])=>{const pr=o.c/o.n;
+    x.beginPath();x.arc(f.X(+L),f.Y(pr),4.5,0,7);x.fillStyle=C.panel;x.fill();
+    x.strokeStyle=C.data;x.lineWidth=1.8;x.stroke();});
+}
+
+/* ================= TAB 1 · self-test ================= */
+const T1_LV=[3,6,10,16],T1_REPS=8;
+const T1={q:[],i:0,res:{},sd:null,th:null};
+function t1Build(){
+  T1.q=[];T1_LV.forEach(d=>{for(let r=0;r<T1_REPS;r++)T1.q.push(d);});
+  for(let i=T1.q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[T1.q[i],T1.q[j]]=[T1.q[j],T1.q[i]];}
+  T1.i=0;T1.res={};T1_LV.forEach(d=>T1.res[d]={n:0,yes:0});T1.sd=null;T1.th=null;
+}
+function t1Draw(){
+  const d=T1.q[T1.i];if(d===undefined)return t1End();
+  setPatches('t1-ref','t1-test',d);
+  $('t1-bar').style.width=(T1.i/T1.q.length*100)+'%';
+  $('t1-count').textContent='trial '+(T1.i+1)+' of '+T1.q.length;
+}
+function t1Ans(yes){
+  const d=T1.q[T1.i];if(d===undefined)return;
+  T1.res[d].n++;if(yes)T1.res[d].yes++;
+  T1.i++;T1.i<T1.q.length?t1Draw():t1End();
+}
+function t1End(){
+  $('t1-run').classList.add('hidden');$('t1-done').classList.remove('hidden');
+  T1.sd=probitSpread(T1_LV.map(d=>[d,T1.res[d].yes/T1.res[d].n]));
+  T1.th=PEZ*T1.sd;
+  $('t1-sd').textContent=T1.sd.toFixed(2);
+  $('t1-th').textContent=T1.th.toFixed(2);
+  const easy=T1.res[T1_LV[0]],pr0=easy.yes/easy.n;
+  $('t1-rev').innerHTML='<strong>Your threshold by this method: '+T1.th.toFixed(2)+' grey levels — a Weber fraction of '+
+    (T1.th/GBASE*100).toFixed(2)+'%.</strong> '+(pr0>.55
+      ? 'At the smallest difference you still said "different" '+easy.yes+' times in '+easy.n+'. Note that the number above came from a curve fitted to your proportions and a criterion nobody measured — the same two decisions the simulated subject needed.'
+      : 'At the smallest difference you were near chance ('+easy.yes+'/'+easy.n+'), which on most displays means that step fell below what your screen can render. The estimate is carried by the larger levels; try again in a darker room if you want it tighter.');
+  t1Plot();note(3,'see closing');cmpPlot();
+}
+function t1Plot(){
+  const p=cv('t1-plot',220);if(!p)return;const{x,w,h}=p,L=44,R=16,T=16,B=32;
+  const X=v=>L+v/20*(w-L-R),Y=pr=>h-B-(pr-.4)/.62*(h-T-B);
+  grid(x,L,R,T,B,w,h,[.5,.75,1].map(v=>[v,Y(v)]),v=>v.toFixed(2),
+    [0,5,10,15,20].map(v=>[v,X(v)]),v=>v,'difference (grey levels)');
+  x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(L,Y(.5));x.lineTo(w-R,Y(.5));x.stroke();x.setLineDash([]);
+  if(!T1.sd)return;
+  x.beginPath();for(let v=0;v<=20;v+=.2){const px=X(v),py=Y(ncdf(v/T1.sd));v?x.lineTo(px,py):x.moveTo(px,py);}
+  x.strokeStyle=C.live;x.lineWidth=1.8;x.stroke();
+  T1_LV.forEach(d=>{const pr=T1.res[d].yes/T1.res[d].n;
+    x.beginPath();x.arc(X(d),Y(Math.max(.4,Math.min(1,pr))),4.5,0,7);x.fillStyle=C.panel;x.fill();
+    x.strokeStyle=C.data;x.lineWidth=1.8;x.stroke();
+    x.fillStyle=C.soft;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='bottom';
+    x.fillText(T1.res[d].yes+'/'+T1.res[d].n,X(d),Y(Math.max(.4,Math.min(1,pr)))-9);});
+}
+$('t1-yes').onclick=()=>t1Ans(true);
+$('t1-no').onclick=()=>t1Ans(false);
+$('t1-start').onclick=()=>{t1Build();$('t1-intro').classList.add('hidden');
+  $('t1-done').classList.add('hidden');$('t1-run').classList.remove('hidden');t1Draw();};
+$('t1-again').onclick=()=>{t1Build();$('t1-done').classList.add('hidden');
+  $('t1-run').classList.remove('hidden');t1Draw();};
+
+/* ================= TAB 2 · LIMITS =================
+   Trial-level simulation. The subject carries an internal criterion; a
+   habituation bias shifts it in whichever direction the series is travelling,
+   so ascending and descending series err oppositely. */
+const LIM_STEP=0.5, LIM_TOP=16, LIM_NOISE=()=>0.15*sigD(100);
+const LIM={bias:1,series:[],cur:null};
+$('lim-bias').oninput=e=>{LIM.bias=+e.target.value;$('lim-biasv').textContent=LIM.bias.toFixed(2)+' g';};
+$('lim-biasv').textContent='1.00 g';
+
+function limNewSeries(dir){
+  const jitter=Math.random()*1.5;
+  return {dir,rows:[],cross:null,
+          d:dir==='desc'?LIM_TOP-jitter:0+jitter,done:false};
+}
+/* his answer at difference d, given the direction he is travelling */
+function limSay(d,dir){
+  const eff=PEZ*sigD(100)+(dir==='asc'?LIM.bias:-LIM.bias);
+  return (d+randn()*LIM_NOISE())>eff?'different':'same';
+}
+function limAdvance(s){
+  if(s.done)return;
+  const say=limSay(s.d,s.dir);
+  s.rows.push({d:s.d,say});
+  const flipped=(s.dir==='desc')?(say==='same'):(say==='different');
+  if(flipped){
+    s.cross=(s.dir==='desc')?s.d+LIM_STEP/2:s.d-LIM_STEP/2;
+    s.cross=Math.max(0,Math.min(LIM_TOP,s.cross));
+    s.done=true;
+  }else{
+    s.d+=(s.dir==='desc')?-LIM_STEP:LIM_STEP;
+    if(s.d<0||s.d>LIM_TOP){s.cross=Math.max(0,Math.min(LIM_TOP,s.d));s.done=true;}
+  }
+}
+function limFinish(s){let g=0;while(!s.done&&g++<200)limAdvance(s);return s;}
+function limRunFull(dir){const s=limNewSeries(dir);limFinish(s);LIM.series.push(s);return s;}
+
+function limCrossings(dir){return LIM.series.filter(s=>s.dir===dir&&s.cross!=null).map(s=>s.cross);}
+function limStats(){
+  const a=limCrossings('asc'),d=limCrossings('desc');
+  const all=LIM.series.filter(s=>s.cross!=null).map(s=>s.cross);
+  return {a,d,am:a.length?mean(a):null,dm:d.length?mean(d):null,
+          th:all.length?mean(all):null,n:LIM.series.length};
+}
+function limUpdate(){
+  const s=LIM.cur,st=limStats();
+  if(s){
+    const last=s.rows[s.rows.length-1];
+    $('lim-k').textContent=s.rows.length||'—';
+    $('lim-d').textContent=last?last.d.toFixed(1)+' g':s.d.toFixed(1)+' g';
+    $('lim-say').textContent=last?last.say:'—';
+    $('lim-cross').textContent=s.cross!=null?s.cross.toFixed(2)+' g':'—';
+  }
+  $('lim-n').textContent=st.n;
+  $('lim-am').textContent=st.am!=null?st.am.toFixed(2)+' g':'—';
+  $('lim-dm').textContent=st.dm!=null?st.dm.toFixed(2)+' g':'—';
+  $('lim-gap').textContent=(st.am!=null&&st.dm!=null)?(st.am-st.dm).toFixed(2)+' g':'—';
+  $('lim-th').textContent=st.th!=null?st.th.toFixed(2)+' g':'—';
+  if(st.am!=null&&st.dm!=null){
+    const mid=(st.am+st.dm)/2, truth=PEZ*sigD(100);
+    $('lim-canc').textContent=(Math.abs(mid-truth)).toFixed(2)+' g off';
+  }
+  if(s&&s.done)show('lim-rev1');
+  if(limCrossings('asc').length&&limCrossings('desc').length)show('lim-rev2');
+  if(st.n>=8)show('lim-rev3');
+  if(st.th!=null&&st.n>=8){note(1,st.th.toFixed(2)+' g');cmpPlot();}
+  limLadder();limCrossPlot();
+}
+function limLadder(){
+  const p=cv('lim-ladder',250);if(!p)return;const{x,w,h}=p,L=46,R=110,T=18,B=34;
+  const s=LIM.cur, n=Math.max(s?s.rows.length:0,10);
+  const X=i=>L+i/(n-1||1)*(w-L-R), Y=v=>h-B-v/LIM_TOP*(h-T-B);
+  grid(x,L,R,T,B,w,h,[0,4,8,12,16].map(v=>[v,Y(v)]),v=>v,[],()=>'','step within the series');
+  if(!s||!s.rows.length){x.fillStyle=C.faint;x.textAlign='center';x.textBaseline='middle';
+    x.fillText('present a step to begin',(L+w-R)/2,(T+h-B)/2);return;}
+  x.beginPath();s.rows.forEach((r,i)=>{const px=X(i),py=Y(r.d);i?x.lineTo(px,py):x.moveTo(px,py);});
+  x.strokeStyle=C.data2;x.lineWidth=1.4;x.stroke();
+  s.rows.forEach((r,i)=>{
+    x.beginPath();x.arc(X(i),Y(r.d),5,0,7);
+    if(r.say==='different'){x.fillStyle=C.data;x.fill();}
+    else{x.fillStyle=C.panel;x.fill();x.strokeStyle=C.data;x.lineWidth=1.7;x.stroke();}
+  });
+  const last=s.rows[s.rows.length-1];
+  x.fillStyle=C.soft;x.font='10px "Space Mono", monospace';x.textAlign='left';x.textBaseline='middle';
+  x.fillText(last.say,X(s.rows.length-1)+11,Y(last.d));
+  if(s.cross!=null){
+    x.strokeStyle=C.live;x.lineWidth=1.8;x.setLineDash([5,4]);
+    x.beginPath();x.moveTo(L,Y(s.cross));x.lineTo(w-R,Y(s.cross));x.stroke();x.setLineDash([]);
+    x.fillStyle=C.live;x.textAlign='left';x.textBaseline='bottom';
+    x.fillText('crossing '+s.cross.toFixed(2)+' g',w-R+6,Y(s.cross)-3);
+  }
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText((s.dir==='desc'?'descending':'ascending')+' · filled = "different"',L+2,T);
+}
+function limCrossPlot(){
+  const p=cv('lim-cross-plot',190);if(!p)return;const{x,w,h}=p,L=82,R=18,T=22,B=34;
+  const X=v=>L+v/LIM_TOP*(w-L-R);
+  x.strokeStyle=C.rule2;x.lineWidth=1;
+  [0,4,8,12,16].forEach(v=>{x.beginPath();x.moveTo(X(v),T);x.lineTo(X(v),h-B);x.stroke();});
+  x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  [0,4,8,12,16].forEach(v=>x.fillText(v,X(v),h-B+8));
+  x.fillText('crossing point (g above the standard)',(L+w-R)/2,h-12);
+  x.textAlign='right';x.textBaseline='middle';x.fillStyle=C.soft;
+  const rA=T+30,rD=T+76;
+  x.fillText('ascending',L-12,rA);x.fillText('descending',L-12,rD);
+  const st=limStats();
+  [[st.a,rA],[st.d,rD]].forEach(([arr,r])=>arr.forEach((v,i)=>{
+    x.beginPath();x.arc(X(v),r+((i%3)-1)*7,4,0,7);
+    x.fillStyle=C.panel;x.fill();x.strokeStyle=C.data;x.lineWidth=1.6;x.stroke();}));
+  [[st.am,rA],[st.dm,rD]].forEach(([m,r])=>{if(m==null)return;
+    x.strokeStyle=C.data;x.lineWidth=1.6;x.beginPath();x.moveTo(X(m),r-19);x.lineTo(X(m),r+19);x.stroke();});
+  if(st.th!=null){
+    x.strokeStyle=C.live;x.lineWidth=1.8;x.setLineDash([5,4]);
+    x.beginPath();x.moveTo(X(st.th),T);x.lineTo(X(st.th),h-B);x.stroke();x.setLineDash([]);
+    x.fillStyle=C.live;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+    x.fillText('average '+st.th.toFixed(2)+' g',X(st.th),T+1);
+  }
+}
+$('lim-step').onclick=()=>{
+  if(!LIM.cur||LIM.cur.done){LIM.cur=limNewSeries('desc');}
+  limAdvance(LIM.cur);
+  if(LIM.cur.done&&!LIM.series.includes(LIM.cur))LIM.series.push(LIM.cur);
+  limUpdate();
+};
+$('lim-finish').onclick=()=>{
+  if(!LIM.cur||LIM.cur.done)LIM.cur=limNewSeries('desc');
+  limFinish(LIM.cur);
+  if(!LIM.series.includes(LIM.cur))LIM.series.push(LIM.cur);
+  limUpdate();
+};
+$('lim-restart').onclick=()=>{
+  if(LIM.cur&&!LIM.cur.done){const i=LIM.series.indexOf(LIM.cur);if(i>=0)LIM.series.splice(i,1);}
+  LIM.cur=limNewSeries('desc');limUpdate();
+};
+$('lim-asc').onclick=()=>{LIM.cur=limRunFull('asc');limUpdate();};
+$('lim-many').onclick=()=>{
+  for(let i=0;i<14;i++)limRunFull(i%2===0?'desc':'asc');
+  LIM.cur=LIM.series[LIM.series.length-1];limUpdate();
+};
+$('lim-reset').onclick=()=>{LIM.series=[];LIM.cur=null;limUpdate();};
+
+/* ---- greater / equal / less sweeps ---- */
+const GEL={sweeps:[],lo:null,hi:null};
+/* Sweeps alternate direction for the same reason the yes/no series do: taking
+   the first transition in a single direction lets noise trip both limens early,
+   which drags the whole interval — and so the PSE — the way the sweep travels.
+   Running both ways and pooling cancels it. */
+$('gel-run').onclick=()=>{
+  GEL.sweeps=[];
+  const crit=PEZ*sigD(100),ns=LIM_NOISE();
+  const answer=d=>{const e=d+randn()*ns;
+    return e>crit?'greater':(e<-crit?'less':'equal');};
+  for(let s=0;s<10;s++){
+    const up=(s%2===0);
+    let lo=null,hi=null,prev=null;
+    if(up){
+      for(let d=-22;d<=22;d+=0.5){const say=answer(d);
+        if(prev==='less'&&say==='equal'&&lo===null)lo=d-0.25;
+        if(prev==='equal'&&say==='greater'&&hi===null)hi=d-0.25;
+        prev=say;}
+    }else{
+      for(let d=22;d>=-22;d-=0.5){const say=answer(d);
+        if(prev==='greater'&&say==='equal'&&hi===null)hi=d+0.25;
+        if(prev==='equal'&&say==='less'&&lo===null)lo=d+0.25;
+        prev=say;}
+    }
+    if(lo!==null&&hi!==null&&hi>lo)GEL.sweeps.push({lo,hi,up});
+  }
+  if(GEL.sweeps.length){
+    GEL.lo=mean(GEL.sweeps.map(s=>s.lo));GEL.hi=mean(GEL.sweeps.map(s=>s.hi));
+    const iu=GEL.hi-GEL.lo,pse=(GEL.hi+GEL.lo)/2,jnd=iu/2;
+    $('gel-lo').textContent=GEL.lo.toFixed(2)+' g';
+    $('gel-hi').textContent=GEL.hi.toFixed(2)+' g';
+    $('gel-iu').textContent=iu.toFixed(2)+' g';
+    $('gel-pse').textContent=pse.toFixed(2)+' g';
+    $('gel-jnd').textContent=jnd.toFixed(2)+' g';
+    show('gel-rev');
+  }
+  gelPlot();
+};
+function gelPlot(){
+  const p=cv('gel-plot',215);if(!p)return;const{x,w,h}=p,L=44,R=18,T=26,B=36;
+  const LOW=-22,HIGH=22;
+  const X=v=>L+(v-LOW)/(HIGH-LOW)*(w-L-R);
+  x.strokeStyle=C.rule2;x.lineWidth=1;
+  [-20,-10,0,10,20].forEach(v=>{x.beginPath();x.moveTo(X(v),T);x.lineTo(X(v),h-B);x.stroke();});
+  x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  [-20,-10,0,10,20].forEach(v=>x.fillText(v,X(v),h-B+8));
+  x.fillText('comparison minus standard (g)',(L+w-R)/2,h-12);
+  if(!GEL.sweeps.length){x.fillStyle=C.faint;x.textBaseline='middle';
+    x.fillText('run the sweeps',(L+w-R)/2,(T+h-B)/2);return;}
+  const lane=(h-T-B-16)/GEL.sweeps.length;
+  GEL.sweeps.forEach((s,i)=>{
+    const py=T+8+lane*i+lane/2;
+    x.strokeStyle=C.rule;x.lineWidth=1;x.beginPath();x.moveTo(L,py);x.lineTo(w-R,py);x.stroke();
+    x.fillStyle='rgba(53,86,107,.18)';x.fillRect(X(s.lo),py-lane*.34,X(s.hi)-X(s.lo),lane*.68);
+    [s.lo,s.hi].forEach(v=>{x.beginPath();x.arc(X(v),py,3.2,0,7);x.fillStyle=C.data;x.fill();});
+    x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='right';x.textBaseline='middle';
+    x.fillText(s.up?'↑':'↓',L-6,py);
+  });
+  const iuLo=X(GEL.lo),iuHi=X(GEL.hi),pse=(GEL.lo+GEL.hi)/2;
+  x.strokeStyle=C.live;x.lineWidth=1.8;
+  [GEL.lo,GEL.hi].forEach(v=>{x.setLineDash([5,4]);x.beginPath();
+    x.moveTo(X(v),T);x.lineTo(X(v),h-B);x.stroke();x.setLineDash([]);});
+  x.strokeStyle=C.flag;x.lineWidth=1.6;x.beginPath();
+  x.moveTo(X(pse),T);x.lineTo(X(pse),h-B);x.stroke();
+  x.fillStyle=C.live;x.font='9.5px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  x.fillText('interval of uncertainty',(iuLo+iuHi)/2,T-14);
+  x.fillStyle=C.flag;x.textBaseline='bottom';x.fillText('PSE',X(pse),h-B-2);
+}
+
+/* ================= TAB 2 · self-test ================= */
+const T2_STEP=1.5,T2_MAX=30,T2_TICK=380,T2_SERIES=6;
+const T2={series:0,dir:'asc',delta:0,timer:null,crossings:[],active:false,th:null};
+function t2Label(){
+  $('t2-instr').textContent=T2.dir==='asc'
+    ?'Climbing from nothing — press the moment you first notice a difference.'
+    :'Falling from clearly different — press the moment it stops looking different.';
+  $('t2-resp').textContent=T2.dir==='asc'?'I notice it now':'Looks the same now';
+  $('t2-count').textContent='series '+Math.min(T2.series+1,T2_SERIES)+' of '+T2_SERIES+
+    ' · '+(T2.dir==='asc'?'ascending':'descending');
+}
+function t2NextSeries(){
+  if(T2.series>=T2_SERIES)return t2End();
+  T2.dir=(T2.series%2===0)?'asc':'desc';
+  T2.delta=T2.dir==='asc'?0:T2_MAX;
+  T2.active=true;t2Label();setPatches('t2-ref','t2-test',T2.delta);
+  clearInterval(T2.timer);
+  T2.timer=setInterval(()=>{
+    T2.delta+=T2.dir==='asc'?T2_STEP:-T2_STEP;
+    if(T2.dir==='asc'&&T2.delta>=T2_MAX)return t2Cross(T2_MAX);
+    if(T2.dir==='desc'&&T2.delta<=0)return t2Cross(0);
+    setPatches('t2-ref','t2-test',T2.delta);
+  },T2_TICK);
+}
+function t2Cross(v){
+  if(!T2.active)return;T2.active=false;clearInterval(T2.timer);
+  T2.crossings.push({dir:T2.dir,v});T2.series++;t2Plot();
+  setTimeout(()=>{if(!$('panel-lim').classList.contains('on'))return;t2NextSeries();},500);
+}
+function t2Abort(){clearInterval(T2.timer);T2.active=false;
+  $('t2-run').classList.add('hidden');$('t2-intro').classList.remove('hidden');}
+$('t2-resp').onclick=()=>{if(T2.active)t2Cross(T2.delta);};
+document.addEventListener('keydown',e=>{
+  if(!$('panel-lim').classList.contains('on'))return;
+  if($('t2-run').classList.contains('hidden'))return;
+  if(e.code==='Space'){e.preventDefault();if(T2.active)t2Cross(T2.delta);}
+});
+function t2End(){
+  $('t2-run').classList.add('hidden');$('t2-done').classList.remove('hidden');
+  const asc=T2.crossings.filter(c=>c.dir==='asc').map(c=>c.v);
+  const desc=T2.crossings.filter(c=>c.dir==='desc').map(c=>c.v);
+  T2.th=mean(T2.crossings.map(c=>c.v));
+  $('t2-a').textContent=asc.length?mean(asc).toFixed(2):'—';
+  $('t2-d').textContent=desc.length?mean(desc).toFixed(2):'—';
+  $('t2-th').textContent=T2.th.toFixed(2);
+  const gap=asc.length&&desc.length?mean(asc)-mean(desc):0;
+  $('t2-rev').innerHTML='<strong>Your threshold by this method: '+T2.th.toFixed(2)+' grey levels.</strong> '+
+    'Your ascending crossings averaged '+(asc.length?mean(asc).toFixed(2):'—')+' and your descending ones '+
+    (desc.length?mean(desc).toFixed(2):'—')+' — a gap of '+Math.abs(gap).toFixed(2)+
+    '. That gap is your own habituation and anticipation error, the thing the two directions exist to cancel. '+
+    (Math.abs(gap)>2?'Yours is sizeable, which is exactly why a single direction would have misled you.'
+      :'Yours is small, but a one-direction experiment would have had no way to know that in advance.');
+  t2Plot();note(3,'see closing');cmpPlot();
+}
+function t2Plot(){
+  const p=cv('t2-plot',185);if(!p)return;const{x,w,h}=p,L=78,R=16,T=20,B=32;
+  const X=v=>L+v/T2_MAX*(w-L-R);
+  x.strokeStyle=C.rule2;x.lineWidth=1;
+  [0,10,20,30].forEach(v=>{x.beginPath();x.moveTo(X(v),T);x.lineTo(X(v),h-B);x.stroke();});
+  x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  [0,10,20,30].forEach(v=>x.fillText(v,X(v),h-B+8));
+  x.fillText('crossing point (grey levels)',(L+w-R)/2,h-12);
+  x.textAlign='right';x.textBaseline='middle';x.fillStyle=C.soft;
+  const rA=T+32,rD=T+82;
+  x.fillText('ascending',L-12,rA);x.fillText('descending',L-12,rD);
+  const asc=T2.crossings.filter(c=>c.dir==='asc').map(c=>c.v);
+  const desc=T2.crossings.filter(c=>c.dir==='desc').map(c=>c.v);
+  [[asc,rA],[desc,rD]].forEach(([arr,r])=>arr.forEach((v,i)=>{
+    x.beginPath();x.arc(X(v),r+((i%2)?7:-7),4,0,7);
+    x.fillStyle=C.panel;x.fill();x.strokeStyle=C.data;x.lineWidth=1.6;x.stroke();}));
+  if(T2.crossings.length){const m=mean(T2.crossings.map(c=>c.v));
+    x.strokeStyle=C.live;x.lineWidth=1.8;x.setLineDash([5,4]);
+    x.beginPath();x.moveTo(X(m),T);x.lineTo(X(m),h-B);x.stroke();x.setLineDash([]);
+    x.fillStyle=C.live;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+    x.fillText('average '+m.toFixed(2),X(m),T+1);}
+}
+$('t2-start').onclick=()=>{T2.series=0;T2.crossings=[];
+  $('t2-intro').classList.add('hidden');$('t2-done').classList.add('hidden');
+  $('t2-run').classList.remove('hidden');t2NextSeries();};
+$('t2-again').onclick=()=>{T2.series=0;T2.crossings=[];
+  $('t2-done').classList.add('hidden');$('t2-run').classList.remove('hidden');t2NextSeries();};
+
+/* ================= TAB 3 · ADJUSTMENT ================= */
+/* His constant error: "equal" sits above 100 g. Set well clear of the noise in
+   the mean of ~40 settings (SD ~1.1 g), so the offset is legible rather than a
+   coin-flip — the point of the step is that it is systematic, not marginal. */
+const ADJ_CE=3.4;
+const ADJ={set:[]};
+function adjTake(k){
+  const s=sigD(100);
+  for(let i=0;i<k;i++)ADJ.set.push(100+ADJ_CE+randn()*s);
+  adjUpdate();
+}
+function adjUpdate(){
+  const n=ADJ.set.length;
+  $('adj-n').textContent=n;
+  const last=n?ADJ.set[n-1]:null;
+  $('adj-last').textContent=last!=null?last.toFixed(2)+' g':'—';
+  $('adj-err').textContent=last!=null?((last-100>=0?'+':'')+(last-100).toFixed(2)+' g'):'—';
+  if(n>=2){
+    const m=mean(ADJ.set),sd=sdev(ADJ.set);
+    $('adj-mean').textContent=m.toFixed(2)+' g';
+    $('adj-ce').textContent=((m-100>=0?'+':'')+(m-100).toFixed(2)+' g');
+    $('adj-sd').textContent=sd.toFixed(2)+' g';
+    $('adj-th').textContent=(PEZ*sd).toFixed(2)+' g';
+  }else{['adj-mean','adj-ce','adj-sd','adj-th'].forEach(k=>$(k).textContent='—');}
+  if(n>=1)show('adj-rev1');
+  if(n>=3)show('adj-rev2');
+  if(n>=20){show('adj-rev3');note(2,(PEZ*sdev(ADJ.set)).toFixed(2)+' g');cmpPlot();}
+  adjPlot();
+}
+function adjPlot(){
+  const p=cv('adj-plot',205);if(!p)return;const{x,w,h}=p,L=34,R=22,T=24,B=36;
+  const LOW=84,HIGH=116;
+  const X=v=>L+(v-LOW)/(HIGH-LOW)*(w-L-R);
+  x.strokeStyle=C.rule;x.beginPath();x.moveTo(L,h-B);x.lineTo(w-R,h-B);x.stroke();
+  x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  [90,95,100,105,110].forEach(v=>x.fillText(v,X(v),h-B+8));
+  x.fillText('where he set the comparison (g)',(L+w-R)/2,h-12);
+  /* the true standard */
+  x.strokeStyle=C.ink;x.lineWidth=1.2;x.setLineDash([4,3]);
+  x.beginPath();x.moveTo(X(100),T);x.lineTo(X(100),h-B);x.stroke();x.setLineDash([]);
+  x.fillStyle=C.soft;x.font='9.5px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  x.fillText('true 100 g',X(100),T-14);
+  if(!ADJ.set.length){x.fillStyle=C.faint;x.textAlign='center';x.textBaseline='middle';
+    x.fillText('take a setting',(L+w-R)/2,(T+h-B)/2);return;}
+  ADJ.set.forEach((v,i)=>{
+    x.beginPath();x.arc(X(v),h-B-13-((i%9)*8),3.6,0,7);
+    x.fillStyle=(i===ADJ.set.length-1)?C.flag:'rgba(53,86,107,.55)';x.fill();});
+  if(ADJ.set.length>=2){
+    const m=mean(ADJ.set),sd=sdev(ADJ.set);
+    x.fillStyle='rgba(95,115,51,.16)';
+    x.fillRect(X(m-PEZ*sd),T+4,X(m+PEZ*sd)-X(m-PEZ*sd),h-B-T-4);
+    x.strokeStyle=C.live;x.lineWidth=1.8;
+    x.beginPath();x.moveTo(X(m),T+4);x.lineTo(X(m),h-B);x.stroke();
+    x.fillStyle=C.live;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+    x.fillText('mean '+m.toFixed(2)+'  ·  ±PE '+(PEZ*sd).toFixed(2),X(m)+6,T+4);
+  }
+}
+$('adj-one').onclick=()=>adjTake(1);
+$('adj-few').onclick=()=>adjTake(4);
+$('adj-many').onclick=()=>adjTake(35);
+$('adj-reset').onclick=()=>{ADJ.set=[];adjUpdate();};
+
+/* ================= TAB 3 · self-test ================= */
+const T3_N=7;
+const T3={i:0,set:[],th:null,m:null,sd:null};
+function t3Next(){
+  if(T3.i>=T3_N)return t3End();
+  const start=(Math.random()<.5?-1:1)*(8+Math.random()*14);
+  $('t3-slider').value=start.toFixed(1);
+  t3Update();$('t3-count').textContent='setting '+(T3.i+1)+' of '+T3_N;
+}
+function t3Update(){
+  const v=+$('t3-slider').value;
+  $('t3-sv').textContent=(v>=0?'+':'')+v.toFixed(1);
+  setPatches('t3-ref','t3-test',v);
+}
+$('t3-slider').oninput=t3Update;
+$('t3-set').onclick=()=>{T3.set.push(+$('t3-slider').value);T3.i++;
+  T3.i<T3_N?t3Next():t3End();};
+function t3End(){
+  $('t3-run').classList.add('hidden');$('t3-done').classList.remove('hidden');
+  T3.m=mean(T3.set);T3.sd=sdev(T3.set);T3.th=PEZ*T3.sd;
+  $('t3-m').textContent=(T3.m>=0?'+':'')+T3.m.toFixed(2);
+  $('t3-ce').textContent=(T3.m>=0?'+':'')+T3.m.toFixed(2);
+  $('t3-s').textContent=T3.sd.toFixed(2);
+  $('t3-th').textContent=T3.th.toFixed(2);
+  $('t3-rev').innerHTML='<strong>Your threshold by this method: '+T3.th.toFixed(2)+' grey levels.</strong> '+
+    'Physical equality was 0, and your settings averaged '+(T3.m>=0?'+':'')+T3.m.toFixed(2)+
+    ' — that offset is your <em>constant error</em>, where "identical" actually sits for you'+
+    (Math.abs(T3.m)>1.5?', and it is not small.':'.')+
+    ' Only the scatter around it ('+T3.sd.toFixed(2)+') fed the threshold. Two independent facts about you, '+
+    'from one column of numbers — which is what this method is uniquely good for.';
+  t3Plot();note(3,'see closing');cmpPlot();
+}
+function t3Plot(){
+  const p=cv('t3-plot',175);if(!p)return;const{x,w,h}=p,L=34,R=22,T=24,B=36;
+  const LOW=-26,HIGH=26;
+  const X=v=>L+(v-LOW)/(HIGH-LOW)*(w-L-R);
+  x.strokeStyle=C.rule;x.beginPath();x.moveTo(L,h-B);x.lineTo(w-R,h-B);x.stroke();
+  x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  [-20,-10,0,10,20].forEach(v=>x.fillText(v,X(v),h-B+8));
+  x.fillText('your setting, relative to identical (grey levels)',(L+w-R)/2,h-12);
+  x.strokeStyle=C.ink;x.lineWidth=1.2;x.setLineDash([4,3]);
+  x.beginPath();x.moveTo(X(0),T);x.lineTo(X(0),h-B);x.stroke();x.setLineDash([]);
+  x.fillStyle=C.soft;x.font='9.5px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  x.fillText('identical',X(0),T-14);
+  T3.set.forEach((v,i)=>{x.beginPath();x.arc(X(v),h-B-13-((i%5)*8),3.8,0,7);
+    x.fillStyle='rgba(53,86,107,.6)';x.fill();});
+  if(T3.set.length>=2&&T3.m!==null){
+    x.fillStyle='rgba(95,115,51,.16)';
+    x.fillRect(X(T3.m-T3.th),T+4,X(T3.m+T3.th)-X(T3.m-T3.th),h-B-T-4);
+    x.strokeStyle=C.live;x.lineWidth=1.8;
+    x.beginPath();x.moveTo(X(T3.m),T+4);x.lineTo(X(T3.m),h-B);x.stroke();
+    x.fillStyle=C.live;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+    x.fillText('mean '+T3.m.toFixed(2),X(T3.m)+6,T+4);}
+}
+$('t3-start').onclick=()=>{T3.i=0;T3.set=[];T3.m=T3.sd=T3.th=null;
+  $('t3-intro').classList.add('hidden');$('t3-done').classList.add('hidden');
+  $('t3-run').classList.remove('hidden');t3Next();};
+$('t3-again').onclick=()=>{T3.i=0;T3.set=[];T3.m=T3.sd=T3.th=null;
+  $('t3-done').classList.add('hidden');$('t3-run').classList.remove('hidden');t3Next();};
+
+/* ================= COMPARISON ================= */
+function barChart(id,rows,unit,axisMax){
+  const p=cv(id,150);if(!p)return;const{x,w,h}=p,L=112,R=24,T=22,B=32;
+  const mx=Math.max(axisMax||0,Math.max(1,...rows.map(r=>r.v||0))*1.2);
+  const X=v=>L+v/mx*(w-L-R);
+  x.strokeStyle=C.rule;x.beginPath();x.moveTo(L,h-B);x.lineTo(w-R,h-B);x.stroke();
+  x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  const tick=mx>20?10:(mx>8?5:2);
+  for(let v=0;v<=mx;v+=tick)x.fillText(v.toFixed(0),X(v),h-B+8);
+  x.fillText('threshold estimate ('+unit+')',(L+w-R)/2,h-12);
+  const lane=(h-T-B)/rows.length;
+  rows.forEach((r,i)=>{
+    const py=T+lane*i+lane/2;
+    x.fillStyle=C.soft;x.font='10.5px "Space Mono", monospace';x.textAlign='right';x.textBaseline='middle';
+    x.fillText(r.k,L-12,py);
+    if(r.v==null){x.fillStyle=C.faint;x.textAlign='left';x.fillText('not run yet',L+8,py);return;}
+    x.strokeStyle=C.rule2;x.lineWidth=1;x.beginPath();x.moveTo(L,py);x.lineTo(w-R,py);x.stroke();
+    x.beginPath();x.arc(X(r.v),py,5.5,0,7);x.fillStyle=r.c;x.fill();
+    x.fillStyle=C.ink;x.textAlign='left';x.textBaseline='middle';
+    x.fillText(r.v.toFixed(2),X(r.v)+11,py);
+  });
+}
+function cmpPlot(){
+  const simRW=A3.fitted?PEZ*A3.s*Math.SQRT2:null;
+  const limSt=limStats();
+  const sim=[{k:'right & wrong',v:simRW,c:C.data},
+             {k:'limits',v:limSt.n>=8?limSt.th:null,c:C.live},
+             {k:'adjustment',v:ADJ.set.length>=20?PEZ*sdev(ADJ.set):null,c:C.flag}];
+  const you=[{k:'right & wrong',v:T1.th,c:C.data},
+             {k:'limits',v:T2.th,c:C.live},
+             {k:'adjustment',v:T3.th,c:C.flag}];
+  barChart('cmp-sim',sim,'g',12);
+  barChart('cmp-you',you,'grey levels',T2_MAX);
+  const yv=you.filter(r=>r.v!=null);
+  if(yv.length>=2){
+    const lo=Math.min(...yv.map(r=>r.v)),hi=Math.max(...yv.map(r=>r.v));
+    show('cmp-rev');
+    $('cmp-rev').innerHTML='<strong>Your '+yv.length+' estimates span '+lo.toFixed(2)+' to '+hi.toFixed(2)+
+      ' grey levels'+(yv.length<3?' so far':'')+'.</strong> One visual system, '+yv.length+
+      ' procedures, '+(hi-lo<1.5?'and they land close together — but nothing guaranteed that.'
+        :'and a spread of '+(hi-lo).toFixed(2)+' between them. Neither number is the "true" one being approximated: each is what its own procedure plus its own convention defines a threshold to be.');
+    if(yv.length===3)note(3,yv.map(r=>r.v.toFixed(1)).join(' / '));
+  }
+}
+
+/* ================= WEBER ================= */
+const STD=[25,50,100,200,400],A4={};
+$('a4-btns').innerHTML=STD.map(v=>`<button data-s="${v}">${v} g standard</button>`).join('');
+$('a4-btns').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+  const W=+b.dataset.s,lv=[.02,.04,.06,.09,.13].map(f=>+(f*W).toFixed(2)),pts=[];
+  lv.forEach(L=>{let c=0;for(let i=0;i<160;i++)if(lift(W,L))c++;pts.push([L,c/160]);});
+  const sd=probitSpread(pts);
+  A4[W]={sd,th:PEZ*sd,pts};a4plot();
+  if(Object.keys(A4).length>=4){show('a4-rev');
+    note(4,(mean(Object.entries(A4).map(([W,o])=>o.th/+W))*100).toFixed(2)+'%');}
+});
+function a4plot(){
+  const p=cv('a4-plot',265);if(!p)return;const{x,w,h}=p;
+  const L=48,R=14,T=18,B=36,mid=(h-T-B)*.52+T;
+  const X=v=>L+v/430*(w-L-R);
+  const Yt=v=>mid-10-v/26*(mid-10-T), Yf=v=>h-B-v/.09*(h-B-(mid+24));
+  x.strokeStyle=C.rule2;x.lineWidth=1;x.fillStyle=C.faint;x.textAlign='right';x.textBaseline='middle';
+  x.font='10px "Space Mono", monospace';
+  [0,10,20].forEach(v=>{x.beginPath();x.moveTo(L,Yt(v));x.lineTo(w-R,Yt(v));x.stroke();x.fillText(v,L-8,Yt(v));});
+  [0,.04,.08].forEach(v=>{x.beginPath();x.moveTo(L,Yf(v));x.lineTo(w-R,Yf(v));x.stroke();x.fillText((v*100).toFixed(0)+'%',L-8,Yf(v));});
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='bottom';
+  x.fillText('threshold in grams', L, T+2);
+  x.fillText('threshold ÷ standard', L, mid+18);
+  x.textAlign='center';x.textBaseline='top';
+  [0,100,200,300,400].forEach(v=>x.fillText(v,X(v),h-B+8));
+  x.fillText('standard weight (g)',(L+w-R)/2,h-12);
+  const E=Object.entries(A4).map(([W,o])=>[+W,o]).sort((a,b)=>a[0]-b[0]);
+  if(E.length>1){x.beginPath();E.forEach(([W,o],i)=>{const px=X(W),py=Yt(o.th);i?x.lineTo(px,py):x.moveTo(px,py);});
+    x.strokeStyle=C.data2;x.lineWidth=1.4;x.stroke();}
+  E.forEach(([W,o])=>{x.beginPath();x.arc(X(W),Yt(o.th),4.5,0,7);x.fillStyle=C.data;x.fill();
+    x.beginPath();x.arc(X(W),Yf(o.th/W),4.5,0,7);x.fillStyle=C.live;x.fill();
+    x.fillStyle=C.soft;x.font='9.5px "Space Mono", monospace';x.textAlign='center';x.textBaseline='bottom';
+    x.fillText(o.th.toFixed(1),X(W),Yt(o.th)-7);
+    x.fillText((o.th/W*100).toFixed(1)+'%',X(W),Yf(o.th/W)-7);});
+  $('a4-stats').innerHTML=E.length?E.map(([W,o])=>
+    `<div class="stat"><span class="k">${W} g standard</span><span class="v d">${(o.th/W*100).toFixed(2)}%</span></div>`).join(''):'';
+}
+
+/* ================= FECHNER'S SCALE ================= */
+const A5={n:0};
+const kW=()=>PEZ*WEBER, mult=()=>1+kW();
+const wAt=n=>W0*Math.pow(mult(),n);
+function a5upd(){
+  const W=wAt(A5.n);
+  $('a5-n').textContent=A5.n;
+  $('a5-w').textContent=W.toFixed(2)+' g';
+  $('a5-st').textContent=A5.n?(W-wAt(A5.n-1)).toFixed(3)+' g':'—';
+  a5plot();
+  if(A5.n>=25){show('a5-rev');note(5,(Math.log(100/W0)/Math.log(mult())).toFixed(1)+' units');}
+}
+function a5plot(){
+  const p=cv('a5-plot',285);if(!p)return;const{x,w,h}=p,L=44,R=16,T=18,B=40;
+  const nMax=Math.log(120/W0)/Math.log(mult());
+  const X=v=>L+v/120*(w-L-R),Y=n=>h-B-n/(nMax*1.05)*(h-T-B);
+  grid(x,L,R,T,B,w,h,[0,25,50,75,100].filter(v=>v<=nMax*1.05).map(v=>[v,Y(v)]),v=>v,
+    [0,20,40,60,80,100,120].map(v=>[v,X(v)]),v=>v,'weight (g) — each tick is one more unit of sensation');
+  for(let i=0;i<=A5.n;i++){const W=wAt(i);if(W>120)break;
+    x.strokeStyle=i===A5.n?C.live:'rgba(95,115,51,.35)';x.lineWidth=i===A5.n?1.8:1;
+    x.beginPath();x.moveTo(X(W),h-B);x.lineTo(X(W),h-B-(i===A5.n?15:8));x.stroke();}
+  if(A5.n>0){x.beginPath();
+    for(let i=0;i<=A5.n;i++){const W=wAt(i);if(W>120)break;const px=X(W),py=Y(i);i?x.lineTo(px,py):x.moveTo(px,py);}
+    x.strokeStyle=C.data;x.lineWidth=2;x.stroke();
+    const W=Math.min(120,wAt(A5.n));
+    x.beginPath();x.arc(X(W),Y(A5.n),4.5,0,7);x.fillStyle=C.data;x.fill();
+    x.fillStyle=C.ink;x.font='10.5px "Space Mono", monospace';x.textAlign='right';x.textBaseline='bottom';
+    x.fillText(A5.n+' units at '+W.toFixed(1)+' g',X(W)-9,Y(A5.n)-5);}
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText('units of sensation',L+2,T);
+}
+$('a5-1').onclick=()=>{A5.n++;a5upd();};
+$('a5-10').onclick=()=>{A5.n+=10;a5upd();};
+$('a5-100').onclick=()=>{A5.n=Math.round(Math.log(100/W0)/Math.log(mult()));a5upd();};
+$('a5-r').onclick=()=>{A5.n=0;a5upd();};
+
+/* ================= TABS ================= */
+const TABS={rw:()=>{a1plot();a2plot();a3plot();a3fit();t1Plot();},
+            lim:()=>{limLadder();limCrossPlot();gelPlot();t2Plot();},
+            adj:()=>{adjPlot();t3Plot();}};
+function showTab(t){
+  if(t!=='lim')t2Abort();
+  Object.keys(TABS).forEach(k=>{
+    $('tab-'+k).classList.toggle('on',k===t);
+    $('panel-'+k).classList.toggle('on',k===t);
+  });
+  requestAnimationFrame(TABS[t]);
+}
+Object.keys(TABS).forEach(k=>$('tab-'+k).onclick=()=>showTab(k));
+
+/* ---- first paint ---- */
+TABS.rw();a4plot();a5upd();cmpPlot();
+window.addEventListener('resize',()=>{
+  const active=Object.keys(TABS).find(k=>$('panel-'+k).classList.contains('on'));
+  if(active)TABS[active]();
+  a4plot();a5plot();cmpPlot();
+});
+</script>

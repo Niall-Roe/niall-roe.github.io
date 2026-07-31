@@ -21,10 +21,16 @@ PARTS=(
   src/04_ex1234.js     # scaffolding + card-deck framework, examples 1-4
   src/05_ex56.js       # examples 5-6 (dice, two friends and a metal box)
   src/06_ex1418.js     # examples 14-18 (binomial expansion, urns, census)
-  src/07_ex912.js      # examples 9, 12 (balancing reasons, and its refutation)
-  src/08_ex78.js       # examples 7-8 (agreement, chance and its logarithm)
+  src/07_ex912.js      # examples 9, 12 (balancing reasons, its refutation) and 27
+  src/08_ex78.js       # examples 7-8 (agreement, chance) and 26 (its logarithm)
   src/09_ex1011.js     # examples 10-11 (bag of beans, two numbers not one)
-  src/10_ex13.js       # example 13 (colour chart), closes </body></html>
+  src/10_ex1920.js     # examples 19-20 (Epimenides; the induction from five or six)
+  src/11_ex21.js       # example 21 (indifference), 28 and 30 (urns), 29 (the tide)
+  src/12_ex22.js       # example 22 (which bag did this coin come from)
+  src/13_ex23.js       # example 23 (insisting on the shuffle)
+  src/14_ex24.js       # example 24 (which way round)
+  src/15_ex25.js       # example 25 (the conclusion, or the proceeding)
+  src/16_ex13.js       # example 13 (colour chart), closes </body></html>
 )
 
 for p in "${PARTS[@]}"; do

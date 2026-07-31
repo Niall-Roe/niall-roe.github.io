@@ -5,6 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Peirce — The Probability of Induction (interactive)</title>
 <style>
+  /* ==========================================================================
+     One palette for prose, controls and plots alike. The examples are meant to
+     read as continuations of the text, not as apparatus bolted onto it: no
+     cards, no fills, no borders except hairlines, and the same serif
+     throughout — including inside the canvases, which draw with PAL below.
+     ========================================================================*/
+  :root {
+    --page:      #f4f1ea;
+    --paper:     #ffffff;
+    --ink:       #1f2328;
+    --ink-soft:  #575d66;
+    --ink-faint: #8a9099;
+    --rule:      #dbd6cb;
+    --rule-soft: #ece8df;
+    --wash:      #faf8f3;
+    --accent:    #2f6f9f;   /* the first quantity, wherever a pair is shown */
+    --accent-2:  #b0563f;   /* the second */
+    --accent-3:  #4a7c59;   /* truth, or the thing being approached */
+    --accent-4:  #9a7b3f;   /* remarks and asides */
+    --tint:      rgba(47, 111, 159, .10);
+    --tint-2:    rgba(176, 86, 63, .10);
+    --tint-3:    rgba(74, 124, 89, .12);
+    --tint-4:    rgba(154, 123, 63, .12);
+  }
+
   body {
     font-family: 'Georgia', serif;
     line-height: 1.8;
@@ -12,15 +37,15 @@
     margin: 0 auto;
     padding: 20px;
     font-size: 16px;
-    background-color: #fafafa;
-    color: #212529;
+    background-color: var(--page);
+    color: var(--ink);
   }
 
   .article-container {
-    background-color: white;
-    padding: 40px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    border-radius: 4px;
+    background-color: var(--paper);
+    padding: 52px 56px;
+    box-shadow: 0 1px 3px rgba(60, 50, 30, .10);
+    border-radius: 2px;
   }
 
   h3 {
@@ -37,7 +62,14 @@
     margin-bottom: 10px;
   }
 
-  h5 { font-size: 1.05em; margin: 12px 0 8px 0; }
+  h5 {
+    font-size: .82em;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .09em;
+    color: var(--ink-faint);
+    margin: 22px 0 8px 0;
+  }
 
   .section-number {
     text-align: center;
@@ -46,337 +78,951 @@
     font-weight: bold;
   }
 
-  .example-trigger {
-    background-color: #e8f4f8;
-    border-left: 3px solid #2c7fb8;
-    padding: 2px 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 2px;
-  }
-
-  .example-trigger:hover {
-    background-color: #b3d9ed;
-    border-left-color: #1565c0;
-  }
-
-  .example-container {
-    margin: 25px 0;
-    padding: 25px;
-    background-color: #f8f9fa;
-    border: 2px solid #dee2e6;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-  }
-
-  .example-header {
-    font-weight: bold;
-    font-size: 1.1em;
-    margin-bottom: 20px;
-    color: #1565c0;
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    align-items: center;
-  }
-
-  .example-header:before {
-    content: '\25BC';
-    margin-right: 10px;
-    transition: transform 0.2s;
-  }
-
-  .example-header.collapsed:before {
-    content: '\25B6';
-  }
-
-  .example-content {
-    margin-top: 20px;
-  }
-
-  /* Highlighting for probability concepts */
-  .hl-antecedent {
-    background-color: #fff3cd;
-    padding: 2px 4px;
-    border-radius: 2px;
-    font-weight: 500;
-  }
-  .hl-consequent {
-    background-color: #d1ecf1;
-    padding: 2px 4px;
-    border-radius: 2px;
-    font-weight: 500;
-  }
-  .hl-consequence {
-    background-color: #d4edda;
-    padding: 2px 4px;
-    border-radius: 2px;
-    font-weight: 600;
-  }
-
-  /* For addition/multiplication rules */
-  .hl-event-a { background-color: #fee5d9; padding: 2px 4px; }
-  .hl-event-b { background-color: #deebf7; padding: 2px 4px; }
-  .hl-combined { background-color: #d4e4c4; padding: 2px 4px; font-weight: 500; }
-
-  .formula {
-    text-align: center;
-    margin: 20px 0;
-    font-family: 'Courier New', monospace;
-    font-size: 1.1em;
-    background-color: #f5f5f5;
-    padding: 15px;
-    border-radius: 4px;
-  }
-
-  .arrow-diagram {
-    text-align: center;
-    font-size: 1.2em;
-    margin: 20px 0;
-    padding: 15px;
-    background-color: #f0f0f0;
-    border-radius: 4px;
-  }
-
   p {
     text-align: justify;
     margin-bottom: 15px;
+    position: relative;      /* positioning context for .ex-num */
   }
 
-  .plot-container {
-    margin: 20px 0;
-    padding: 15px;
-    background-color: white;
-    border-radius: 4px;
-    border: 1px solid #ddd;
+  /* ------------------------------------------------------------------------
+     Example numbers in the gutter, for referring to them elsewhere. The marker
+     is inserted at the head of its trigger and positioned with `left` only, so
+     its vertical place is the static one — the trigger's own first line, which
+     is what makes two examples in one paragraph land separately.
+     ----------------------------------------------------------------------*/
+  .ex-num {
+    position: absolute;
+    left: -46px;
+    width: 34px;
+    text-align: right;
+    font-size: .78em;
+    line-height: 1.85;
+    letter-spacing: .03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+    user-select: none;
+    pointer-events: none;
   }
+  /* the gutter is the container's own 56px of padding, which narrows to 20 at
+     the same breakpoint the rest of the layout stacks — no room for it there */
+  @media (max-width: 720px) { .ex-num { display: none; } }
+
+  html { scroll-behavior: smooth; }
+
+  /* ------------------------------------------------------------------------
+     The trigger. A whole paragraph is often the anchor, so a fill would tint
+     half the page; a hairline under the run of text marks its extent without
+     competing with the prose. The fill appears only on hover, to show how far
+     the passage reaches.
+     ----------------------------------------------------------------------*/
+  .example-trigger, .example-trigger-yellow {
+    cursor: pointer;
+    padding: 0;
+    border-radius: 1px;
+    background-color: transparent;
+    transition: background-color .22s ease, border-color .22s ease;
+  }
+  /* Solid and very pale: a whole paragraph of dotted rule reads as texture,
+     a whole paragraph of this reads as a margin note. */
+  .example-trigger        { border-bottom: 1px solid rgba(47, 111, 159, .28); }
+  .example-trigger-yellow { border-bottom: 1px solid rgba(154, 123, 63, .32); }
+  .example-trigger:hover        { background-color: var(--tint);   border-bottom-color: var(--accent); }
+  .example-trigger-yellow:hover { background-color: var(--tint-4); border-bottom-color: var(--accent-4); }
+  .example-trigger.is-open, .example-trigger-yellow.is-open {
+    border-bottom-style: solid;
+    border-bottom-color: var(--rule);
+    background-color: transparent;
+  }
+
+  /* ------------------------------------------------------------------------
+     The example itself. grid-template-rows 0fr -> 1fr animates to the content's
+     own height with nothing measured in script; the inner div does the
+     clipping. Margin travels with it so the space closes up too.
+     ----------------------------------------------------------------------*/
+  .example-container {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    margin: 0;
+    transition: grid-template-rows .55s cubic-bezier(.22, .61, .36, 1),
+                margin .55s cubic-bezier(.22, .61, .36, 1),
+                opacity .3s ease;
+  }
+  .example-container.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin: 34px 0 38px 0;
+  }
+  .example-container > .ex-inner { overflow: hidden; min-height: 0; }
+
+  .example-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: .8em;
+    font-variant: small-caps;
+    letter-spacing: .1em;
+    font-weight: 400;
+    color: var(--ink-faint);
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 22px;
+  }
+  .example-header:before {
+    content: '\25BE';
+    font-size: .9em;
+    line-height: 1;
+    transition: transform .25s ease;
+  }
+  .example-header.collapsed:before { transform: rotate(-90deg); }
+  .example-header:after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--rule-soft);
+  }
+  .example-header:hover { color: var(--ink-soft); }
+
+  .example-content { margin-top: 0; }
+
+  /* ------------------------------------------------------------------------
+     Numbers in Peirce's own text, driven by the sliders below them. Dormant
+     they are indistinguishable from the prose; live they take the colour of
+     the control moving them.
+     ----------------------------------------------------------------------*/
+  .live { transition: color .25s ease, background-color .4s ease; }
+  .live.is-live {
+    font-variant-numeric: tabular-nums;
+    background-color: var(--tint);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+  /* The tint suits a numeral. It does not suit a clause, where it becomes a
+     block of colour across three lines, nor a fraction, where it sits under
+     the rule and shifts it. In both, the colour alone does the tying. */
+  .frac .live.is-live, .peirce-table .live.is-live, .live.is-live.phrase {
+    background-color: transparent;
+    padding: 0;
+  }
+  .live.is-live.k1 { color: var(--accent);   background-color: var(--tint); }
+  .live.is-live.k2 { color: var(--accent-2); background-color: var(--tint-2); }
+  .live.is-live.k3 { color: var(--accent-3); background-color: var(--tint-3); }
+  .live.is-live.k4 { color: var(--accent-4); background-color: var(--tint-4); }
+
+  /* the driving slider wears the colour of the numbers it moves */
+  .ctl.k1 input[type=range] { accent-color: var(--accent); }
+  .ctl.k2 input[type=range] { accent-color: var(--accent-2); }
+  .ctl.k3 input[type=range] { accent-color: var(--accent-3); }
+  .ctl.k4 input[type=range] { accent-color: var(--accent-4); }
+  .ctl.k1 .slider-val { color: var(--accent); }
+  .ctl.k2 .slider-val { color: var(--accent-2); }
+  .ctl.k3 .slider-val { color: var(--accent-3); }
+  .ctl.k4 .slider-val { color: var(--accent-4); }
+
+  /* shown beside a control group that has left Peirce's figures behind */
+  .restore-peirce {
+    font-size: .8em;
+    font-variant: small-caps;
+    letter-spacing: .07em;
+    color: var(--ink-faint);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+    padding: 0;
+    margin: 2px 0 10px 0;
+    border-bottom: 1px dotted var(--rule);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+  }
+  .restore-peirce.on { opacity: 1; pointer-events: auto; }
+  /* it belongs with the view tabs, on the same baseline as them */
+  .mode-tabs .restore-peirce { margin: 0 0 8px 22px; align-self: center; }
+  .restore-peirce:hover { color: var(--ink-soft); }
+
+  /* ------------------------------------------------------------------------
+     Peirce's three terms, coloured in his own sentence rather than only in the
+     legend below it. Dormant they are ordinary text; the colour arrives with
+     the example, on the same rule as the live numbers.
+     ----------------------------------------------------------------------*/
+  .hl-text {
+    border-radius: 2px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+    background-color: transparent;
+    transition: background-color .35s ease;
+  }
+  .hl-text.hl-on.a { background-color: rgba(154, 123, 63, .16); }
+  .hl-text.hl-on.c { background-color: rgba(47, 111, 159, .14); }
+  .hl-text.hl-on.q { background-color: rgba(74, 124, 89, .16); }
+
+  /* A clause that owns a stretch of a slider's travel: it lights as the slider
+     enters its range and fades as it leaves, so the paragraph reads as a
+     running commentary on where the control is. Slow enough to be a fade and
+     not a flicker while dragging. */
+  .hl-band {
+    border-radius: 2px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+    background-color: transparent;
+    transition: background-color .45s ease;
+  }
+  .hl-band.band-on { background-color: rgba(47, 111, 159, .26); }
+  @media (prefers-reduced-motion: reduce) { .hl-band { transition: none; } }
+
+  /* --------------------------------------------- highlighting in the prose */
+  .hl-antecedent  { background-color: rgba(154, 123, 63, .14); padding: 1px 3px; border-radius: 2px; }
+  .hl-consequent  { background-color: rgba(47, 111, 159, .12); padding: 1px 3px; border-radius: 2px; }
+  .hl-consequence { background-color: rgba(74, 124, 89, .14);  padding: 1px 3px; border-radius: 2px; }
+  .hl-event-a  { background-color: rgba(176, 86, 63, .12); padding: 1px 3px; border-radius: 2px; }
+  .hl-event-b  { background-color: rgba(47, 111, 159, .12); padding: 1px 3px; border-radius: 2px; }
+  .hl-combined { background-color: rgba(74, 124, 89, .14);  padding: 1px 3px; border-radius: 2px; }
+
+  /* ------------------------------------------------- displayed expressions */
+  .formula, .formula-box, .arrow-diagram {
+    text-align: center;
+    margin: 24px 0;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 1.16em;
+    font-weight: 400;
+  }
+  .arrow-diagram { font-size: 1.14em; }
 
   .calc-output {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 4px;
-    border-left: 4px solid #6c757d;
-    font-family: 'Courier New', monospace;
-    margin-top: 15px;
+    background: none;
+    border: none;
+    border-left: 2px solid var(--rule);
+    border-radius: 0;
+    padding: 2px 0 2px 18px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    margin-top: 16px;
     white-space: pre-wrap;
-    font-size: 0.82em;
-    line-height: 1.5;
+    font-size: .78em;
+    line-height: 1.65;
+    color: var(--ink-soft);
     overflow-x: auto;
   }
 
-  .control-panel {
-    background-color: #fff;
-    padding: 15px;
-    border-radius: 4px;
-    border: 1px solid #dee2e6;
-    margin-bottom: 15px;
+  .key-insight {
+    background: none;
+    border: none;
+    border-left: 2px solid var(--accent-4);
+    border-radius: 0;
+    padding: 1px 0 1px 18px;
+    margin: 20px 0;
+    font-style: italic;
+  }
+  .key-insight strong { font-style: normal; }
+
+  .note-block {
+    font-size: .9em;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    border-left: 2px solid var(--rule);
+    padding: 1px 0 1px 18px;
+    margin: 16px 0;
+    font-family: inherit;
   }
 
-  /* Mode toggle tabs (Theoretical / Long-Run Frequency) */
+  .click-info {
+    padding: 1px 0 1px 18px;
+    background: none;
+    border: none;
+    border-left: 2px solid var(--accent-4);
+    border-radius: 0;
+    margin-top: 16px;
+    font-size: .95em;
+  }
+
+  .help-text { color: var(--ink-faint); font-style: italic; text-align: left; }
+
+  .control-panel, .plot-container, .group-box {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0 0 18px 0;
+  }
+  .plot-container { margin: 18px 0; }
+
+  .result-box {
+    padding: 16px 0 0 0;
+    margin-top: 22px;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--rule-soft);
+    border-radius: 0;
+  }
+
+  /* --------------------------------------------------------- mode switches */
   .mode-tabs {
     display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
+    gap: 24px;
+    margin-bottom: 22px;
     flex-wrap: wrap;
+    border-bottom: 1px solid var(--rule-soft);
   }
   .mode-tab {
-    padding: 10px 20px;
-    background-color: #e9ecef;
-    border: 2px solid #dee2e6;
-    border-radius: 6px;
+    padding: 3px 0 8px 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
     cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
     font-family: inherit;
-    font-size: 1em;
+    font-size: .95em;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    color: var(--ink-faint);
+    transition: color .2s, border-color .2s;
   }
+  .mode-tab:hover { color: var(--ink-soft); }
   .mode-tab.active {
-    background-color: #2c7fb8;
-    color: white;
-    border-color: #2c7fb8;
+    background: none;
+    color: var(--ink);
+    border-bottom-color: var(--accent);
   }
 
-  /* Key insight callout box */
-  .key-insight {
-    background-color: #fff3cd;
-    border-left: 4px solid #ffc107;
-    padding: 15px;
-    margin: 15px 0;
-    border-radius: 4px;
-  }
-
-  /* Formula display box */
-  .formula-box {
-    text-align: center;
-    font-size: 1.2em;
-    margin: 20px 0;
-    padding: 15px;
-    background-color: #f0f0f0;
-    border-radius: 6px;
-    font-weight: bold;
-  }
-
-  /* Metal box for Ex6 (Known/Unknown metal scenario) */
+  /* ------------------------------------------------------------- ex6's box */
   .metal-box {
     width: 120px; height: 120px;
-    border: 4px solid #333; border-radius: 8px;
+    border: 1px solid var(--rule); border-radius: 3px;
     display: flex; align-items: center; justify-content: center;
-    font-size: 2em; font-weight: bold; margin: 10px auto;
+    font-family: inherit;
+    font-size: 1.6em; font-variant: small-caps; letter-spacing: .06em;
+    margin: 10px auto;
   }
-  .metal-box.gold   { background-color: #d4af37; color: #000; }
-  .metal-box.lead   { background-color: #808080; color: #fff; }
-  .metal-box.opaque { background-color: #555;    color: #fff; }
+  .metal-box.gold   { background-color: #d9c07a; color: #3a2f10; border-color: #c3a969; }
+  .metal-box.lead   { background-color: #9a9a9a; color: #fff;    border-color: #8a8a8a; }
+  .metal-box.opaque { background-color: #6b6b6b; color: #fff;    border-color: #5c5c5c; }
 
-  /* Click-info box (used in ex14, ex15, ex18) */
-  .click-info {
-    padding: 15px;
-    background-color: #fff3cd;
-    border: 1px solid #ffc107;
-    border-radius: 5px;
-    margin-top: 15px;
-    font-size: 0.95em;
+  /* --------------------------------- Peirce's granary table, in the article */
+  .granary-table {
+    position: relative;
+    margin: 28px 0;
+    padding: 22px 0;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    border-radius: 0;
+  }
+  #peirce-table-block:target { background-color: var(--tint-4); }
+  #peirce-table-controls { margin: 0 0 14px 0; }
+
+  /* the two sliders side by side, so the controls cost as little height as
+     they can and the table stays in view with them */
+  .gt-sliders {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 4px 26px;
+  }
+  .gt-sliders > .ctl { flex: 1 1 210px; margin-bottom: 6px; }
+  .gt-sliders > .restore-peirce { flex: 0 0 auto; margin-bottom: 12px; }
+
+  /* the second pair, under the paragraph that discusses the table */
+  .gt-echo {
+    display: none;
+    margin: 4px 0 18px 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule-soft);
+  }
+  .gt-echo.on { display: block; }
+  .gt-group { margin-bottom: 10px; }
+  .gt-head {
+    font-family: inherit;
+    font-size: .8em;
+    font-variant: small-caps;
+    letter-spacing: .07em;
+    color: var(--ink-faint);
+    margin-bottom: 3px;
+  }
+  .gt-cells { line-height: 1.9; }
+  .gt-mult {
+    font-family: inherit;
+    font-size: .85em;
+    font-weight: 400;
+    color: var(--accent);
+    margin: 0 8px 0 2px;
+  }
+  .granary-table .mode-tabs { margin: 14px 0 16px 0; gap: 20px; }
+  .granary-table .mode-tab { font-size: .88em; }
+  .gt-expansion {
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 1.16em;
+    text-align: center;
+    margin: 6px 0 12px 0;
+  }
+  .gt-term { white-space: nowrap; font-family: 'Times New Roman', Georgia, serif; }
+  .gt-total {
+    font-family: inherit;
+    font-size: .9em;
+    color: var(--ink-soft);
+    text-align: left;
+    margin: 12px 0 0 0;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule-soft);
   }
 
-  /* Sequence box (used in ex14 sequence display) */
+  /* Set as it is set in the paper: letters on the page, no cell around them. */
   .sequence-box {
     display: inline-block;
-    padding: 3px 6px;
-    margin: 2px;
-    background-color: #e9ecef;
-    border: 1px solid #adb5bd;
-    border-radius: 3px;
-    font-family: monospace;
-    font-size: 0.9em;
+    padding: 0;
+    margin: 0 1.1em 0 0;
+    background: none;
+    border: none;
+    font-family: inherit;
+    letter-spacing: .1em;
   }
 
-  /* Group box (used in ex16) */
-  .group-box {
-    padding: 15px;
-    margin: 10px 0;
-    border: 1px solid #dee2e6;
-    border-radius: 5px;
-    background-color: #ffffff;
-  }
-
-  /* Result box (used in ex16) */
-  .result-box {
-    padding: 20px;
-    margin-top: 20px;
-    background-color: #e7f3ff;
-    border: 2px solid #2c7fb8;
-    border-radius: 8px;
-  }
-
-  /* Yellow trigger (stub/coming-soon examples) */
-  .example-trigger-yellow {
-    background-color: #fff9e6;
-    border-left: 3px solid #e6ac00;
-    padding: 2px 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 2px;
-  }
-  .example-trigger-yellow:hover {
-    background-color: #ffe066;
-    border-left-color: #b8860b;
-  }
-
-  /* ---- controls (replacing Shiny widgets) ---- */
-  .ctl { margin-bottom: 14px; }
+  /* -------------------------------------------------------------- controls */
+  .ctl { margin-bottom: 16px; }
   .ctl > label {
     display: block;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.88em;
-    font-weight: 600;
-    margin-bottom: 4px;
-    line-height: 1.4;
+    font-family: inherit;
+    font-size: .92em;
+    font-weight: 400;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+    line-height: 1.5;
   }
   .ctl select, .ctl input[type=number] {
     width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+    padding: 4px 2px;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
     font-family: inherit;
-    font-size: 0.95em;
-    background: #fff;
+    font-size: 1em;
+    color: var(--ink);
+    background: transparent;
   }
-  .ctl input[type=range] { width: 100%; }
+  .ctl select:focus, .ctl input[type=number]:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+  .ctl input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    margin: 2px 0;
+  }
   .ctl .slider-val {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.85em;
-    color: #2c7fb8;
+    font-family: inherit;
+    font-size: .95em;
+    color: var(--accent);
     font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
   .ctl.checkbox label {
-    display: flex; align-items: center; gap: 8px; font-weight: 500;
+    display: flex; align-items: center; gap: 8px; font-weight: 400;
   }
-  .ctl.checkbox input { width: auto; }
-  .ctl .radio-row { display: flex; gap: 16px; flex-wrap: wrap; }
+  .ctl.checkbox input { width: auto; accent-color: var(--accent); }
+  .ctl .radio-row { display: flex; gap: 18px; flex-wrap: wrap; }
   .ctl .radio-row.stacked { flex-direction: column; gap: 4px; }
   .ctl .radio-row label {
     display: flex; align-items: center; gap: 6px;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.9em; font-weight: 500; cursor: pointer;
+    font-family: inherit;
+    font-size: .95em; font-weight: 400; cursor: pointer;
+    color: var(--ink-soft);
   }
+  .ctl .radio-row input { accent-color: var(--accent); }
 
+  /* Buttons set as small caps in the text face, outlined rather than filled —
+     they sit in the column beside the prose and should not shout across it. */
   button.btn {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.9em;
-    padding: 7px 14px;
+    font-family: inherit;
+    font-size: .88em;
+    font-variant: small-caps;
+    letter-spacing: .05em;
+    padding: 5px 13px;
     margin: 3px 4px 3px 0;
-    border: 1px solid transparent;
-    border-radius: 4px;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
     cursor: pointer;
-    background-color: #e7e7e7;
-    border-color: #ccc;
+    background: none;
+    color: var(--ink-soft);
+    transition: color .18s, border-color .18s, background-color .18s;
   }
-  button.btn:hover { filter: brightness(0.94); }
-  button.btn-primary   { background-color: #2c7fb8; color: #fff; border-color: #2c7fb8; }
-  button.btn-success   { background-color: #28a745; color: #fff; border-color: #28a745; }
-  button.btn-warning   { background-color: #ffc107; color: #212529; border-color: #ffc107; }
-  button.btn-danger    { background-color: #dc3545; color: #fff; border-color: #dc3545; }
-  button.btn-info      { background-color: #17a2b8; color: #fff; border-color: #17a2b8; }
-  button.btn-secondary { background-color: #6c757d; color: #fff; border-color: #6c757d; }
+  button.btn:hover { background-color: var(--wash); color: var(--ink); border-color: var(--ink-faint); }
+  button.btn.is-active {
+    background-color: var(--tint-4);
+    border-color: var(--accent-4);
+    color: var(--accent-4);
+  }
+  button.btn-primary   { color: var(--accent);   border-color: rgba(47, 111, 159, .45); }
+  button.btn-success   { color: var(--accent-3); border-color: rgba(74, 124, 89, .45); }
+  button.btn-warning   { color: var(--accent-4); border-color: rgba(154, 123, 63, .50); }
+  button.btn-danger    { color: var(--accent-2); border-color: rgba(176, 86, 63, .45); }
+  button.btn-info      { color: var(--accent);   border-color: rgba(47, 111, 159, .45); }
+  button.btn-secondary { color: var(--ink-soft); border-color: var(--rule); }
+  button.btn-primary:hover   { background-color: var(--tint);   color: var(--accent); }
+  button.btn-success:hover   { background-color: var(--tint-3); color: var(--accent-3); }
+  button.btn-warning:hover   { background-color: var(--tint-4); color: var(--accent-4); }
+  button.btn-danger:hover    { background-color: var(--tint-2); color: var(--accent-2); }
+  button.btn-info:hover      { background-color: var(--tint);   color: var(--accent); }
   button.btn-block     { display: block; width: 100%; margin: 4px 0; }
-  button.btn-lg        { font-size: 1.05em; padding: 10px 18px; }
-  button.btn-sm        { font-size: 0.82em; padding: 5px 10px; }
 
-  /* ---- layout ---- */
-  .row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
-  .row > .col { padding: 0 10px; box-sizing: border-box; }
-  .col-3  { flex: 0 0 25%;     max-width: 25%; }
+  /* A row of actions laid out across the column rather than stacked down the
+     side of it, so the graphic they drive stays in view with the prose. */
+  .ex-buttonbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+    margin-bottom: 16px;
+  }
+  .ex-buttonbar .btn { margin: 0; }
+  button.btn-lg        { font-size: 1em; padding: 8px 18px; }
+  button.btn-sm        { font-size: .8em; padding: 3px 9px; }
+
+  /* ------------------------------------------------------------------------
+     Aligned number lines (ex8). One grid: label, line, value. The three lines
+     are the same length by construction, and each marker travels the same
+     span as the slider's thumb, so a point on one reads straight down to the
+     others. .nl-line is inset by half a thumb width for that reason.
+     ----------------------------------------------------------------------*/
+  /* The value column is a fixed width, not max-content: the readings change
+     length as they run ("1 : 1" to "999 : 1 — off the line"), and on
+     max-content that would resize the column and shunt the tracks sideways
+     while the slider is being dragged. */
+  .nl-grid {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr) 12em;
+    align-items: center;
+    gap: 34px 20px;
+    margin: 26px 0 30px 0;
+  }
+  .nl-label { text-align: right; font-size: .98em; color: var(--ink-soft); line-height: 1.35; }
+  .nl-sub { color: var(--ink-faint); font-size: .85em; font-weight: 400; }
+  .nl-value {
+    font-variant-numeric: tabular-nums;
+    line-height: 1.35;
+  }
+  .nl-value strong { font-size: 1.15em; }
+  .nl-value.k1 strong { color: var(--accent); }
+  .nl-value.k2 strong { color: var(--accent-2); }
+  .nl-value.k3 strong { color: var(--accent-3); }
+
+  /* Two of these sit side by side in ex9, so the rows are tightened and the
+     label and value columns cut back to what a one-word label needs. */
+  .nl-compact {
+    grid-template-columns: 4.6em minmax(0, 1fr) 5.4em;
+    gap: 15px 12px;
+    margin: 6px 0 2px 0;
+  }
+  .nl-compact .nl-line { height: 26px; }
+  .nl-compact .nl-line.nl-under { height: 18px; }
+  .nl-compact .nl-value { font-size: .95em; }
+  .nl-compact .nl-label { font-size: .95em; }
+
+  .ex9-arg-head {
+    display: flex; align-items: baseline; gap: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .ex9-arg-name { font-size: 1.05em; }
+  .ex9-arg-head select {
+    font-family: inherit; font-size: .88em; color: var(--ink-soft);
+    border: none; border-bottom: 1px solid var(--rule); background: none;
+    padding: 1px 2px;
+  }
+  .ex9-arg-head .btn { margin: 0 0 0 auto; padding: 1px 7px; }
+  .ex9-fav { font-size: .8em; color: var(--ink-faint); margin-top: 2px; }
+  .nl-rowticks { height: 12px; margin: 0 8px; }
+
+  /* ex27 has a full phrase for a label and two figures for a value, so it wants
+     more room in both side columns than the paired columns of ex9 do. */
+  #ex27-content .nl-grid { grid-template-columns: 7em minmax(0, 1fr) 8.6em; }
+
+  /* "Update your belief" reads as the sentence the three buttons complete, so
+     it is set as text rather than as a fourth button. */
+  .ex27-lead {
+    color: var(--ink-soft);
+    margin-right: 4px;
+  }
+
+  .nl-track { position: relative; }
+  .nl-track input[type=range] { display: block; width: 100%; margin: 0; }
+  .nl-track.k1 input[type=range] { accent-color: var(--accent); }
+  .nl-track.k2 input[type=range] { accent-color: var(--accent-2); }
+  .nl-track.k3 input[type=range] { accent-color: var(--accent-3); }
+  .nl-track.k4 input[type=range] { accent-color: var(--accent-4); }
+
+  .nl-line { position: relative; height: 30px; margin: 0 8px; }
+  .nl-line.nl-under { height: 22px; }
+  .nl-rule { position: absolute; top: 8px; left: 0; right: 0; height: 1px; background: var(--ink-faint); }
+  .nl-tick {
+    position: absolute; top: 5px; width: 1px; height: 7px;
+    background: var(--rule); transform: translateX(-50%);
+  }
+  .nl-tick.major { top: 3px; height: 12px; background: var(--ink-faint); }
+  .nl-line.nl-under .nl-tick { top: 0; }
+  .nl-line.nl-under .nl-tick.major { top: 0; height: 9px; }
+  .nl-ticklab {
+    position: absolute; top: 17px;
+    font-size: .74em; color: var(--ink-faint);
+    transform: translateX(-50%); white-space: nowrap;
+    /* Two-line labels ("½" over "an even chance") take the width of the longer
+       line, and without this the short one sits at its left edge rather than
+       over the tick. */
+    text-align: center;
+  }
+  .nl-line.nl-under .nl-ticklab { top: 10px; }
+  /* No transition on `left`: the markers are meant to read as the same point
+     as the slider's thumb, and any easing makes them lag behind the drag. */
+  .nl-dot {
+    position: absolute; top: 8px; width: 13px; height: 13px;
+    border-radius: 50%; transform: translate(-50%, -50%);
+    /* a colour of its own, so a track that forgets its key still shows its
+       marker rather than silently drawing nothing */
+    background-color: var(--accent);
+    transition: background-color .2s;
+  }
+  .nl-track.k2 .nl-dot { background-color: var(--accent-2); }
+  .nl-track.k3 .nl-dot { background-color: var(--accent-3); }
+  .nl-dot.off { background-color: var(--ink-faint); }
+  .nl-arrow {
+    position: absolute; right: -16px; top: -1px;
+    font-size: .85em; color: var(--ink-faint);
+  }
+  @media (max-width: 720px) {
+    .nl-grid { grid-template-columns: 1fr; gap: 4px 0; }
+    .nl-label { text-align: left; }
+    .nl-value { min-width: 0; margin-bottom: 16px; }
+  }
+
+  /* ------------------------------------------------------------------------
+     Two columns of the same facts (ex8): the probability and the chance, with
+     the rows reading across. The point is carried by the "multiply them" row,
+     where one column works and the other does not, so the two are set side by
+     side at the same weight and marked rather than argued.
+     ----------------------------------------------------------------------*/
+  .conv-grid {
+    display: grid;
+    grid-template-columns: max-content 1fr 1fr;
+    align-items: baseline;
+    gap: 14px 22px;
+    margin: 24px 0 20px 0;
+  }
+  .conv-head {
+    font-size: .8em;
+    font-variant: small-caps;
+    letter-spacing: .07em;
+    color: var(--ink-faint);
+  }
+  .conv-lbl { text-align: right; color: var(--ink-soft); font-size: .95em; }
+  .conv-cell { font-variant-numeric: tabular-nums; line-height: 1.5; }
+  .conv-val strong { font-size: 1.12em; }
+  .conv-val.k1 strong { color: var(--accent); }
+  .conv-val.k2 strong { color: var(--accent-2); }
+  .conv-val.k3 strong { color: var(--accent-3); }
+  .conv-hr { grid-column: 1 / -1; height: 1px; background: var(--rule-soft); }
+  .conv-tag { display: block; font-size: .82em; color: var(--ink-faint); font-variant-numeric: normal; }
+  .conv-cell .ctl { margin-bottom: 0; }
+  .conv-cell .ctl > label { margin-bottom: 0; }
+
+  /* ex8 stacks two grids — the arguments, then the reading. Giving both the
+     same column template and gutter puts every track on one axis, so the
+     sliders and the number lines share a left edge, a right edge and therefore
+     a midpoint, and the values line up under each other. */
+  #ex8-content .conv-grid,
+  #ex8-content .nl-grid {
+    grid-template-columns: 11em minmax(0, 1fr) 12em;
+    column-gap: 20px;
+  }
+  @media (max-width: 720px) {
+    .conv-grid { grid-template-columns: 1fr; gap: 4px 0; }
+    .conv-lbl { text-align: left; margin-top: 12px; }
+    .conv-head { display: none; }
+  }
+
+  /* ex7's working, set close under its bars rather than in a box of its own */
+  .ex7-work-line {
+    text-align: center;
+    font-size: 1.05em;
+    margin: 0 0 4px 0;
+  }
+  #ex7-plot { margin: 12px 0 0 0; }
+
+  /* ------------------------------------------------------------------------
+     The row of urns (ex28). One urn per proportion, balls stacked inside it,
+     drawn in the text rather than in a canvas so that they scale with the page.
+     ----------------------------------------------------------------------*/
+  .urn-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px 12px;
+    margin: 20px 0 12px 0;
+  }
+  .urn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+  .urn-balls {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 2px;
+    padding: 5px 5px 6px 5px;
+    border: 1px solid var(--rule);
+    border-top: none;
+    border-radius: 0 0 9px 9px;
+    background-color: var(--wash);
+  }
+  .urn-ball {
+    display: inline-block;          /* so it also works outside the urn stack */
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 1px solid var(--ink-faint);
+  }
+  .urn-ball.w { background-color: var(--paper); }
+  .urn-ball.b { background-color: #4f555c; border-color: #4f555c; }
+  .urn-lab {
+    font-size: .78em;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* the granary itself: no balls to count, just the proportion it is mixed at */
+  .granary-bar {
+    display: flex;
+    height: 26px;
+    margin: 16px 0 4px 0;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .granary-white { background-color: var(--paper); }
+  .granary-black { background-color: #4f555c; }
+  .urn-ball.empty { background-color: transparent; border-style: dotted; }
+
+  /* eighty-one urns want less room each than five do */
+  .urn-row-tight { gap: 8px 5px; }
+  .urn-row-tight .urn-ball { width: 8px; height: 8px; }
+  .urn-row-tight .urn-balls { padding: 3px 3px 4px 3px; gap: 1px; border-radius: 0 0 6px 6px; }
+  .urn-row-tight .urn-lab { display: none; }
+
+  /* urns that no longer agree with what was drawn */
+  .urn.dim { opacity: .22; }
+  .urn { transition: opacity .25s ease; }
+  .urn-ball.ringed { box-shadow: 0 0 0 2px var(--accent-3); }
+
+  /* the two balls drawn, and the one still to come */
+  .draw-row {
+    display: flex; justify-content: center; align-items: flex-start;
+    gap: 30px; margin: 18px 0 20px 0;
+  }
+  .draw-slot { text-align: center; }
+  .draw-ball {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 1px solid var(--ink-faint); margin: 0 auto 6px auto;
+  }
+  .draw-ball.w { background-color: var(--paper); }
+  .draw-ball.b { background-color: #4f555c; border-color: #4f555c; }
+  .draw-ball.q {
+    background-color: var(--wash); border-style: dashed; border-color: var(--accent-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5em; color: var(--accent-3);
+  }
+  .draw-ball.q:after { content: "?"; }
+  .draw-lab {
+    font-size: .76em; font-variant: small-caps; letter-spacing: .07em;
+    color: var(--ink-faint);
+  }
+  .thirds-row {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 5px; margin-bottom: 4px;
+  }
+
+  /* ------------------------------------------------------------------------
+     The argument set as a sentence, with its choices as words in it (ex1).
+     ----------------------------------------------------------------------*/
+  .arg-line {
+    position: relative;          /* the little menus hang off this */
+    text-align: left;
+    font-size: 1.12em;
+    line-height: 2.2;
+    margin: 6px 0 18px 0;
+  }
+  /* bold and dotted, so the words that can be changed look like they can be */
+  .arg-pick {
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: 700;
+    color: inherit;
+    background: none;
+    border: none;
+    border-bottom: 1px dotted currentColor;
+    padding: 0 1px;
+    cursor: pointer;
+  }
+  .arg-pick:hover { background-color: rgba(0, 0, 0, .06); }
+
+  .arg-menu {
+    position: absolute;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    min-width: 9em;
+    padding: 3px;
+    background-color: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    box-shadow: 0 3px 10px rgba(60, 50, 30, .14);
+  }
+  .arg-opt {
+    font-family: inherit;
+    font-size: .82em;
+    line-height: 1.5;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 2px;
+    padding: 3px 7px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+  .arg-opt:hover { background-color: var(--wash); color: var(--ink); }
+  .arg-opt.on { color: var(--ink); font-weight: 700; }
+
+  /* the arrow of the consequence, and the "then" that is the same thing in
+     words — a stronger green than the washes either side of it, since it is
+     the part that carries the probability */
+  .arg-rule {
+    text-align: center;
+    font-size: 1.1em;
+    line-height: 2.2;
+    margin: 4px 0 16px 0;
+  }
+
+  .hl-then {
+    color: #2f6b45;
+    font-weight: 700;
+    background-color: rgba(74, 124, 89, .22);
+    border-radius: 2px;
+    padding: 1px 4px;
+    margin: 0 1px;
+  }
+
+  /* A remark of the editor's rather than a sentence of Peirce's: set in from
+     the margin behind a rule, so the page never has to be read twice to see
+     whose voice it is in. */
+  .ed-note {
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+    margin-left: 2px;
+    color: var(--ink-soft);
+  }
+
+  /* Where an example reports back inside Peirce's own paragraph, the report is
+     tinted so it cannot be mistaken for his sentence carrying on. Figures
+     inside it keep the colour of the slider that moves them. */
+  .ex-reading {
+    background-color: rgba(47, 111, 159, .11);
+    color: var(--accent);
+    border-radius: 2px;
+    padding: 1px 3px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  /* ------------------------------------ the paper read as vowels and consonants
+     29 asks the rule of succession about the next letter of this article, so
+     the article itself has to show its letters. Unread ones are barely tinted;
+     the ones the reading has passed are stronger, so the head is visible as a
+     boundary running down the page. Letters are wrapped a block at a time as
+     blocks come into view — thirty thousand spans at once is not a click. */
+  .vc { border-radius: 2px; }
+  .vc-v { background-color: rgba(154, 123, 63, .12); }
+  .vc-c { background-color: rgba(47, 111, 159, .09); }
+  .vc-seen.vc-v { background-color: rgba(154, 123, 63, .42); color: #6d552b; }
+  .vc-seen.vc-c { background-color: rgba(47, 111, 159, .34); color: #234f72; }
+  /* the letter the reading is standing on */
+  .vc-head { outline: 2px solid var(--ink); outline-offset: 0; border-radius: 2px; }
+
+  /* the observed proportion, with the rule's answer marked on it */
+  .vc-bar {
+    position: relative; height: 38px; margin: 4px 0 2px;
+    border: 1px solid var(--rule); border-radius: 3px;
+    background-color: rgba(154, 123, 63, .16); overflow: visible;
+  }
+  .vc-bar-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background-color: rgba(47, 111, 159, .26);
+    border-right: 1px solid rgba(47, 111, 159, .5);
+    transition: width .18s ease;
+  }
+  .vc-mark { position: absolute; top: -6px; bottom: -6px; width: 2px; transition: left .18s ease; }
+  .vc-mark-lab {
+    position: absolute; font-size: .7em; letter-spacing: .02em; white-space: nowrap;
+    transform: translateX(-50%); transition: left .18s ease;
+  }
+  .vc-scale { position: relative; height: 15px; font-size: .7em; color: var(--ink-faint); }
+  .vc-scale span { position: absolute; transform: translateX(-50%); }
+
+  /* the letters read so far, reproduced under the example */
+  .vc-read {
+    font-size: .92em; line-height: 1.7; color: var(--ink-soft);
+    max-height: 96px; overflow: hidden;
+  }
+  .vc-read .vc { background-color: transparent; }
+  .vc-read .vc-v { color: #9a7b3f; font-weight: 700; }
+  .vc-read .vc-c { color: #2f6f9f; }
+
+  /* ---------------------------------------------------------------- layout */
+  .row { display: flex; flex-wrap: wrap; margin: 0 -14px; }
+  .row > .col { padding: 0 14px; box-sizing: border-box; }
+  .col-3  { flex: 0 0 25%;      max-width: 25%; }
   .col-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
   .col-5  { flex: 0 0 41.6667%; max-width: 41.6667%; }
-  .col-6  { flex: 0 0 50%;     max-width: 50%; }
+  .col-6  { flex: 0 0 50%;      max-width: 50%; }
   .col-7  { flex: 0 0 58.3333%; max-width: 58.3333%; }
   .col-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
-  .col-12 { flex: 0 0 100%;    max-width: 100%; }
+  .col-12 { flex: 0 0 100%;     max-width: 100%; }
   @media (max-width: 720px) {
     .row > .col { flex: 0 0 100%; max-width: 100%; }
-    .article-container { padding: 18px; }
+    .article-container { padding: 22px 20px; }
     body { padding: 8px; }
   }
 
   canvas.plot { width: 100%; display: block; }
 
-  hr { border: none; border-top: 1px solid #dee2e6; margin: 18px 0; }
+  hr { border: none; border-top: 1px solid var(--rule-soft); margin: 20px 0; }
 
   table.tbl {
     width: 100%;
     border-collapse: collapse;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.86em;
-    margin-top: 15px;
-    background: #fff;
+    font-family: inherit;
+    font-size: .92em;
+    margin-top: 16px;
+    background: none;
   }
   table.tbl th, table.tbl td {
-    border: 1px solid #dee2e6;
-    padding: 6px 8px;
+    border: none;
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 5px 8px;
     text-align: center;
+    font-variant-numeric: tabular-nums;
   }
-  table.tbl th { background-color: #f1f3f5; }
-  table.tbl tbody tr:nth-child(odd) { background-color: #f9f9f9; }
-  table.tbl tr.highlighted-row-90 { background-color: #d1ecf1 !important; font-weight: 700; }
+  table.tbl th {
+    background: none;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule);
+  }
+  table.tbl tbody tr:nth-child(odd) { background: none; }
+  table.tbl tr.highlighted-row-90 { background-color: var(--tint) !important; font-weight: 400; color: var(--accent); }
   .table-scroll { overflow-x: auto; }
 
   /* inline fraction rendering (replaces MathJax) */
@@ -385,7 +1031,7 @@
     flex-direction: column;
     vertical-align: middle;
     text-align: center;
-    font-size: 0.85em;
+    font-size: .85em;
     line-height: 1.25;
     margin: 0 3px;
   }
@@ -396,54 +1042,60 @@
 
   /* displayed tables carried over from the printed article */
   .peirce-table {
-    margin: 20px auto;
+    margin: 22px auto;
     border-collapse: collapse;
-    font-size: 0.92em;
+    font-size: .95em;
     max-width: 560px;
   }
-  .peirce-table td { padding: 5px 10px; vertical-align: middle; }
-  .peirce-table td.lbl { text-align: right; color: #333; }
+  .peirce-table td { padding: 4px 10px; vertical-align: middle; }
+  .peirce-table td.lbl { text-align: right; color: var(--ink-soft); }
   .peirce-table td:last-child { text-align: left; white-space: nowrap; }
   @media (max-width: 720px) {
-    .peirce-table { font-size: 0.8em; }
+    .peirce-table { font-size: .82em; }
     .peirce-table td { padding: 4px 5px; }
   }
+  /* Peirce's probable-error table becomes selectable while ex17 is open: each
+     row picks its own confidence level. The seventh row is the reader's, so it
+     is not on the page at all until then. */
+  #ex17-custom-row, #ex16-row1, #ex16-row2 { display: none; }
+  .peirce-table.ex16-live #ex16-row1,
+  .peirce-table.ex16-live #ex16-row2 { display: table-row; }
+  .peirce-table.ex17-live #ex17-custom-row { display: table-row; }
+  .peirce-table.ex17-live tr[data-conf] { cursor: pointer; }
+  .peirce-table.ex17-live tr[data-conf]:hover { background-color: var(--wash); }
+  .peirce-table.ex17-live tr.conf-active { background-color: var(--tint); }
+
   .rad {
     border-top: 1px solid currentColor;
     padding: 2px 3px 0 3px;
     display: inline-block;
   }
 
-  sup.fn { font-size: 0.7em; line-height: 0; }
-  sup.fn a { text-decoration: none; color: #2c7fb8; }
+  sup.fn { font-size: .7em; line-height: 0; }
+  sup.fn a { text-decoration: none; color: var(--accent); }
   .footnotes {
-    margin-top: 36px;
-    padding-top: 16px;
-    border-top: 1px solid #ccc;
-    font-size: 0.88em;
-    color: #444;
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-soft);
+    font-size: .9em;
+    color: var(--ink-soft);
   }
   .footnotes p { text-align: left; margin-bottom: 8px; }
-  .footnotes a { text-decoration: none; color: #2c7fb8; }
-
-  .note-block {
-    font-size: 0.85em;
-    color: #555;
-    background: #f1f3f5;
-    border-left: 3px solid #adb5bd;
-    padding: 10px 14px;
-    margin: 12px 0;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-  }
+  .footnotes a { text-decoration: none; color: var(--accent); }
 
   .footer {
-    margin-top: 40px;
+    margin-top: 44px;
     padding-top: 20px;
-    border-top: 1px solid #ccc;
-    font-size: 0.85em;
-    color: #555;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    border-top: 1px solid var(--rule-soft);
+    font-size: .9em;
+    color: var(--ink-soft);
+    font-family: inherit;
     text-align: justify;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .example-container, .example-header:before, .live, .restore-peirce { transition: none; }
   }
 </style>
 </head>

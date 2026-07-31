@@ -91,15 +91,15 @@ registerExample("example-ex13", (box) => {
     const uA0 = ex13Inverse(c.f, h1 / 360), uA1 = ex13Inverse(c.f, h2 / 360);
     const uB1 = ex13Inverse(c.f, h3 / 360);
     const outline = (x0, x1, label, share) => {
-      pl.rect(x0, bot, x1, top, { col: null, border: "#111", lwd: 3 });
+      pl.rect(x0, bot, x1, top, { col: null, border: "#1f2328", lwd: 3 });
       pl.text((x0 + x1) / 2, top + 0.08, label, { cex: 0.85, font: 2 });
-      pl.text((x0 + x1) / 2, top + 0.03, `${fmt(share * 100, 1)}% of the chart`, { cex: 0.7, col: "#333" });
+      pl.text((x0 + x1) / 2, top + 0.03, `${fmt(share * 100, 1)}% of the chart`, { cex: 0.7, col: "#3a3f45" });
     };
     outline(uA0, uA1, "Area 1", uA1 - uA0);
     outline(uA1, uB1, "Area 2", uB1 - uA1);
-    pl.text(0.5, bot - 0.06, "every color, shading into its neighbours", { cex: 0.75, col: "#555", font: 3 });
-    pl.text(0.01, bot - 0.13, `hue ${fmt(360 * c.f(0.001), 0)}°`, { cex: 0.65, col: "#777", adj: 0 });
-    pl.text(0.99, bot - 0.13, `hue ${fmt(360 * c.f(0.999), 0)}°`, { cex: 0.65, col: "#777", adj: 1 });
+    pl.text(0.5, bot - 0.06, "every color, shading into its neighbours", { cex: 0.75, col: "#575d66", font: 3 });
+    pl.text(0.01, bot - 0.13, `hue ${fmt(360 * c.f(0.001), 0)}°`, { cex: 0.65, col: "#8a9099", adj: 0 });
+    pl.text(0.99, bot - 0.13, `hue ${fmt(360 * c.f(0.999), 0)}°`, { cex: 0.65, col: "#8a9099", adj: 1 });
   });
   $("#ex13-plot", content).appendChild(canvas);
 
@@ -111,25 +111,25 @@ registerExample("example-ex13", (box) => {
     const halfSum = n * 0.5;
     $("#ex13-reductio", content).innerHTML = `
       <div class="row">
-        <div class="col col-4"><div style="padding:14px;border:2px solid #2c7fb8;border-radius:6px;text-align:center;">
+        <div class="col col-4"><div style="padding:14px;border:2px solid #2f6f9f;border-radius:6px;text-align:center;">
           <p style="margin-bottom:4px;font-weight:700;">Area 1</p>
-          <p style="margin-bottom:4px;font-size:0.85em;color:#555;">hues ${h1}°–${h2}°</p>
+          <p style="margin-bottom:4px;font-size:0.85em;color:#575d66;">hues ${h1}°–${h2}°</p>
           <p style="margin-bottom:0;font-size:1.6em;font-weight:700;">&frac12;</p>
-          <p style="margin-bottom:0;font-size:0.78em;color:#555;">no data either way</p></div></div>
-        <div class="col col-4"><div style="padding:14px;border:2px solid #2c7fb8;border-radius:6px;text-align:center;">
+          <p style="margin-bottom:0;font-size:0.78em;color:#575d66;">no data either way</p></div></div>
+        <div class="col col-4"><div style="padding:14px;border:2px solid #2f6f9f;border-radius:6px;text-align:center;">
           <p style="margin-bottom:4px;font-weight:700;">Area 2</p>
-          <p style="margin-bottom:4px;font-size:0.85em;color:#555;">hues ${h2}°–${h3}°</p>
+          <p style="margin-bottom:4px;font-size:0.85em;color:#575d66;">hues ${h2}°–${h3}°</p>
           <p style="margin-bottom:0;font-size:1.6em;font-weight:700;">&frac12;</p>
-          <p style="margin-bottom:0;font-size:0.78em;color:#555;">no data either way</p></div></div>
-        <div class="col col-4"><div style="padding:14px;border:2px solid #c1523f;border-radius:6px;text-align:center;background:#fdf1ef;">
+          <p style="margin-bottom:0;font-size:0.78em;color:#575d66;">no data either way</p></div></div>
+        <div class="col col-4"><div style="padding:14px;border:2px solid #b0563f;border-radius:6px;text-align:center;background:#f9efec;">
           <p style="margin-bottom:4px;font-weight:700;">Both together</p>
-          <p style="margin-bottom:4px;font-size:0.85em;color:#555;">hues ${h1}°–${h3}°</p>
-          <p style="margin-bottom:0;font-size:1.1em;font-weight:700;color:#c1523f;">
+          <p style="margin-bottom:4px;font-size:0.85em;color:#575d66;">hues ${h1}°–${h3}°</p>
+          <p style="margin-bottom:0;font-size:1.1em;font-weight:700;color:#b0563f;">
             &frac12; + &frac12; = 1 &nbsp;<span style="font-weight:400;">by addition</span></p>
-          <p style="margin-bottom:0;font-size:1.1em;font-weight:700;color:#c1523f;">
+          <p style="margin-bottom:0;font-size:1.1em;font-weight:700;color:#b0563f;">
             &frac12; &nbsp;<span style="font-weight:400;">by the same principle</span></p></div></div>
       </div>
-      <div style="padding:15px;background:#f8d7da;border:1px solid #f5c6cb;border-radius:5px;margin-top:14px;">
+      <div style="padding:15px;background:#f2dcd8;border:1px solid #e9cec8;border-radius:5px;margin-top:14px;">
         <p style="margin-bottom:6px;"><strong>The contradiction.</strong> The two areas are incompatible, so the
           rule for the addition of probabilities gives their union <strong>1</strong>. But the union is itself
           an enclosed area about which we are equally ignorant, so the same reasoning gives it
@@ -142,7 +142,7 @@ registerExample("example-ex13", (box) => {
 
     const rows = EX13_CHARTS.map((cc) => {
       const a = ex13Share(cc.f, h1, h2), b = ex13Share(cc.f, h2, h3);
-      const cur = cc.id === c.id ? ' style="background:#fff3cd;font-weight:700;"' : "";
+      const cur = cc.id === c.id ? ' style="background:#f5ead1;font-weight:700;"' : "";
       return `<tr${cur}><td style="text-align:left;">${cc.name} &mdash; ${cc.sub}</td>
         <td>${fmt(a * 100, 1)}%</td><td>${fmt(b * 100, 1)}%</td><td>${fmt((a + b) * 100, 1)}%</td></tr>`;
     }).join("");
