@@ -18,7 +18,7 @@ registerExample("example-ex24", (box) => {
   const content = h(`<div id="ex24-content" class="example-content">
     <p>An urn holds some proportion of white balls. We draw a sample, observe the proportion in it,
       and conclude that the urn's proportion lies within a tolerance of what we saw. Whether that
-      conclusion is any good can be asked in two directions, and they are not the same question.</p>
+      conclusion is any good can be asked in two ways.</p>
     <div id="ex24-controls" class="control-panel"></div>
     <div class="row">
       <div class="col col-6">

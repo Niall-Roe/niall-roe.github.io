@@ -323,8 +323,7 @@ registerExample("example-ex9", (box) => {
     let check = `<div class="note-block">
       <strong>Cross-check.</strong> Multiplying the chances directly gives
       ${bigmark(prodNum)} : ${bigmark(prodDen)}, i.e. a probability of ${frac(bigmark(prodNum), bigmark(prodNum) + " + " + bigmark(prodDen))}
-      = <strong>${fmt(direct, 6)}</strong> &mdash; the same number the sum of logarithms produced above.
-      Adding intensities of belief and multiplying chances are the same operation.`;
+      = <strong>${fmt(direct, 6)}</strong> &mdash; the same number the sum of logarithms produced above.`;
     const favs = args.map(favOf);
     if (allPro && args.length === 2 && favs.includes(81) && favs.includes(93)) {
       check += `<br><br>With Peirce's own two rules this is
@@ -1056,7 +1055,7 @@ registerExample("example-ex32", (box) => {
     pl.axes({ nx: 5, yat: [] });
     pl.box();
     pl.axisLabels("P(A → C), as the testing found it", null);
-    pl.title("What each argument is worth, and how well we know it", { cex: 0.9 });
+    pl.title("What each argument is worth and how well we know it", { cex: 0.9 });
     pl.clip(true);
     pl.abline({ v: 0.5, col: PAL.inkFaint, lwd: 1, lty: 3 });
     st.rows.forEach((r, k) => {
@@ -1242,6 +1241,7 @@ registerExample("example-ex32", (box) => {
 registerExample("example-ex34", (box) => {
   box.appendChild(exHeader("Interactive Example: A Proportion of What?", "ex34-content"));
   const content = h(`<div id="ex34-content" class="example-content">
+    <p class="help-text" style="margin-bottom:6px;">Note: Work in Progress</p>
     <p>Peirce's two rules, as counts. Each probability is the shaded part of its own grid.</p>
     <div class="ex-buttonbar" id="ex34-cases"></div>
     <div id="ex34-gloss"></div>
@@ -1434,8 +1434,8 @@ registerExample("example-ex34", (box) => {
     } else if (!counted) {
       say = `Putting the overlap above zero says there is a wider space &mdash;
         <span class="math">A<sub>0</sub></span>, in which both antecedents are defined and sometimes both
-        hold. That makes the question a real one. It does not answer it. The two arguments leave the
-        proportion anywhere between ${fmt(lo / k, 3)} and ${fmt(hi / k, 3)}, and every value in that band is
+        hold. This makes the question possible to answer, but doesn't give that answer. The two arguments
+        leave the proportion anywhere between ${fmt(lo / k, 3)} and ${fmt(hi / k, 3)}, and every value in that band is
         consistent with 81 in 100 and 93 in 100. Count them and see.`;
     } else if (lo === hi) {
       say = `Counted, and at this overlap the counts settle it on their own: ${bigmark(lo)} of the
@@ -1459,8 +1459,8 @@ registerExample("example-ex34", (box) => {
     $("#ex34-say", content).innerHTML = `<div class="note-block">${say}
       <p style="margin-top:8px;margin-bottom:0;">Pooling the two grids does give a countable figure,
       ${bigmark(C1 + C2)} in ${bigmark(N1 + N2)}, or ${fmt(POOL, 2)}. But observe
-      <span class="math">A<sub>2</sub></span> twice as often and it moves, though neither argument has
-      changed. It is a proportion of how much you looked, not of what you found.</p></div>`;
+      <span class="math">A<sub>2</sub></span> twice as often and it moves even though neither argument
+      has changed.</p></div>`;
 
     drawCanvas(lineCanvas);
   }

@@ -81,9 +81,10 @@ registerExample("example-ex28", (box) => {
       <p class="help-text" id="ex28-note"></p>
     </div>
     <div id="ex28-letters" style="display:none;">
-      <p>A hundred and one urns, the <em>k</em>th holding letters of which <em>k</em> in a hundred are
-        consonants. This paper is now written in the only two letters the urns know. Read some of it and ask
-        which urn it was drawn from.</p>
+      <p>Imagine there are a hundred and one urns, the <em>k</em>th holding letters of which <em>k</em> in a
+        hundred are consonants. Pretend that this paper is written in just consonants and vowels, without
+        worrying about the specific consonant or vowel. We will proceed like the conceptualist. Read some of
+        the paper and try to determine the probability that it was drawn from a given urn.</p>
       <div class="ex-buttonbar">
         <button class="btn btn-primary" data-act="ten">Read ten letters</button>
         <button class="btn btn-primary" data-act="hundred">Read a hundred</button>
@@ -239,9 +240,9 @@ registerExample("example-ex28", (box) => {
     const st = posterior();
     const trueP = VC.total ? (VC.total - VC.vowels) / VC.total : 0;
     $("#ex28-say", content).innerHTML = `<div class="note-block">${st.n === 0
-      ? `Nothing has been read, so every urn is as likely as every other and the picture is flat. That flat
-         picture is the assumption, not a finding: it is put in at the start because nothing else suggested
-         itself, and everything the calculation says afterwards is partly it.`
+      ? `Nothing has been read, so by the principle of indifference (or rule of succession) every urn is as
+         likely as every other and the distribution is flat. This reflects an assumption and is the result of
+         ignorance. Later findings built on this flat distribution are only as good as their foundation.`
       : `<strong>${bigmark(st.cons)}</strong> consonants in <strong>${bigmark(st.n)}</strong> letters. The
          weight has a mean at <strong>${fmt(st.mean, 1)}</strong>, so the urns say this paper came from urn
          <strong style="color:${PICK};">${st.pick}</strong> &mdash; ringed below. The paper's own proportion
@@ -580,10 +581,9 @@ registerExample("example-ex29", (box) => {
         <span style="right:0;left:auto;transform:none;">1</span></div>`;
 
     $("#ex29-say", content).innerHTML = `<div class="note-block">${st.n === 0
-      ? `Not a letter has been read, and the rule already answers <strong>&frac12;</strong> &mdash;
-         <span class="math">(0 + 1) / (0 + 2)</span>. It would answer the same of any question whatever, which
-         is the whole of what it knows before it starts. The paper is in fact
-         <strong>${fmt(trueP, 3)}</strong> consonant, so the answer is not merely unfounded, it is wrong.`
+      ? `You have read no letters, so the rule of succession says: <strong>&frac12;</strong> &mdash;
+         <span class="math">(0 + 1) / (0 + 2)</span>. It would answer the same of any question whatever. The
+         paper is in fact <strong>${fmt(trueP, 3)}</strong> consonant.`
       : `<strong>${bigmark(st.cons)}</strong> consonants in <strong>${bigmark(st.n)}</strong> letters, an
          observed proportion of <strong>${fmt(obs, 4)}</strong>. The rule puts the next letter at
          <strong>${fmt(rule, 4)}</strong> &mdash; ${frac(`${bigmark(st.cons)} + 1`, `${bigmark(st.n)} + 2`)}

@@ -1216,9 +1216,7 @@
 
   <p>In the conceptualistic view of probability, complete ignorance, where the judgment ought not to swerve either toward or away from the hypothesis, is represented by the probability 1/2.<sup class="fn"><a href="#fn2" id="fnref2">2</a></sup></p>
 
-  <p><span class="example-trigger" data-toggle="example-ex13">But let us suppose that we are totally ignorant what colored hair the inhabitants of Saturn have. Let us, then, take a color-chart in which all possible colors are shown shading into one another by imperceptible degrees. In such a chart the relative areas occupied by different classes of colors are perfectly arbitrary. Let us inclose such an area with a closed line, and ask what is the chance on conceptualistic principles that the color of the hair of the inhabitants of Saturn falls within that area? The answer cannot be indeterminate because we must be in some state of belief; and, indeed, conceptualistic writers do not admit indeterminate probabilities. As there is no certainty in the matter, the answer lies between zero and unity. As no numerical value is afforded by the data, the number must be determined by the nature of the scale of probability itself, and not by calculation from the data. The answer can, therefore, only be one-half, since the judgment should neither favor nor oppose the hypothesis. What is true of this area is true of any other one; and it will equally be true of a third area which embraces the other two. But the probability for each of the smaller areas being one-half, that for the larger should be at least unity, which is absurd.</span></p>
-
-  <div id="example-ex13" class="example-container"></div>
+  <p>But let us suppose that we are totally ignorant what colored hair the inhabitants of Saturn have. Let us, then, take a color-chart in which all possible colors are shown shading into one another by imperceptible degrees. In such a chart the relative areas occupied by different classes of colors are perfectly arbitrary. Let us inclose such an area with a closed line, and ask what is the chance on conceptualistic principles that the color of the hair of the inhabitants of Saturn falls within that area? The answer cannot be indeterminate because we must be in some state of belief; and, indeed, conceptualistic writers do not admit indeterminate probabilities. As there is no certainty in the matter, the answer lies between zero and unity. As no numerical value is afforded by the data, the number must be determined by the nature of the scale of probability itself, and not by calculation from the data. The answer can, therefore, only be one-half, since the judgment should neither favor nor oppose the hypothesis. What is true of this area is true of any other one; and it will equally be true of a third area which embraces the other two. But the probability for each of the smaller areas being one-half, that for the larger should be at least unity, which is absurd.</span> <div id="example-ex13" class="example-container"></div>
 
   <div class="section-number">III.</div>
 
@@ -4481,15 +4479,6 @@ registerExample("example-ex16", (box) => {
   function update() {
     confSlider.style.display = chk("ex16_show_errors") ? "" : "none";
     const c = calc();
-    const conclusion = c.ratio >= 4.77
-      ? `<div style="padding:15px;background-color:#dde9dc;border:1px solid #cfe0d0;border-radius:5px;">
-           <p><strong>The difference is REAL (systematic), not due to chance.</strong></p></div>`
-      : c.ratio >= 2.5
-      ? `<div style="padding:15px;background-color:#f5ead1;border:1px solid #9a7b3f;border-radius:5px;">
-           <p><strong>The difference is likely REAL, though not as certain.</strong></p></div>`
-      : `<div style="padding:15px;background-color:#f2dcd8;border:1px solid #e9cec8;border-radius:5px;">
-           <p><strong>The difference may be attributed to CHANCE.</strong></p></div>`;
-
     $("#ex16_results", content).innerHTML = `<div class="result-box">
       <h4>Analysis Results</h4>
       <h5>Step 1: Calculate Probable Errors</h5>
@@ -4500,8 +4489,7 @@ registerExample("example-ex16", (box) => {
       <p><strong>Observed difference: </strong>${fmt(c.diffObs, 4)}</p>
       <p><strong>Sum of probable errors: </strong>${fmt(c.sumErr, 4)}</p>
       <p><strong>Multiple of error: </strong>${fmt(c.ratio, 1)} x (e1 + e2)</p>
-      <hr>
-      <h5>Conclusion</h5>${conclusion}</div>`;
+      </div>`;
     drawCanvas(canvas);
   }
   update();
@@ -5008,8 +4996,7 @@ registerExample("example-ex9", (box) => {
     let check = `<div class="note-block">
       <strong>Cross-check.</strong> Multiplying the chances directly gives
       ${bigmark(prodNum)} : ${bigmark(prodDen)}, i.e. a probability of ${frac(bigmark(prodNum), bigmark(prodNum) + " + " + bigmark(prodDen))}
-      = <strong>${fmt(direct, 6)}</strong> &mdash; the same number the sum of logarithms produced above.
-      Adding intensities of belief and multiplying chances are the same operation.`;
+      = <strong>${fmt(direct, 6)}</strong> &mdash; the same number the sum of logarithms produced above.`;
     const favs = args.map(favOf);
     if (allPro && args.length === 2 && favs.includes(81) && favs.includes(93)) {
       check += `<br><br>With Peirce's own two rules this is
@@ -5741,7 +5728,7 @@ registerExample("example-ex32", (box) => {
     pl.axes({ nx: 5, yat: [] });
     pl.box();
     pl.axisLabels("P(A → C), as the testing found it", null);
-    pl.title("What each argument is worth, and how well we know it", { cex: 0.9 });
+    pl.title("What each argument is worth and how well we know it", { cex: 0.9 });
     pl.clip(true);
     pl.abline({ v: 0.5, col: PAL.inkFaint, lwd: 1, lty: 3 });
     st.rows.forEach((r, k) => {
@@ -5927,6 +5914,7 @@ registerExample("example-ex32", (box) => {
 registerExample("example-ex34", (box) => {
   box.appendChild(exHeader("Interactive Example: A Proportion of What?", "ex34-content"));
   const content = h(`<div id="ex34-content" class="example-content">
+    <p class="help-text" style="margin-bottom:6px;">Note: Work in Progress</p>
     <p>Peirce's two rules, as counts. Each probability is the shaded part of its own grid.</p>
     <div class="ex-buttonbar" id="ex34-cases"></div>
     <div id="ex34-gloss"></div>
@@ -6119,8 +6107,8 @@ registerExample("example-ex34", (box) => {
     } else if (!counted) {
       say = `Putting the overlap above zero says there is a wider space &mdash;
         <span class="math">A<sub>0</sub></span>, in which both antecedents are defined and sometimes both
-        hold. That makes the question a real one. It does not answer it. The two arguments leave the
-        proportion anywhere between ${fmt(lo / k, 3)} and ${fmt(hi / k, 3)}, and every value in that band is
+        hold. This makes the question possible to answer, but doesn't give that answer. The two arguments
+        leave the proportion anywhere between ${fmt(lo / k, 3)} and ${fmt(hi / k, 3)}, and every value in that band is
         consistent with 81 in 100 and 93 in 100. Count them and see.`;
     } else if (lo === hi) {
       say = `Counted, and at this overlap the counts settle it on their own: ${bigmark(lo)} of the
@@ -6144,8 +6132,8 @@ registerExample("example-ex34", (box) => {
     $("#ex34-say", content).innerHTML = `<div class="note-block">${say}
       <p style="margin-top:8px;margin-bottom:0;">Pooling the two grids does give a countable figure,
       ${bigmark(C1 + C2)} in ${bigmark(N1 + N2)}, or ${fmt(POOL, 2)}. But observe
-      <span class="math">A<sub>2</sub></span> twice as often and it moves, though neither argument has
-      changed. It is a proportion of how much you looked, not of what you found.</p></div>`;
+      <span class="math">A<sub>2</sub></span> twice as often and it moves even though neither argument
+      has changed.</p></div>`;
 
     drawCanvas(lineCanvas);
   }
@@ -6353,7 +6341,7 @@ registerExample("example-ex8", (box) => {
     </div>
 
     <div class="note-block">Peirce&rsquo;s <em>chance</em> is what we now call the <strong>odds</strong>.
-      A chance of 81/19 is odds of 81 to 19 on; an even chance, 1/1, is evens.</div>
+      A chance of 81/19 is odds of 81:19 on; an even chance, 1:1, is evens.</div>
   </div>`);
   box.appendChild(content);
 
@@ -6720,9 +6708,9 @@ registerExample("example-ex10", (box) => {
 registerExample("example-ex11", (box) => {
   box.appendChild(exHeader("Interactive Example: Two Numbers, Not One", "ex11-content"));
   const content = h(`<div id="ex11-content" class="example-content">
-    <p>Draw from the bag again, and watch two numbers rather than one. The first is the proportion white among
-      the drawings. The second is the probable error: the amount by which the first is as likely as not to be
-      wrong. Drawing more beans moves the first number very little and the second a great deal.</p>
+    <p>On these drawings we calculate two numbers. The first is the proportion white among the drawings. The
+      second is the probable error: the amount by which the first is as likely as not to be wrong. Initially,
+      drawing more beans moves the first number very little and the second a great deal.</p>
     <div class="ex-buttonbar">
       <button class="btn btn-primary" data-act="d1">Draw one bean</button>
       <button class="btn btn-primary" data-act="d10">Draw ten</button>
@@ -7809,9 +7797,10 @@ registerExample("example-ex28", (box) => {
       <p class="help-text" id="ex28-note"></p>
     </div>
     <div id="ex28-letters" style="display:none;">
-      <p>A hundred and one urns, the <em>k</em>th holding letters of which <em>k</em> in a hundred are
-        consonants. This paper is now written in the only two letters the urns know. Read some of it and ask
-        which urn it was drawn from.</p>
+      <p>Imagine there are a hundred and one urns, the <em>k</em>th holding letters of which <em>k</em> in a
+        hundred are consonants. Pretend that this paper is written in just consonants and vowels, without
+        worrying about the specific consonant or vowel. We will proceed like the conceptualist. Read some of
+        the paper and try to determine the probability that it was drawn from a given urn.</p>
       <div class="ex-buttonbar">
         <button class="btn btn-primary" data-act="ten">Read ten letters</button>
         <button class="btn btn-primary" data-act="hundred">Read a hundred</button>
@@ -7967,9 +7956,9 @@ registerExample("example-ex28", (box) => {
     const st = posterior();
     const trueP = VC.total ? (VC.total - VC.vowels) / VC.total : 0;
     $("#ex28-say", content).innerHTML = `<div class="note-block">${st.n === 0
-      ? `Nothing has been read, so every urn is as likely as every other and the picture is flat. That flat
-         picture is the assumption, not a finding: it is put in at the start because nothing else suggested
-         itself, and everything the calculation says afterwards is partly it.`
+      ? `Nothing has been read, so by the principle of indifference (or rule of succession) every urn is as
+         likely as every other and the distribution is flat. This reflects an assumption and is the result of
+         ignorance. Later findings built on this flat distribution are only as good as their foundation.`
       : `<strong>${bigmark(st.cons)}</strong> consonants in <strong>${bigmark(st.n)}</strong> letters. The
          weight has a mean at <strong>${fmt(st.mean, 1)}</strong>, so the urns say this paper came from urn
          <strong style="color:${PICK};">${st.pick}</strong> &mdash; ringed below. The paper's own proportion
@@ -8308,10 +8297,9 @@ registerExample("example-ex29", (box) => {
         <span style="right:0;left:auto;transform:none;">1</span></div>`;
 
     $("#ex29-say", content).innerHTML = `<div class="note-block">${st.n === 0
-      ? `Not a letter has been read, and the rule already answers <strong>&frac12;</strong> &mdash;
-         <span class="math">(0 + 1) / (0 + 2)</span>. It would answer the same of any question whatever, which
-         is the whole of what it knows before it starts. The paper is in fact
-         <strong>${fmt(trueP, 3)}</strong> consonant, so the answer is not merely unfounded, it is wrong.`
+      ? `You have read no letters, so the rule of succession says: <strong>&frac12;</strong> &mdash;
+         <span class="math">(0 + 1) / (0 + 2)</span>. It would answer the same of any question whatever. The
+         paper is in fact <strong>${fmt(trueP, 3)}</strong> consonant.`
       : `<strong>${bigmark(st.cons)}</strong> consonants in <strong>${bigmark(st.n)}</strong> letters, an
          observed proportion of <strong>${fmt(obs, 4)}</strong>. The rule puts the next letter at
          <strong>${fmt(rule, 4)}</strong> &mdash; ${frac(`${bigmark(st.cons)} + 1`, `${bigmark(st.n)} + 2`)}
@@ -8969,7 +8957,7 @@ registerExample("example-ex24", (box) => {
   const content = h(`<div id="ex24-content" class="example-content">
     <p>An urn holds some proportion of white balls. We draw a sample, observe the proportion in it,
       and conclude that the urn's proportion lies within a tolerance of what we saw. Whether that
-      conclusion is any good can be asked in two directions, and they are not the same question.</p>
+      conclusion is any good can be asked in two ways.</p>
     <div id="ex24-controls" class="control-panel"></div>
     <div class="row">
       <div class="col col-6">
@@ -9479,6 +9467,20 @@ registerExample("example-ex13", (box) => {
     drawCanvas(canvas);
   }
   update();
+});
+
+/* ==========================================================================
+   Held back for the moment.
+
+   The examples themselves are untouched, above and in their own files; this
+   only replaces what their triggers open, so that nothing has to be unpicked
+   to put them back. Delete this block and they return as they were.
+   ========================================================================*/
+["example-ex22", "example-ex23", "example-ex24", "example-ex25"].forEach((id) => {
+  registerExample(id, (box) => {
+    box.appendChild(h(`<div class="example-content" style="padding-top:2px;">
+      <p class="ed-note" style="margin-bottom:0;">Coming soon.</p></div>`));
+  });
 });
 </script>
 </body>

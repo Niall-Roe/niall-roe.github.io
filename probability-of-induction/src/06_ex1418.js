@@ -936,15 +936,6 @@ registerExample("example-ex16", (box) => {
   function update() {
     confSlider.style.display = chk("ex16_show_errors") ? "" : "none";
     const c = calc();
-    const conclusion = c.ratio >= 4.77
-      ? `<div style="padding:15px;background-color:#dde9dc;border:1px solid #cfe0d0;border-radius:5px;">
-           <p><strong>The difference is REAL (systematic), not due to chance.</strong></p></div>`
-      : c.ratio >= 2.5
-      ? `<div style="padding:15px;background-color:#f5ead1;border:1px solid #9a7b3f;border-radius:5px;">
-           <p><strong>The difference is likely REAL, though not as certain.</strong></p></div>`
-      : `<div style="padding:15px;background-color:#f2dcd8;border:1px solid #e9cec8;border-radius:5px;">
-           <p><strong>The difference may be attributed to CHANCE.</strong></p></div>`;
-
     $("#ex16_results", content).innerHTML = `<div class="result-box">
       <h4>Analysis Results</h4>
       <h5>Step 1: Calculate Probable Errors</h5>
@@ -955,8 +946,7 @@ registerExample("example-ex16", (box) => {
       <p><strong>Observed difference: </strong>${fmt(c.diffObs, 4)}</p>
       <p><strong>Sum of probable errors: </strong>${fmt(c.sumErr, 4)}</p>
       <p><strong>Multiple of error: </strong>${fmt(c.ratio, 1)} x (e1 + e2)</p>
-      <hr>
-      <h5>Conclusion</h5>${conclusion}</div>`;
+      </div>`;
     drawCanvas(canvas);
   }
   update();

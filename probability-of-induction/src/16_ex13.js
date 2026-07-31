@@ -159,6 +159,20 @@ registerExample("example-ex13", (box) => {
   }
   update();
 });
+
+/* ==========================================================================
+   Held back for the moment.
+
+   The examples themselves are untouched, above and in their own files; this
+   only replaces what their triggers open, so that nothing has to be unpicked
+   to put them back. Delete this block and they return as they were.
+   ========================================================================*/
+["example-ex22", "example-ex23", "example-ex24", "example-ex25"].forEach((id) => {
+  registerExample(id, (box) => {
+    box.appendChild(h(`<div class="example-content" style="padding-top:2px;">
+      <p class="ed-note" style="margin-bottom:0;">Coming soon.</p></div>`));
+  });
+});
 </script>
 </body>
 </html>

@@ -137,9 +137,9 @@ registerExample("example-ex10", (box) => {
 registerExample("example-ex11", (box) => {
   box.appendChild(exHeader("Interactive Example: Two Numbers, Not One", "ex11-content"));
   const content = h(`<div id="ex11-content" class="example-content">
-    <p>Draw from the bag again, and watch two numbers rather than one. The first is the proportion white among
-      the drawings. The second is the probable error: the amount by which the first is as likely as not to be
-      wrong. Drawing more beans moves the first number very little and the second a great deal.</p>
+    <p>On these drawings we calculate two numbers. The first is the proportion white among the drawings. The
+      second is the probable error: the amount by which the first is as likely as not to be wrong. Initially,
+      drawing more beans moves the first number very little and the second a great deal.</p>
     <div class="ex-buttonbar">
       <button class="btn btn-primary" data-act="d1">Draw one bean</button>
       <button class="btn btn-primary" data-act="d10">Draw ten</button>

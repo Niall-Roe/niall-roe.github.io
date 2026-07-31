@@ -178,7 +178,7 @@ registerExample("example-ex8", (box) => {
     </div>
 
     <div class="note-block">Peirce&rsquo;s <em>chance</em> is what we now call the <strong>odds</strong>.
-      A chance of 81/19 is odds of 81 to 19 on; an even chance, 1/1, is evens.</div>
+      A chance of 81/19 is odds of 81:19 on; an even chance, 1:1, is evens.</div>
   </div>`);
   box.appendChild(content);
 
