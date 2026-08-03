@@ -1,0 +1,4 @@
+R CMD Sweave $1
+texi2pdf --clean $(basename $1 .Rnw).tex
+rm -f $(basename $1 .Rnw)-*.pdf
+rm -f Rplots.ps

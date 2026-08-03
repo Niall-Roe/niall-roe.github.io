@@ -837,22 +837,21 @@ registerExample("example-ex3", (box) => {
     const r = simulate();
     const ad = antecedentDesc(deckType, true);
     $("#ex3_calc", content).textContent =
-      `ANTECEDENT A: ${ad}\n\n` +
-      `CONSEQUENCE 1: "IF A, THEN B" where B = ${TARGET_DESC[b]}\n` +
-      `  - B occurs: ${r.countB} / ${r.n} times\n` +
-      `  - P(A → B) = ${rround(r.pB, 4)}\n\n` +
-      `CONSEQUENCE 2: "IF (A AND B), THEN C" where C = ${TARGET_DESC[c]}\n` +
-      `  - Among ${r.countB} cases where B holds,\n` +
-      `    C also holds: ${r.countBoth} times\n` +
-      `  - P(A∧B → C) = ${r.countBoth} / ${r.countB} = ${rround(r.pCgivenB, 4)}\n\n` +
-      `COMBINED CONSEQUENCE: "IF A, THEN (B AND C)"\n` +
-      `  - Both B and C: ${r.countBoth} / ${r.n} times\n` +
-      `  - P(A → [B∧C]) = ${rround(r.pBoth, 4)}\n\n` +
-      `MULTIPLICATION RULE:\n` +
+      `The antecedent is ${ad}.\n\n` +
+      `First consequence — if A, then B, where B is ${TARGET_DESC[b]}.\n` +
+      `  B occurred ${r.countB} times in ${r.n}.\n` +
+      `  P(A → B) = ${rround(r.pB, 4)}\n\n` +
+      `Second consequence — if A and B, then C, where C is ${TARGET_DESC[c]}.\n` +
+      `  Among the ${r.countB} cases where B held, C held ${r.countBoth} times.\n` +
+      `  P(A∧B → C) = ${r.countBoth} / ${r.countB} = ${rround(r.pCgivenB, 4)}\n\n` +
+      `The two together — if A, then both B and C.\n` +
+      `  Both held ${r.countBoth} times in ${r.n}.\n` +
+      `  P(A → [B∧C]) = ${rround(r.pBoth, 4)}\n\n` +
+      `And that is the rule:\n` +
       `  P(A → B) × P(A∧B → C) = ${rround(r.pB, 4)} × ${rround(r.pCgivenB, 4)} = ${rround(r.pB * r.pCgivenB, 4)}\n` +
       `  P(A → [B∧C]) = ${rround(r.pBoth, 4)}\n\n` +
-      `The consequences CHAIN: first A leads to B, then among cases\n` +
-      `where we have both A and B, we check if C follows.`;
+      `The consequences chain. A leads to B, and then among the cases where\n` +
+      `both A and B hold, we ask whether C follows.`;
     drawCanvas(barCanvas); drawCanvas(gridCanvas);
   }
   update();
@@ -919,21 +918,23 @@ registerExample("example-ex4", (box) => {
     const indep = Math.abs(pC - pCgivenB) < 0.001;
     const ad = antecedentDesc(deckType, true);
     $("#ex4_calc", content).textContent =
-      `ANTECEDENT A: ${ad}\n\n` +
-      `CONSEQUENCE 1: "IF A, THEN B" where B = ${ruleDesc(ruleB)}\n` +
-      `  - P(A → B) = ${countB}/${size} = ${rround(pB, 4)}\n\n` +
-      `CONSEQUENCE 2: "IF A, THEN C" where C = ${ruleDesc(ruleC)}\n` +
-      `  - P(A → C) = ${countC}/${size} = ${rround(pC, 4)}\n\n` +
-      `INDEPENDENCE TEST:\n` +
-      `  - P(A → C) = ${rround(pC, 4)}\n` +
-      `  - P(A∧B → C) = ${countBoth}/${countB} = ${rround(pCgivenB, 4)}\n` +
-      `  - ${indep ? "✓ INDEPENDENT" : "✗ NOT INDEPENDENT"}\n\n` +
-      `SPECIAL RULE (only works if independent):\n` +
+      `The antecedent is ${ad}.\n\n` +
+      `First consequence — if A, then B, where B is ${ruleDesc(ruleB)}.\n` +
+      `  P(A → B) = ${countB}/${size} = ${rround(pB, 4)}\n\n` +
+      `Second consequence — if A, then C, where C is ${ruleDesc(ruleC)}.\n` +
+      `  P(A → C) = ${countC}/${size} = ${rround(pC, 4)}\n\n` +
+      `Are they independent? Knowing B would have to leave C where it was.\n` +
+      `  P(A → C) = ${rround(pC, 4)}\n` +
+      `  P(A∧B → C) = ${countBoth}/${countB} = ${rround(pCgivenB, 4)}\n` +
+      `  ${indep ? "The same, so B and C are independent."
+        : "Not the same, so B and C are not independent."}\n\n` +
+      `The special rule, which holds only in that case:\n` +
       `  P(A → B) × P(A → C) = ${rround(pB, 4)} × ${rround(pC, 4)} = ${rround(pB * pC, 4)}\n` +
       `  P(A → [B∧C]) = ${countBoth}/${size} = ${rround(pBoth, 4)}\n\n` +
       (indep
-        ? `✓ Rule works! Products match exactly.\nThis is because knowing B doesn't change the probability of C.`
-        : `✗ Rule doesn't work here. B and C are NOT independent.\nKnowing B changes the probability of C.\nDifference: |${rround(pB * pC, 4)} - ${rround(pBoth, 4)}| = ${rround(Math.abs(pB * pC - pBoth), 4)}`);
+        ? `The two agree, because knowing B does not change the probability of C.`
+        : `The two do not agree, because knowing B changes the probability of C.\n` +
+          `They are out by ${rround(Math.abs(pB * pC - pBoth), 4)}.`);
     drawCanvas(canvas);
   }
   update();

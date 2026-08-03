@@ -65,7 +65,7 @@ function ex5Favorable(preset) {
 registerExample("example-ex5", (box) => {
   box.appendChild(exHeader("Interactive Example: Peirce's Dice Problems", "ex5-content"));
   const content = h(`<div id="ex5-content" class="example-content">
-    <p>Explore classic dice probability problems using the rules we've learned. Select a preset or run a simulation.</p>
+    <p>The dice problems Peirce works through, and a few others. Pick one, or run it and count.</p>
     <div class="key-insight"><strong>Important Note: </strong>These are theoretical problems. The answers give
       expectations about empirical long-run frequencies&mdash;but we solve them with mathematics, not by rolling
       10,000 times, just as we solve geometry with trigonometry rather than a protractor.</div>
@@ -277,6 +277,7 @@ document.addEventListener("input", (ev) => {
 }, true);
 
 registerExample("example-ex6", (box) => {
+  box.appendChild(exHeader("Interactive Example: Two Rules, and the Cases They Agree On", "ex6-content"));
   const content = h(`<div id="ex6-content" class="example-content">
     <div class="row">
       <div class="col col-6"><h5><span class="math">A</span><sub>1</sub> &rarr; <span class="math">C</span></h5>

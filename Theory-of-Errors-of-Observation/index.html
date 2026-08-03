@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peirce — On the Theory of Errors of Observations (plain text)</title>
+<style>
+  :root {
+    --page:      #f4f1ea;
+    --paper:     #ffffff;
+    --ink:       #1f2328;
+    --ink-soft:  #575d66;
+    --ink-faint: #8a9099;
+    --rule:      #dbd6cb;
+    --rule-soft: #ece8df;
+    --wash:      #faf8f3;
+  }
+
+  body {
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 16px;
+    background-color: var(--page);
+    color: var(--ink);
+  }
+
+  .article-container {
+    background-color: var(--paper);
+    padding: 52px 56px;
+    box-shadow: 0 1px 3px rgba(60, 50, 30, .10);
+    border-radius: 2px;
+  }
+
+  h3 { text-align: center; font-variant: small-caps; margin-top: 40px; margin-bottom: 6px; letter-spacing: 1px; font-size: 1.6em; }
+  h4 { text-align: center; font-weight: normal; margin-bottom: 10px; color: var(--ink-soft); }
+
+  p { text-align: justify; margin-bottom: 15px; }
+
+  .formula { text-align: center; margin: 24px 0; font-family: 'Times New Roman', Georgia, serif; font-style: italic; }
+  .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 2px; }
+  .frac > .num { border-bottom: 1px solid currentColor; padding: 0 4px; }
+  .frac > .den { padding: 0 4px; }
+
+  .peirce-table { border-collapse: collapse; margin: 20px auto; }
+  .peirce-table th, .peirce-table td { border: 1px solid var(--rule); padding: 6px 16px; text-align: center; }
+
+  sup, sub { font-size: .75em; }
+
+  .footnotes { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: .9em; color: var(--ink-soft); }
+  .footnotes li { margin-bottom: 10px; }
+
+  figure { text-align: center; margin: 30px 0; }
+  figure img { max-width: 100%; }
+  figcaption { font-size: .85em; color: var(--ink-faint); margin-top: 8px; }
+
+  .peirce-pi, .peirce-e { font-style: italic; }
+
+  .rad { border-top: 1px solid currentColor; padding: 2px 3px 0 3px; display: inline-block; }
+  .peirce-defs { list-style: none; padding-left: 1.5em; margin-bottom: 15px; }
+  .peirce-defs li { margin-bottom: 4px; }
+  .prose-gap { border: 1px dashed var(--rule); background: var(--wash); color: var(--ink-faint); padding: 10px 16px; margin: 15px 0; font-size: .85em; font-style: italic; }
+</style>
+</head>
+<body>
+<div class="article-container">
+
+<h3>On the Theory of Errors of Observations</h3>
+<h4>P 77: Coast Survey Report 1870, 200&ndash;224</h4>
+<h4 style="font-size: .8em;">Original text: <a href="https://www.unav.es/gep/USCoastSurveyReport.pdf" target="_blank" rel="noopener">U.S. Coast Survey Report for 1870, Appendix No. 21</a> (public domain: U.S. federal government publication)</h4>
+
+<!-- p.114 -->
+<p>The object of this paper is to give a general account of the theory of errors of observations, with the design of showing what the limitations to the applicability of the method of least squares are, and what course is to be pursued when that method fails. We shall begin with an elementary account of the general principles of the subject, in order to state them with a little more accuracy than is commonly done.</p>
+
+<p>The notation employed is one which has been suggested by the study of the logic of relations. Small Roman letters will denote objects partly indeterminate. Thus m may denote a man, without saying what man. Small Italics will be used for relative terms; thus <i>l</i> may denote a lover. The correlates of such relative terms will be written after them on the same line; thus <i>t</i>m or <i>l</i>m may denote a tooth of a man or a lover of a man, if m denotes man, <i>t</i> a tooth of and <i>l</i> a lover of something undetermined. Then, <i>l</i>w will denote a lover of a woman, it being indeterminate what lover and what woman. <i>tl</i>w will denote a tooth of a lover of a woman. If we wish to denote that which is a lover of all women, we must have a symbol to denote all women. As [x] is commonly used in the method of least squares to denote the sum of all the quantities x, so we may write [w] to denote all women, and then <i>l</i>[w] will denote something which is a lover of all women, or we may write the same thing thus, <i>l</i><sup>w</sup>. A relative term has a double indeterminacy, being indeterminate in reference to the relate and also in reference to the correlate. A lover may be this lover, that lover, or the other lover, and each of these may be lover of this, or that, or the other. Corresponding, therefore, to the [<i>l</i>], which denotes all lovers, we may write {<i>l</i>} to denote the lover to whomever he is a lover. Thus, {<i>l</i>}<sup>w</sup> will denote a lover of nothing but women, or we may write the same thing thus, <sup><i>l</i></sup>w. We may denote &ldquo;loved by&rdquo; by K<sup><i>l</i></sup>.</p>
+
+<!-- p.115 -->
+<p>Corresponding to any absolute term, as man, there is a relative term, &ldquo;man that is,&rdquo; as in the expression &ldquo;a man that is rich.&rdquo; I shall denote a relative of this sort by the symbol for the absolute term, with an inverted comma after it, as m<sup>,</sup>. Thus, if b denotes anything black, m<sup>,</sup> b will denote a man that is black.</p>
+
+<p>Let V be the relative &ldquo;a general name which is applicable to.&rdquo; Thus, Vm will denote a general term which is applicable to some man. V<sup>m</sup> will denote a general term which is applicable to every man. V<sup>m,</sup> V<sup>w</sup> will be a general term which is applicable to every man and to every woman. K V [V<sup>m,</sup> V<sup>w</sup>] will denote that to which every general term is applicable which is applicable to every man and to every woman; in other words, this denotes either a man or a woman. I shall write this for short m &#43;<sub>,</sub> w.</p>
+
+<p>Zero is defined by the general equation x &#43;<sub>,</sub> 0 = x, whatever x may be. Then, <i>zero</i> generally denotes nothing.</p>
+
+<p>Unity is defined by the general equation x<sup>,</sup> 1 = x, whatever x may be, and then 1 generally will denote anything.</p>
+
+<p>But 1 and 0 have sometimes to be interpreted as relative terms. Now, it can be proved by the principles of the logic of relatives that so considered 0<sup>x</sup> = 0, unless x = 0, when 0<sup>0</sup> = 1; and that 1x = 1, unless x = 0, when 10 = 0. It follows that 0<sup>x</sup> is such a logical function<sup><a href="#fn1" id="fnref1">1</a></sup> of x that it signifies &ldquo;the case of the non-existence of,&rdquo; while 1<i>x</i> is such a logical function of x that it signifies &ldquo;the case of the existence of.&rdquo;</p>
+
+<p>Since [m] denotes all men, we may naturally write <span class="frac"><span class="num">[m]</span><span class="den">m</span></span> to denote what all men become when that factor is removed which makes [m] refer to <i>men</i> rather than to anything else; that is to say, to denote the <i>number</i> of men. We may write this for short [m] with heavy brackets. Then <i>t</i> being a relative term, (&ldquo;a tooth of,&rdquo;) by [t1] will be denoted the total number of teeth in the universe. But [t] will be used as equivalent to <span class="frac"><span class="num">[t1]</span><span class="den">[1]</span></span>, or the average number of teeth that anything has. But &ldquo;anything&rdquo; is not to be taken here in an absolute sense. We always limit our considerations entirely to a certain class. As De Morgan expresses it, we always have a limited universe. When we reckon up the number of all things to find the average number of teeth <i>per</i> thing, it would be absurd to count among things the virtues,</p>
+
+<!-- p.116 -->
+<p>shades of color, days or seconds of time.</p>
+
+<p>Anything which belongs to the limited universe under consideration is called, in the theory of probabilities, an <i>event</i>. An expression like [<i>t</i>], where <i>t</i> is a relative term, is termed a relative number, average number, or probable number. If the relative term to which the average number refers is one of those relatives which are formed by adding a comma to the symbol for an absolute term, as m, then the relative number is called a <i>probability</i>. For example, [m<sup>,</sup>] is the average number of men that anything is, but it is usually called the probability that anything is a man.</p>
+
+<p>The importance of average numbers arises from the fact that all our knowledge really consists of nothing but average numbers; for all our knowledge is derived from induction, and its analogue, hypothesis. Now, the scientific conduct of this kind of reasoning is highly complex, because all sorts of precautions have to be attended to, and it has to be accompanied by a great deal of deduction. But the general nature of induction is everywhere the same, and is completely typified in the following example.</p>
+
+<p>From a bag of mixed black and white beans I take out a handful, and count the number of black and the number of white beans, and I assume that the black and white are nearly in the same ratio throughout the bag.</p>
+
+<p>If I am in error in this conclusion, it is an error which a repetition of the same process must tend to rectify. It is, therefore, a valid inference. But it clearly teaches me nothing in reference to the color of any particular bean. Of that I am as ignorant as before. The case is not in the least altered if I find all the beans of my handful to be black, or all to be white. I can still infer only the approximate general ratio, and it is only this I express when I say the observation makes the probability of any one bean being white or being black very great; for a probability is itself only an average number.</p>
+
+<p>At first thought it is hard to admit this; but the difficulty will be in great measure removed if we consider how it is that the knowledge of average numbers becomes useful in particular cases. Suppose we know the relative number of black beans in a certain bag; then, if we draw a large number of beans out of it, we know that the total number of black beans we shall draw will be equal to the number of drawings multiplied by the average number of beans in the bag. Suppose we know the relative numbers of black beans in a large number of bags, containing different proportions; then, if the beans are well mixed up in each, we may only draw a single bean from each, and yet we can predict nearly the total number of black beans which would be drawn by simply taking the sum</p>
+
+<!-- p.117 -->
+<p>of the relative numbers. If the black beans had a value while the white ones were worthless, then the total number of black beans which would be drawn would be the important thing to know. But as knowledge derives its practical importance from its influence upon our conduct, let us suppose that at every drawing we have our choice between two bags to draw from; then the man who knew the relative number of black beans in every bag would act in every case as though the bean he would draw from the bag which contained the larger proportion of black ones were known to be black, and as though the bean he would draw from the other were certainly white. Strictly speaking, he would know nothing about the beans that would be drawn in the particular case, but he would have a knowledge which would be so far equivalent to that that it would influence his conduct in the particular case. This is the only knowledge we ever have, a knowledge of what assumption to make in the particular case in order to do the best in the long run. Whenever, then, we have to do with a <i>value</i>, the sum-total of which in the long run is the only thing which concerns us, the average amount of it is important to be known; but in all other cases the average numbers are of no consequence.</p>
+
+<p>It is evident that in the example just given it would be a valuable increase of knowledge to know, for instance, what the difference in the relative number of black beans at the top and bottom of a bag was, and any limitation of the &ldquo;universe&rdquo; used which should separate a relative number into two different ones would be advantageous.</p>
+
+<p>There are many problems in probabilities, which, being solved, give a relative number composed of two terms, one known and the other unknown. Such an indeterminate result shows that a wider &ldquo;universe&rdquo; must be adopted for one of the terms of the relative number.</p>
+
+<p>The fundamental arithmetical formul&aelig; relating to relative numbers are as follows:</p>
+
+<p>We have seen that the relative number of things that are men, or the probability that a thing is a man, is equal to <span class="frac"><span class="num">[m<sup>,</sup>1]</span><span class="den">[1]</span></span>. By &ldquo;thing&rdquo; here is meant any object of our limited universe, as, for example, an animal. But we may wish to consider the relative number of animals that are men when our limited universe is a wider class than animal. In this case, <i>a</i> denoting an animal, we write this probability <span class="frac"><span class="num">[m<sup>,</sup>a]</span><span class="den">[a]</span></span>. Let us suppose that, our universe being &ldquo;day,&rdquo; we wish to know the</p>
+
+<!-- p.118 -->
+<p>probability that if it thunders on any day it will rain on that day. To say that if it thunders it will rain on the same day is the same as to say that every day on which it thunders is a day on which it rains. Then let t be a day on which it thunders and r a day on which it rains, and the probability in question is <span class="frac"><span class="num">[t<sup>,</sup>r]</span><span class="den">[t]</span></span>. In general, the probability that if one event happens another will happen is equal to the probability that both will happen, divided by the probability that the first will happen.</p>
+
+<p>Let us now see how to express the probability that a certain quantity will have a certain value. It is clearly implied that the quantity is defined in some other way than by its value. It might be, for instance, the length of time a bird will be on wing. Let x be this quantity, and let n be any definite value. Then <span class="frac"><span class="num">[x<sup>,</sup>n]</span><span class="den">[x]</span></span>, or the number of cases in which the time a bird is flying has that value, divided by the whole number of cases of a bird&rsquo;s flying, is the probability that a bird will fly for that length of time. But since time is continuous, the length of time a bird may be up may have an infinite number of different values. Consequently, the probability of any one is <i>zero</i>. We, therefore, seek the probability that the time lies between n and n + &Delta;n; and if &Delta;n is infinitesimal, (say d<i>n</i>,) then the probability is proportional to d<i>n</i>. We may, therefore, write this probability thus, [n<sub>x</sub>] d<i>n</i>. Here n<sub>x</sub> denotes the case of the value of x being about n.</p>
+
+<p>The probability that if one quantity, <i>x</i>, has a value lying between <i>m</i> and <i>m</i> + d<i>m</i>, then another quantity, <i>y</i>, has a value lying between <i>n</i> and <i>n</i> + d<i>n</i>, will, according to what has been said, be equal to the probability that both <i>x</i> and <i>y</i> will have the supposed values, divided by the probability that <i>x</i> will have the supposed value, or will be <span class="frac"><span class="num">[m<sub>x</sub><sup>,</sup>n<sub>y</sub>] d<i>m</i>.d<i>n</i></span><span class="den">[m<sub>x</sub>] d<i>m</i></span></span>, or, since the d<i>m</i> disappeared by cancellation, <span class="frac"><span class="num">[m<sub>x</sub><sup>,</sup>n<sub>y</sub>]</span><span class="den">[m<sub>x</sub>]</span></span> d<i>n</i>.</p>
+
+<p>Given, the probability of A, the probability of B, and the probability that if A happens, B happens. Required, the probability that if B happens, A happens.</p>
+
+<p>The probability of A is [A]. The probability of B is [B]. The probability that if A then B is <span class="frac"><span class="num">[A<sup>,</sup>B]</span><span class="den">[A]</span></span>.</p>
+
+<!-- p.119 -->
+<p>The probability that if B then A is <span class="frac"><span class="num">[A<sup>,</sup>B]</span><span class="den">[B]</span></span>. Then we have&mdash;</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">[A<sup>,</sup>B]</span><span class="den">[B]</span></span>
+  = <span class="frac"><span class="num">[A<sup>,</sup>B]</span><span class="den">[A]</span></span> &times; [A] &divide; [B]
+</div>
+
+<p>or the probability, if B happens that A happens, is equal to the probability if A happens that B happens, multiplied by the probability of A and divided by the probability of B.</p>
+
+<p>We now pass to the theory of observations. An observation gives us the value of a certain quantity which is connected with an unknown quantity in such a way as to be partly dependent on the latter value, and partly on accidental circumstances, not capable of being separately taken account of.</p>
+
+<p>These accidental variations are, however, in all cases subject to a statistical law, so that (observations of a certain kind forming the limited universe, X being the unknown quantity, &Xi; the quantity observed) the quantity,</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><sup>,</sup> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> d&xi;
+</div>
+
+<p>or the probability that if the unknown quantity X has a certain value x, then the observed quantity &Xi; will have a value between &xi; and &xi; + d&xi;, is a certain arithmetical function of the values &xi; and x. If we write &epsilon; for &xi; &minus; x, or the error of observation, then we may put &phi; for such a function that&mdash;</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><sup>,</sup> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> = &phi; (&epsilon;, x)
+</div>
+
+<p>The special form of the function &phi; is called the <b>law of the facility of the errors</b>. Except so far as this law is known, an observation can afford us no information whatever. The following conditions are invariably fulfilled by this function. (It must be understood that only <i>real</i> quantities are considered.)</p>
+
+<ol>
+<li>It has but one value for each set of values of its variables.</li>
+<li>Its value is always positive and less than unity.</li>
+<li>It vanishes when &epsilon; is infinite.</li>
+</ol>
+
+<!-- p.120 -->
+<ol start="4">
+<li>Its integral relatively to &epsilon; from &minus;&infin; to +&infin; is always unity.</li>
+</ol>
+
+<p>Beyond this the form of the function is determined by the peculiarities of the kind of observations.</p>
+
+<p>The probability that if the observed quantity &Xi; has the value &xi;, then the unknown quantity X has the value <i>x</i> is&mdash;</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">[x<sub>x</sub><sup>,</sup> &xi;<sub>&Xi;</sub>]</span><span class="den">[&xi;<sub>&Xi;</sub>]</span></span> dx
+</div>
+
+<p>The value of this probability is for any particular kind of observations an arithmetical function of &epsilon; and &xi;, which we may write &psi; (&epsilon;, &xi;) d&epsilon;.</p>
+
+<p>The probability that the unknown quantity X has the value <i>x</i> without reference to observation is [x<sub>x</sub>]d<i>x</i>. This is in any case a function of x, which may be written &Psi;x . d<i>x</i>.</p>
+
+<p>The probability that the quantity given by observation &Xi; has the value &xi;, without reference to the value of the unknown quantity, is [&xi;<sub>&Xi;</sub>] d&xi;. This an arithmetical function of &xi;, which may be &Phi;&xi; . d&xi;.</p>
+
+<p>If &Phi;&xi;, &Psi;x, and &phi; (&epsilon;, x) are given, then we can obtain &psi; (&epsilon;, &xi;) thus:</p>
+
+<div class="formula">
+  &psi;(&epsilon;, &xi;) = <span class="frac"><span class="num">&phi; (&epsilon;, x)</span><span class="den">&Phi;&xi;</span></span> &Psi;x
+</div>
+
+<p>Suppose a number of independent observations to be made. Then we shall have a series of functions&mdash;</p>
+
+<div class="formula">
+  <table style="margin: 0 auto; border-collapse: collapse;">
+    <tr><td style="padding: 2px 30px 2px 0;">&phi;<sub>1</sub> (&epsilon;<sub>1</sub>, x)</td><td>&Phi;<sub>1</sub>&xi;<sub>1</sub></td></tr>
+    <tr><td style="padding: 2px 30px 2px 0;">&phi;<sub>2</sub> (&epsilon;<sub>2</sub>, x)</td><td>&Phi;<sub>2</sub>&xi;<sub>2</sub></td></tr>
+    <tr><td style="padding: 2px 30px 2px 0;">&phi;<sub>3</sub> (&epsilon;<sub>3</sub>, x)</td><td>&Phi;<sub>3</sub>&xi;<sub>3</sub></td></tr>
+    <tr><td>&amp;c.</td><td>&amp;c.</td></tr>
+  </table>
+</div>
+
+<p>then the probability that if the quantities observed have the values &xi;<sub>1</sub>, &xi;<sub>2</sub>, &xi;<sub>3</sub>, &amp;c., the unknown quantity X has the value <i>x</i> will be&mdash;</p>
+
+<div class="formula">
+  &Psi;x .
+  <span class="frac"><span class="num">&phi;<sub>1</sub>(&epsilon;<sub>1</sub>, x)</span><span class="den">&Phi;<sub>1</sub>&xi;<sub>1</sub></span></span> .
+  <span class="frac"><span class="num">&phi;<sub>2</sub>(&epsilon;<sub>2</sub>, x)</span><span class="den">&Phi;<sub>2</sub>&xi;<sub>2</sub></span></span> .
+  <span class="frac"><span class="num">&phi;<sub>3</sub>(&epsilon;<sub>3</sub>, x)</span><span class="den">&Phi;<sub>3</sub>&xi;<sub>3</sub></span></span> .&amp;c.
+</div>
+
+<p>or&mdash;</p>
+
+<div class="formula">
+  &Psi;<sup>x</sup> . <sup>n</sup>&Pi;<sub>i=1</sub> <span class="frac"><span class="num">&phi;<sub>i</sub>(&epsilon;<sub>i</sub>, x)</span><span class="den">&Phi;<sub>i</sub>&xi;<sub>i</sub></span></span>
+</div>
+
+<!-- p.121 -->
+<p>The probability &Psi;x . d<i>x</i> antecedent to <i>all</i> observations will be simply d<i>x</i>, and, therefore, the factor &Psi;x may be omitted in the above expression.</p>
+
+<p>It will be perceived that observation never gives us to know a <i>number</i> expressing the value of the unknown quantity, <b>but only a function expressing the probability of each value</b>. It happens, however, in a very comprehensive case, that this function assumes a form which involves but two constants, so that in this case observation may be said to give us two numbers, a value for the unknown quantity, and the probable error of that value.</p>
+
+<p>Mr. Crofton&rsquo;s method of considering this case seems to me to make it more comprehensible than any other. Suppose that the unknown quantity X has been observed twice, the values given by observation being &xi;<sub>1</sub> and &xi;<sub>2</sub>. Put [&xi;] for &xi;<sub>1</sub> + &xi;<sub>2</sub>. What then is the probability that if <i>x</i> is the value of X, the sum of the values given by the two observations will be [&xi;]. It is clearly&mdash;</p>
+
+<div class="formula">
+  &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &phi;<sub>1</sub>(&epsilon;<sub>1</sub>, x) . &phi;<sub>2</sub>([&epsilon;] &minus; &epsilon;<sub>1</sub>, x) . d&epsilon;<sub>1</sub>
+</div>
+
+<p>Developing &phi;<sub>2</sub>([&epsilon;] &minus; &epsilon;<sub>1</sub>, x) by powers of &epsilon;<sub>1</sub>, this integral becomes&mdash;</p>
+
+<div class="formula">
+  &phi;<sub>2</sub>([&epsilon;], x) &minus; &phi;&prime;<sub>2</sub>([&epsilon;], x) &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>1</sub>&phi;<sub>1</sub>(&epsilon;<sub>1</sub>, x) . d&epsilon;<sub>1</sub>
+  <br><br>
+  + <span class="frac"><span class="num">1</span><span class="den">2</span></span> &phi;&Prime;<sub>2</sub>([&epsilon;], x) &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>1</sub>&sup2; &phi;<sub>1</sub>(&epsilon;<sub>1</sub>, x) . d&epsilon;<sub>1</sub>
+  <br><br>
+  + <span class="frac"><span class="num">1</span><span class="den">6</span></span> &phi;&#8244;<sub>2</sub>([&epsilon;], x) &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>1</sub>&sup3; &phi;<sub>1</sub>(&epsilon;<sub>1</sub>, x) . d&epsilon;<sub>1</sub> &minus; &amp;c.
+</div>
+
+<p>If in place of two we have <i>n</i> observations, the probability that the sum of all will be [&xi;] is&mdash;</p>
+
+<div class="formula">
+  <sup>n&minus;1</sup>&Pi;<sub>1</sub><sup>i</sup> (1 &minus; &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>i</sub>&phi;<sub>i</sub>(&epsilon;<sub>i</sub>, x) . D<sub>i</sub>
+  <br><br>
+  + <span class="frac"><span class="num">1</span><span class="den">2</span></span> &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>i</sub>&sup2;&phi;<sub>i</sub> (&epsilon;<sub>i</sub>, x) . D&sup2;&epsilon;<sub>i</sub> &minus; &amp;c.) &phi;<sub>n</sub>([&epsilon;], x)
+</div>
+
+<p>Of these co-efficients&mdash;</p>
+
+<div class="formula">
+  &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>i</sub> &phi;<sub>i</sub> (&epsilon;<sub>i</sub>, x)
+</div>
+
+<!-- p.122 -->
+<p>is the probable or mean value of the error of the observed quantity&mdash;</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">1</span><span class="den">2</span></span> &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>i</sub>&sup2; &phi;<sub>i</sub> (&epsilon;<sub>i</sub>, x)
+</div>
+
+<p>is half the probable value of the square of this error, and so on. The probable value of the error is often less than the probable value of its square, owing to positive and negative errors balancing. But the co-efficients which involve the cube and higher powers of the error may often become insignificant. This, for example, will be the case if <i>n</i> is very great; for then, in comparison with the sum of all the errors, the value of any one will be very small. In fact, in this case we may neglect a quantity a certain number of times, say M, larger than what we could neglect before, and may take a unit of measurement M times larger. Then if&mdash;</p>
+
+<div class="formula">
+  [&epsilon;], [&epsilon;&sup2;], [&epsilon;&sup3;], &amp;c.,
+</div>
+
+<p>be the probable value of the error, the error square, the error cube, &amp;c., on the old scale of measures, their numerical values on the new scale will be&mdash;</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">[&epsilon;]</span><span class="den">M</span></span>,
+  <span class="frac"><span class="num">[&epsilon;&sup2;]</span><span class="den">M&sup2;</span></span>,
+  <span class="frac"><span class="num">[&epsilon;&sup3;]</span><span class="den">M&sup3;</span></span>, &amp;c.
+</div>
+
+<p>Consequently if M is sufficiently large, the higher co-efficients may be neglected. It also frequently happens that the error of each observation is due to the combined effect of a great number of independent or nearly independent causes, each one of which alone would produce but an insignificant effect. In this case, by the same reasoning the higher co-efficients will disappear.</p>
+
+<p>The manner in which sensation and volition are propagated through the nerves is unknown, but it must be by some very complicated process, because it is very slow compared with the rate of propagation of sound. It is, therefore, probable that there may be variations of the rate of passage, and that the velocity through each small portion of the whole length of the nerve is to some extent independent of the velocity through the other parts. If this is so, the whole time of propagation would be subject to a variation, the proba-</p>
+
+<!-- p.123 -->
+<p>ble values of whose cube and higher powers would be insignificant. However this may be, it appears to be a fact that in all carefully-made observations, the error of which is due to the inevitable inaccuracy of the action of the human nerves, the probable values of the cube, &amp;c., of the errors are very small.</p>
+
+<p>Whenever these quantities disappear it can be proved by an analytical process which need not be reproduced here that&mdash;</p>
+
+<div class="formula">
+  &phi;(&epsilon;, x) = <span class="frac"><span class="num">h</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;" title="Peirce&rsquo;s typeset uses this glyph where the modern symbol would be &pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e" title="Peirce&rsquo;s typeset uses this glyph where the modern symbol would be e (base of natural logarithms)">G</span><sup>&minus;h&sup2;(&epsilon;&minus;E)&sup2;</sup>
+</div>
+
+<p>where h and E are quantities which depend upon x. <b>We thus reach the fundamental formula of the method of least squares.</b></p>
+
+<p>It is not the object of this paper to explain that method itself. Only it may be remarked that in the deduction of it which is usually given, it is assumed that what we wish to obtain from observations in any case (whether the method of least squares is applicable or not) is the most probable value of the unknown quantity. This is not the case, for there is but an infinitesimal probability in favor of any one value. Suppose that the cause of error in observing the place of a star were a nearly simple oscillation of the image about its mean point. Then the most probable errors would be the extreme ones. But we should much prefer to assume as the value the probable or mean value than the most probable value, which would be removed the furthest possible from that value. The conception of the matter is this. <b>What observation has to teach us is a <i>function</i>, &psi; (&epsilon;, &xi;), not a mere number.</b> But in cases to which the method of least squares is applicable, this function is completely determined by two numbers, which are the value of the unknown quantity derived from the application of that method and the value of its probable error.<sup><a href="#fn2" id="fnref2">2</a></sup></p>
+
+<p>It is assumed in treatises on least squares that &Phi;&xi; . d&xi;, or the probability (without regard to the value of the unknown quantity) that the quantity observed will have a value between &xi; and &xi; + d&xi;, is equal to d&xi;. When this is not the case it is only necessary to weight each observation by dividing by &Phi;&xi;.</p>
+
+<p>If the probability of error does not follow that law which the method of least squares supposes, that is to say, if the probability of</p>
+
+<!-- p.124 -->
+<p>the error x in the mean of a large number of observations is not equal to <span class="frac"><span class="num">h</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e">G</span><sup>&minus;h&sup2;x&sup2;</sup>, where h is a constant independent of x, then it must at least be of this form if h be considered to be a function of x. Now, h&sup2; is the weight which has to be assigned to an observation in the application of the method of least squares; and therefore when this method does not apply in its unmodified form, it is only necessary to find what function of x, h must be in order to give the required law of facility of errors, and then proceed according to the method of least squares, after having weighted each observation by h&sup2;. Let the equation which represents the facility of error be plotted, the error being taken as absciss&aelig;, and the probability of that error as ordinate;</p>
+
+<p>then plot on the same diagram the curve y = <span class="frac"><span class="num">1</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e">G</span><sup>&minus;x&sup2;</sup>. Let us suppose, then, that a certain value of x, y, is A times as great for the actual curve of errors as it is for the normal least-squares curve. Now, if h be increased in the ratio A, the ordinates will be increased in this same ratio, and the absciss&aelig; will be diminished in the inverse ratio so that the area of the curve is preserved. But if the ordinates at any one point are to be increased in the ratio A, then the abscissae at that point must be contracted in the inverse ratio, so as to preserve the area; so that if we had a function f<i>x</i> such that D<sub>x</sub> f<i>x</i> = <span class="frac"><span class="num">1</span><span class="den">a</span></span>, then the probability of this function of the error would follow the law y = <span class="frac"><span class="num">1</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e">G</span><sup>&minus;(f<i>x</i>)&sup2;</sup>, and consequently <span class="frac"><span class="num">1</span><span class="den">(D<sub>x</sub> f<i>x</i>)&sup2;</span></span> is the weight which has to be assigned to any such observation in applying the method of least squares. It will be observed that since the weight depends on the value of the error, it will be necessary first to make an approximate solution of the problem in order to get an approximate value of the error from which to determine the weight, so that when the method of least squares is not applicable in its unmodified form, an approximate method must necessarily be resorted to.</p>
+
+<p>Let us now proceed to consider the method of ascertaining the law of facility of error. In any case, if the error is compounded of an infinite number of infinitely small errors, or approximates to being so, then the law of facility of errors is of that general form which the method of least squares prescribes, and nothing remains indeterminate excepting the value of h. Observation has sufficiently shown that</p>
+
+<!-- p.125 -->
+<p>in transit-observations the law of error is of this sort. I copy, for example, from Chauvenet&rsquo;s <i>Astronomy</i> the following table, taken from Bessel&rsquo;s <i>Fundamenta Astronomi&aelig;</i>, showing the errors made by Bradley in observing Sirius and Procyon:</p>
+
+<table class="peirce-table">
+<tr><th>Between&mdash;</th><th>No. of errors<br>by the theory</th><th>No. of errors<br>by experience</th></tr>
+<tr><td>0.0 and 0.1</td><td>95</td><td>94</td></tr>
+<tr><td>0.1 and 0.2</td><td>89</td><td>88</td></tr>
+<tr><td>0.2 and 0.3</td><td>78</td><td>78</td></tr>
+<tr><td>0.3 and 0.4</td><td>64</td><td>58</td></tr>
+<tr><td>0.4 and 0.5</td><td>50</td><td>51</td></tr>
+<tr><td>0.5 and 0.6</td><td>36</td><td>36</td></tr>
+<tr><td>0.6 and 0.7</td><td>24</td><td>26</td></tr>
+<tr><td>0.7 and 0.8</td><td>15</td><td>14</td></tr>
+<tr><td>0.8 and 0.9</td><td>9</td><td>10</td></tr>
+<tr><td>0.9 and 1.0</td><td>5</td><td>7</td></tr>
+<tr><td>Over 1.0</td><td>5</td><td>8</td></tr>
+</table>
+
+<p>Fechner, in his <i>Elemente der Psychophysik</i>, has, in connection with his psychophysical law, discussed the applicability of the method to cases of sensation generally such as the estimate of the relative weights of two masses, and he finds that if v be the energy of the force which produces the excitation of any nerve, then if log v be considered as the observed quantity, <b>the errors of the observed quantity will follow the law of least squares.</b> Strictly speaking, the law of least squares recognizes the possibility of any error positive or negative, however great, although the probability of indefinitely great errors will be indefinitely small. It occurred to me that in the case of the emersion of a star from an occultation, since it was impossible to strike the chronograph-key too early, while it might be struck indefinitely too late, the law of least squares could hardly apply, and I have made some experiments upon this point, which I will narrate in detail at the end of this paper, merely remarking in this place that the divergence from the theoretical law proved to be insignificant. On the other hand, there are many cases in which we have no reason</p>
+
+<!-- p.126 -->
+<p>to expect that the errors will vary according to the least-squares
+curve. Let us consider, for example, a chemical analysis. Here the
+error is generally not due to the combined action of a very great
+number of very small causes, but, on the contrary, there are gener-
+ally two or three leading causes of error, depending upon some
+defect in the theory of the analysis or on some error in the manipula-
+tion, which is likely to result from a single one, such as cannot be
+regarded as in any way compounded of a large number of indepen-
+dent parts. Thus, a drop may be spilled or a portion thrown out of
+the crucible too small to be detected, but the whole drop is spilled
+at once, or the whole portion goes at once. In very exact analysis, in
+which such causes are almost altogether eliminated, the remaining
+and chief cause of error will be an error of weighing, due to a want
+of delicacy of the balance, and will be of the same nature as an error
+of computation, due to the fact that the number of decimal places
+used has been limited. The method of considering such errors is
+treated by Dr. Bremiker, in the preface to his Tabula Logarith-
+morum Sex Decimalium, a work to which the attention of chemists
+ought to be drawn. When the law of facility of errors cannot be
+deduced a priori from the consideration of the causes to which it is
+due, a large number of experimental observations must be made
+upon a known quantity in order to find in what manner the errors
+vary, or the same series of observations may be used both to deter-
+mine what the value of the unknown quantity is and also what the
+law of the variation of errors is. Thus, in the method of least squares,
+h is to be determined empirically, and the common way of doing it
+is to use the actual observations by which the unknown quantity is
+determined to determine also the value of h. In doing this, it should
+be remembered that a precise and trustworthy determination can
+only be obtained from a large number of observations. This proce-
+dure amounts, in fact, to adding an additional unknown quantity, a
+very obvious fact, and yet one which is habitually overlooked. Encke,
+in his Astronomisches Jahrbuch for 1834, has given the most com-
+plete formulas that I have anywhere found for determining the value
+of h, as well as its uncertainty. These formulae require correction on
+account of the circumstance just mentioned.
+When it is necessary to combine, by least squares, observations of
+different orders of precision, they are weighted proportionately to
+h<sup>2</sup>. If we have two series of observations, one of which is as accurate</p>
+
+<p>as you please, and the other as inaccurate as you please, a better
+result than that which the most accurate series of measures gives can
+always be got by combining with it the least accurate series, provided
+the proper weights are given to the two series. This proposition
+seems paradoxical, and is not admitted by many very competent
+heads, but I cannot see how the conclusion can possibly be evaded.
+It does not depend at all upon any of the peculiar principles used by
+the method of least squares, but rests on the fundamental axioms of
+probabilities. Indeed, it may conveniently be based directly upon the
+principles of logic itself. The least accurate series of measures offers
+certain facts, which may be used as premises, and it cannot be that
+if those facts are properly used they leave us in greater ignorance
+than we were before. Additional facts must increase our knowledge,
+if the proper inferences are made from them, and, therefore, an
+additional series of observations, if it have any weight at all, must, if
+its proper weight be assigned to it, improve the value of the unknown
+quantity. On the other hand, when it is considered that there is an
+uncertainty in the value of h, it may be that if the two series of
+observations differ greatly in accuracy, and the value of h is not
+determined with much precision, it may be better at once to take the
+result of the best series of observations than to combine the two
+series with the best weights that we are able to give.</p>
+
+<p>Let&mdash;</p>
+<ul class="peirce-defs">
+<li>x<sub>i</sub> be the value from any set of observations;</li>
+<li>&epsilon;<sub>i</sub> the mean error of this set;</li>
+<li>g<sub>i</sub>&epsilon;<sub>i</sub> the mean error of &epsilon;<sub>i</sub>;</li>
+<li>w<sub>i</sub> the true weight;</li>
+<li>E the mean error of weight <i>one</i>; and</li>
+<li>x the truly weighted mean.</li>
+</ul>
+
+<div class="formula">
+  x = <span class="frac"><span class="num">&Sigma;<sub>i</sub>(w<sub>i</sub>x<sub>i</sub>)</span><span class="den">&Sigma;<sub>i</sub>w<sub>i</sub></span></span>
+</div>
+
+<p>The best approximation we can get to x will be subject to two
+kinds of error: first, those arising from errors of x<sub>i</sub>; and, secondly,
+those arising from errors in our assumed values of &epsilon;<sub>i</sub>, from which we
+derive w<sub>i</sub> by the formula,</p>
+
+<div class="formula">
+  w<sub>i</sub> = <span class="frac"><span class="num">E&sup2;</span><span class="den">&epsilon;<sub>i</sub>&sup2;</span></span>
+</div>
+
+<p>The mean error of w<sub>i</sub> will be w<sub>i</sub>&sup2;g<sub>i</sub>&sup2;</p>
+
+<div class="formula">
+  D<sub>x<sub>2</sub></sub> x = <span class="frac"><span class="num">w<sub>2</sub></span><span class="den">&Sigma;<sub>i</sub>w<sub>i</sub></span></span>
+</div>
+
+<div class="formula">
+  D<sub>w<sub>i</sub></sub>x = <span class="frac"><span class="num">x<sub>i</sub>&Sigma;<sub>i</sub>w<sub>i</sub> &minus; &Sigma;<sub>i</sub>w<sub>i</sub>x</span><span class="den">(&Sigma;<sub>i</sub>w<sub>i</sub>)&sup2;</span></span>
+  = <span class="frac"><span class="num">x<sub>i</sub> &minus; x</span><span class="den">&Sigma;<sub>i</sub>w<sub>i</sub></span></span>
+</div>
+
+<p>Then we have&mdash;</p>
+
+<div class="formula">
+  &epsilon;&sup2; = &Sigma;<sub>i</sub> <span class="frac"><span class="num">(x<sub>i</sub> &minus; x)&sup2;</span><span class="den">(&Sigma;<sub>i</sub>w<sub>i</sub>)&sup2;</span></span> w<sub>i</sub>&sup2;g<sub>i</sub>&sup2;
+  + &Sigma;<sub>i</sub> <span class="frac"><span class="num">w<sub>i</sub>&sup2;</span><span class="den">(&Sigma;<sub>i</sub>w<sub>i</sub>)&sup2;</span></span> &epsilon;<sub>i</sub>&sup2;
+  = <span class="frac"><span class="num">&Sigma;<sub>i</sub>(x<sub>i</sub>&minus;x)&sup2; w<sub>i</sub>g<sub>i</sub>&sup2; + E&sup2;&Sigma;<sub>i</sub>w<sub>i</sub></span><span class="den">(&Sigma;<sub>i</sub>w<sub>i</sub>)&sup2;</span></span>
+</div>
+
+<p>These are the two common rules by which &epsilon; may be calculated. Call their results &epsilon;&prime; and &epsilon;&Prime;, so that&mdash;</p>
+
+<div class="formula">
+  &epsilon;&prime; = <span class="frac"><span class="num">E</span><span class="den">&radic;<span class="rad">&Sigma;<sub>i</sub>w<sub>i</sub></span></span></span>
+</div>
+
+<div class="formula">
+  &epsilon;&Prime; = &radic;<span class="rad"><span class="frac"><span class="num">&Sigma;<sub>i</sub>w<sub>i</sub>(x<sub>i</sub>&minus;x)&sup2;</span><span class="den">(m &minus; 1)&Sigma;<sub>i</sub>w<sub>i</sub></span></span></span>
+</div>
+
+<p>where m is the number of determinations. The first gives&mdash;</p>
+
+<div class="formula">
+  &epsilon;&sup2; = &epsilon;&prime;&sup2; + <span class="frac"><span class="num">&Sigma;<sub>i</sub>(x<sub>i</sub>&minus;x)&sup2; w<sub>i</sub>&sup2;g<sub>i</sub>&sup2;</span><span class="den">(&Sigma;<sub>i</sub>w<sub>i</sub>)&sup2;</span></span>
+</div>
+
+<!-- p.129 -->
+<p>If m = 2,</p>
+
+<div class="formula">
+  (x<sub>1</sub> &minus; x) = x<sub>i</sub> &minus; <span class="frac"><span class="num">w<sub>1</sub>x<sub>1</sub> + w<sub>2</sub>x<sub>2</sub></span><span class="den">w<sub>1</sub> + w<sub>2</sub></span></span>
+  = <span class="frac"><span class="num">w<sub>2</sub></span><span class="den">w<sub>1</sub> + w<sub>2</sub></span></span> x<sub>1</sub> &minus; x<sub>2</sub>
+</div>
+
+<div class="formula">
+  x<sub>2</sub> &minus; x = &minus;<span class="frac"><span class="num">w<sub>1</sub></span><span class="den">w<sub>1</sub> + w<sub>2</sub></span></span> (x<sub>1</sub> &minus; x<sub>2</sub>)
+</div>
+
+<div class="formula">
+  &epsilon;&sup2; = &epsilon;&prime;&sup2; + <span class="frac"><span class="num">w<sub>1</sub>&sup2;w<sub>2</sub>&sup2;</span><span class="den">(w<sub>1</sub> + w<sub>2</sub>)&#8308;</span></span> (g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;)(x<sub>1</sub> &minus; x<sub>2</sub>)&sup2;
+</div>
+
+<p>Put <span class="frac"><span class="num">w<sub>2</sub></span><span class="den">w<sub>1</sub></span></span> = r,</p>
+
+<div class="formula">
+  &epsilon;&sup2; = &epsilon;&prime;&sup2; + <span class="frac"><span class="num">r&sup2;</span><span class="den">(1 + r)&#8308;</span></span> (g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;)(x<sub>1</sub> &minus; x<sub>2</sub>)&sup2;
+</div>
+
+<div class="formula">
+  &epsilon;&Prime; = &radic;<span class="rad"><span class="frac"><span class="num">w<sub>1</sub>w<sub>2</sub>&sup2; + w<sub>1</sub>&sup2;w<sub>2</sub></span><span class="den">(w<sub>1</sub> + w<sub>2</sub>)&sup3;</span></span> (x<sub>1</sub> &minus; x<sub>2</sub>)&sup2;</span>
+  = &radic;<span class="rad"><span class="frac"><span class="num">w<sub>1</sub>w<sub>2</sub></span><span class="den">(w<sub>1</sub> + w<sub>2</sub>)&sup2;</span></span> (x<sub>1</sub> &minus; x<sub>2</sub>)&sup2;</span>
+</div>
+
+<div class="formula">
+  &epsilon;&Prime;&sup2; = <span class="frac"><span class="num">w<sub>1</sub>w<sub>2</sub></span><span class="den">(w<sub>1</sub> + w<sub>2</sub>)&sup2;</span></span>(x<sub>1</sub> &minus; x<sub>2</sub>)&sup2;
+  = <span class="frac"><span class="num">r</span><span class="den">(1 + r)&sup2;</span></span>(x<sub>1</sub> &minus; x<sub>2</sub>)&sup2;
+</div>
+
+<div class="formula">
+  &epsilon;&sup2; = &epsilon;&prime;&sup2; + <span class="frac"><span class="num">r</span><span class="den">(1 + r)&sup2;</span></span>(g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;)&epsilon;&Prime;&sup2;
+</div>
+
+<p>Now, suppose &epsilon;&sup2; &lt; &epsilon;<sub>1</sub>&sup2; &lt; &epsilon;<sub>2</sub>&sup2;; then r &lt; 1; then&mdash;</p>
+
+<div class="formula">
+  &epsilon;<sub>1</sub>&sup2; &gt; &epsilon;&prime;&sup2; + <span class="frac"><span class="num">r</span><span class="den">(1 + r)&sup2;</span></span>(g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;)&epsilon;&Prime;&sup2;
+</div>
+
+<p>But&mdash;</p>
+
+<div class="formula">
+  &epsilon;&prime; = &epsilon;<sub>1</sub> &radic;<span class="rad"><span class="frac"><span class="num">w<sub>1</sub></span><span class="den">w<sub>1</sub> + w<sub>2</sub></span></span></span>
+  = <span class="frac"><span class="num">&epsilon;<sub>1</sub></span><span class="den">&radic;<span class="rad">1 + r</span></span></span>
+  = &epsilon;<sub>2</sub> &radic;<span class="rad"><span class="frac"><span class="num">r</span><span class="den">1 + r</span></span></span>
+</div>
+
+<!-- p.130 -->
+<div class="formula">
+  &epsilon;&prime;&sup2; = &epsilon;<sub>1</sub>&sup2; <span class="frac"><span class="num">1</span><span class="den">1 + r</span></span> = &epsilon;<sub>2</sub>&sup2; <span class="frac"><span class="num">r</span><span class="den">1 + r</span></span>
+</div>
+
+<div class="formula">
+  <span class="frac"><span class="num">&epsilon;<sub>1</sub>&sup2;</span><span class="den">&epsilon;<sub>2</sub>&sup2;</span></span> = <span class="frac"><span class="num">w<sub>2</sub></span><span class="den">w<sub>1</sub></span></span> = r
+</div>
+
+<div class="formula">&epsilon;<sub>1</sub>&sup2; = r&epsilon;<sub>2</sub>&sup2;</div>
+
+<div class="formula">
+  &epsilon;<sub>1</sub>&sup2; &minus; &epsilon;&prime;&sup2; = &epsilon;<sub>1</sub>&sup2; <span class="frac"><span class="num">r</span><span class="den">1 + r</span></span>
+</div>
+
+<div class="formula">
+  &epsilon;<sub>1</sub>&sup2; <span class="frac"><span class="num">r</span><span class="den">1 + r</span></span> &gt; <span class="frac"><span class="num">r</span><span class="den">1 + r&sup2;</span></span> (g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;)&epsilon;&Prime;&sup2;
+</div>
+
+<div class="formula">
+  <span class="frac"><span class="num">&epsilon;<sub>1</sub>&sup2;</span><span class="den">&epsilon;&Prime;&sup2;</span></span>(1 + r) &gt; (g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;)
+</div>
+
+<div class="formula">&epsilon;<sub>2</sub>&sup2; r = &epsilon;<sub>1</sub>&sup2;</div>
+
+<div class="formula">
+  r <span class="frac"><span class="num">&epsilon;<sub>2</sub>&sup2;</span><span class="den">&epsilon;&Prime;&sup2;</span></span>(1 + r) &gt; (g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;)
+</div>
+
+<div class="formula">
+  r <span class="frac"><span class="num">&epsilon;<sub>1</sub>&sup2; + &epsilon;<sub>2</sub>&sup2;</span><span class="den">&epsilon;&Prime;&sup2;</span></span> &gt; g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;
+</div>
+
+<p>Unless this condition is satisfied, the combination is worse than
+the best determination.
+It is generally admitted that m<sub>i</sub> being the number of observations
+from which &epsilon;<sub>i</sub> has been determined,</p>
+
+<div class="formula">
+  g<sub>i</sub> = <span class="frac"><span class="num">1</span><span class="den">&radic;<span class="rad">2m<sub>i</sub></span></span></span>
+</div>
+
+<p>Then the condition is&mdash;</p>
+
+<div class="formula">
+  2r<span class="frac"><span class="num">&epsilon;<sub>1</sub>&sup2; + &epsilon;<sub>2</sub>&sup2;</span><span class="den">&epsilon;&Prime;&sup2;</span></span> &gt; <span class="frac"><span class="num">1</span><span class="den">m<sub>1</sub></span></span> + <span class="frac"><span class="num">1</span><span class="den">m<sub>2</sub></span></span>
+</div>
+
+<!-- p.131 -->
+<p>or we may write&mdash;</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">&epsilon;<sub>1</sub>&sup2; + &epsilon;<sub>2</sub>&sup2;</span><span class="den">(x<sub>1</sub> &minus; x<sub>2</sub>)&sup2;</span></span> &gt; <span class="frac"><span class="num">g<sub>1</sub>&sup2; + g<sub>2</sub>&sup2;</span><span class="den">(1 + r)&sup2;</span></span>
+</div>
+
+<p>or&mdash;</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">&epsilon;<sub>1</sub>&sup2; + &epsilon;<sub>2</sub>&sup2;</span><span class="den">(x<sub>1</sub> &minus; x<sub>2</sub>)&sup2;</span></span>(1 + r)&sup2; &gt;
+  <span class="frac"><span class="num"><span class="frac"><span class="num">1</span><span class="den">m<sub>1</sub></span></span> + <span class="frac"><span class="num">1</span><span class="den">m<sub>2</sub></span></span></span><span class="den">2</span></span>
+</div>
+
+<p>or we may write&mdash;</p>
+
+<div class="formula">
+  <span class="frac"><span class="num">
+    <span class="frac"><span class="num">(x<sub>1</sub> &minus; x)&sup2;</span><span class="den">&epsilon;<sub>1</sub>&sup2;</span></span> +
+    <span class="frac"><span class="num">(x<sub>2</sub> &minus; x)&sup2;</span><span class="den">&epsilon;<sub>2</sub>&sup2;</span></span>
+  </span><span class="den">
+    <span class="frac"><span class="num">1</span><span class="den">&epsilon;<sub>1</sub>&sup2;</span></span> +
+    <span class="frac"><span class="num">1</span><span class="den">&epsilon;<sub>2</sub>&sup2;</span></span>
+  </span></span>
+  &lt;
+  <span class="frac"><span class="num">&minus;4&epsilon;<sub>1</sub>&sup2;</span><span class="den">
+    <span class="frac"><span class="num">1</span><span class="den">m<sub>1</sub></span></span> +
+    <span class="frac"><span class="num">1</span><span class="den">m<sub>2</sub></span></span>
+  </span></span>
+</div>
+
+<p>Some writers upon the subject have wished to assign a smaller
+weight to those observations which differ largely from the mean than
+to those which come close to it. They have reasoned as if h, or the
+precision of an observation, were something which belonged to a
+single observation; whereas, in fact, it is a statistical quantity alto-
+gether, and belongs only to an observation as a member of a certain
+series. We may have a large series of observations for which h has a
+certain value, and those observations may perhaps be separated into
+two series on some principle or other for which h shall have two
+different values, and if this can be done there is an advantage in
+doing it. It is, in fact, limiting our universe. In probabilities generally
+h is a mean or probable quantity for a series of observations, and if
+we can divide our universe into two parts, getting different values of
+h, it will be an increase of knowledge to do so. For example, suppose
+that some of the observations were taken under one set of circum-
+stances and the rest under another set of circumstances. That would
+afford a principle upon which the observations could be distin-
+guished, and if the value of h for the two sets turned out different,
+it would be an advantage to separate them and to give them different
+weights. Now, the degree of discordance of observations from the
+most probable value of the unknown quantity may be taken as a</p>
+
+<p>means of estimating the relative degrees of care, &c., used in making
+them, and so to discriminate between them. But it would certainly
+be very absurd to allow no weight to the fact that we have endeav-
+ored to make them all with equal care. It must never be forgotten
+that h is a statistical quantity; not one which belongs to a single
+observation, but one which belongs to an infinite series of observa-
+tions.
+It is entirely in accordance with the method of least squares to
+reject discordant observations, and this has always been done, even
+by those who object to an exact criterion for determining what obser-
+vations should be rejected. For example, Mr. Glaisher says that no
+observation should be rejected excepting obvious mistakes, thereby
+admitting that it is proper sometimes to reject observations, and
+nobody is more opposed to the rejection of observations than he. But
+no line of demarkation can be drawn between mistakes which are
+obvious and mistakes which are not obvious. In some cases it may be
+obvious that 53 has been written by the recorder instead of 35. In
+other cases it may be doubtful whether it ought to be called an
+obvious mistake or whether there may be some doubt hanging over
+it, and there is every grade of probability, from the greatest to the
+least; and when we examine into the facts of observation, and do not
+attempt to make our way through a vacuous space of pure theory, it
+will be found that the occasional rejection of observations is justified
+from every point of view; and if observations are to be rejected, exact
+criteria are necessary to determine upon principles of probabilities
+in what cases they should be rejected. The criterion of Professor
+Peirce is the only one which conforms rigidly to those principles, and,
+indeed, I am not aware that it has been attacked upon the ground
+of not conforming to the principles of probabilities, although it has
+been attacked on the ground that no such criterion should be used,
+and that no observation should be rejected except upon principles of
+guesswork, for that is what it amounts to to say that none but obvious
+mistakes should be rejected. Experience has shown that the errors
+which this criterion rejects are almost precisely those which a person
+of sound judgment would pronounce to be obvious mistakes, but
+some other criteria have been proposed, which are confessedly inex-
+act, but which have the advantage of involving less calculation, but
+these are no better than the unaided judgment of an experienced
+person, and in some cases not so good.</p>
+
+<h4><i>Account of the experiments</i></h4>
+
+<p>These experiments were made in order to study the distribution
+of errors in the observation of a phenomenon not seen coming on,
+as in the case of a transit, but sudden, as in the case of the emersion
+of a star from behind the moon. The time was noted upon a Hipp
+chronoscope, which is a modification of an invention of Wheat-
+stone's. The train of clock-work moved by weight is regulated by the
+vibration of a little spring or reed striking against a toothed wheel a
+thousand times a second. There are two hands, one of which marks
+tenths of a second, and the other thousandths of a second. These
+hands are thrown into gear when the first event occurs, and out of
+gear when the second event occurs, so that the amount that they
+have moved measures the interval. The manner in which they are
+thrown in and out of gear is this: The axis of one of the wheels of the
+main train is hung, and the axis of one of the wheels of the hand-
+gearing passes completely through it and comes out behind, where
+it rests upon a spring, which spring is influenced by an electro-
+magnet. There are two crown-wheels, one upon the hollow axis be-
+longing to the main train already mentioned, the other facing it at
+a very small distance from it, and fixed in position and upon the axis
+of the wheel belonging to the hand-gearing, which moves backward
+and forward inside, and the other axis as described. There is a little
+arm, which will catch in the teeth of one or other of these crown-
+wheels. Before the first event it is in the teeth of the fixed crown-
+wheel, which thus prevents the hands from turning round. When the
+first event occurs this arm is thrown forward into the teeth of the
+rapidly rotating crown-wheel, and thus the hands begin to turn
+round. When the second event occurs the arm is thrown into the
+teeth of the first crown-wheel, and so the hands are suddenly
+stopped.
+It will be observed that although the instrument only registers to
+thousandths of a second, yet if an event can be repeated many times
+with a variation of time much smaller than that, the instrument
+ought, theoretically, in the mean of a large number of observations,
+to give a much closer result than 0.001 second; for when the first
+event occurs, and the arm is thrown into the moving crown-wheel,
+it probably will not strike exactly in any catch, but will strike on the
+inclined side of a tooth. If it strikes on the forward side of the tooth,</p>
+
+
+<p>the hands will be carried forward by the fraction of a thousandth of
+a second more as the arm glides down this side to the bottom of the
+catch. But if it strikes on the back side of the tooth, the hands will
+be carried relatively back the fraction of the thousandth part of a
+second as the arm glides back to the bottom of the catch. Now, if the
+top of the tooth is midway between the bottom of two catches, it is
+equally likely to be carried forward or back. The same thing occurs
+when the second event happens and the arm strikes upon the fixed
+crown-wheel. An error in the marked interval will thus result, which
+error may amount to &minus;0.001 second in the extreme, or to +0.001
+second, and any one error between these limits is as likely as any
+other; consequently, these errors, being entirely incidental and inde-
+pendent of one another, they will balance one another in the mean
+of a large number of observations, and thus a much higher degree of
+accuracy may be reached. This, however, is a matter which has no
+influence on the experiments which I have made, inasmuch as the
+interval measured by me was a variable one, and in point of fact I
+have never been able to make the instrument work with such nicety
+as to measure much closer than 0.001 second. In the descriptions of
+this instrument which I have seen, only two instrumental corrections
+have been mentioned; one is owing to the rate with which the instru-
+ment goes, and the other is with reference to the time occupied by
+the arm in passing from one crown-wheel to the other. To determine
+these two constants, a little apparatus accompanies the instrument,
+by which the time of the fall of a ball from different heights may be
+registered, and by registering the time from two different heights
+these two corrections, one of which is proportional to the time and
+the other is a constant, may be determined. The ball is held in a pair
+of jaws; when these jaws separate, the contact is broken, the hands
+begin to move, and the ball begins to fall. Care should be taken that
+the ball is so small that the jaws cannot be separated for any apprecia-
+ble time before the ball is free to fall, but if the spring with which
+they open is sufficiently strong the ball may fall freely from the very
+first. At the bottom the ball strikes upon a platform made of wood and
+covered with green cloth, and it throws this platform down upon two
+metallic springs below it, through which contact is made again, so
+that the hand stops, and then the platform is held down by a catch.
+As the instrument came from the makers it was found that when
+the ball struck upon the platform it threw one of the springs down,
+so that the contact was made, and then immediately interrupted</p>
+
+
+<p>before there was time for the hand to stop, so that a slight error of
+about 0.001 second arose in this way. This was usually corrected by
+putting little wooden wedges beneath these springs, so that they
+could not be thrown down in this way. In order further to test the
+instrument, I made use of a break-circuit chronometer, and mea-
+sured the interval of two seconds upon the instrument for this pur-
+pose. It was necessary to employ two telegraph-repeaters. There are
+two ways in which this can be arranged, so as to correct a break-
+circuit chronometer with a Hipp chronoscope. It is sufficient to de-
+scribe one of them. The arrangement is shown in the accompanying
+figure:
+Bat. is the battery; Ch., the chronoscope; Chr., the chronometer;
+R., a resistance-coil; and I and II, two telegraph-repeaters. I is a
+common telegraph-repeater, with the non-conducting screw so far
+raised that when the armature once flies up the magnet cannot bring
+it down again. F is the magnet end of this repeater; B, the end at the
+second circuit. When the first circuit is broken the armature flies up
+and instantly breaks the second circuit. II is arranged differently
+from common repeaters. As long as there is a current through the
+first circuit and the armature is held down, there is no connection in
+the second circuit. When the first circuit is broken, the armature,
+under the influence of a very strong spring, flies up for a distance of
+a tenth of a millimeter, and there makes the connection in the second
+circuit.
+This repeater can be extemporized out of a common relay. The
+resistance-coil should always be used in connection with the chrono-
+scope in such a way that when the circuit is broken in the first place
+the current shall be so weak as just to be able to hold the hands still,
+while when it is made again the current shall be so strong as to make
+the circuit as quickly as possible.
+The rate as given by the break-circuit chronometer did not agree
+with that found by the fall-apparatus, and indeed there was a slight
+discrepancy in the rate given by the latter for different heights of fall.
+Professor J. E. Oliver suggested to me that this discrepancy was due
+to a retardation of the instrument when the hands were geared in,
+which took place somewhat gradually, and I found that this was the
+case, and that the ear could detect that when the hands were geared
+in, during the space of three-fourths of a second, the note produced
+by the vibration of the reed was lowered about the sixth of a tone.
+The supposition that this took place uniformly sufficiently accounted</p>
+
+
+<p>for all the discrepancy, and this gave me two more instrumental
+constants, viz: the amount of retardation on gearing in the hands, and
+the time during which that retardation was brought about. With this
+instrument as well as with the other chronometer I made a large
+number of experiments upon the time occupied in answering signals
+of various kinds, such as the emission of points upon paper from
+behind a screen, the appearance of induction-sparks from a Ruhm-
+korff coil, flashes of light thrown upon a screen, sudden changes from
+one magic-lantern figure to another, &c., the general result of which
+was to confirm the facts already in our possession, and which are due
+to the researches of Hirsch, Daumbusch, and others. But there was
+one series of experiments which deserves particular description. I
+employed a young man about eighteen years of age, who had had no
+previous experience whatever in observations, to answer a signal
+consisting of a sharp sound like a rap, the answer being made upon
+a telegraph-operator's key nicely adjusted. Five hundred observa-
+tions were made on every week-day during a month, twenty-four
+days' observations in all. The results are given in the accompanying
+table, and are also shown upon plate No. 27. On this plate the abscissae
+represent the interval of time between the signal and the answer as
+indicated on the Hipp chronoscope, the ordinates measure the num-
+ber of observations, which were subject to a large amount of error.
+The curve has, however, not been plotted directly from the observa-
+tions, but after they have been smoothed off by the addition of adja-
+cent numbers in the table eight times over, so as to diminish the
+irregularities of the curve. The smoother curve on the figures is a
+mean curve for every day drawn by eye so as to eliminate the ir-
+regularities entirely. It was found that after the first two or three days
+the curve differed very little from that derived from the theory of
+least squares. It will be noticed that on the first day, when the ob-
+server was entirely inexperienced, the observations scattered to such
+an extent that I have been obliged to draw the curve upon a different
+scale from that adopted for the other days. It will also be seen that
+the personal equation from the mean amount by which the answer
+came too late rapidly decreased for the first five days, until it was
+about one seventh of a second, and that it then gradually increased
+until the twelfth day, when it amounted to about 0.22 seconds. But
+while the personal equation was thus first diminishing and afterward
+increasing, the probable error or range of errors was constantly de-
+creasing after the twelfth day. There was some variation in the per-</p>
+
+
+<figure>
+  <img src="Text/plate-27.png" alt="Plate 27: Diagrams illustrating Appendix No. 21, On the Theory of Errors of Observation">
+  <figcaption>Plate 27 &mdash; diagrams illustrating Appendix No. 21 (the observation-day curves referenced in the text above).</figcaption>
+</figure>
+
+<!-- p.137 -->
+<p>sonal equation, but not much, but the range of errors continually decreased as long as the observations lasted, and so remarkably that for the twenty-fourth day the probable error does not exceed one-eightieth of a second. I think that this clearly demonstrates the value of such practice in training the nerves for observation, for it can hardly be supposed that the best observer has so small a range of error as this, and I would therefore recommend that transit-observers be kept in constant training by means of some observations of an artificial event which can be repeated with rapidity, so that several hundred can be taken daily without great labor, and I do not think that it is essential that these observations should very closely imitate the transit of a star over wires, inasmuch as it is the general condition of the nerves which it is important to keep in training more than anything peculiar to this or that kind of observation.</p>
+
+</div>
+</body>
+</html>

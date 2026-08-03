@@ -390,9 +390,10 @@ function stickySnap(id) {
    EXAMPLE 15 — Sampling from an urn (Section IV)
    ========================================================================*/
 registerExample("example-ex15", (box) => {
-  const content = h(`<div>
-    <h4>Interactive Demonstration: Sampling from an Urn</h4>
-    <p>Explore the binomial distribution for sampling with replacement.</p>
+  box.appendChild(exHeader("Interactive Example: Judging the Urn by Four Balls", "ex15-content"));
+  const content = h(`<div id="ex15-content" class="example-content">
+    <p>Every way four balls can come out of the urn, and how often each way comes out. Judging the urn by
+      what was drawn means reading the proportion off one of these.</p>
     <div class="row">
       <div class="col col-4">
         <div id="ex15-controls"></div>
@@ -516,43 +517,49 @@ registerExample("example-ex15", (box) => {
    EXAMPLE 17 — Peirce's formula for probable error
    ========================================================================*/
 registerExample("example-ex17", (box) => {
-  const content = h(`<div>
+  box.appendChild(exHeader("Interactive Example: The Formula for the Probable Error", "ex17-content"));
+  const content = h(`<div id="ex17-content" class="example-content">
     <div class="row">
-      <div class="col col-12"><div id="ex17-controls"></div></div>
+      <div class="col col-4" id="ex17-ctl-p"></div>
+      <div class="col col-4" id="ex17-ctl-s"></div>
+      <div class="col col-4" id="ex17-ctl-c"></div>
     </div>
-    <hr>
-    <p><strong>Test with Simulation:</strong></p>
     <div class="row">
       <div class="col col-4">
-        <button class="btn btn-primary btn-block" id="ex17_simulate_single">Draw Single Sample</button>
-        <button class="btn btn-success btn-block" id="ex17_simulate_100">Draw 100 Samples</button>
-        <button class="btn btn-danger btn-block" id="ex17_reset">Reset History</button>
+        <div class="ex-buttonbar">
+          <button class="btn btn-primary btn-sm" id="ex17_simulate_single">Draw a sample</button>
+          <button class="btn btn-primary btn-sm" id="ex17_simulate_100">Draw a hundred</button>
+          <button class="btn btn-warning btn-sm" id="ex17_reset">Clear</button>
+        </div>
+        <div id="ex17-rescale"></div>
+        <div id="ex17_current_result"></div>
       </div>
-      <div class="col col-8"><div id="ex17_current_result"></div></div>
+      <div class="col col-8"><div class="plot-container" id="ex17-combined-plot"></div></div>
     </div>
-    <br>
-    <div id="ex17-combined-plot"></div>
-    <hr>
-    <p><strong>History of Last 100 Samples:</strong></p>
-    <div id="ex17-history-plot"></div>
   </div>`);
   box.appendChild(content);
 
   let history = [];
   let current = null;
 
-  const ctl = $("#ex17-controls", content);
-  ctl.appendChild(slider("ex17_p", "True proportion (p):", 0.001, 0.999, 0.5, 0.001, (v) => v.toFixed(3), "k1"));
-  ctl.appendChild(slider("ex17_s", "Number of balls drawn (s):", 10, 1000, 100, 10, null, "k2"));
-  ctl.appendChild(checkbox("ex17_rescale", "Rescale charts", false));
-  ctl.appendChild(h("<hr>"));
-  ctl.appendChild(select("ex17_confidence", "Select confidence level:",
-    [["custom", "Custom"], ["50", "50% (half the time)"], ["90", "90% (9 times out of 10)"],
-     ["99", "99% (99 times out of 100)"], ["99.9", "99.9% (999 times out of 1,000)"],
-     ["99.99", "99.99% (9,999 times out of 10,000)"],
-     ["99.99999999", "9,999,999,999 out of 10,000,000,000"]], "90"));
-  const customBox = slider("ex17_custom_conf", "Custom confidence level (%):", 50, 100, 95, 1);
-  ctl.appendChild(customBox);
+  $("#ex17-ctl-p", content).appendChild(
+    slider("ex17_p", "True proportion (p):", 0.001, 0.999, 0.5, 0.001, (v) => v.toFixed(3), "k1"));
+  $("#ex17-ctl-s", content).appendChild(
+    slider("ex17_s", "Balls drawn (s):", 10, 1000, 100, 10, null, "k2"));
+  /* One plain slider rather than a menu with a custom row hanging off it. It
+     runs in nines rather than in percent — k of them means 100(1 - 10^-k) — so
+     that every row of Peirce's printed table is a position on it, from a half
+     at k = 0.301 to his ten-billionth at k = 10. Clicking a row sets it there. */
+  const NINES = (c) => -Math.log10(1 - c / 100);
+  const CONF = () => 100 * (1 - Math.pow(10, -num("ex17_k")));
+  $("#ex17-ctl-c", content).appendChild(
+    slider("ex17_k", "How often the bound is to hold:", 0.301, 10, 1, 0.001, (v) => {
+      /* as many decimals as the level has nines, so 90, 99.9 and 99.99999999
+         all read as themselves rather than as rounding */
+      const c = 100 * (1 - Math.pow(10, -v));
+      return `${c.toFixed(Math.max(0, Math.ceil(v) - 2))}%`;
+    }, "k3"));
+  $("#ex17-rescale", content).appendChild(checkbox("ex17_rescale", "Rescale charts", false));
 
   content.addEventListener("input", () => update());
   content.addEventListener("change", () => update());
@@ -565,11 +572,7 @@ registerExample("example-ex17", (box) => {
     "99.9% (999 times out of 1,000)", "99.99% (9,999 times out of 10,000)",
     "99.99999999% (9,999,999,999 times out of 10,000,000,000)"];
 
-  function getConstant() {
-    const sel = val("ex17_confidence");
-    if (sel === "custom") return qnorm((1 + num("ex17_custom_conf") / 100) / 2) / Math.SQRT2;
-    return CONSTANTS[CONF_IDS.indexOf(sel)];
-  }
+  function getConstant() { return qnorm((1 + CONF() / 100) / 2) / Math.SQRT2; }
 
   /* --------------------------------------------------------------------------
      Peirce's table is already printed in the article; rather than repeat it in
@@ -585,12 +588,13 @@ registerExample("example-ex17", (box) => {
   const ex17Row = (i) => () => ex17Bound(CONSTANTS[i]);
   const ex17Table = document.getElementById("ex17-table");
   if (ex17Table) {
+    /* clicking a printed row moves the slider to that row's level */
     ex17Table.addEventListener("click", (ev) => {
       const tr = ev.target.closest("tr[data-conf]");
-      if (!tr || !document.getElementById("ex17_confidence")) return;
-      const sel = document.getElementById("ex17_confidence");
-      sel.value = tr.getAttribute("data-conf");
-      sel.dispatchEvent(new Event("change", { bubbles: true }));
+      if (!tr || !document.getElementById("ex17_k")) return;
+      const c = parseFloat(tr.getAttribute("data-conf"));
+      if (!Number.isFinite(c)) return;
+      setSlider("ex17_k", Math.min(10, Math.max(0.301, NINES(c))));
       refreshLive("example-ex17");
     });
   }
@@ -600,79 +604,97 @@ registerExample("example-ex17", (box) => {
     sEq: () => ` = ${bigmark(num("ex17_s"))}`,
     e0: ex17Row(0), e1: ex17Row(1), e2: ex17Row(2),
     e3: ex17Row(3), e4: ex17Row(4), e5: ex17Row(5),
+    /* the seventh row is wherever the slider is standing, so a level between
+       two of Peirce's printed ones still has its bound written out */
     customLabel: () => {
-      const c = num("ex17_custom_conf");
-      return `${fmt(c, 0)} times out of 100 within`;
+      const c = CONF();
+      return `${c >= 99.99 ? fmt(c, 6) : fmt(c, 2)} times out of 100 within`;
     },
-    customConst: () => fmt(qnorm((1 + num("ex17_custom_conf") / 100) / 2) / Math.SQRT2, 3),
-    eCustom: () => ex17Bound(qnorm((1 + num("ex17_custom_conf") / 100) / 2) / Math.SQRT2)
+    customConst: () => fmt(getConstant(), 3),
+    eCustom: () => ex17Bound(getConstant())
   }, {
     onRefresh: (on) => {
       if (!ex17Table) return;
       ex17Table.classList.toggle("ex17-live", on);
-      const sel = on ? val("ex17_confidence") : null;
-      $$("tr[data-conf]", ex17Table).forEach((tr) =>
-        tr.classList.toggle("conf-active", tr.getAttribute("data-conf") === sel));
+      const c = on ? CONF() : null;
+      $$("tr[data-conf]", ex17Table).forEach((tr) => {
+        const v = parseFloat(tr.getAttribute("data-conf"));
+        tr.classList.toggle("conf-active", c !== null && Number.isFinite(v)
+          && Math.abs(NINES(v) - NINES(c)) < 0.005);
+      });
     }
   });
 
-  const combinedCanvas = mkCanvas(400, (pl) => {
-    const p = num("ex17_p"), s = num("ex17_s"), rescale = chk("ex17_rescale");
-    const ks = Array.from({ length: s + 1 }, (_, i) => i);
-    const phat = ks.map((k) => k / s);
-    const probs = ks.map((k) => dbinom(k, s, p));
-    const maxP = Math.max(...probs);
-    const se = Math.sqrt(p * (1 - p) / s), delta = 1 / s;
+  /* --------------------------------------------------------------------------
+     One picture rather than two. The distribution of p-hat sits along the top
+     on the same proportion axis as the record below it, and a new sample lands
+     on the curve and then drops into the first row of the stack, pushing the
+     rest down. That is the thing worth watching: not any one interval, but the
+     rate at which intervals of this construction cover the truth.
+     ------------------------------------------------------------------------*/
+  const combinedCanvas = mkCanvas(460, (pl) => {
+    const p = num("ex17_p"), s2 = num("ex17_s"), rescale = chk("ex17_rescale");
+    const se = Math.sqrt(p * (1 - p) / s2), delta = 1 / s2;
     const xlim = rescale ? [Math.max(0, p - 5 * se), Math.min(1, p + 5 * se)] : [0, 1];
-    pl.setup({ xlim: xlim, ylim: [0, maxP * 1.3], mar: [4, 5, 3, 2] });
-    pl.axes({}); pl.box();
-    pl.axisLabels("p̂", "Probability mass");
-    pl.title("Sampling Distribution of p-hat", { cex: 1.1 });
+
+    const ROWS = 22;                       // rows of history under the curve
+    const df = history.slice(-ROWS).reverse();   // newest first, just under the curve
+    const nContain = history.filter((d) => d.containsP).length;
+
+    /* one coordinate system: x is the proportion for both halves, y runs from
+       the top of the curve down through the rows */
+    pl.setup({ xlim: xlim, ylim: [-ROWS - 1.5, 10], mar: [4, 4, 3, 2] });
+    pl.axes({ yat: [] });
+    pl.box();
+    pl.axisLabels("Proportion", null);
+    pl.title(history.length
+      ? `${bigmark(nContain)} of ${bigmark(history.length)} intervals cover the truth (${
+          fmt(nContain / history.length, 3)})`
+      : "Draw a sample to begin", { cex: 1.0 });
     pl.clip(true);
-    ks.forEach((k, i) => { if (probs[i] > 0) pl.segments(phat[i], 0, phat[i], probs[i], { lwd: 3, col: "#a8adb4" }); });
-    pl.points(phat, probs, { cex: 1.2, col: "#a8adb4" });
+
+    // the curve, scaled into the top ten units
+    const ks = Array.from({ length: s2 + 1 }, (_, i) => i);
+    const probs = ks.map((k) => dbinom(k, s2, p));
+    const maxP = Math.max(...probs) || 1;
+    const H = 9;
+    ks.forEach((k, i) => {
+      if (probs[i] <= 0) return;
+      pl.segments(k / s2, 0, k / s2, (probs[i] / maxP) * H, { lwd: 2, col: "#c9ccd1" });
+    });
     const xs = [], ys = [];
-    for (let i = 0; i < 500; i++) { const x = i / 499; xs.push(x); ys.push(dnorm(x, p, se) * delta); }
+    for (let i = 0; i < 500; i++) {
+      const x = xlim[0] + (xlim[1] - xlim[0]) * i / 499;
+      xs.push(x); ys.push((dnorm(x, p, se) * delta / maxP) * H);
+    }
     pl.lines(xs, ys, { col: "#2f6f9f", lwd: 2, lty: 2 });
-    pl.abline({ v: p, col: "#c79a45", lwd: 3 });
+    pl.abline({ v: p, col: "#c79a45", lwd: 2.5 });
+
+    // the rule the samples drop across
+    pl.segments(xlim[0], -0.6, xlim[1], -0.6, { col: PAL.rule, lwd: 1 });
+
+    // the record, newest just below the rule
+    df.forEach((d, i) => {
+      const y = -1.4 - i;
+      const col = d.containsP ? "#4a7c59" : "#b0563f";
+      pl.segments(d.ciLower, y, d.ciUpper, y, { col: col, lwd: i === 0 ? 2.4 : 1.4 });
+      pl.points([d.pHat], [y], { cex: i === 0 ? 0.8 : 0.5, col: col });
+    });
     if (current) {
-      const obsProb = dbinom(current.whiteBalls, s, p);
-      pl.segments(current.pHat, 0, current.pHat, obsProb, { lwd: 5, col: "#8a7aa8" });
-      pl.points([current.pHat], [obsProb], { cex: 1.5, col: "#8a7aa8" });
-      const ciCol = current.containsP ? "#4a7c59" : "#b0563f";
-      pl.segments(current.ciLower, 0, current.ciUpper, 0, { col: ciCol, lwd: 5 });
-      pl.points([current.pHat], [0], { col: PAL.accent, cex: 2 });
+      const obsProb = (dbinom(current.whiteBalls, s2, p) / maxP) * H;
+      pl.segments(current.pHat, 0, current.pHat, obsProb, { lwd: 4, col: "#8a7aa8" });
+      pl.points([current.pHat], [obsProb], { cex: 1.3, col: "#8a7aa8" });
     } else {
-      pl.text((xlim[0] + xlim[1]) / 2, maxP * 0.9, "Draw a sample to see\nthe observed outcome", { cex: 1.1, col: "#9a9a9a" });
+      pl.text((xlim[0] + xlim[1]) / 2, H * 0.55, "Draw a sample to see where it lands",
+        { cex: 0.95, col: PAL.inkFaint });
     }
     pl.clip(false);
+    pl.legend("topleft", {
+      legend: ["The truth", "Covers it", "Misses it"],
+      col: ["#c79a45", "#4a7c59", "#b0563f"], lwd: [2.5, 2, 2], cex: 0.7
+    });
   });
   $("#ex17-combined-plot", content).appendChild(combinedCanvas);
-
-  const historyCanvas = mkCanvas(400, (pl) => {
-    if (!history.length) { blankPlot(pl, "Draw samples to see\nhistory accumulate here"); return; }
-    const df = history.slice(-100);
-    const rescale = chk("ex17_rescale");
-    let ylim = [0, 1];
-    if (rescale) {
-      const vals = df.flatMap((d) => [d.ciLower, d.ciUpper, d.p]);
-      const lo = Math.min(...vals), hi = Math.max(...vals), d = hi - lo;
-      ylim = [lo - 0.1 * d, hi + 0.1 * d];
-    }
-    const nContain = df.filter((d) => d.containsP).length;
-    pl.setup({ xlim: [0.5, df.length + 0.5], ylim: ylim, mar: [4, 5, 3, 2] });
-    pl.axes({}); pl.box();
-    pl.axisLabels("Sample Number", "Proportion");
-    pl.title(`History of Confidence Intervals (${nContain} out of ${df.length} contain true p)`, { cex: 1.05 });
-    pl.clip(true);
-    pl.abline({ h: df[0].p, col: "#c79a45", lwd: 2 });
-    df.forEach((d, i) => {
-      pl.segments(i + 1, d.ciLower, i + 1, d.ciUpper, { col: d.containsP ? "#4a7c59" : "#b0563f", lwd: 1.5 });
-      pl.points([i + 1], [d.pHat], { cex: 0.5, col: PAL.accent });
-    });
-    pl.clip(false);
-  });
-  $("#ex17-history-plot", content).appendChild(historyCanvas);
 
   function drawSample() {
     const p = num("ex17_p"), s = num("ex17_s");
@@ -685,10 +707,7 @@ registerExample("example-ex17", (box) => {
       containsP: (p >= pHat - margin && p <= pHat + margin), p: p };
     return { rec: rec, whiteBalls: whiteBalls, s: s };
   }
-  function confLevel() {
-    const sel = val("ex17_confidence");
-    return sel === "custom" ? num("ex17_custom_conf") : parseFloat(sel);
-  }
+  function confLevel() { return CONF(); }
 
   $("#ex17_simulate_single", content).addEventListener("click", () => {
     const d = drawSample();
@@ -708,8 +727,6 @@ registerExample("example-ex17", (box) => {
   $("#ex17_reset", content).addEventListener("click", () => { history = []; current = null; update(); });
 
   function update() {
-    const sel = val("ex17_confidence");
-    customBox.style.display = sel === "custom" ? "" : "none";
     /* The table of levels and bounds is Peirce's own, printed above; it fills
        in there rather than being repeated here. */
 
@@ -726,7 +743,7 @@ registerExample("example-ex17", (box) => {
           <div style="padding:10px;margin-top:10px;background-color:${col};color:white;border-radius:5px;text-align:center;font-weight:bold;">${txt}</div>
         </div>`;
     } else $("#ex17_current_result", content).innerHTML = "";
-    drawCanvas(combinedCanvas); drawCanvas(historyCanvas);
+    drawCanvas(combinedCanvas);
   }
   update();
 });
@@ -956,7 +973,8 @@ registerExample("example-ex16", (box) => {
    EXAMPLE 18 — Extreme probabilities are more secure
    ========================================================================*/
 registerExample("example-ex18", (box) => {
-  const content = h(`<div>
+  box.appendChild(exHeader("Interactive Example: One White Ball in a Hundred", "ex18-content"));
+  const content = h(`<div id="ex18-content" class="example-content">
     <div class="row">
       <div class="col col-4">
         <div id="ex18-controls"></div>

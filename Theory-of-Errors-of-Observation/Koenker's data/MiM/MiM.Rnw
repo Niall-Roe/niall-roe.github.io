@@ -1,0 +1,737 @@
+\documentclass[12pt,twoside]{amsart}
+
+%% additional packages
+\usepackage[latin1]{inputenc}
+\usepackage{a4wide,graphicx,color,thumbpdf}
+\usepackage{hyperref}
+\usepackage{amsmath}
+\usepackage{array}
+\usepackage{harvard}
+\usepackage{setspace}
+
+
+%% markup commands for code/software
+\let\code=\texttt
+\let\pkg=\textbf
+\let\proglang=\textsf
+\newcommand{\file}[1]{`\code{#1}'}
+\renewcommand{\email}[1]{\href{mailto:#1}{\normalfont\texttt{#1}}}
+
+%% markup for comments
+\newcommand{\fixme}[1]{\emph{\marginpar{FIXME} (#1)}}
+\newcommand{\readme}[1]{\emph{\marginpar{README} (#1)}}
+
+%% \usepackage{Sweave} is essentially
+\RequirePackage[T1]{fontenc}
+\RequirePackage{ae,fancyvrb}
+\DefineVerbatimEnvironment{Sinput}{Verbatim}{fontshape=sl}
+\DefineVerbatimEnvironment{Soutput}{Verbatim}{}
+\DefineVerbatimEnvironment{Scode}{Verbatim}{fontshape=sl}
+\newenvironment{Schunk}{}{}
+\SweaveOpts{engine=R, eps=FALSE, keep.source = TRUE}
+
+
+% hyperref setup
+\definecolor{Red}{rgb}{0.5,0,0}
+\definecolor{Blue}{rgb}{0,0,0.5}
+\hypersetup{%
+  pdftitle = {The Median is the Message},
+  pdfsubject = {},
+  pdfkeywords = {Law of errors, median, mean, standard error},
+  pdfauthor = {Roger Koenker},
+  %% change colorlinks to false for pretty printing
+  colorlinks = {true},
+  linkcolor = {Blue},
+  citecolor = {Blue},
+  urlcolor = {Red},
+  hyperindex = {true},
+  linktocpage = {true},
+}
+
+%\doublespacing
+
+\begin{document}
+
+\bibliographystyle{econometrica}
+
+\title{{\bf The Median is the Message:}\\
+	Wilson and Hilferty's Reanalysis of C.S. Peirce's\\
+	Experiments on the Law of Errors}
+\author{Roger Koenker}
+\thanks{Version: \today.   This research was partially supported by NSF grant
+SES-05-44673.  The author would like to thank Marc Hallin, Steve Portnoy and
+Steve Stigler for helpful comments at various stages of this inquiry.  Comments
+by an Associate Editor were also extraordinarily helpful.  All data and software
+required to reproduce the results reported here will be made available on the web via
+\url{http://www.econ.uiuc.edu/~roger/research/frechet/frechet.html}.}
+
+\begin{abstract}
+Data is reanalyzed from an important series of 19th century experiments
+conducted by C. S. Peirce and designed to study the plausibility of the
+Gaussian law of errors for astronomical observations.  Contrary to the
+findings of Peirce, but in accordance with subsequent analysis by Fr\'echet
+and Wilson and Hilferty, we find normality implausible and medians an
+attractive  alternative to means for the analysis.
+\end{abstract}
+
+\maketitle
+
+\pagestyle{myheadings}
+\markboth{\sc The Median is the Message}{\sc Roger Koenker}
+
+%\begin{abstract}
+%A reanalysis of the Peirce (1872) experiments.
+%\end{abstract}
+
+%\noindent {\bf Keywords:} Law of errors, medians, means, standard errors
+
+<<preliminaries, echo=FALSE, results=hide>>=
+library(quantreg)
+library(Hmisc)
+library(lattice)
+options(prompt = "R> ", continue = "+  ", digits = 4)
+get_version <- function(pkg) gsub("-", "--", packageDescription(pkg)["Version"])
+cleanup <- FALSE
+@
+
+
+\begin{quote}
+One of the first necessities of the discussion of any statistical problem
+is to study the data themselves.  
+
+\hspace{3in}
+E.B. Wilson (1923)
+\end{quote}
+
+\section{Introduction} \label{sec:intro}
+
+In the summer of 1872 C.S Peirce\footnote{Charles Saunders Peirce (as in
+{\it purse}) (1839-1914) was a preeminant American mathematician, logician
+and philosopher of the 19th century.  In addition to his fundamental
+contributions to set theory and relational logic, he is generally regarded
+as the progenitor of philosophical pragmatism and the field of semiotics.
+\citeasnoun{Stig.92} calls Peirce ``one of the two greatest American scientific minds
+of [the 19th] century (the other being J. Willard Gibbs.)''}
+conducted a series of experiments
+designed to investigate the validity of the Gaussian law of errors,
+and thus the applicability of the method of least squares,
+for observational studies such as those then commonly employed in
+astronomy.  The conclusion Peirce drew from these experiments was that faith in
+the ``normal'' law and the method of least squares was fully justified.  
+However,  subsequent analysis by \citeasnoun{F.24} and by \citeasnoun{WH.29} found that 
+the normal approximation
+was quite unsatisfactory, concluding that medians offered a preferable
+mode of analysis to means for Peirce's data.   The primary objective of
+the present note is to evaluate the methods and conclusions of Wilson
+and Hilferty in the light of subsequent statistical developments.
+
+Early in his prolific career Peirce was employed by the U.S. Coast and
+Geodetic  Survey.  In this capacity he undertook a series of experiments
+intended to investigate  the ``distribution of errors in observations of 
+a phenomenon,''  as Peirce expresses it, a phenomenon ``not seen coming
+on, as in the case of a transit, but sudden, as in the case of the
+emersion of a star from behind the moon.''  To this end, he hired a
+young man who had no prior experience in scientific observation whose
+task was to respond to a ``signal consisting of a sharp sound like a rap''
+by depressing a telegraph operator's key ``nicely adjusted.''  Response
+times were recorded in milliseconds with the aid of a very sophisticated
+instrument called a Hipp chronoscope.  For 24 days in July and early
+August of 1872 roughly 500 such responses were collected for each day.
+Data was recorded as illustrated in Table \ref{tab.Day6}, and published as an integral
+part of  \citeasnoun{Peirce.73}.
+
+\begin{table}[tbp]
+\begin{center}
+\resizebox{.8\textwidth}{!}{ \includegraphics{images/Day6.jpg}}
+\end{center}
+\caption{Raw Data for  Day 6 of the Experiment:  Odd columns of the table give
+times in milliseconds and associated even columns report cell counts
+of the number of occurrences of the indicated timing.  Source: Peirce(1873)}
+\label{tab.Day6}
+\end{table} 
+
+% Read Peirce's tables from Peirce.rda 
+% so this doesn't need to be re-read from the txt files at each compilation time
+<<read, echo = FALSE, results=hide>>=
+if(file.exists("data/Peirce.rda")) load("data/Peirce.rda") else{
+ReadPeirceData <- function(file){
+	d <- scan(file)
+	n <- length(d)
+	m <- (n %/% 18) + 1
+	d[(n+1):(18*m)] <- NA
+	D <- matrix(d,2)
+	D <- t(matrix(D,18))
+	D <- array(D,c(m,2,9))
+	D <- aperm(D,c(1,3,2))
+	x <- c(D[,,1])
+	y <- c(D[,,2])
+	x <- x[!is.na(x)]
+	y <- y[!is.na(y)]
+	for(i in 2:length(x))
+		if(x[i] < x[i-1]) x[i] = x[i-1] + 1
+	s <- y==0
+	list(x = x[!s], y = y[!s])
+	}
+files <- paste("data",list.files(path = "data", pattern = "txt"),sep="/")
+ndays <- length(files)
+day   <- list(NULL)
+dates <- c(1,5,6,8,9,10,15,16,17,18,19,20,22,23,24,25,26,27,29,30,31,1,2,3)
+dates <- paste(c(rep("July",21),rep("August",3)),dates)
+
+for(i in 1:ndays){
+	print(files[i])
+	day[[i]] <- ReadPeirceData(files[i])
+	day[[i]]$date <- dates[i]
+	}
+save(day, file = "data/Peirce.rda")
+}
+if(cleanup) file.remove("data/Peirce.rda")
+@
+
+\section{Wilson and Hilferty's Analysis}
+
+%Unfortunately, the diploma thesis of Fr\'echet's student, M. Samama, is no longer 
+%available in Strasbourg,\footnote{The possibility that it may found in the
+%Fr\'echet archive in Paris is currently under investigation.}  
+The analysis of Wilson and Hilferty offers a revealing 
+glimpse into an earlier era of statistical computation.   Table \ref{tab.WH} 
+constitutes my best attempt to reproduce their main table.  An encouraging feature
+of this exercise is that the column of means matches the original table exactly,
+and the medians also match to three significant digits, except for day 15, in which
+there appears to be a transposition of two digits.\footnote{A minor mystery of the 
+Wilson-Hilferty medians is that they are reported to four significant digits despite 
+the fact that the original data all have unique 3-digit medians.}  The standard
+deviation of the means also agree quite well with the original table except for
+a few  entries that could be attributed to differences in rounding conventions.
+I defer discussion of the entries for the ``standard deviation'' of the median
+to the next section.  Since there appears to have been no generally agreed upon
+method for assessing the accuracy of the median at the time, these entries are
+one of the more intriguing aspects of the analysis.
+
+The scale estimates in  Columns 3-6 of the table are quite consistent with
+Wilson and Hilferty's table.  Under normality one would expect that the ratio of half 
+the interquartile
+range to the scaled standard deviation would be unity, however we find instead that
+these ratios are  consistently smaller than one.  Similarly, the number of observations
+lying beyond $\pm 3.1 \hat \sigma$ bounds is excessive, as is the number of observations lying
+{\it inside} the $\pm 0.25 \hat \sigma$ intervals.  Thus, as emphasized by Wilson and
+Hilferty, Peirce's  observations are both more peaked near the median, and heavier
+tailed than one would expect from the normal model. 
+
+
+<<summary, echo=FALSE, results=hide>>=
+require(quantreg)
+load("data/Peirce.rda")
+y <- list(1:24)
+x <- y
+dates <- y
+for(i in 1:24){
+	y[[i]] <- rep(day[[i]]$x, day[[i]]$y) + runif(sum(day[[i]]$y), -.5, .5)
+	x[[i]] <- rep(i,length(y[[i]]))
+	dates[[i]] <- day[[i]]$date
+	}
+
+#Basic Yule Estimator of standard deviation of the median
+sdm.yule <- function(y,bw){
+        f0 <- sum(abs(y - median(y)) < bw)/(2 * bw * length(y))
+        (1/(2 * f0)) / sqrt(length(y))
+        }
+tab <- matrix(0,24,15)
+for(i in 1:24){
+	y <- rep(day[[i]]$x, day[[i]]$y) 
+	n <- length(y)
+	sqn <- sqrt(n-1)
+	qs <- quantile(y)
+	m1 <- qs[3]
+	s1 <- sdm.yule(y,bw=1.6)
+	f <- summary(lm(y~1))$coef[1:2]
+	m2 <- f[1]
+	s2 <- f[2]
+	pe1 <- (qs[4] - qs[2])/2
+	pe2 <- 0.6745 * s2 * sqn 
+	rat <- pe1/pe2
+	ad  <- mean(abs(y - mean(y)))
+	outm <- sum(y < (m2 - 3.1 * s2 * sqn))
+	outp <- sum(y > (m2 + 3.1 * s2 * sqn))
+	outt <- outm + outp
+	inm <- sum(abs(y - mean(y)) <=  0.25 * s2 * sqn)
+	Eint <- round(n * (pnorm(.25) - pnorm(-.25)))
+	excess <- round(100*(inm - Eint)/Eint)
+	tab[i,] <- c(n, m1, s1, m2, s2, pe1, pe2, rat, ad, 
+		outm, outp, outt, inm, Eint, excess)
+	}
+# Now make character version of the tables
+med <- paste(tab[,2],"$\\pm$",format(round(tab[,3],1)))
+mean <- paste(format(round(tab[,4],1)),"$\\pm$",format(round(tab[,5],1)))
+iqr1 <- format(round(tab[,6],1))
+iqr2 <- format(round(tab[,7],1))
+rat  <- format(round(tab[,8],3))
+mad  <- format(round(tab[,9],1))
+tab.WH <- cbind(tab[,1], med,mean, iqr1,iqr2,rat,mad,tab[,10:15])
+cnames <- c("n", "median","mean","IQR/2","$\\kappa \\sigma$","ratio","mad",
+	"N","P","T","Oin","Ein","Ex")
+dimnames(tab.WH) <- list(1:24,cnames)
+caption <-  "Summary Statistics for the Peirce (1872) Experiments:  This table
+attempts to reproduce a portion of the Wilson and Hilferty (1929) analysis of the Peirce
+experiments.  Column numbers correspond to the numbering used by Wilson and
+Hilferty.  Following the columns with the daily sample sizes, medians and
+means and their associated standard errors, 
+there are four scale statistics:  half the interquartile range, 
+$0.6745 \\sigma$,  the ratio $IQR/(2 \\kappa \\sigma)$  and the mean absolute deviation.
+The next three columns contain the number of observations falling outside a
+$3.1 \\sigma$ cutoff:  numbers below, above and total.   The final three colums contain
+the number of observations within a $0.25 \\sigma$ cutoff, the expected number
+of such observations under the normal model, and the excess number, respectively." 
+cgroup <- c("",paste("(",1:9,")",sep=""))
+ncgroup <- c(rep(1,7),3,2,1)
+lat <- latex.default(tab.WH, file = "MiMsum.tex",cgroup = cgroup, n.cgroup = ncgroup,
+	caption=caption,rowlabel = "Day", size="footnotesize", caption.loc = "bottom", 
+	where = "!ht")
+@
+
+\input MiMsum
+
+Wilson and Hilferty provide a
+second panel of their main table containing  estimates of several different measures
+of skewness of the observations.  Unfortunately, these computations are quite
+inaccurate, so it seemed pointless to attempt to replicate them in detail.\footnote{
+Before rushing to condemn the carelessness of their calculations, it is worthwhile
+to contemplate computing third moment estimates based on Peirce's data given the
+technology available in 1929.  What modern computers now produce in milliseconds was
+then an extremely laborious process.} 
+Instead, Table \ref{Tab.SK} reports the conventional estimates of  skewness
+$\gamma_1  = \mu_3 / \sigma^3$ and kurtosis $\gamma_2 = (\mu_4 / \sigma^4) - 3$. 
+In addition, the \citeasnoun{Agostino} and \citeasnoun{Anscombe} tests for
+normality based on these estimates are reported.  Both of these test statistics
+are approximately normal under the hypothesis of normality, so neither test
+supports the plausibility of normality for the Peirce data.
+
+<<skewness, echo=FALSE, results=hide>>=
+require(moments)
+tab <- matrix(0,24,4)
+
+for(i in 1:24){
+	y <- rep(day[[i]]$x, day[[i]]$y) 
+	n <- length(y)
+	m2  <- mean(y)
+	mu2 <- mean((y - m2)^2)
+	mu3 <- mean((y - m2)^3)
+	mu4 <- mean((y - m2)^4)
+	sk1 <- mu3/mu2^(3/2) 
+	kur <- mu4/mu2^2
+	agt <- agostino.test(y)$statistic[2]
+	ant <- anscombe.test(y)$statistic[2]
+	tab[i,] <- c(sk1,agt,kur,ant)
+	}
+# Now make character version of the tables
+Tab.SK <- round(tab,3)
+cnames <- c("Skewness", "D'Agostino","Kurtosis","Anscombe")
+dimnames(Tab.SK) <- list(1:24, cnames)
+caption = "Skewness and Kurtosis Estimates for Peirce Experiment:  
+Columns one and three of the table report daily estimates of the skewness
+and kurtosis coefficients, $\\gamma_1$ and $\\gamma_2$.  Columns two and four
+report the corresponding D'Agostino (1970) and Anscombe-Glynn (1983)
+test statistics for normality based upon the respective coefficients.
+Both test statistics are approximately standard Gaussian under the null
+hypothesis, so at conventional significance levels
+Gaussian skewness is rejected in 19 of the 24 days, while Gaussian
+kurtosis is rejected for all 24 days."
+lat <- latex.default(Tab.SK, file = "MiMSK.tex",caption=caption,rowlabel = "Day",
+	size="footnotesize", caption.loc = "bottom", where = "!ht")
+@
+\input MiMSK
+
+Further visual evidence on the plausibility of normality for the Peirce data
+can been seen in Figure \ref{fig.Pqq} where we give QQ plots of the daily
+samples against Gaussian quantiles.  With the exception of two or three days,
+July 5 and 9; none of these plots supports Peirce's view that the data is Gaussian.
+Of course, all of the plots support the well-known Tukey maxim:  All distributions
+are normal in the middle.  But both abnormal skewness and kurtosis are clearly
+evident for most of the 24 days.
+
+<<Pqq, echo = FALSE>>=
+set.seed(100)
+
+y <- list(1:24)
+x <- y
+dates <- y
+for(i in 1:24){
+	#y[[i]] <- rep(day[[i]]$x, day[[i]]$y) + runif(sum(day[[i]]$y), -.5, .5)
+	y[[i]] <- rep(day[[i]]$x, day[[i]]$y) 
+	x[[i]] <- rep(i,length(y[[i]]))
+	dates[[i]] <- day[[i]]$date
+	}
+Y <- unlist(y)
+X <- unlist(x)
+X <- as.factor(X)
+dates <- unlist(dates)
+levels(X) <- dates
+@
+
+\setkeys{Gin}{width=\textwidth}
+\begin{figure}[t]
+\begin{center}
+<<Pqq, echo = FALSE, fig=TRUE, height=6, width=8>>=
+qqp<- qqmath( ~ Y | X, 
+	distribution = qnorm, prepanel = prepanel.qqmathline, 
+	panel = function(x, ...){
+	panel.qqmathline(x, col = "red", ...)
+	panel.qqmath(x, xlab = "", ylab = "", type = "l",...)})
+print(qqp)
+@
+\caption{Normal QQ Plots for each of the 24 days of the Peirce Experiments:  }
+\label{fig.Pqq} 
+\end{center}
+\end{figure}
+
+Why should we care whether the response times reported in the Peirce experiments
+are Gaussian?  There are several perspectives from which to view this
+question.  From a pragmatic perspective, we would like to know whether Peirce's
+original objective---to justify the use of least squares methods---is supported
+by the evidence of the experiments.  Since Laplace's work in 1770's it had been 
+recognized that the
+sample mean enjoyed a certain optimality under the so-called Gaussian
+law of errors, or what is sometimes called Laplace's {\it second} law of
+error.  In contrast, Laplace's {\it first} law of error, the double exponential
+distribution, could be similarly invoked to justify  the optimality of the
+sample median.  We will explore in the next section the assertion of both
+Fr\'echet and Wilson and Hilferty that for the Peirce data medians offer a
+superior vehicle of analysis.
+
+From a deeper ontological perspective we might be tempted to ask:  Is Gaussian
+random sampling {\it ever} a plausible model for scientific observation? 
+\citeasnoun{WH.29} cite Poincar\'e's famous dictum that everybody believes in
+the Gaussian law of errors:  the mathematicians because they think it has been
+empirically demonstrated by experimenters, and the experimenters because they
+think the mathematicians have proven it {\it a priori}.
+What accounts for such an extraordinary suspension of skepticism?  No one
+would be so surprised to learn from \citeasnoun{W.23}  that Laplace's first law 
+sometimes fits {\it economic} observations better than his second law.\footnote{
+Wilson's source for this example, \citeasnoun{Crum} also argues for the advantages
+of medians over means for seasonal adjustment of his interest rate series.  Crum
+fits a contaminated normal mixture model obtaining a contamination proportion $1/4$
+and relative scale of $4.8$.  Following \citeasnoun{Yule.17}, Crum then solves
+a quartic equation to find that for this contamination proportion the median is
+more efficient than the mean if relative scale exceeds $2.6$.}
+<<Crum, echo = FALSE, results=hide>>=
+# To reproduce Crum (1923)
+a <- 3/4
+b <- 1/4
+z <- c(b * a^2, 2 * a * b^2, (a^3 + b^3 - pi/2), 2 * b * a^2, a * b^2)
+polyroot(z)
+@
+But Peirce's experiments seem to be the very model of a reproducible scientific
+experiment; if we do not see Gaussian behavior here, then where could we expect to
+find it?\footnote{In fairness, we should recall that \citeasnoun{Stigler.77} considers
+several historical instances of estimating a well-defined location parameter---all 
+cases in which the refinement of modern measurement provides a considerably
+more accurate estimate of the quantity in question---and concludes that while 
+some modest amount of trimming is preferable to the untrimmed sample mean,
+the sample median is ``too inefficient.'' }
+
+\section{The Standard Deviation of the Median}
+
+The most puzzling aspect of the \citeasnoun{WH.29} analysis for me involves
+their reported ``standard deviations of the medians.''  These values are crucial
+to their argument:
+\begin{quote}
+A comparison of the standard deviations of the  median and mean in columns (1)
+and (2) shows that for these observations the median is better determined that
+the mean on 13 days, worse determined on 9 days, and equally well determined
+on 2 days.  Roughly speaking this means that mean and median  are on the whole
+about equally well determined.
+\end{quote}
+
+<<Sdm, echo = FALSE>>=
+# Some functions that compute various estimates of the standard error of the median
+sdm.exact <- function(x, probs = .5, alpha = .95, interp = TRUE, ...){
+ n<-length(x)
+ x<- sort(x)
+ nlo = probs
+ nhi = probs
+ for(i in 1:length(probs)){
+    pbin <- pbinom((0:n),n,probs[i])
+    nlo <- max(which(pbin <= (1-alpha)/2))
+    nhi <- min(which(pbin >= 1-(1-alpha)/2))
+    if(interp){
+       hlo <- ((1 - alpha)/2  - pbin[nlo])/(pbin[nlo+1] - pbin[nlo])
+       hhi <- (1 - (1 - alpha)/2  - pbin[nhi-1])/(pbin[nhi] - pbin[nhi-1])
+       }
+    else {
+       hlo = 0
+       hhi = 1
+       }
+    xlo <- hlo * x[nlo+1] + (1-hlo) * x[nlo]
+    xhi <- hhi * x[nhi] + (1-hhi) * x[nhi-1]
+   }
+ sd <- (xhi - xlo)/(2 * qnorm(1 - (1 - alpha)/2))
+ return(sd)
+}
+sdm.jeff <- function(x, prob = .5, alpha = .95){
+	# See Jeffreys (ToP, p 159)
+	n <-length(x)
+	x <- sort(x)
+	nlo <- floor(prob * n - qnorm(1 - (1 - alpha)/2) * sqrt(n)/2)
+	nhi <- ceiling(prob * n + qnorm(1 - (1 - alpha)/2) * sqrt(n)/2)
+	sd <- (x[nhi] - x[nlo])/(2 * qnorm(1 - (1 - alpha)/2))
+	return(sd)
+	}
+
+#Note that all three of the next functions need modified version of summary.rq
+#that allows bandwidth to be passed directly rather than hs = T/F
+sdm.rqiid <-  function(y,bw) summary(rq(y~1),se="iid", bandwidth=bw)$coef[2]
+sdm.rqnid <-  function(y,bw) summary(rq(y~1),se="nid", bandwidth=bw)$coef[2]
+sdm.rqker <-  function(y,bw) summary(rq(y~1),se="ker", bandwidth=bw)$coef[2]
+
+# Basic Siddiqui Estimator
+sidd <- function(y,bw){
+	c(.5 * (diff(quantile(y,c(.5 - bw, .5 + bw)))/(2 * bw)) / sqrt(length(y)))
+	}
+# Full Siddiqui Estimator
+sdm.sidd <- function(y,bw){
+	if(length(bw)>1) bw <- sdm.bw(y,bw,sidd)
+	unlist(lapply(y,FUN=sidd, bw=bw))
+	}
+
+# Basic Yule Estimator
+yule <- function(y,bw){
+	f0 <- sum(abs(y - median(y)) < bw)/(2 * bw * length(y)) 
+	(1/(2 * f0)) / sqrt(length(y))
+	}
+
+# Full Yule Estimator
+sdm.yule <- function(y,bw){
+	if(length(bw)>1) bw <- sdm.bw(y,bw,yule)
+	unlist(lapply(y,FUN=yule, bw=bw))
+	}
+
+# Basic Laplace Estimator
+laplace <- function(y){
+        n <- length(y)
+        f0 <- 1/(2 * sum(abs(y-median(y))/n))
+        (1/(2 * f0)) / sqrt(n)
+        }
+
+# Full Laplace Estimator
+sdm.laplace <- function(y){
+        unlist(lapply(y,FUN=laplace))
+        }
+
+# Bootstrap Estimator
+sdm.rqboot <-  function(y) summary(rq(y~1),se="boot",R = 500)$coef[2]
+
+# Bandwidth Selection for Yule and Siddiqui estimators
+
+sdm.bw <- function(y, bws, fun){
+WHses <- c(3.0,2.4,1.8,1.2,2.1,1.8,1.6,1.2,1.4,1.5,1.8,1.9,
+	1.3,1.2,1.0,1.4,1.7,1.3,0.9,1.3,1.6,1.5,1.1,0.9)
+fs <- bws
+for(i in 1:length(bws)){
+	fs[i] <- sum((WHses - unlist(lapply(y,FUN=fun, bw=bws[i])))^2)
+	}
+plot(bws,fs)
+bws[which.min(fs)]
+}
+
+tab <- matrix(0,24,8)
+tab[,1] <- WHses <- c(3.0,2.4,1.8,1.2,2.1,1.8,1.6,1.2,1.4,1.5,1.8,1.9,
+	1.3,1.2,1.0,1.4,1.7,1.3,0.9,1.3,1.6,1.5,1.1,0.9)
+tab[,2] <- sdm.sidd(y,2:50/200)  #seems decent grid
+tab[,3] <- sdm.yule(y,10:50/10)  #seems decent grid
+tab[,4] <- sdm.laplace(y)  
+tab[,5] <- unlist(lapply(y,FUN=sdm.exact,interp=FALSE))
+tab[,6] <- unlist(lapply(y,FUN=sdm.exact,interp=TRUE))
+tab[,7] <- unlist(lapply(y,FUN=sdm.rqboot))
+tab[,8] <- unlist(lapply(y,FUN=sdm.jeff))
+mse <- format(round(apply((tab - WHses)^2,2,"mean"),3))
+mae <- format(round(apply(abs(tab - WHses),2,"mean"),3))
+mxe <- format(round(apply(abs(tab - WHses),2,"max"),3))
+meen <- format(round(apply(tab,2,"mean"),3))
+tab <- format(round(tab,1))
+tab <- rbind(tab,meen,mae,mse,mxe)
+cnames <- c("WH", "Siddiqui","Yule","Laplace","Exact I","Exact II","Boot","Jeffreys")
+rnames <- c(1:24,"Mean","MAE","MSE","MXE")
+dimnames(tab) <- list(rnames, cnames)
+caption <-  "Standard Deviations for the Medians:  The table reports Wilson and
+Hilferty's estimates of the standard deviation of the median and seven attempts
+to reproduce their estimates as described in the text.  Column means and three
+measures of  the discrepancy between the original estimates and the new ones
+are given:  mean absolute error, mean squared error, and maximal absolute error."
+tab.Sdm <- tab[,c(1,4,3,2,5,6,8,7)]
+lat <- latex.default(tab.Sdm, file = "MiMsdm.tex",caption=caption,rowlabel = "Day",
+	n.rgroup = c(24,4), size="footnotesize", caption.loc = "bottom", where = "!ht")
+@
+
+\input MiMsdm
+
+But what {\it is} the standard deviation of the median?  Even today there is
+more than a little ambiguity about the phrase, how are we to interpret it in 1929?
+One possibility, suggested by the approach taken in \citeasnoun{W.27}, is that Wilson
+and Hilferty adopted Laplace's first law of error wholeheartedly and used the
+mean absolute deviation, the maximum likelihood estimator of the Laplace scale
+parameter, to estimate the density and thereby the standard deviation.
+This approach yields the standard deviation estimates in the ``Laplace'' column
+of Table \ref{tab.Sdm} and we see that they correspond rather poorly to the
+estimates reported by Wilson and Hilferty.  The Laplacian estimates are 
+substantially smaller
+for most of the days with a mean of only \Sexpr{meen[4]} versus the mean
+of \Sexpr{meen[1]} for the Wilson and Hilferty estimates.  So, if not
+the leap of Laplacian faith, what else? 
+
+\citeasnoun{Yule.17} seems to be the first to systematically treat the problem of
+estimating the precision of the sample median.  Yule provides
+two suggestions:  the first is to simply assume normality and inflate the usual
+estimate of the standard deviation of the mean by the infamous factor,
+known already to Laplace, $\sqrt{\pi / 2} \approx 1.253$.
+This suggestion is clearly not very helpful
+in the present  instance, since it begs the question of whether the
+median is more precisely estimated  than the mean.  Yule's second suggestion is to 
+estimate the asymptotic standard deviation of the sample median, 
+$\omega = 1/(2 f_0 \sqrt{n})$, 
+where $f_0$ denotes the density function of the  observations evaluated at the median.
+He offers one numerical example of how to compute this estimate, an example that  is 
+reproduced in all his subsequent editions up to and including those coauthored with Maurice
+Kendall in the 1930's and 1940's.  Based on the heights of 8585 
+adult males in the United Kingdom, Yule's estimate of $f_0$ took the
+frequency of subjects in the cell containing the median, 1329 men 67 inches tall, 
+and divided by the sample size.  This can be interpreted as an estimate,
+\[
+\hat f(x) = \frac{\hat F_n (x + h) - \hat F_n (x-h)}{2 h} 
+\]
+and happens to simplify by taking $h = 1/2$, because the cell boundaries were defined
+in inches.  The appeal of this calculation to Yule was---one can't resist 
+speculating---that the result yielded an estimate of 0.0349, essentially identical to
+that obtained
+by his normal theory approach, 0.0348.  In the present circumstance it is difficult to
+judge {\it a priori} how to chose the bandwidth $h$ for an analogous calculation
+for the Peirce data, so in the spirit of ``reverse engineering,'' we tried
+a grid of values seeking one that most closely reproduces Wilson and Hilferty's 
+results.  Unfortunately, although we can come close, we are unable, 
+with a fixed bandwidth,
+to match their results to the two significant figures they report.  The best we
+can do is reported in the ``Yule'' column of Table \ref{tab.Sdm}.  This strategy
+yields $h =$ \Sexpr{sdm.bw(y,10:50/10,yule)}, which is quite small by
+modern standards.  The textbook of \citeasnoun{Kelly} describes a procedure
+essentially similar to Siddiqui's and illustrates its use on a sample of 62
+daily temperature observations, considering bandwidths ranging from 0.065 to 0.25. 
+
+Equally simple and appealing is the suggestion of \citeasnoun{Sidd} to base the estimate of the 
+standard deviation of the median on an estimate of the reciprocal of the density,
+or sparsity function,
+\[
+\hat s(\tau) = \frac{\hat F_n^{-1} (\tau + h) - \hat F_n^{-1} (\tau - h)}{2 h}. 
+\]
+Now, $\hat \omega = \hat s(.5) / (2 \sqrt{n})$, and we can again optimize over
+the bandwidth to find the best fit to the Wilson and Hilferty estimates.  This
+time $h =$ \Sexpr{sdm.bw(y,2:50/200,sidd)}, which is again quite small.
+%For a sample of size 500, the bandwidth suggested by
+%Siddiqui would be  $h = $\Sexpr{round(bandwidth.rq(.5, 500, hs = FALSE),3)}, 
+%which yields somewhat larger estimates of the standard deviations.
+
+A third option that may have been open to Wilson and Hilferty involves estimating
+the standard deviations from the width of direct confidence intervals based on
+the binomial theory of the order statistics.  \citeasnoun{Lehmann.59}  attributes this
+technique to \citeasnoun{Thompson.36}, but it is not impossible that something similar 
+occurred to Wilson.  Two
+versions of this ``exact'' method are explored here:  the first involves constructing the 
+conventional ``conservative'' interval and dividing its length by the factor
+\Sexpr{2 * 1.96}, the second involves interpolating the limits of the conservative 
+interval and the interval
+formed by its adjacent order statistics and  again rescaling the length 
+to obtain a standard deviation estimate.  Both of the foregoing estimates are
+reported in Table \ref{tab.Sdm} together with their means over the 24 days,
+and their deviation from the Wilson and Hilferty estimates measured by
+mean squared error.  
+Another variant of the exact methods, suggested by \citeasnoun{Jeffreys}, is to use the
+normal approximation to the binomial.  Results for this option are reported
+as well.  
+
+For the sake of further comparison, we have also considered bootstrap estimates
+of the standard deviation, even though this is certainly not a plausible
+candidate for Wilson and Hilferty's method.   For this purpose we have done
+500 bootstrap replications.  Ironically, this method comes closest to
+the results of Wilson and Hilferty in the sense of mean squared error.
+
+All of the methods investigated, with the possible exception of the Laplace method,
+yield standard deviations quite close to those reported by Wilson and Hilferty, and
+all support their conclusion that the mean  and median are about equally well determined.
+Unfortunately, however, none of the methods successfully ``reproduce'' the Wilson
+and Hilferty results, so the question remains open:  How did they do it?  
+
+\section{Quotidian Fluctuations}
+
+A striking feature of the Peirce experiments is the degree of daily variation when
+compared to the intra-day variability we have just considered.  This is illustated
+graphically in Figure \ref{fig.Quot} where we plot daily means and medians with
+associated pointwise error bands.  The initial drop in average response times
+over the first five days can be attributed to ``learning by doing,''  but the
+gradual increase and possible leveling off is more difficult to explain.  Perhaps,
+after becoming proficient, some element of {\it ennui} sets in.  In any case,  the daily
+variability is so large that it swamps the intra-day  variation and the confidence
+bands for the means and medians are indistinguishable.
+
+<<Quot, echo = FALSE>>=
+D <- matrix(0,24,4)
+for(i in 1:24){
+        y <- rep(day[[i]]$x, day[[i]]$y)
+        n <- length(y)
+        sqn <- sqrt(n-1)
+        qs <- quantile(y)
+        m1 <- qs[3]
+        s1 <- yule(y,bw=3)
+        f <- summary(lm(y~1))$coef[1:2]
+        m2 <- f[1]
+        s2 <- f[2]
+        D[i,] <- c(m1, s1, m2, s2)
+        }
+x <- c(1:24,24:1)
+y1 <- c(D[,1] - 2 * D[,2],rev(D[,1] + 2 * D[,2]))
+y2 <- c(D[,3] - 2 * D[,4],rev(D[,3] + 2 * D[,4]))
+
+@
+
+\setkeys{Gin}{width=.6\textwidth}
+\begin{figure}[t]
+\begin{center}
+<<Quotplot, echo = FALSE, fig=TRUE, height=6, width=8>>=
+plot(1:24,D[,1], xlab = "Day", ylab = "Response Time (ms)", type="l")
+polygon(x,y1,col="lightblue")
+polygon(x,y1,col="pink")
+@
+\caption{Daily Medians and Means with Confidence Band}
+\label{fig.Quot} 
+\end{center}
+\end{figure}
+
+Peirce concludes from this that ``transit observers be kept in constant training 
+by means of some observations of an artificial event  which can be repeated with
+rapidity, ... as it is the general condition of the nerves which it is important
+to keep in training more than anything peculiar to this or that kind of observation.'' 
+This conclusion seems to rest on the fact that the average response times tend to
+level off in the last few days of the experiment, and the standard deviations
+are also lowest in this period.  
+\citeasnoun{Stig.92} provides a comprehensive review of Pierce's substantial
+influence on subsequent developments in experimental psychology.
+
+\section{Conclusion}
+
+Peirce's experiments and their subsequent analysis constitute an object lesson
+in the sophistication of early data collection and  analysis.  Given the
+computational difficulties faced by Wilson and Hilferty it is remarkable
+how much of their analysis {\it was} reproducible.  Their work sets an
+enviable standard for contemporary computational research.
+The primary conclusion drawn by their analysis---that
+medians were competitive with means for the very carefully designed
+experiments of Peirce---is entirely vindicated.
+
+Such findings naturally raise new questions about extending median methods to 
+more complex statistical settings.  There is a long tradition of such inquiry
+beginning in the 18th century with the ``method of situation'' of Boscovich and
+Laplace, and continuing with  Edgeworth's (1988) ``plural median'' estimator for 
+regression.  More recent developments like Tukey's median polish for two-way anova
+and quantile regression have addressed some of these questions.
+But it is still not uncommon to enounter the attitude:  ``Sure, median methods work 
+well in practice, but how do they work in theory?''  The struggle continues.
+\bibliography{MiM}
+
+\end{document}

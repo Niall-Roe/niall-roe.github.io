@@ -1,0 +1,36 @@
+This is an archive of files for the paper
+
+The Median is the Message: Wilson and Hilferty's Reanalysis of C.S. Peirce's
+Experiments on the Law of Errors
+
+
+The paper is written in Sweave so all the text and computations are embedded
+in the file MiM.Rnw.  This is processed with the command:
+
+	Rnw2pdf MiM
+
+which first runs R to do the computation and then processes a resulting tex file.
+The shell command Rnw2pdf expects that you have a reasonably functional tex
+installation as well as a reasonably current R installation.
+
+There are two subdirectories:  
+
+	o data:  containing the data files for the Peirce experiments, and 
+	o images:  containing the images of the raw data as published by Peirce.  
+
+Note that an R data file Peirce.rda is included in my quantreg package
+with a documentation file, so unless you really want to see gory details of what
+you saw in the above paper, this is an easier access route:
+
+	require(quantreg)
+	data(Peirce)
+	?Peirce
+
+Auxillary stuff:
+
+See http://nobelprize.org/nobel_prizes/economics/articles/samuelson-2/index.html
+for the following quote from Paul Samuelson about Wilson:
+
+	Also, for me, I was able to become the sole protegé of the polymath 
+	Edwin Bidwell Wilson, who had himself been the sole protegé of Yale's 
+	great physicist Willard Gibbs.

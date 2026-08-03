@@ -82,33 +82,6 @@
 
   hr { border: none; border-top: 1px solid #dee2e6; margin: 22px 0; }
 
-  /* ---- scenario switcher ---- */
-  .mode-tabs {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 20px;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  .mode-tab {
-    padding: 10px 20px;
-    background-color: #e9ecef;
-    border: 2px solid #dee2e6;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: 600;
-    transition: all 0.2s;
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.95em;
-  }
-  .mode-tab.active {
-    background-color: #2c7fb8;
-    color: white;
-    border-color: #2c7fb8;
-  }
-  .scenario-panel { display: none; }
-  .scenario-panel.active { display: block; }
-
   /* ---- controls ---- */
   .ctl { margin-bottom: 14px; }
   .ctl > label {
@@ -119,16 +92,6 @@
     margin-bottom: 4px;
     line-height: 1.4;
   }
-  .ctl select, .ctl input[type=number] {
-    width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-family: inherit;
-    font-size: 0.95em;
-    background: #fff;
-    box-sizing: border-box;
-  }
   .ctl input[type=range] { width: 100%; }
   .ctl .slider-val {
     font-family: 'Helvetica Neue', Arial, sans-serif;
@@ -136,10 +99,6 @@
     color: #2c7fb8;
     font-weight: 700;
   }
-  .ctl.checkbox label {
-    display: flex; align-items: center; gap: 8px; font-weight: 500;
-  }
-  .ctl.checkbox input { width: auto; }
   .help-text {
     font-family: 'Helvetica Neue', Arial, sans-serif;
     font-size: 0.82em;
@@ -147,27 +106,11 @@
     margin: -8px 0 12px 0;
   }
 
-  button.btn {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
-    font-size: 0.9em;
-    padding: 7px 14px;
-    margin: 3px 4px 3px 0;
-    border: 1px solid transparent;
-    border-radius: 4px;
-    cursor: pointer;
-    background-color: #e7e7e7;
-    border-color: #ccc;
-  }
-  button.btn:hover { filter: brightness(0.94); }
-  button.btn-sm { font-size: 0.82em; padding: 5px 10px; }
-
   /* ---- layout ---- */
   .row { display: flex; flex-wrap: wrap; margin: 0 -10px; }
   .row > .col { padding: 0 10px; box-sizing: border-box; }
   .col-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
-  .col-6  { flex: 0 0 50%;      max-width: 50%; }
   .col-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
-  .col-12 { flex: 0 0 100%;     max-width: 100%; }
   @media (max-width: 800px) {
     .row > .col { flex: 0 0 100%; max-width: 100%; }
     .article-container { padding: 18px; }
@@ -236,13 +179,6 @@
   table.tbl tbody tr:nth-child(odd) { background-color: #f9f9f9; }
   table.tbl td.lbl { text-align: left; }
 
-  /* confusion matrix */
-  .conf-table { border-collapse: collapse; width: 100%; text-align: center; table-layout: fixed; margin-top: 10px; }
-  .conf-table td, .conf-table th { border: 2px solid #fff; padding: 14px 8px; font-weight: bold; font-family: 'Helvetica Neue', Arial, sans-serif; }
-  .conf-table th.label-cell { background-color: #f1f3f5; color: #333; font-size: 0.85em; font-weight: 600; }
-  .conf-table td { font-size: 0.9em; color: #222; }
-  .conf-table td .cell-name { display: block; font-weight: 600; font-size: 0.82em; color: #444; }
-
   /* Decision boxes are deliberately colourless. Red, amber and green are
      reserved for severity alone, so that a coloured thing on this page always
      means the same thing: how well a claim came through its test. The verdict
@@ -250,7 +186,6 @@
   .result-box { padding: 14px 16px; margin: 10px 0; border-radius: 5px; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.92em; }
   .reject-h0    { background-color: #eceff1; border: 1px solid #cfd8dc; border-left: 4px solid #455a64; }
   .fail-reject  { background-color: #f5f7f8; border: 1px solid #dde3e6; border-left: 4px solid #90a4ae; }
-  .neutral-box  { background-color: #eef2f5; border: 1px solid #dde3e8; }
 
   /* severity boxes — the reserved ramp */
   .severity-box { padding: 14px 16px; margin: 10px 0; border-radius: 5px; background-color: #f5f5f5; border: 1px solid #ddd; font-family: 'Helvetica Neue', Arial, sans-serif; font-size: 0.92em; }
@@ -263,15 +198,6 @@
     font-variant-numeric: tabular-nums;
   }
   .sev-headline .sev-level { font-size: 0.5em; font-weight: 600; margin-left: 6px; }
-
-  .key-insight {
-    background-color: #fff3cd;
-    border-left: 4px solid #ffc107;
-    padding: 14px 16px;
-    margin: 15px 0;
-    border-radius: 4px;
-    font-size: 0.95em;
-  }
 
   /* severity assessment badges */
   .assess { font-weight: 700; }
@@ -319,28 +245,29 @@ produced data agreeing less well with the claim, were the claim false. Everythin
 this page is that probability.
 </p>
 
-<div class="mode-tabs" id="scenario-switcher"></div>
+<p>A plant discharges water into a river. The standard it is held to is a mean outflow temperature
+of no more than 150&deg;F, so the hypothesis under test is H&#8320;: &mu; &le; 150, and the test
+rejects when the sample mean runs high enough that a null this size would rarely produce it.</p>
+<p>A verdict comes back either way. The interesting question begins after it, and the top panel
+answers it for every claim at once: drag the claim line and read its severity off the curve.</p>
 
-<div id="panel-water"   class="scenario-panel active"></div>
-<div id="panel-custom"  class="scenario-panel"></div>
-<div id="panel-tornado" class="scenario-panel"></div>
-<div id="panel-tea"     class="scenario-panel"></div>
-<div id="panel-compare" class="scenario-panel"></div>
+<div class="row">
+  <div class="col col-4"><div class="sidebar" id="controls"></div></div>
+  <div class="col col-8" id="figure"></div>
+</div>
 
 <div class="footer">
   <p class="citation">
-  Severity is Deborah Mayo&rsquo;s criterion, developed with Aris Spanos. The account followed here
-  is hers; any errors in the implementation are not.
+  The example is the accident-inspection case discussed by Mayo and Spanos. Severity is
+  Mayo&rsquo;s criterion, developed with Aris Spanos; the account followed here is theirs, and any
+  errors in the implementation are not.
   </p>
   <p class="citation">
   Mayo, D. (1996), <em>Error and the Growth of Experimental Knowledge</em>, University of Chicago
   Press. Mayo, D. &amp; Spanos, A. (2006), &lsquo;Severe Testing as a Basic Concept in a
   Neyman&ndash;Pearson Philosophy of Induction&rsquo;, <em>British Journal for the Philosophy of
   Science</em> 57(2), 323&ndash;57. Mayo, D. (2018), <em>Statistical Inference as Severe
-  Testing</em>, Cambridge University Press. Finley, J. P. (1884), &lsquo;Tornado
-  Predictions&rsquo;, <em>American Meteorological Journal</em> 1, 85&ndash;88; Peirce, C. S.
-  (1884), &lsquo;The Numerical Measure of the Success of Predictions&rsquo;, <em>Science</em> 4,
-  453&ndash;4. Fisher, R. A. (1935), <em>The Design of Experiments</em>, Oliver &amp; Boyd, ch. 2.
+  Testing</em>, Cambridge University Press.
   </p>
   <p class="citation">
   Companion page: <a href="../roc-and-hypothesis-testing/">Signal Detection &amp; Hypothesis
@@ -355,9 +282,9 @@ this page is that probability.
    Part 1: statistical primitives (replacing R's stats package)
    Part 2: a small canvas renderer that mimics R base graphics
    Part 3: tiny DOM / control-building utilities
-   Shared lineage with ../roc-and-hypothesis-testing/src/03_lib.js. The normal
-   family and the renderer are the same code; the discrete family (lgamma,
-   choose, dhyper, pbinom) is added here for the tornado and tea scenarios.
+   Shared lineage with ../roc-and-hypothesis-testing/src/03_lib.js, trimmed to
+   what this page actually calls and extended with a top axis, a draggable
+   marker line, and the pointer plumbing behind it.
    ==========================================================================*/
 
 /* ---------------------------------------------------------------- MATH --- */
@@ -418,50 +345,6 @@ function qnorm(p, mean = 0, sd = 1) {
   return mean + sd * x;
 }
 
-/* ---- the discrete family: Fisher's tea design and the binomial capability
-   model both need exact combinatorics. Everything is routed through a log
-   gamma so the factorials never overflow, even though the counts here are
-   small enough that they would not.                                        */
-
-// Lanczos g=7, n=9 — the standard coefficients; good to ~15 digits.
-function lgamma(x) {
-  const g = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-    771.32342877765313, -176.61502916214059, 12.507343278686905,
-    -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-  if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - lgamma(1 - x);
-  x -= 1;
-  let a = g[0];
-  const t = x + 7.5;
-  for (let i = 1; i < 9; i++) a += g[i] / (x + i);
-  return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
-}
-const lchoose = (n, k) => (k < 0 || k > n) ? -Infinity
-  : lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
-const choose = (n, k) => Math.round(Math.exp(lchoose(n, k)));
-// B(a,b) = Γ(a)Γ(b)/Γ(a+b)
-const beta = (a, b) => Math.exp(lgamma(a) + lgamma(b) - lgamma(a + b));
-
-// P(X = x) for X ~ Hypergeometric: x white drawn from m white and n black in k draws
-function dhyper(x, m, n, k) {
-  if (x < Math.max(0, k - n) || x > Math.min(k, m)) return 0;
-  return Math.exp(lchoose(m, x) + lchoose(n, k - x) - lchoose(m + n, k));
-}
-function dbinom(x, size, prob) {
-  if (x < 0 || x > size) return 0;
-  if (prob <= 0) return x === 0 ? 1 : 0;
-  if (prob >= 1) return x === size ? 1 : 0;
-  return Math.exp(lchoose(size, x) + x * Math.log(prob) + (size - x) * Math.log(1 - prob));
-}
-// P(X <= q); q is floored, as in R
-function pbinom(q, size, prob) {
-  const k = Math.floor(q + 1e-9);
-  if (k < 0) return 0;
-  if (k >= size) return 1;
-  let s = 0;
-  for (let i = 0; i <= k; i++) s += dbinom(i, size, prob);
-  return Math.min(1, s);
-}
-
 /* ---------------------------------------------------------- FORMATTING --- */
 
 // R's round(x, d) then default printing: 0.5 -> "0.5", not "0.5000"
@@ -470,12 +353,9 @@ function rround(x, d) {
   const r = Number(x.toFixed(d));
   return String(r);
 }
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-
 /* ------------------------------------------------------------ PLOTTING --- */
 /* A minimal re-implementation of the parts of R base graphics the app uses:
-   plot(NULL)/rect/text/lines/points/segments/polygon/abline/axis/legend.
+   plot(NULL)/text/lines/points/segments/polygon/abline/axis/legend.
    Coordinates passed to these methods are USER (data) coordinates.          */
 
 const BASE_FONT = 12;
@@ -497,16 +377,6 @@ class RPlot {
     }
     const [mb, ml, mt, mr] = this.mar;
     let px0 = ml, px1 = this.W - mr, py0 = this.H - mb, py1 = mt;
-    /* `square` shrinks the PLOT REGION to a square and centres it, so a 1:1
-       plot really looks 1:1. (R's coord_fixed instead widens the roomier
-       axis's limits, which leaves the box itself a rectangle — not what an
-       ROC square wants.) Assumes xlim and ylim already span equal ranges. */
-    if (o.square) {
-      const side = Math.min(px1 - px0, py0 - py1);
-      const cx = (px0 + px1) / 2;
-      px0 = cx - side / 2; px1 = cx + side / 2;
-      py1 = py0 - side;
-    }
     this.xlim = xlim; this.ylim = ylim;
     this.px0 = px0; this.px1 = px1; this.py0 = py0; this.py1 = py1;
     return this;
@@ -561,17 +431,6 @@ class RPlot {
       if (o.pch === 21) { c.fillStyle = o.fill || "white"; c.fill(); c.stroke(); } else c.fill();
     }
   }
-  // axis-aligned rectangle in user coordinates — the tea scenario's bars
-  rect(x0, y0, x1, y1, o = {}) {
-    const c = this.ctx;
-    const px = this.X(x0), py = this.Y(y1);
-    const w = this.X(x1) - px, hgt = this.Y(y0) - py;
-    if (o.col) { c.fillStyle = o.col; c.fillRect(px, py, w, hgt); }
-    if (o.border) {
-      c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; c.setLineDash([]);
-      c.strokeRect(px, py, w, hgt);
-    }
-  }
   segments(x0, y0, x1, y1, o = {}) {
     const c = this.ctx;
     c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
@@ -603,19 +462,6 @@ class RPlot {
     const bottom = pts.slice().reverse().map((p) => [p[0], baseline]);
     const all = top.concat(bottom);
     this.polygon(all.map((p) => p[0]), all.map((p) => p[1]), o);
-  }
-  arrow(x0, y0, x1, y1, o = {}) {
-    const c = this.ctx;
-    this.segments(x0, y0, x1, y1, o);
-    const P0 = [this.X(x0), this.Y(y0)], P1 = [this.X(x1), this.Y(y1)];
-    const len = o.length || 8;
-    const ang = Math.atan2(P1[1] - P0[1], P1[0] - P0[0]);
-    const spread = (o.angle || 20) * Math.PI / 180;
-    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1;
-    c.beginPath();
-    c.moveTo(P1[0], P1[1]); c.lineTo(P1[0] - len * Math.cos(ang - spread), P1[1] - len * Math.sin(ang - spread));
-    c.moveTo(P1[0], P1[1]); c.lineTo(P1[0] - len * Math.cos(ang + spread), P1[1] - len * Math.sin(ang + spread));
-    c.stroke();
   }
   static ticks(lo, hi, n = 5) {
     const span = hi - lo;
@@ -853,7 +699,6 @@ function h(html) {
   return t.content.firstElementChild;
 }
 const $ = (sel, root) => (root || document).querySelector(sel);
-const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
 
 function slider(id, label, min, max, value, step, fmtFn) {
   const d = document.createElement("div");
@@ -866,27 +711,7 @@ function slider(id, label, min, max, value, step, fmtFn) {
   show();
   return d;
 }
-function select(id, label, choices, selected) {
-  const opts = choices.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(selected) ? " selected" : ""}>${esc(t)}</option>`).join("");
-  return h(`<div class="ctl"><label for="${id}">${label}</label><select id="${id}">${opts}</select></div>`);
-}
-function checkbox(id, label, checked) {
-  return h(`<div class="ctl checkbox"><label><input type="checkbox" id="${id}"${checked ? " checked" : ""}> ${label}</label></div>`);
-}
-function radios(name, label, choices, selected, stacked) {
-  const items = choices.map(([v, t]) =>
-    `<label><input type="radio" name="${name}" value="${esc(v)}"${v === selected ? " checked" : ""}> ${esc(t)}</label>`).join("");
-  return h(`<div class="ctl"><label>${label}</label><div class="radio-row${stacked ? " stacked" : ""}">${items}</div></div>`);
-}
 function helpText(str) { return h(`<p class="help-text">${str}</p>`); }
-function numberInput(id, label, value, min, max, step) {
-  return h(`<div class="ctl"><label for="${id}">${label}</label>
-    <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}"></div>`);
-}
-function readonlyRow(label, value, id, note) {
-  return h(`<div class="ctl"><label>${label}</label>
-    <div class="readonly-val"${id ? ` id="${id}"` : ''}>${value}${note ? ` <span class="ro-note">${note}</span>` : ''}</div></div>`);
-}
 // update a slider's position and its printed value together
 function setSliderValue(id, v, fmtFn) {
   const e = document.getElementById(id);
@@ -895,47 +720,20 @@ function setSliderValue(id, v, fmtFn) {
   const out = document.getElementById(id + '_val');
   if (out) out.textContent = fmtFn ? fmtFn(+v) : v;
 }
-const val = (id) => { const e = document.getElementById(id); return e ? e.value : null; };
-const num = (id) => +val(id);
-const chk = (id) => { const e = document.getElementById(id); return e ? e.checked : false; };
-const radioVal = (name) => { const e = document.querySelector(`input[name="${name}"]:checked`); return e ? e.value : null; };
 </script>
 <script>
 /* ============================================================================
-   Shared state and the pieces every scenario uses.
-
-   The four scenarios differ in what the data look like — a sample mean, a
-   2x2 table of forecasts, a count of cups — but they are all asked the same
-   question, and they all answer it with the same three-way verdict. Keeping
-   the classification, the colours and the table shape here is what makes the
-   comparison across scenarios legible.
+   State, and the pieces the severity calculation is judged by.
    ==========================================================================*/
 
+const MU0 = 150;   // the standard the plant is held to, in °F
+
 const State = {
-  scenario: 'water',
-
-  /* The two continuous scenarios are the same test with different framing, so
-     they run the same code — but they keep separate copies of the settings,
-     so that fiddling with the custom test does not silently rewrite the water
-     plant example you came in on. Water pins μ₀ at 150; custom exposes it. */
-  cont: {
-    water:  { observedMean: 152, claimMu: 153, alpha: 0.025, n: 100, sigma: 10, mu0: 150 },
-    custom: { observedMean: 152, claimMu: 153, alpha: 0.025, n: 100, sigma: 10, mu0: 150 },
-  },
-
-  // Finley's tornado forecasts, 1884-1891
-  tp: 28, tn: 2680, fp: 72, fn: 23,
-  claimTpr: 0.5,
-  /* The R original opened on FPR < 0.1. With a standard error of 0.003 that
-     claim clears the observed rate by some twenty-four standard errors — it
-     passes trivially and shows nothing. 0.03 sits about where the question is
-     actually live. */
-  claimFpr: 0.03,
-
-  // Fisher's lady tasting tea: j = milk-first cups correctly identified, 0..4
-  teaCorrect: 4,
-  teaClaim: 0.75,
-
+  observedMean: 152,
+  claimMu: 153,
+  alpha: 0.025,
+  n: 100,
+  sigma: 10,
 };
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
@@ -943,9 +741,8 @@ const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 /* Round to a slider's step so that dragging and the slider agree on the value.
    The trailing toFixed clears the binary-fraction drift that would otherwise
    leave 151.2 stored as 151.20000000000002 and fail an equality test in the
-   tables. */
+   table. */
 const snap = (v, step) => +(Math.round(v / step) * step).toFixed(6);
-
 
 /* ------------------------------------------------------------ VERDICTS --- */
 
@@ -969,42 +766,21 @@ const SEV_KEY = `<p class="help-text">Pass &ge; 0.84 &nbsp;&middot;&nbsp; Weak &
   &nbsp;&middot;&nbsp; below that the claim is <em>BENT</em> — the data would look like this
   even if it were false.</p>`;
 
-function severityBar(sev) {
-  const pct = Math.round(Math.max(0, Math.min(1, sev)) * 100);
-  return `<div class="severity-bar" style="background: linear-gradient(to right,
-    #4caf50 ${pct}%, #eee ${pct}%);"></div>`;
-}
-
 // the headline readout: the number first, everything else in support of it
 function severityReadout(claimHtml, sev, extraHtml) {
   const [cls, level] = severityClass(sev);
+  const pct = Math.round(clamp(sev, 0, 1) * 100);
   return `<div class="severity-box ${cls}">
     <div>${claimHtml}</div>
     <div class="sev-headline">${Number.isFinite(sev) ? rround(sev, 3) : '—'}<span
       class="sev-level">${level}</span></div>
-    ${severityBar(sev)}
+    <div class="severity-bar" style="background: linear-gradient(to right,
+      #4caf50 ${pct}%, #eee ${pct}%);"></div>
     ${extraHtml || ''}
   </div>`;
 }
 
-/* A disclosure. The tables are the least readable form of the answer and the
-   plots are the most, so the numbers live behind a click — present for anyone
-   who wants to check them, absent for everyone who does not. The inner div is
-   what gets re-rendered, so the open/closed state survives every redraw. */
-function foldedNumbers(summary) {
-  return h(`<details class="fold"><summary>${summary}</summary>
-    <div class="fold-body"></div></details>`);
-}
-
 /* -------------------------------------------------------------- COLORS --- */
-
-function hexToRgb(hex) {
-  const m = hex.replace('#', '');
-  const full = m.length === 3 ? m.split('').map((c) => c + c).join('') : m;
-  const n = parseInt(full, 16);
-  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
-}
-function rgba(hex, a) { const [r, g, b] = hexToRgb(hex); return `rgba(${r},${g},${b},${a})`; }
 
 /* Red, amber and green belong to severity and to nothing else on this page.
    The rejection region — which is about the test's verdict, not about how well
@@ -1017,9 +793,18 @@ const COL = {
   severity:  '#2e7d32',
   reject:    '#78909c',   // the rejection region, deliberately inert
   pass:      '#2e7d32',
-  weak:      '#f9a825',
   bent:      '#c62828',
 };
+
+function hexToRgb(hex) {
+  const m = hex.replace('#', '');
+  const full = m.length === 3 ? m.split('').map((c) => c + c).join('') : m;
+  const n = parseInt(full, 16);
+  return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
+}
+function rgba(hex, a) { const [r, g, b] = hexToRgb(hex); return `rgba(${r},${g},${b},${a})`; }
+
+/* --------------------------------------------------------------- PLOTS --- */
 
 /* Where to put the value label so it clears both reference lines. A number
    sitting on top of the 0.84 rule is exactly the number you most want to read
@@ -1031,16 +816,14 @@ function severityLabelY(sev) {
     || clamp(sev + 0.1, 0.06, 0.95);
 }
 
-// horizontal reference lines drawn on every severity curve
+// the two horizontal reference lines on the severity curve
 function severityBenchmarks(pl, o = {}) {
   pl.abline({ h: 0.84, col: COL.pass, lwd: 1.2, lty: 3 });
   pl.abline({ h: 0.5, col: COL.bent, lwd: 1.2, lty: 3 });
-  if (o.labels !== false) {
-    const x = o.at !== undefined ? o.at : pl.xlim[1];
-    const adj = o.adj !== undefined ? o.adj : 1;
-    pl.text(x, 0.885, 'passes severely (0.84)', { col: COL.pass, adj, cex: 0.64 });
-    pl.text(x, 0.455, 'BENT below 0.5', { col: COL.bent, adj, cex: 0.64 });
-  }
+  const x = o.at !== undefined ? o.at : pl.xlim[1];
+  const adj = o.adj !== undefined ? o.adj : 1;
+  pl.text(x, 0.885, 'passes severely (0.84)', { col: COL.pass, adj, cex: 0.64 });
+  pl.text(x, 0.455, 'BENT below 0.5', { col: COL.bent, adj, cex: 0.64 });
 }
 
 // shade the area under ys[i0..i1) down to a baseline
@@ -1067,123 +850,80 @@ function seqBy(from, to, step) {
   for (let v = from; v <= to + step * 1e-6; v += step) out.push(+v.toFixed(10));
   return out;
 }
-
-/* ---------------------------------------------------- BAYES FACTOR KEY --- */
-
-// Jeffreys' grades, stated in terms of BF10 (evidence for H1 over H0)
-function bfInterpretation(bf10) {
-  if (!Number.isFinite(bf10)) return '—';
-  const strength = (b) => b > 100 ? 'Extreme' : b > 30 ? 'Very strong'
-    : b > 10 ? 'Strong' : b > 3 ? 'Moderate' : b > 1 ? 'Weak' : null;
-  if (bf10 >= 1) {
-    const s = strength(bf10);
-    return s ? `${s} evidence for H₁` : 'No evidence either way';
-  }
-  const s = strength(1 / bf10);
-  return s ? `${s} evidence for H₀` : 'No evidence either way';
-}
-
-/* ------------------------------------------------------- SCENARIO HOST --- */
-/* Each scenario module registers a builder here; the switcher in 08_close.js
-   calls it the first time that scenario is shown and never again, so slider
-   positions survive switching away and back. */
-
-const SCENARIOS = {};
-function registerScenario(key, buildFn) { SCENARIOS[key] = { build: buildFn, built: false }; }
 </script>
 <script>
 /* ============================================================================
-   The continuous case: a one-sided z test of H₀: μ ≤ μ₀ with σ known.
+   The water plant: a one-sided z test of H₀: μ ≤ 150 with σ known.
 
-   Water plant. The accident-inspection example Mayo and Spanos use: an
-   ecological standard says water discharged from the plant must not exceed
-   150°F on average. A sample is taken, a mean comes back, and the question is
-   what that mean licenses you to say about the true mean — not merely whether
-   it crossed a line.
+   The accident-inspection example Mayo and Spanos use. An ecological standard
+   says water discharged from the plant must not exceed a mean temperature of
+   150°F. A sample is taken, a mean comes back, and the test returns a verdict.
+   The question this page is about begins after that verdict: what does this
+   particular result license you to say about the true mean?
 
-   Custom test. The same machinery with μ₀ unpinned, so the scenario can be
-   pointed at anything on a similar scale.
-
-   Severity, for a result that rejected H₀ and so indicates μ > μ₁:
+   For a result that rejected H₀ and so indicates μ > μ₁:
        SEV(μ > μ₁) = Pr(X̄ ≤ x̄_obs ; μ = μ₁)
    and for a result that did not:
        SEV(μ ≤ μ₁) = Pr(X̄ ≥ x̄_obs ; μ = μ₁).
 
    Both collapse to Φ(h), where h is the claim's HEADROOM: how far inside the
-   observed result the claim sits, measured in standard errors. That single
-   quantity is what the standardized comparison panel is built on, and it is
-   why the top scale on the severity plot is worth having — a claim can be
+   observed result the claim sits, measured in standard errors. That is why
+   the severity plot carries a second scale along its top — a claim can be
    read either in degrees Fahrenheit or in the units that actually govern it.
    ==========================================================================*/
 
-const CONT_RANGE = {
+const RANGE = {
   observed: { min: 148, max: 156, step: 0.1 },
   claim:    { min: 149, max: 155, step: 0.1 },
 };
 
-function contCompute(key) {
-  const S = State.cont[key];
+function compute() {
+  const S = State;
   const se = S.sigma / Math.sqrt(S.n);
-  const critical = S.mu0 + qnorm(1 - S.alpha) * se;
+  const critical = MU0 + qnorm(1 - S.alpha) * se;
   const reject = S.observedMean >= critical;
   // headroom, in SEs, of a claim at mu1 — positive means the result has room
   // to spare, negative means the claim outruns what was seen
   const hOf = (mu1) => (reject ? S.observedMean - mu1 : mu1 - S.observedMean) / se;
-  const xOfH = (h) => reject ? S.observedMean - h * se : S.observedMean + h * se;
+  const xOfH = (hv) => reject ? S.observedMean - hv * se : S.observedMean + hv * se;
   const sevAt = (mu1) => pnorm(hOf(mu1));
   return { S, se, critical, reject, hOf, xOfH, sevAt,
     severity: sevAt(S.claimMu), h: hOf(S.claimMu) };
 }
 
-/* The R original's BF₀₁: a closed form of the unit-information style
-   comparison for a known-σ z test. It is an approximation and is labelled as
-   one — it is here to show that the Bayesian summary and the severity summary
-   answer different questions, not to be a reference implementation. */
-function contBayesFactor(key) {
-  const S = State.cont[key];
-  const se = S.sigma / Math.sqrt(S.n);
-  const z = (S.observedMean - S.mu0) / se;
-  if (!(S.n > 0)) return NaN;
-  return Math.sqrt(S.n / (S.n + 1)) * Math.exp((z * z) / (2 * (S.n + 1)) - (z * z) / 2);
-}
-
 // both panels share this x-range, which is what lets them be read as one figure
-function contXRange(key) {
-  const { S, se } = contCompute(key);
+function xRange() {
+  const { S, se } = compute();
   return [
-    Math.min(S.mu0 - 4 * se, S.claimMu - 4 * se, S.observedMean - 2 * se),
-    Math.max(S.mu0 + 7 * se, S.claimMu + 4 * se, S.observedMean + 2 * se),
+    Math.min(MU0 - 4 * se, S.claimMu - 4 * se, S.observedMean - 2 * se),
+    Math.max(MU0 + 7 * se, S.claimMu + 4 * se, S.observedMean + 2 * se),
   ];
 }
 
 /* ------------------------------------------------- PANEL 1: THE ANSWER --- */
-/* Severity as a function of the claim. This is the object the whole page is
-   about: not one number but a curve, whose crossings of 0.84 and 0.5 are the
-   claims this result can and cannot bear. */
+/* Severity as a function of the claim. This is the object the page is about:
+   not one number but a curve, whose crossings of 0.84 and 0.5 are the claims
+   this result can and cannot bear. */
 
-function drawContCurve(pl, key) {
-  const { S, se, reject, hOf, xOfH, severity } = contCompute(key);
-  const [xMin, xMax] = contXRange(key);
+function drawCurve(pl) {
+  const { S, reject, hOf, xOfH, severity } = compute();
+  const [xMin, xMax] = xRange();
   const xs = grid(xMin, xMax, 400);
-  const ys = xs.map((x) => pnorm(hOf(x)));
 
   pl.setup({ xlim: [xMin, xMax], ylim: [0, 1], mar: [1.6, 4.4, 5, 1.5] });
-
   severityBenchmarks(pl, { at: reject ? xMax : xMin, adj: reject ? 1 : 0 });
 
-  pl.lines(xs, ys, { col: COL.claim, lwd: 2.8 });
+  pl.lines(xs, xs.map((x) => pnorm(hOf(x))), { col: COL.claim, lwd: 2.8 });
   pl.handle(S.claimMu, { col: COL.observed, lwd: 2, lty: 2 });
   pl.points([S.claimMu], [severity], { col: COL.observed, cex: 2 });
-  pl.text(S.claimMu + (xMax - xMin) * 0.012,
-    severityLabelY(severity), rround(severity, 3),
-    { col: COL.observed, adj: 0, font: 2, cex: 0.86 });
+  pl.text(S.claimMu + (xMax - xMin) * 0.012, severityLabelY(severity),
+    rround(severity, 3), { col: COL.observed, adj: 0, font: 2, cex: 0.86 });
 
   // the standardized scale: the same axis in units of standard error
-  const hs = [-2, -1, 0, 1, 2, 3];
-  const at = hs.map(xOfH).filter((x) => x >= xMin && x <= xMax);
-  const labs = hs.filter((hv) => { const x = xOfH(hv); return x >= xMin && x <= xMax; })
-    .map((hv) => (hv > 0 ? '+' : '') + hv);
-  pl.axisTop({ at, labels: labs });
+  const hs = [-2, -1, 0, 1, 2, 3].filter((hv) => {
+    const x = xOfH(hv); return x >= xMin && x <= xMax;
+  });
+  pl.axisTop({ at: hs.map(xOfH), labels: hs.map((hv) => (hv > 0 ? '+' : '') + hv) });
   pl.text(reject ? xMax : xMin, 0.06, 'headroom, in SE',
     { col: '#888', adj: reject ? 1 : 0, cex: 0.64 });
 
@@ -1196,14 +936,13 @@ function drawContCurve(pl, key) {
 
 /* ------------------------------------------- PANEL 2: WHERE IT COMES FROM --- */
 
-function drawContDensities(pl, key) {
-  const { S, se, critical, reject } = contCompute(key);
-  const [xMin, xMax] = contXRange(key);
+function drawDensities(pl) {
+  const { S, se, critical, reject } = compute();
+  const [xMin, xMax] = xRange();
   const xs = grid(xMin, xMax, 500);
-  const h0 = xs.map((x) => dnorm(x, S.mu0, se));
+  const h0 = xs.map((x) => dnorm(x, MU0, se));
   const claim = xs.map((x) => dnorm(x, S.claimMu, se));
-  const peak = Math.max(...h0);
-  const yMax = peak * 1.3;
+  const yMax = Math.max(...h0) * 1.3;
 
   pl.setup({ xlim: [xMin, xMax], ylim: [0, yMax], mar: [4, 4.4, 2.6, 1.5] });
 
@@ -1230,9 +969,9 @@ function drawContDensities(pl, key) {
     { col: COL.observed, adj: 0, font: 2, cex: 0.72 });
 
   pl.axes(); pl.box();
-  pl.axisLabels(key === 'water' ? 'Mean temperature (°F)' : 'Observed mean', 'Density');
+  pl.axisLabels('Mean temperature (°F)', 'Density');
   pl.legend('topright', {
-    legend: [`H₀: μ = ${rround(S.mu0, 2)}`, `claim: μ = ${rround(S.claimMu, 2)}`],
+    legend: [`H₀: μ = ${MU0}`, `claim: μ = ${rround(S.claimMu, 2)}`],
     col: [COL.null, COL.claim], lty: [1, 2], lwd: [2.2, 2.2],
   });
   pl.subtitle(`n = ${S.n}, σ = ${S.sigma}, SE = ${rround(se, 3)}`, { cex: 0.75 });
@@ -1240,8 +979,8 @@ function drawContDensities(pl, key) {
 
 /* -------------------------------------------------------------- PANELS --- */
 
-function contDecisionHtml(key) {
-  const { S, critical, reject } = contCompute(key);
+function decisionHtml() {
+  const { S, critical, reject } = compute();
   if (reject) {
     return `<div class="result-box reject-h0">
       <strong>Test verdict: reject H₀</strong><br>
@@ -1252,29 +991,17 @@ function contDecisionHtml(key) {
     observed ${rround(S.observedMean, 2)} &lt; critical ${rround(critical, 2)}</div>`;
 }
 
-function contSeverityHtml(key) {
-  const { S, se, reject, severity, h } = contCompute(key);
-  const claim = `<strong>μ ${reject ? '&gt;' : '&le;'} ${rround(S.claimMu, 2)}</strong>`;
-  return severityReadout(claim, severity,
+function severityHtml() {
+  const { S, se, reject, severity, h } = compute();
+  return severityReadout(
+    `<strong>μ ${reject ? '&gt;' : '&le;'} ${rround(S.claimMu, 2)}</strong>`, severity,
     `<span class="help-text" style="margin:0;">headroom ${(h >= 0 ? '+' : '')}${rround(h, 2)} SE
      &nbsp;·&nbsp; SE ${rround(se, 3)}</span>`);
 }
 
-function contBayesHtml(key) {
-  const bf01 = contBayesFactor(key);
-  if (!Number.isFinite(bf01) || bf01 <= 0) return `<div class="result-box neutral-box">—</div>`;
-  return `<div class="result-box neutral-box">
-    <strong>BF₀₁ (approx):</strong> ${rround(bf01, 3)}<br>
-    <strong>BF₁₀ (approx):</strong> ${rround(1 / bf01, 3)}<br>
-    ${bfInterpretation(1 / bf01)}
-    <div class="help-text" style="margin:6px 0 0 0;">A comparison of two hypotheses against each
-    other. Severity instead asks how well one claim withstood the test it was actually put to.</div>
-  </div>`;
-}
-
-function contTableHtml(key) {
-  const { S, reject, sevAt, hOf } = contCompute(key);
-  const mus = seqBy(S.mu0 - 1, S.mu0 + 5, 0.5);
+function tableHtml() {
+  const { S, reject, sevAt, hOf } = compute();
+  const mus = seqBy(MU0 - 1, MU0 + 5, 0.5);
   const nearest = mus.reduce((a, b) =>
     Math.abs(b - S.claimMu) < Math.abs(a - S.claimMu) ? b : a);
   const rows = mus.map((mu1) => {
@@ -1293,14 +1020,14 @@ function contTableHtml(key) {
     <tbody>${rows}</tbody></table></div>${SEV_KEY}`;
 }
 
-function contInterpretationHtml(key) {
-  const { S, se, critical, reject, severity } = contCompute(key);
+function interpretationHtml() {
+  const { S, se, critical, reject, severity } = compute();
   if (reject) {
     return `<p><strong>Rejection case.</strong> The observed mean
       (${rround(S.observedMean, 2)}) reached the critical value
-      (${rround(critical, 2)}), so H₀: μ &le; ${rround(S.mu0, 2)} is rejected. Mayo's advice is to
-      read that as evidence <em>against</em> H₀ and nothing more; what the result licenses
-      positively is a separate question, and the curve above is the answer to it.</p>
+      (${rround(critical, 2)}), so H₀: μ &le; ${MU0} is rejected. Mayo's advice is to read that as
+      evidence <em>against</em> H₀ and nothing more; what the result licenses positively is a
+      separate question, and the curve above is the answer to it.</p>
       <p>Severity for the claim μ &gt; ${rround(S.claimMu, 2)} is
       <strong>${rround(severity, 3)}</strong>: the probability of having seen a mean no larger
       than ${rround(S.observedMean, 2)} if the true mean were exactly ${rround(S.claimMu, 2)}.
@@ -1329,1191 +1056,127 @@ function contInterpretationHtml(key) {
 
 /* --------------------------------------------------------------- BUILD --- */
 
-const ContRefs = {};
+const Refs = {};
 
-function renderCont(key) {
-  const R = ContRefs[key];
-  if (!R) return;
-  drawCanvas(R.curveCanvas);
-  drawCanvas(R.densityCanvas);
-  R.decisionEl.innerHTML = contDecisionHtml(key);
-  R.severityEl.innerHTML = contSeverityHtml(key);
-  R.tableEl.innerHTML = contTableHtml(key);
-  R.bfEl.innerHTML = contBayesHtml(key);
-  R.interpEl.innerHTML = contInterpretationHtml(key);
-  R.seEl.textContent = rround(contCompute(key).se, 3);
+function render() {
+  drawCanvas(Refs.curveCanvas);
+  drawCanvas(Refs.densityCanvas);
+  Refs.decisionEl.innerHTML = decisionHtml();
+  Refs.severityEl.innerHTML = severityHtml();
+  Refs.tableEl.innerHTML = tableHtml();
+  Refs.interpEl.innerHTML = interpretationHtml();
+  Refs.seEl.textContent = rround(compute().se, 3);
 }
 
 // dragging and the sliders are two views of one value, so each updates the other
-function contSetFromDrag(key, which, x) {
-  const S = State.cont[key];
-  const r = CONT_RANGE[which];
+function setFromDrag(which, x) {
+  const r = RANGE[which];
   const v = clamp(snap(x, r.step), r.min, r.max);
-  if (which === 'observed') S.observedMean = v; else S.claimMu = v;
-  setSliderValue(`${key}_${which}`, v, (n) => n.toFixed(1));
-  renderCont(key);
+  if (which === 'observed') State.observedMean = v; else State.claimMu = v;
+  setSliderValue(which, v, (n) => n.toFixed(1));
+  render();
 }
 
-function buildContPanel(key) {
-  const container = $('#panel-' + key);
-  const S = State.cont[key];
-  const id = (s) => `${key}_${s}`;
-  container.innerHTML = '';
-
-  container.appendChild(h(key === 'water'
-    ? `<div>
-      <p>A plant discharges water into a river. The standard it is held to is a mean outflow
-      temperature of no more than 150°F, so the hypothesis under test is H₀: μ &le; 150, and the
-      test rejects when the sample mean runs high enough that a null this size would rarely
-      produce it.</p>
-      <p>A verdict comes back either way. The interesting question begins after it, and the top
-      panel answers it for every claim at once: drag the claim line and read its severity off the
-      curve.</p>
-    </div>`
-    : `<div>
-      <p>The same one-sided z test with σ known, but with the null value unpinned. Set μ₀, the
-      sample size and the significance level to whatever test you are trying to think about, then
-      read off which claims that test's result would license.</p>
-      <p>The two settings worth moving together are n and the claim. Severity depends on the gap
-      between the observed mean and the claimed mean measured <em>in standard errors</em>, so
-      shrinking SE by raising n makes the same nominal claim far more sharply tested.</p>
-    </div>`));
-
-  const row = h('<div class="row"></div>');
-  const sideCol = h('<div class="col col-4"><div class="sidebar"></div></div>');
-  const mainCol = h('<div class="col col-8"></div>');
-  const side = sideCol.querySelector('.sidebar');
+function build() {
+  const side = $('#controls'), main = $('#figure');
 
   side.appendChild(h('<h4>Severity of the claim</h4>'));
-  const severityEl = h('<div></div>'); side.appendChild(severityEl);
+  Refs.severityEl = h('<div></div>'); side.appendChild(Refs.severityEl);
 
   side.appendChild(h('<hr>'));
   side.appendChild(h('<h4>The claim, and the result</h4>'));
   side.appendChild(helpText('Both of these can be dragged directly on the plots.'));
 
-  const addSlider = (which, label) => {
-    const r = CONT_RANGE[which];
-    const el = slider(id(which), label, r.min, r.max,
-      which === 'observed' ? S.observedMean : S.claimMu, r.step, (v) => v.toFixed(1));
+  [['claim', 'Claim μ₁:'], ['observed', 'Observed mean:']].forEach(([which, label]) => {
+    const r = RANGE[which];
+    const el = slider(which, label, r.min, r.max,
+      which === 'observed' ? State.observedMean : State.claimMu, r.step, (v) => v.toFixed(1));
     el.querySelector('input').addEventListener('input', (e) => {
-      if (which === 'observed') S.observedMean = +e.target.value;
-      else S.claimMu = +e.target.value;
-      renderCont(key);
+      if (which === 'observed') State.observedMean = +e.target.value;
+      else State.claimMu = +e.target.value;
+      render();
     });
     side.appendChild(el);
-  };
-  addSlider('claim', 'Claim μ₁:');
-  addSlider('observed', 'Observed mean:');
+  });
 
   side.appendChild(h('<hr>'));
   side.appendChild(h('<h4>The test</h4>'));
-  if (key === 'custom') {
-    const el = slider(id('mu0'), 'Null hypothesis μ₀:', 145, 155, S.mu0, 1, (v) => v.toFixed(0));
-    el.querySelector('input').addEventListener('input', (e) => {
-      S.mu0 = +e.target.value; renderCont(key);
-    });
-    side.appendChild(el);
-  } else {
-    side.appendChild(h(`<div class="ctl"><label>Null hypothesis μ₀</label>
-      <div class="readonly-val">150°F <span class="ro-note">the standard</span></div></div>`));
-  }
+  side.appendChild(h(`<div class="ctl"><label>Null hypothesis μ₀</label>
+    <div class="readonly-val">${MU0}°F <span class="ro-note">the standard</span></div></div>`));
 
   /* One precision control. n and σ enter only through SE, and n is the knob an
      experimenter actually has, so σ goes behind a disclosure and SE is shown
      as a readout rather than being set twice over. */
-  const nSl = slider(id('n'), 'Sample size (n):', 10, 500, S.n, 10, (v) => v.toFixed(0));
+  const nSl = slider('n', 'Sample size (n):', 10, 500, State.n, 10, (v) => v.toFixed(0));
   nSl.querySelector('input').addEventListener('input', (e) => {
-    S.n = +e.target.value; renderCont(key);
+    State.n = +e.target.value; render();
   });
   side.appendChild(nSl);
+
   const seRow = h(`<div class="ctl"><label>Standard error</label>
     <div class="readonly-val"><span class="se-val"></span>
     <span class="ro-note">σ ⁄ √n — the unit severity is measured in</span></div></div>`);
   side.appendChild(seRow);
+  Refs.seEl = seRow.querySelector('.se-val');
 
   const sigmaFold = h('<details class="fold"><summary>Population SD</summary></details>');
-  const sigSl = slider(id('sigma'), 'σ:', 1, 20, S.sigma, 1, (v) => v.toFixed(0));
+  const sigSl = slider('sigma', 'σ:', 1, 20, State.sigma, 1, (v) => v.toFixed(0));
   sigSl.querySelector('input').addEventListener('input', (e) => {
-    S.sigma = +e.target.value; renderCont(key);
+    State.sigma = +e.target.value; render();
   });
   sigmaFold.appendChild(sigSl);
   side.appendChild(sigmaFold);
 
-  const alphaSl = slider(id('alpha'), 'Significance level α:', 0.01, 0.10, S.alpha, 0.005,
+  const alphaSl = slider('alpha', 'Significance level α:', 0.01, 0.10, State.alpha, 0.005,
     (v) => v.toFixed(3));
   alphaSl.querySelector('input').addEventListener('input', (e) => {
-    S.alpha = +e.target.value; renderCont(key);
+    State.alpha = +e.target.value; render();
   });
   side.appendChild(alphaSl);
 
   side.appendChild(h('<hr>'));
-  const decisionEl = h('<div></div>'); side.appendChild(decisionEl);
-
-  const bfFold = h('<details class="fold"><summary>Bayes factor</summary><div class="fold-body"></div></details>');
-  side.appendChild(bfFold);
+  Refs.decisionEl = h('<div></div>'); side.appendChild(Refs.decisionEl);
 
   // both canvases share an x-range and their left and right margins, so the
   // two panels line up column for column and read as a single figure
   const figure = h('<div class="plot-container"></div>');
-  const curveCanvas = mkCanvas(250, (pl) => drawContCurve(pl, key), {
+  Refs.curveCanvas = mkCanvas(250, drawCurve, {
     drag: {
-      handles: () => [{ x: State.cont[key].claimMu, key: 'claim' }],
-      onDrag: (which, x) => contSetFromDrag(key, which, x),
+      handles: () => [{ x: State.claimMu, key: 'claim' }],
+      onDrag: setFromDrag,
     },
   });
-  const densityCanvas = mkCanvas(320, (pl) => drawContDensities(pl, key), {
+  Refs.densityCanvas = mkCanvas(320, drawDensities, {
     drag: {
       handles: () => [
-        { x: State.cont[key].observedMean, key: 'observed' },
-        { x: State.cont[key].claimMu, key: 'claim' },
+        { x: State.observedMean, key: 'observed' },
+        { x: State.claimMu, key: 'claim' },
       ],
-      onDrag: (which, x) => contSetFromDrag(key, which, x),
+      onDrag: setFromDrag,
     },
   });
-  figure.appendChild(curveCanvas);
-  figure.appendChild(densityCanvas);
-  figure.appendChild(h('<p class="plot-hint">Drag the marked lines to move the claim or the observed result.</p>'));
-  mainCol.appendChild(figure);
+  figure.appendChild(Refs.curveCanvas);
+  figure.appendChild(Refs.densityCanvas);
+  figure.appendChild(h(`<p class="plot-hint">Drag the marked lines to move the claim or the
+    observed result.</p>`));
+  main.appendChild(figure);
 
-  const tableFold = foldedNumbers('Show the numbers');
-  mainCol.appendChild(tableFold);
+  /* The table is the least readable form of the answer and the plots the most,
+     so the numbers live behind a click. The inner div is what gets re-rendered,
+     so the open/closed state survives every redraw. */
+  const fold = h(`<details class="fold"><summary>Show the numbers</summary>
+    <div class="fold-body"></div></details>`);
+  main.appendChild(fold);
+  Refs.tableEl = fold.querySelector('.fold-body');
 
-  mainCol.appendChild(h('<h4>Interpretation</h4>'));
-  const interpEl = h('<div></div>'); mainCol.appendChild(interpEl);
+  main.appendChild(h('<h4>Interpretation</h4>'));
+  Refs.interpEl = h('<div></div>'); main.appendChild(Refs.interpEl);
 
-  row.appendChild(sideCol); row.appendChild(mainCol);
-  container.appendChild(row);
-
-  ContRefs[key] = {
-    curveCanvas, densityCanvas, decisionEl, severityEl, interpEl,
-    tableEl: tableFold.querySelector('.fold-body'),
-    bfEl: bfFold.querySelector('.fold-body'),
-    seEl: seRow.querySelector('.se-val'),
-  };
-  renderCont(key);
+  render();
 }
-
-registerScenario('water', () => buildContPanel('water'));
-registerScenario('custom', () => buildContPanel('custom'));
 </script>
 <script>
-/* ============================================================================
-   Finley's tornado forecasts, 1884-1891.
-
-   Finley reported 2803 forecasts of which he called 96.6% correctly, and
-   presented that as a success. Peirce pointed out in Science the same year
-   that a forecaster who simply never predicted a tornado would have scored
-   higher still, because tornadoes are rare — and proposed the measure now
-   called the Peirce Skill Score, TPR − FPR, which is immune to that trick.
-
-   Severity is the natural next question. TPR and FPR are estimates from
-   finite counts, so each has a sampling distribution; a claim about the true
-   rate behind them can be tested severely or not at all. Two claims are
-   assessed here, in the two directions that matter:
-       SEV(TPR > t) = Pr(TPR̂ ≤ TPR̂_obs ; TPR = t)
-       SEV(FPR < f) = Pr(FPR̂ ≥ FPR̂_obs ; FPR = f)
-   Both use the normal approximation to the binomial proportion, which is
-   sound for the 2752 non-tornado occasions and rough for the 51 tornadoes —
-   and that asymmetry is the whole lesson of the panel.
-   ==========================================================================*/
-
-function tornadoMetrics() {
-  const S = State;
-  const tp = S.tp, tn = S.tn, fp = S.fp, fn = S.fn;
-  const total = tp + tn + fp + fn;
-  const rate = (a, b) => (a + b) === 0 ? NaN : a / (a + b);
-
-  const tpr = rate(tp, fn);           // sensitivity: caught tornadoes / tornadoes
-  const fnr = rate(fn, tp);
-  const tnr = rate(tn, fp);           // specificity
-  const fpr = rate(fp, tn);           // false alarms / calm days
-  const ppv = rate(tp, fp);           // precision
-  const npv = rate(tn, fn);
-  const accuracy = total === 0 ? NaN : (tp + tn) / total;
-
-  // binomial standard errors, floored so a degenerate 0 or 1 rate still plots
-  const seOf = (p, n) => (!Number.isFinite(p) || n <= 0) ? NaN
-    : Math.max(Math.sqrt(p * (1 - p) / n), 1e-6);
-  const tprSe = seOf(tpr, tp + fn);
-  const fprSe = seOf(fpr, fp + tn);
-
-  return { tp, tn, fp, fn, total, tpr, fnr, tnr, fpr, ppv, npv, accuracy, tprSe, fprSe,
-    pss: (Number.isFinite(tpr) && Number.isFinite(fpr)) ? tpr - fpr : NaN,
-    nPos: tp + fn, nNeg: fp + tn };
-}
-
-// headroom in SEs, then severity — the same two steps as every other scenario
-const hTpr = (m, claim) => (m.tpr - claim) / m.tprSe;
-const hFpr = (m, claim) => (claim - m.fpr) / m.fprSe;
-const sevTpr = (m, claim) => pnorm(hTpr(m, claim));
-const sevFpr = (m, claim) => pnorm(hFpr(m, claim));
-
-/* ------------------------------------------------- PANEL 1: THE ANSWER --- */
-
-/* One panel per rate, each zoomed to four standard errors either side of what
-   was observed. Drawn together on a common [0,1] axis the false alarm curve
-   would be a step pinned at 1 across the whole width, which is unreadable and
-   says less than it seems to. Zoomed, both are clean sigmoids of the same
-   shape, and the message moves into the axes: sensitivity is in play across
-   half the unit interval, the false alarm rate across two percentage points.
-   The width of each window IS the precision of that estimate. */
-const TOR_SPEC = {
-  tpr: {
-    col: '#2e7d32', label: 'TPR', sign: '>', state: 'claimTpr',
-    centre: (m) => m.tpr, se: (m) => m.tprSe, sev: sevTpr, h: hTpr,
-    title: 'Claims about sensitivity',
-    note: (m) => `from ${m.nPos} tornadoes · SE ${rround(m.tprSe, 3)}`,
-    // the control's granularity has to match the estimate's precision, or the
-    // claim jumps several standard errors at a time
-    sliderId: 'tor_claim_tpr', max: 1, step: 0.01, dp: 2,
-  },
-  fpr: {
-    col: '#b71c1c', label: 'FPR', sign: '<', state: 'claimFpr',
-    centre: (m) => m.fpr, se: (m) => m.fprSe, sev: sevFpr, h: hFpr,
-    title: 'Claims about false alarms',
-    note: (m) => `from ${m.nNeg} calm occasions · SE ${rround(m.fprSe, 4)}`,
-    sliderId: 'tor_claim_fpr', max: 0.3, step: 0.001, dp: 3,
-  },
-};
-
-function drawTornadoCurve(pl, which) {
-  const sp = TOR_SPEC[which], m = tornadoMetrics();
-  const c = sp.centre(m), se = sp.se(m);
-  if (!Number.isFinite(c) || !Number.isFinite(se)) { pl.setup({}); return; }
-
-  const xMin = Math.max(0, c - 4 * se), xMax = Math.min(1, c + 4 * se);
-  const xs = grid(xMin, xMax, 300);
-  const ys = xs.map((v) => sp.sev(m, v));
-  const claim = clamp(State[sp.state], xMin, xMax);
-  const sev = sp.sev(m, State[sp.state]);
-  const rising = which === 'fpr';
-
-  pl.setup({ xlim: [xMin, xMax], ylim: [0, 1], mar: [4, 4.2, 5, 1.2] });
-  // put the benchmark captions on whichever side the curve has left empty
-  severityBenchmarks(pl, { at: rising ? xMin : xMax, adj: rising ? 0 : 1 });
-
-  pl.lines(xs, ys, { col: sp.col, lwd: 2.8 });
-  pl.handle(claim, { col: COL.observed, lwd: 2, lty: 2 });
-  pl.points([claim], [sev], { col: COL.observed, cex: 2 });
-
-  const dx = (xMax - xMin) * 0.03;
-  const toFlat = rising ? -dx : dx;   // label into the low, empty side
-  pl.text(claim + toFlat, severityLabelY(sev), rround(sev, 3),
-    { col: COL.observed, adj: rising ? 1 : 0, font: 2, cex: 0.82 });
-
-  pl.axes({ nx: 4 }); pl.box();
-  pl.axisLabels(`Claim: ${sp.label} ${sp.sign} …`, 'Severity');
-  pl.title(sp.title, { cex: 0.9 });
-  pl.subtitle(sp.note(m), { cex: 0.72 });
-}
-
-/* ------------------------------------------- PANEL 2: WHERE IT COMES FROM --- */
-
-function drawTornadoDistns(pl) {
-  const S = State, m = tornadoMetrics();
-  const tprC = Number.isFinite(m.tpr) ? m.tpr : 0;
-  const fprC = Number.isFinite(m.fpr) ? m.fpr : 0;
-  const tprSe = Number.isFinite(m.tprSe) ? m.tprSe : 1e-6;
-  const fprSe = Number.isFinite(m.fprSe) ? m.fprSe : 1e-6;
-
-  const xt = grid(Math.max(0, tprC - 4 * tprSe), Math.min(1, tprC + 4 * tprSe), 400);
-  const xf = grid(Math.max(0, fprC - 4 * fprSe), Math.min(1, fprC + 4 * fprSe), 400);
-  const yt = xt.map((x) => dnorm(x, tprC, tprSe));
-  let yf = xf.map((x) => dnorm(x, fprC, fprSe));
-
-  /* The FPR estimate rests on 2752 occasions and the TPR estimate on 51, so
-     the FPR density is roughly twenty times taller and would flatten the TPR
-     curve into the axis. Rescale it to 80% of the TPR peak: the shapes stay
-     comparable, the heights no longer mean anything. */
-  const peakT = Math.max(...yt), peakF = Math.max(...yf);
-  const scale = peakF > 0 ? (peakT / peakF) * 0.8 : 1;
-  yf = yf.map((y) => y * scale);
-  const yMax = peakT * 1.28;
-
-  pl.setup({ xlim: [0, 1], ylim: [0, yMax], mar: [4, 4.4, 2.4, 1.5] });
-
-  /* Severity regions: outcomes that would have agreed less well with the claim
-     than the observed rate did. The FPR region is there and is too narrow to
-     see, which is exactly the point the panel is making. */
-  fillRegion(pl, xt, yt, 0, cutAt(xt, tprC), 0, rgba(COL.severity, 0.26));
-  fillRegion(pl, xf, yf, cutAt(xf, fprC), xf.length, 0, rgba(COL.severity, 0.26));
-
-  pl.lines(xt, yt, { col: COL.severity, lwd: 2.2 });
-  pl.lines(xf, yf, { col: '#b71c1c', lwd: 2.2, lty: 2 });
-
-  pl.abline({ v: tprC, col: COL.severity, lwd: 1.6 });
-  pl.abline({ v: fprC, col: '#b71c1c', lwd: 1.6 });
-  pl.handle(S.claimTpr, { col: COL.severity, lwd: 1.5, lty: 2 });
-  pl.handle(S.claimFpr, { col: '#b71c1c', lwd: 1.5, lty: 2 });
-
-  pl.text(tprC + 0.015, yMax * 0.9, `observed TPR ${rround(tprC, 3)}`,
-    { col: COL.severity, adj: 0, font: 2, cex: 0.7 });
-  pl.text(fprC + 0.015, yMax * 0.66, `observed FPR ${rround(fprC, 3)}`,
-    { col: '#b71c1c', adj: 0, font: 2, cex: 0.7 });
-
-  pl.axes(); pl.box();
-  pl.axisLabels('Rate', 'Density (FPR rescaled)');
-  pl.subtitle(`TPR from ${m.nPos} tornadoes, SE ${rround(m.tprSe, 3)} · ` +
-    `FPR from ${m.nNeg} calm occasions, SE ${rround(m.fprSe, 4)}`, { cex: 0.72 });
-}
-
-/* --------------------------------------------- PANEL 3: PEIRCE'S POINT --- */
-
-function drawRocPlot(pl) {
-  const m = tornadoMetrics();
-  pl.setup({ xlim: [-0.05, 1.05], ylim: [-0.05, 1.05], mar: [4, 4.4, 5, 1.5],
-    ext: false, square: true });
-
-  pl.abline({ slope: 1, intercept: 0, col: '#aaa', lwd: 1.5, lty: 2 });
-  pl.text(0.62, 0.55, 'random guessing', { col: '#888', cex: 0.7 });
-
-  pl.points([0], [1], { col: COL.null, cex: 1.6 });
-  pl.text(0.04, 1.0, 'perfect', { col: COL.null, adj: 0, font: 2, cex: 0.72 });
-  pl.points([0], [0], { col: '#78909c', cex: 1.6 });
-  pl.text(0.04, 0.05, 'never predict tornado', { col: '#78909c', adj: 0, cex: 0.72 });
-  pl.points([1], [1], { col: '#78909c', cex: 1.6 });
-  pl.text(0.96, 0.96, 'always predict tornado', { col: '#78909c', adj: 1, cex: 0.72 });
-
-  if (Number.isFinite(m.tpr) && Number.isFinite(m.fpr)) {
-    // the Peirce Skill Score IS this vertical drop to the diagonal
-    pl.segments(m.fpr, m.fpr, m.fpr, m.tpr, { col: COL.observed, lwd: 2.4 });
-    pl.text(m.fpr + 0.03, (m.fpr + m.tpr) / 2, `PSS = ${rround(m.pss, 3)}`,
-      { col: COL.observed, adj: 0, font: 2, cex: 0.8 });
-    pl.points([m.fpr], [m.tpr], { col: COL.observed, cex: 2.2 });
-    pl.text(m.fpr, m.tpr + 0.07, 'Finley', { col: COL.observed, font: 2, cex: 0.85 });
-  }
-
-  pl.axes({ nx: 5, ny: 5 }); pl.box();
-  pl.axisLabels('False positive rate', 'True positive rate');
-  pl.title('ROC space', { cex: 0.95 });
-  pl.subtitle('the skill score is the height above the diagonal', { cex: 0.78 });
-}
-
-/* -------------------------------------------------------------- PANELS --- */
-
-function tornadoPerformanceHtml() {
-  const m = tornadoMetrics();
-  const rows = [
-    ['TPR (sensitivity)', m.tpr, 'tornadoes correctly forecast, of all tornadoes'],
-    ['TNR (specificity)', m.tnr, 'calm days correctly forecast, of all calm days'],
-    ['FPR (false alarm rate)', m.fpr, '1 − specificity'],
-    ['FNR (miss rate)', m.fnr, '1 − sensitivity'],
-    ['PPV (precision)', m.ppv, 'tornadoes, of all tornado forecasts'],
-    ['NPV', m.npv, 'calm, of all calm forecasts'],
-    ['Accuracy', m.accuracy, 'the figure Finley reported'],
-    ['PSS = TPR − FPR', m.pss, 'the figure Peirce proposed instead'],
-  ].map(([name, v, note]) => `<tr>
-      <td class="lbl">${name}</td>
-      <td>${Number.isFinite(v) ? rround(v, 3) : '—'}</td>
-      <td class="lbl" style="color:#666;">${note}</td>
-    </tr>`).join('');
-  return `<div class="table-scroll"><table class="tbl">
-    <thead><tr><th>Metric</th><th>Value</th><th>Reading</th></tr></thead>
-    <tbody>${rows}</tbody></table></div>`;
-}
-
-/* The four cells are shaded on one neutral ramp rather than four categorical
-   colours: on this page a colour means severity, and the matrix is data. */
-function tornadoMatrixHtml() {
-  const m = tornadoMetrics();
-  const denomPos = Math.max(m.nPos, 1), denomNeg = Math.max(m.nNeg, 1);
-  const cell = (name, count, prop) =>
-    `<td style="background-color: rgba(69,90,100,${(0.08 + 0.42 * prop).toFixed(3)});">
-      <span class="cell-name">${name}</span>${count}</td>`;
-  return `<table class="conf-table">
-    <tr>
-      <th class="label-cell"></th>
-      <th class="label-cell">Tornado occurred</th>
-      <th class="label-cell">No tornado</th>
-    </tr>
-    <tr>
-      <th class="label-cell">Forecast: tornado</th>
-      ${cell('hit', m.tp, m.tp / denomPos)}
-      ${cell('false alarm', m.fp, m.fp / denomNeg)}
-    </tr>
-    <tr>
-      <th class="label-cell">Forecast: none</th>
-      ${cell('miss', m.fn, m.fn / denomPos)}
-      ${cell('correct rejection', m.tn, m.tn / denomNeg)}
-    </tr>
-  </table>
-  <p class="help-text">${m.total} occasions, ${m.nPos} of them tornadoes
-  (${rround(100 * m.nPos / Math.max(m.total, 1), 2)}%).</p>`;
-}
-
-function tornadoSummaryHtml() {
-  const m = tornadoMetrics();
-  const alwaysNo = m.tn + m.fp;
-  return `<div class="result-box neutral-box">
-    <strong>Finley's record</strong><br>
-    TPR ${Number.isFinite(m.tpr) ? rround(m.tpr, 3) : '—'} ·
-    FPR ${Number.isFinite(m.fpr) ? rround(m.fpr, 3) : '—'}<br>
-    Accuracy ${Number.isFinite(m.accuracy) ? rround(m.accuracy, 3) : '—'} ·
-    PSS ${Number.isFinite(m.pss) ? rround(m.pss, 3) : '—'}
-    <div class="help-text" style="margin:6px 0 0 0;">Forecasting &ldquo;no tornado&rdquo; every
-    time would have scored ${rround(alwaysNo / Math.max(m.total, 1), 3)} accuracy and 0 skill.</div>
-  </div>`;
-}
-
-function tornadoSeverityHtml() {
-  const S = State, m = tornadoMetrics();
-  const st = sevTpr(m, S.claimTpr), sf = sevFpr(m, S.claimFpr);
-  const note = (hv) => `<span class="help-text" style="margin:0;">headroom
-    ${(hv >= 0 ? '+' : '')}${rround(hv, 2)} SE</span>`;
-  return severityReadout(`<strong>TPR &gt; ${rround(S.claimTpr, 2)}</strong>`, st,
-      note(hTpr(m, S.claimTpr)))
-    + severityReadout(`<strong>FPR &lt; ${rround(S.claimFpr, 3)}</strong>`, sf,
-      note(hFpr(m, S.claimFpr)));
-}
-
-function tornadoTablesHtml() {
-  const S = State, m = tornadoMetrics();
-  const mk = (vals, hFn, sevFn, current, fmtClaim) => {
-    const rows = vals.map((v) => {
-      const sev = sevFn(m, v), hv = hFn(m, v);
-      const [assess, cls] = assessLabel(sev);
-      return `<tr class="${Math.abs(v - current) < 1e-9 ? 'claim-current' : ''}">
-        <td class="lbl">${fmtClaim(v)}</td>
-        <td>${Number.isFinite(hv) ? (hv >= 0 ? '+' : '') + rround(hv, 2) : '—'}</td>
-        <td>${Number.isFinite(sev) ? rround(sev, 3) : '—'}</td>
-        <td class="assess ${cls}">${assess}</td></tr>`;
-    }).join('');
-    return `<div class="table-scroll"><table class="tbl">
-      <thead><tr><th>Claim</th><th>Headroom (SE)</th><th>Severity</th><th>Assessment</th></tr></thead>
-      <tbody>${rows}</tbody></table></div>`;
-  };
-  return `<div class="row">
-    <div class="col col-6"><h5>Claims about sensitivity</h5>
-      ${mk(seqBy(0.1, 0.9, 0.1), hTpr, sevTpr, +S.claimTpr.toFixed(10),
-        (v) => `TPR &gt; ${rround(v, 2)}`)}</div>
-    <div class="col col-6"><h5>Claims about the false alarm rate</h5>
-      ${mk(seqBy(0.015, 0.05, 0.005), hFpr, sevFpr, +S.claimFpr.toFixed(10),
-        (v) => `FPR &lt; ${rround(v, 3)}`)}</div>
-  </div>${SEV_KEY}
-  <h5>Performance metrics</h5>${tornadoPerformanceHtml()}`;
-}
-
-function tornadoInterpretationHtml() {
-  const S = State, m = tornadoMetrics();
-  const st = sevTpr(m, S.claimTpr), sf = sevFpr(m, S.claimFpr);
-  const naive = m.total === 0 ? NaN : (m.tn + m.fp) / m.total;
-  return `<p><strong>The base rate problem.</strong> ${m.nPos} of ${m.total} occasions were
-    tornadoes — ${rround(100 * m.nPos / Math.max(m.total, 1), 2)}%. Finley's accuracy of
-    ${rround(m.accuracy, 3)} sounds impressive until you notice that forecasting no tornado every
-    single time scores ${rround(naive, 3)}, with no skill whatever. Accuracy is inflated by class
-    imbalance; the Peirce Skill Score, TPR − FPR = <strong>${rround(m.pss, 3)}</strong>, is not,
-    because it weights performance on the two classes equally.</p>
-    <p><strong>What the record licenses.</strong> Skill scores are point estimates from finite
-    counts, and severity asks what the counts support. The claim TPR &gt;
-    ${rround(S.claimTpr, 2)} passes with severity
-    <strong>${Number.isFinite(st) ? rround(st, 3) : '—'}</strong>; the claim FPR &lt;
-    ${rround(S.claimFpr, 3)} with <strong>${Number.isFinite(sf) ? rround(sf, 3) : '—'}</strong>.
-    The two curves have the same shape, and the asymmetry is entirely in their horizontal
-    scales. Sensitivity is undetermined across half the unit interval, because 51 tornadoes pin
-    nothing down; the false alarm rate is settled within about two percentage points, because
-    2752 calm occasions pin it very tightly indeed. Read on a common axis the second curve would
-    be a vertical step. Rare events are precisely the ones you learn least about, and the width
-    of each window says so directly.</p>
-    <p class="note-block">The normal approximation to a binomial proportion is used throughout.
-    It is comfortable for the ${m.nNeg}-occasion FPR and strained for the ${m.nPos}-occasion TPR,
-    so the sensitivity severities should be read as indicative rather than exact.</p>`;
-}
-
-/* --------------------------------------------------------------- BUILD --- */
-
-const Tor = {};
-
-function renderTornado() {
-  if (!Tor.tprCanvas) return;
-  drawCanvas(Tor.tprCanvas);
-  drawCanvas(Tor.fprCanvas);
-  drawCanvas(Tor.distCanvas);
-  drawCanvas(Tor.rocCanvas);
-  Tor.summaryEl.innerHTML = tornadoSummaryHtml();
-  Tor.severityEl.innerHTML = tornadoSeverityHtml();
-  Tor.matrixEl.innerHTML = tornadoMatrixHtml();
-  Tor.tablesEl.innerHTML = tornadoTablesHtml();
-  Tor.interpEl.innerHTML = tornadoInterpretationHtml();
-}
-
-function tornadoSetFromDrag(which, x) {
-  const sp = TOR_SPEC[which];
-  const v = clamp(snap(x, sp.step), 0, sp.max);
-  State[sp.state] = v;
-  setSliderValue(sp.sliderId, v, (n) => n.toFixed(sp.dp));
-  renderTornado();
-}
-const tornadoHandles = () => [
-  { x: State.claimTpr, key: 'tpr' },
-  { x: State.claimFpr, key: 'fpr' },
-];
-
-function buildTornadoPanel() {
-  const container = $('#panel-tornado'), S = State;
-  container.innerHTML = '';
-
-  container.appendChild(h(`<div>
-    <p>In 1884 John Finley published the results of a tornado forecasting programme and reported
-    that 96.6% of his forecasts were correct. Charles Peirce replied in <em>Science</em> that the
-    figure was worthless as stated: a forecaster who never predicted a tornado at all would have
-    beaten it, because tornadoes are rare. He proposed measuring skill as the excess of the hit
-    rate over the false alarm rate.</p>
-    <p>The counts below are Finley's. The severity question is what they establish about the
-    <em>true</em> rates behind them — and the two curves answer it very differently, for reasons
-    that have nothing to do with Finley and everything to do with how many of each kind of
-    occasion there were.</p>
-  </div>`));
-
-  const row = h('<div class="row"></div>');
-  const sideCol = h('<div class="col col-4"><div class="sidebar"></div></div>');
-  const mainCol = h('<div class="col col-8"></div>');
-  const side = sideCol.querySelector('.sidebar');
-
-  side.appendChild(h('<h4>Severity of each claim</h4>'));
-  const severityEl = h('<div></div>'); side.appendChild(severityEl);
-
-  side.appendChild(h('<hr>'));
-  side.appendChild(h('<h4>The claims</h4>'));
-  side.appendChild(helpText('Both can be dragged directly on the plots.'));
-  [['tpr', 'Claim: TPR (sensitivity) &gt;'],
-   ['fpr', 'Claim: FPR (1 − specificity) &lt;'],
-  ].forEach(([which, label]) => {
-    const sp = TOR_SPEC[which];
-    const sl = slider(sp.sliderId, label, 0, sp.max, S[sp.state], sp.step,
-      (v) => v.toFixed(sp.dp));
-    sl.querySelector('input').addEventListener('input', (e) => {
-      S[sp.state] = +e.target.value; renderTornado();
-    });
-    side.appendChild(sl);
-  });
-
-  side.appendChild(h('<hr>'));
-  const summaryEl = h('<div></div>'); side.appendChild(summaryEl);
-
-  const countsFold = h('<details class="fold"><summary>Edit the counts</summary></details>');
-  countsFold.appendChild(helpText('2803 occasions, 1884&ndash;1891.'));
-  [['tor_tp', 'Hits:', 'tp'], ['tor_fn', 'Misses:', 'fn'],
-   ['tor_fp', 'False alarms:', 'fp'], ['tor_tn', 'Correct rejections:', 'tn'],
-  ].forEach(([id, label, field]) => {
-    const el = numberInput(id, label, S[field], 0, 100000, 1);
-    el.querySelector('input').addEventListener('input', (e) => {
-      S[field] = Math.max(0, Math.round(+e.target.value || 0)); renderTornado();
-    });
-    countsFold.appendChild(el);
-  });
-  const resetBtn = h('<button class="btn btn-sm">Reset to Finley\'s counts</button>');
-  resetBtn.addEventListener('click', () => {
-    S.tp = 28; S.fn = 23; S.fp = 72; S.tn = 2680;
-    ['tp', 'fn', 'fp', 'tn'].forEach((f) => {
-      const e = document.getElementById('tor_' + f); if (e) e.value = S[f];
-    });
-    renderTornado();
-  });
-  countsFold.appendChild(resetBtn);
-  side.appendChild(countsFold);
-
-  const matrixWrap = h('<div></div>'); mainCol.appendChild(matrixWrap);
-
-  const figure = h('<div class="plot-container"></div>');
-  const curveRow = h('<div class="row"></div>');
-  const tprCol = h('<div class="col col-6"></div>');
-  const fprCol = h('<div class="col col-6"></div>');
-  Tor.tprCanvas = mkCanvas(280, (pl) => drawTornadoCurve(pl, 'tpr'), {
-    drag: {
-      handles: () => [{ x: State.claimTpr, key: 'tpr' }],
-      onDrag: tornadoSetFromDrag,
-    },
-  });
-  Tor.fprCanvas = mkCanvas(280, (pl) => drawTornadoCurve(pl, 'fpr'), {
-    drag: {
-      handles: () => [{ x: State.claimFpr, key: 'fpr' }],
-      onDrag: tornadoSetFromDrag,
-    },
-  });
-  tprCol.appendChild(Tor.tprCanvas); fprCol.appendChild(Tor.fprCanvas);
-  curveRow.appendChild(tprCol); curveRow.appendChild(fprCol);
-  figure.appendChild(curveRow);
-  figure.appendChild(h(`<p class="plot-hint">Note the two horizontal scales: the same four
-    standard errors span half the range on the left and two percentage points on the right.</p>`));
-  Tor.distCanvas = mkCanvas(300, drawTornadoDistns, {
-    drag: { handles: tornadoHandles, onDrag: tornadoSetFromDrag },
-  });
-  figure.appendChild(Tor.distCanvas);
-  figure.appendChild(h('<p class="plot-hint">Drag any claim line to move it.</p>'));
-  mainCol.appendChild(figure);
-
-  const rocWrap = h('<div class="plot-container"></div>');
-  Tor.rocCanvas = mkCanvas(420, drawRocPlot);
-  rocWrap.appendChild(Tor.rocCanvas);
-  mainCol.appendChild(rocWrap);
-
-  const tablesFold = foldedNumbers('Show the numbers');
-  mainCol.appendChild(tablesFold);
-
-  mainCol.appendChild(h('<h4>Interpretation</h4>'));
-  const interpEl = h('<div></div>'); mainCol.appendChild(interpEl);
-
-  row.appendChild(sideCol); row.appendChild(mainCol);
-  container.appendChild(row);
-
-  Object.assign(Tor, {
-    summaryEl, severityEl, interpEl,
-    matrixEl: matrixWrap,
-    tablesEl: tablesFold.querySelector('.fold-body'),
-  });
-  renderTornado();
-}
-
-registerScenario('tornado', buildTornadoPanel);
-</script>
-<script>
-/* ============================================================================
-   Fisher's lady tasting tea (1935), and what a small discrete experiment can
-   and cannot establish.
-
-   The design: eight cups, four poured milk-first and four tea-first, the lady
-   told there are four of each and asked to name the four milk-first ones. Her
-   four choices settle everything — if j of them are right, then exactly j of
-   her tea-first choices are right too, so 2j of the eight cups end up
-   correctly classified. There are only five possible outcomes.
-
-   Under guessing, J ~ Hypergeometric(4 milk-first, 4 tea-first, 4 drawn), and
-   the one-sided p-value is Pr(J ≥ j). Only a perfect score clears 0.05: that
-   is Fisher's point about the design, not an accident of these numbers.
-
-   Severity needs something the null alone cannot give — a model of ability.
-   Take θ as the probability she classifies any one cup correctly, so that
-   J ~ Binomial(4, θ). Then, for a result that rejected guessing,
-       SEV(θ > θ₁) = Pr(J < j_obs ; θ = θ₁)
-   and for one that did not,
-       SEV(θ ≤ θ₁) = Pr(J > j_obs ; θ = θ₁).
-
-   Two deliberate departures from the R original are worth stating. It counted
-   correct cups out of eight and modelled them as eight independent trials;
-   because the design fixes four of each, the eight judgements carry only four
-   judgements' worth of information, so the binomial is taken over 4 here. And
-   its severity used the upper tail, Pr(J ≥ j_obs), which is the direction that
-   makes a perfect score look like weak evidence for high ability rather than
-   strong. The lower tail is what matches the continuous case on the other
-   tabs, and it is used here.
-   ==========================================================================*/
-
-const TEA_M = 4;   // milk-first cups
-const TEA_N = 4;   // tea-first cups
-
-function teaCompute() {
-  const j = State.teaCorrect;
-  // Fisher's exact one-sided p-value under random guessing
-  let p = 0;
-  for (let i = j; i <= TEA_M; i++) p += dhyper(i, TEA_M, TEA_N, TEA_M);
-  const reject = p < 0.05;
-
-  const sevAt = (theta) => reject
-    ? pbinom(j - 1, TEA_M, theta)          // Pr(J < j_obs) — less impressive than observed
-    : 1 - pbinom(j, TEA_M, theta);         // Pr(J > j_obs) — more impressive than observed
-
-  /* Bayes factor inside the capability model, so the two hypotheses are
-     stated in the same terms: θ = 1/2 against θ ~ Beta(1,1). The binomial
-     coefficient cancels, leaving B(j+1, 5−j) / (1/2)⁴. */
-  const bf10 = beta(j + 1, TEA_M - j + 1) / Math.pow(0.5, TEA_M);
-
-  /* A standardized scale, for the cross-scenario comparison only. A perfect
-     score puts θ̂ on the boundary where the binomial SE vanishes, so the
-     centre and spread come from the Bayes–Laplace estimate (j+1)/(n+2), which
-     stays inside the interval. This is an approximation and is used nowhere
-     that the exact severities above are available. */
-  const thetaTilde = (j + 1) / (TEA_M + 2);
-  const seTilde = Math.sqrt(thetaTilde * (1 - thetaTilde) / TEA_M);
-  const hOf = (theta) => (reject ? thetaTilde - theta : theta - thetaTilde) / seTilde;
-
-  return { j, cups: 2 * j, pValue: p, reject, sevAt, hOf, thetaTilde, seTilde,
-    severity: sevAt(State.teaClaim), bf10 };
-}
-
-/* ------------------------------------------------- PANEL 1: THE ANSWER --- */
-
-function drawTeaSeverity(pl) {
-  const S = State;
-  const { sevAt, reject, severity } = teaCompute();
-  const thetas = grid(0.5, 1, 300);
-  const sevs = thetas.map(sevAt);
-
-  pl.setup({ xlim: [0.5, 1], ylim: [0, 1], mar: [4, 4.4, 5, 1.5] });
-  severityBenchmarks(pl, { at: reject ? 1 : 0.5, adj: reject ? 1 : 0 });
-
-  pl.lines(thetas, sevs, { col: COL.claim, lwd: 2.8 });
-  pl.handle(S.teaClaim, { col: COL.observed, lwd: 2, lty: 2 });
-  pl.points([S.teaClaim], [severity], { col: COL.observed, cex: 2 });
-  pl.text(S.teaClaim + 0.008, severityLabelY(severity), rround(severity, 3),
-    { col: COL.observed, adj: 0, font: 2, cex: 0.86 });
-
-  pl.axes(); pl.box();
-  pl.axisLabels('Claimed ability θ₁', 'Severity');
-  pl.title(reject ? 'Severity of the claim θ > θ₁' : 'Severity of the claim θ ≤ θ₁', { cex: 0.95 });
-  pl.subtitle('how much ability this result actually establishes', { cex: 0.78 });
-}
-
-/* ------------------------------------------- PANEL 2: WHERE IT COMES FROM --- */
-
-function drawTeaNull(pl) {
-  const { j, pValue } = teaCompute();
-  const xs = [0, 1, 2, 3, 4];
-  const ps = xs.map((x) => dhyper(x, TEA_M, TEA_N, TEA_M));
-  const yMax = Math.max(...ps) * 1.28;
-
-  pl.setup({ xlim: [-0.6, 4.6], ylim: [0, yMax], mar: [4, 4.4, 5, 1.5], ext: false });
-
-  xs.forEach((x, i) => {
-    const inTail = x >= j;
-    const fill = x === j ? COL.observed : (inTail ? rgba(COL.observed, 0.3) : '#cfd8dc');
-    pl.rect(x - 0.38, 0, x + 0.38, ps[i], { col: fill, border: '#607d8b', lwd: 1 });
-    pl.text(x, ps[i] + yMax * 0.055, rround(ps[i], 4), { cex: 0.7, col: '#333' });
-  });
-
-  pl.axes({ xat: xs, nx: 5 }); pl.box();
-  pl.axisLabels('Milk-first cups correctly named (of 4)', 'Probability under guessing');
-  pl.title('The null distribution has five outcomes', { cex: 0.95 });
-  pl.subtitle(`shaded: Pr(J ≥ ${j}) = ${rround(pValue, 4)}`, { cex: 0.78 });
-}
-
-/* -------------------------------------------------------------- PANELS --- */
-
-function teaDecisionHtml() {
-  const { j, cups, pValue, reject } = teaCompute();
-  return `<div class="result-box ${reject ? 'reject-h0' : 'fail-reject'}">
-    <strong>Test verdict: ${reject ? 'reject guessing' : 'do not reject guessing'}</strong><br>
-    ${j} of 4 milk-first cups named correctly (${cups} of 8 cups classified correctly)<br>
-    One-sided exact p-value: ${rround(pValue, 4)}</div>`;
-}
-
-function teaSeverityHtml() {
-  const { reject, severity, hOf } = teaCompute();
-  const claim = `<strong>θ ${reject ? '&gt;' : '&le;'} ${rround(State.teaClaim, 2)}</strong>`;
-  return severityReadout(claim, severity,
-    `<span class="help-text" style="margin:0;">θ is the probability of classifying any one cup
-     correctly; θ = 0.5 is guessing.</span>`);
-}
-
-function teaBayesHtml() {
-  const { bf10 } = teaCompute();
-  return `<div class="result-box neutral-box">
-    <strong>BF₁₀:</strong> ${rround(bf10, 3)}<br>
-    <strong>BF₀₁:</strong> ${rround(1 / bf10, 3)}<br>
-    ${bfInterpretation(bf10)}
-    <div class="help-text" style="margin:6px 0 0 0;">θ = 1/2 against θ ~ Beta(1,1), both inside
-    the binomial capability model. Even a perfect score buys only a modest factor: four
-    judgements is four judgements.</div></div>`;
-}
-
-function teaTableHtml() {
-  const { sevAt, reject } = teaCompute();
-  const rows = seqBy(0.55, 0.95, 0.05).map((t) => {
-    const sev = sevAt(t);
-    const [assess, cls] = assessLabel(sev);
-    const near = Math.abs(t - State.teaClaim) < 0.025;
-    return `<tr class="${near ? 'claim-current' : ''}">
-      <td class="lbl">θ ${reject ? '&gt;' : '&le;'} ${rround(t, 2)}</td>
-      <td>${rround(sev, 3)}</td>
-      <td class="assess ${cls}">${assess}</td></tr>`;
-  }).join('');
-  return `<div class="table-scroll"><table class="tbl">
-    <thead><tr><th>Claim</th><th>Severity</th><th>Assessment</th></tr></thead>
-    <tbody>${rows}</tbody></table></div>${SEV_KEY}`;
-}
-
-function teaInterpretationHtml() {
-  const S = State;
-  const { j, cups, pValue, reject, severity, bf10 } = teaCompute();
-  const head = reject
-    ? `<p><strong>Guessing is rejected.</strong> A perfect score has probability
-       ${rround(pValue, 4)} under random guessing, which clears 0.05 — and it is the only outcome
-       that does. Fisher designed it that way: with eight cups split four and four, nothing short
-       of perfection is significant at the conventional level.</p>`
-    : `<p><strong>Guessing is not rejected.</strong> Pr(J ≥ ${j}) = ${rround(pValue, 4)} under
-       guessing, which does not clear 0.05. With only five possible outcomes, the test has very
-       little room to manoeuvre — only a perfect score would have rejected.</p>`;
-  return head + `<p><strong>What the result establishes.</strong> Rejecting guessing says the
-    lady is doing something. It does not say how much. Severity for the claim
-    θ ${reject ? '&gt;' : '&le;'} ${rround(S.teaClaim, 2)} is
-    <strong>${rround(severity, 3)}</strong> — the probability that this experiment would have
-    produced a result agreeing less well with that claim, if the true ability were exactly
-    ${rround(S.teaClaim, 2)}. Drag the claim line across the curve and the shape of the problem
-    appears: modest claims about her ability pass comfortably, ambitious ones do not, and the
-    experiment as designed simply lacks the resolution to separate a good taster from a perfect
-    one.</p>
-    <p>This is the discrete counterpart of the point the water plant scenario makes with a
-    slider for n. ${cups} of 8 cups correct is a striking result and a small one at the same
-    time. The Bayes factor agrees: ${rround(bf10, 2)} to one is real evidence and is nowhere
-    near decisive.</p>
-    <p class="note-block">The p-value comes from the design's own null, the hypergeometric
-    distribution over the lady's four choices. The severity and the Bayes factor come from a
-    binomial model of ability laid over the same four judgements — a model of what she might be
-    doing, which the null on its own does not supply. Different questions need different
-    machinery, and it is worth being explicit about which is doing what.</p>`;
-}
-
-/* --------------------------------------------------------------- BUILD --- */
-
-const Tea = {};
-
-function renderTea() {
-  if (!Tea.sevCanvas) return;
-  drawCanvas(Tea.sevCanvas);
-  drawCanvas(Tea.nullCanvas);
-  Tea.decisionEl.innerHTML = teaDecisionHtml();
-  Tea.severityEl.innerHTML = teaSeverityHtml();
-  Tea.tableEl.innerHTML = teaTableHtml();
-  Tea.bfEl.innerHTML = teaBayesHtml();
-  Tea.interpEl.innerHTML = teaInterpretationHtml();
-}
-
-function teaSetFromDrag(_which, x) {
-  State.teaClaim = clamp(snap(x, 0.05), 0.5, 1);
-  setSliderValue('tea_claim', State.teaClaim, (v) => v.toFixed(2));
-  renderTea();
-}
-
-function buildTeaPanel() {
-  const container = $('#panel-tea'), S = State;
-  container.innerHTML = '';
-
-  container.appendChild(h(`<div>
-    <p>A lady claims she can tell whether the milk went into the cup before or after the tea.
-    Fisher's design: eight cups, four of each, she is told the split and asked to name the four
-    milk-first ones. Her four choices decide the whole table, so the experiment has five possible
-    outcomes and no more.</p>
-    <p>The test asks whether guessing can be ruled out. Severity asks the question that survives
-    the answer: supposing she is not guessing, how good has this experiment shown her to be?</p>
-  </div>`));
-
-  const row = h('<div class="row"></div>');
-  const sideCol = h('<div class="col col-4"><div class="sidebar"></div></div>');
-  const mainCol = h('<div class="col col-8"></div>');
-  const side = sideCol.querySelector('.sidebar');
-
-  side.appendChild(h('<h4>Severity of the claim</h4>'));
-  const severityEl = h('<div></div>'); side.appendChild(severityEl);
-
-  side.appendChild(h('<hr>'));
-  side.appendChild(h('<h4>The claim, and the result</h4>'));
-  side.appendChild(helpText('The claim can be dragged directly on the curve.'));
-  const claimSl = slider('tea_claim', 'Claimed ability θ₁ (per cup):', 0.5, 1, S.teaClaim, 0.05,
-    (v) => v.toFixed(2));
-  claimSl.querySelector('input').addEventListener('input', (e) => {
-    S.teaClaim = +e.target.value; renderTea();
-  });
-  side.appendChild(claimSl);
-
-  const correctSl = slider('tea_correct', 'Milk-first cups named correctly (of 4):', 0, 4,
-    S.teaCorrect, 1, (v) => `${v} → ${2 * v} of 8 cups`);
-  correctSl.querySelector('input').addEventListener('input', (e) => {
-    S.teaCorrect = +e.target.value; renderTea();
-  });
-  side.appendChild(correctSl);
-
-  side.appendChild(h('<hr>'));
-  const decisionEl = h('<div></div>'); side.appendChild(decisionEl);
-
-  const bfFold = h('<details class="fold"><summary>Bayes factor</summary><div class="fold-body"></div></details>');
-  side.appendChild(bfFold);
-
-  const figure = h('<div class="plot-container"></div>');
-  Tea.sevCanvas = mkCanvas(340, drawTeaSeverity, {
-    drag: { handles: () => [{ x: State.teaClaim, key: 'claim' }], onDrag: teaSetFromDrag },
-  });
-  figure.appendChild(Tea.sevCanvas);
-  figure.appendChild(h('<p class="plot-hint">Drag the claim line to move it.</p>'));
-  mainCol.appendChild(figure);
-
-  const nullWrap = h('<div class="plot-container"></div>');
-  Tea.nullCanvas = mkCanvas(340, drawTeaNull);
-  nullWrap.appendChild(Tea.nullCanvas);
-  mainCol.appendChild(nullWrap);
-
-  const tableFold = foldedNumbers('Show the numbers');
-  mainCol.appendChild(tableFold);
-
-  mainCol.appendChild(h('<h4>Interpretation</h4>'));
-  const interpEl = h('<div></div>'); mainCol.appendChild(interpEl);
-
-  row.appendChild(sideCol); row.appendChild(mainCol);
-  container.appendChild(row);
-
-  Object.assign(Tea, {
-    decisionEl, severityEl, interpEl,
-    tableEl: tableFold.querySelector('.fold-body'),
-    bfEl: bfFold.querySelector('.fold-body'),
-  });
-  renderTea();
-}
-
-registerScenario('tea', buildTeaPanel);
-</script>
-<script>
-/* ============================================================================
-   All four scenarios on one axis.
-
-   Each panel of this page measures something different — a temperature, a hit
-   rate, a false alarm rate, a taster's discrimination — and each has its own
-   standard error. Divide the gap between the claim and the observed result by
-   that standard error and the units drop out. What is left is HEADROOM: how
-   far inside the observed result a claim sits, counted in standard errors.
-
-   Under a normal sampling distribution the severity of a claim is then Φ(h),
-   full stop. The measurement, the units and the subject matter make no
-   difference at all. Three of the four curves on this plot are therefore the
-   same curve, and saying so is the point of drawing them together.
-
-   The fourth is not, and that is the more interesting half. The tea
-   experiment has five possible outcomes, so its severity function is a step
-   function of the data and no amount of rescaling turns it into Φ(h). Where
-   the discrete curve sits relative to the normal one is a measure of how much
-   the normal approximation would have flattered — or in this case understated
-   — a very small experiment.
-   ==========================================================================*/
-
-// each entry reports where its own current claim sits on the common scale
-function comparisonSeries() {
-  const cont = contCompute('water');
-  const m = tornadoMetrics();
-  const tea = teaCompute();
-  const S = State;
-
-  return [
-    {
-      name: 'Water plant',
-      col: '#1565c0',
-      claim: `μ ${cont.reject ? '>' : '≤'} ${rround(S.cont.water.claimMu, 2)}`,
-      h: cont.h,
-      sev: cont.severity,
-      unit: `SE = ${rround(cont.se, 3)} °F`,
-      curve: null,   // exactly Φ(h)
-    },
-    {
-      name: 'Finley, sensitivity',
-      col: '#00838f',
-      claim: `TPR > ${rround(S.claimTpr, 2)}`,
-      h: hTpr(m, S.claimTpr),
-      sev: sevTpr(m, S.claimTpr),
-      unit: `SE = ${rround(m.tprSe, 3)}`,
-      curve: null,
-    },
-    {
-      name: 'Finley, false alarms',
-      col: '#4527a0',
-      claim: `FPR < ${rround(S.claimFpr, 3)}`,
-      h: hFpr(m, S.claimFpr),
-      sev: sevFpr(m, S.claimFpr),
-      unit: `SE = ${rround(m.fprSe, 4)}`,
-      curve: null,
-    },
-    {
-      name: 'Lady tasting tea',
-      col: '#6a1b9a',
-      claim: `θ ${tea.reject ? '>' : '≤'} ${rround(S.teaClaim, 2)}`,
-      h: tea.hOf(State.teaClaim),
-      sev: tea.severity,
-      unit: 'five outcomes, no normal law',
-      /* The discrete severity function on the common scale. Outside θ ∈ [½, 1]
-         there is no claim to have a severity, so the curve stops rather than
-         running along zero and inviting a reading it does not support. */
-      curve: (hv) => {
-        const th = tea.reject
-          ? tea.thetaTilde - hv * tea.seTilde
-          : tea.thetaTilde + hv * tea.seTilde;
-        return (th < 0.5 || th > 1) ? NaN : tea.sevAt(th);
-      },
-    },
-  ];
-}
-
-/* ---------------------------------------------------------------- PLOT --- */
-
-function drawComparison(pl) {
-  const series = comparisonSeries();
-  const hs = grid(-3, 3, 400);
-
-  pl.setup({ xlim: [-3, 3], ylim: [0, 1], mar: [4, 4.4, 5, 1.5] });
-  severityBenchmarks(pl, { at: -2.9, adj: 0 });
-
-  // the normal law, drawn wide and pale: every continuous scenario lies on it
-  pl.lines(hs, hs.map((hv) => pnorm(hv)), { col: rgba('#1565c0', 0.28), lwd: 12 });
-  pl.lines(hs, hs.map((hv) => pnorm(hv)), { col: '#1565c0', lwd: 1.6 });
-
-  // the one series that departs from it
-  series.filter((s) => s.curve).forEach((s) => {
-    pl.lines(hs, hs.map(s.curve), { col: s.col, lwd: 2.6, lty: 2 });
-  });
-
-  /* Where each scenario's current claim actually sits. A claim can be so far
-     inside its result that it falls off this axis entirely — a hollow marker
-     pinned to the edge says so, rather than a solid one at h = 3 implying a
-     headroom it does not have. */
-  series.forEach((s, i) => {
-    if (!Number.isFinite(s.h) || !Number.isFinite(s.sev)) return;
-    const off = Math.abs(s.h) > 3;
-    const hv = clamp(s.h, -2.94, 2.94);
-    pl.points([hv], [s.sev], off
-      ? { col: s.col, cex: 1.5, pch: 21, fill: '#fff' }
-      : { col: s.col, cex: 2.1 });
-    const right = hv < 1.4;
-    const label = off
-      ? `${s.name} (h ${s.h > 0 ? '+' : ''}${rround(s.h, 1)}, off scale)`
-      : s.name;
-    pl.text(hv + (right ? 0.12 : -0.12), clamp(s.sev + 0.07 - 0.035 * i, 0.05, 0.96),
-      label, { col: s.col, adj: right ? 0 : 1, font: 2, cex: 0.72 });
-  });
-
-  pl.abline({ v: 0, col: '#bbb', lwd: 1, lty: 3 });
-  pl.text(0.08, 0.055, 'claim sits exactly at the observed result',
-    { col: '#999', adj: 0, cex: 0.62 });
-
-  pl.axes(); pl.box();
-  pl.axisLabels('Headroom h: standard errors between the claim and the result', 'Severity');
-  pl.legend('bottomright', {
-    legend: ['Φ(h) — every normal-theory claim on this page', 'Lady tasting tea (exact, discrete)'],
-    col: ['#1565c0', '#6a1b9a'], lty: [1, 2], lwd: [2.4, 2.6],
-  });
-  pl.title('One curve, four scenarios', { cex: 0.95 });
-}
-
-/* --------------------------------------------------------------- TABLE --- */
-
-function comparisonTableHtml() {
-  const rows = comparisonSeries().map((s) => {
-    const [assess, cls] = assessLabel(s.sev);
-    const gap = Number.isFinite(s.h) && Number.isFinite(s.sev)
-      ? s.sev - pnorm(s.h) : NaN;
-    return `<tr>
-      <td class="lbl"><strong style="color:${s.col};">${s.name}</strong></td>
-      <td class="lbl">${s.claim}</td>
-      <td>${Number.isFinite(s.h) ? (s.h >= 0 ? '+' : '') + rround(s.h, 2) : '—'}</td>
-      <td>${Number.isFinite(s.sev) ? rround(s.sev, 3) : '—'}</td>
-      <td>${Number.isFinite(gap) ? (Math.abs(gap) < 5e-4 ? '—' : (gap > 0 ? '+' : '') + rround(gap, 3)) : '—'}</td>
-      <td class="assess ${cls}">${assess}</td>
-      <td class="lbl" style="color:#666;">${s.unit}</td>
-    </tr>`;
-  }).join('');
-  return `<div class="table-scroll"><table class="tbl">
-    <thead><tr><th>Scenario</th><th>Current claim</th><th>Headroom (SE)</th><th>Severity</th>
-    <th>vs Φ(h)</th><th>Assessment</th><th>Scale</th></tr></thead>
-    <tbody>${rows}</tbody></table></div>
-    <p class="help-text">The &ldquo;vs Φ(h)&rdquo; column is the departure from the normal law.
-    It is empty wherever the normal law is exact, which is everywhere except the tea.</p>`;
-}
-
-function comparisonInterpretationHtml() {
-  const series = comparisonSeries();
-  const tea = series[3];
-  const gap = tea.sev - pnorm(tea.h);
-  return `<p>Severity has units of nothing. Once the distance between a claim and the result it
-    is judged against is measured in standard errors, the temperature scale, the two rate scales
-    and the taster's scale all disappear, and every normal-theory claim on this page lands on the
-    same curve, Φ(h). That is not a coincidence to be admired so much as a reason the criterion
-    is usable: it means the question &ldquo;how well was this tested?&rdquo; has an answer that
-    does not depend on what was being measured.</p>
-    <p>It also means the four scenarios can be compared directly. Reading the markers left to
-    right tells you which of the claims currently set on the other tabs are doing real work and
-    which are coasting. A claim with two standard errors of headroom passes at 0.977 whether it
-    is about a river, a tornado or a teacup; a claim with none passes at 0.5, which is to say it
-    has not been tested at all.</p>
-    <p><strong>Where the analogy breaks.</strong> The tea experiment has five possible outcomes,
-    so no rescaling makes it normal. Its curve is drawn dashed, and at the claim currently set it
-    sits ${Math.abs(gap) < 5e-4 ? 'almost exactly on' : (gap > 0 ? 'above' : 'below')} the normal
-    curve${Math.abs(gap) < 5e-4 ? '' : ` by ${rround(Math.abs(gap), 3)}`}. Small discrete designs
-    are where the normal approximation earns or loses its keep, and plotting the exact answer
-    against Φ(h) is the cheapest way to see which it has done.</p>
-    <p class="note-block">The tea scenario has no ordinary standard error to divide by — a
-    perfect score puts the estimate on the boundary, where the binomial SE is zero. The scale
-    used here comes from the Bayes–Laplace estimate (j+1)/(n+2), which stays inside the interval.
-    It is an approximation, used for this comparison only; the severities reported on the tea tab
-    itself are exact. The Custom Test scenario is omitted from the plot because it is the same
-    machinery as the water plant and lies on the same curve by construction.</p>`;
-}
-
-/* --------------------------------------------------------------- BUILD --- */
-
-const Cmp = {};
-
-function renderComparison() {
-  if (!Cmp.canvas) return;
-  drawCanvas(Cmp.canvas);
-  Cmp.tableEl.innerHTML = comparisonTableHtml();
-  Cmp.interpEl.innerHTML = comparisonInterpretationHtml();
-}
-
-function buildComparisonPanel() {
-  const container = $('#panel-compare');
-  container.innerHTML = '';
-
-  container.appendChild(h(`<div>
-    <p>The other four tabs measure four unrelated things. This one puts them on a single axis by
-    dividing every claim's distance from its result by that scenario's own standard error. The
-    resulting quantity — headroom, in standard errors — is all that severity depends on.</p>
-    <p>Whatever you have set on the other tabs is what is plotted here. Go and move a claim, then
-    come back: its marker will have slid along the curve.</p>
-  </div>`));
-
-  const figure = h('<div class="plot-container"></div>');
-  Cmp.canvas = mkCanvas(430, drawComparison);
-  figure.appendChild(Cmp.canvas);
-  container.appendChild(figure);
-
-  container.appendChild(h('<h4>The four claims as currently set</h4>'));
-  const tableEl = h('<div></div>'); container.appendChild(tableEl);
-
-  container.appendChild(h('<h4>Interpretation</h4>'));
-  const interpEl = h('<div></div>'); container.appendChild(interpEl);
-
-  Object.assign(Cmp, { tableEl, interpEl });
-  renderComparison();
-}
-
-registerScenario('compare', buildComparisonPanel);
-</script>
-<script>
-/* ============================================================================
-   Wiring. Each scenario is built the first time it is shown and then left
-   alone, so its sliders keep their positions when you switch away and back.
-   The comparison panel is the exception: it reads the other four scenarios'
-   current state, so it is re-rendered every time it is entered.
-   ==========================================================================*/
-
-const SCENARIO_TABS = [
-  ['water',   'Water Plant Temperature'],
-  ['tornado', 'Tornado Prediction (Finley)'],
-  ['tea',     'Lady Tasting Tea'],
-  ['custom',  'Custom Test'],
-  ['compare', 'All Four Compared'],
-];
-
-function showScenario(key) {
-  State.scenario = key;
-  const entry = SCENARIOS[key];
-  if (entry && !entry.built) { entry.build(); entry.built = true; }
-  else if (key === 'compare') renderComparison();
-  SCENARIO_TABS.forEach(([k]) => {
-    $('#panel-' + k).classList.toggle('active', k === key);
-  });
-  $$('.mode-tab').forEach((b, i) => b.classList.toggle('active', SCENARIO_TABS[i][0] === key));
-  // canvases in a hidden panel have no width to measure, so they are drawn
-  // for the first time here, once the panel they live in is on screen
-  pruneCanvases();
-  redrawAll();
-}
-
-function buildScenarioSwitcher() {
-  const el = $('#scenario-switcher');
-  el.innerHTML = '';
-  SCENARIO_TABS.forEach(([key, label]) => {
-    const btn = h(`<button class="mode-tab">${label}</button>`);
-    btn.addEventListener('click', () => showScenario(key));
-    el.appendChild(btn);
-  });
-}
-
-buildScenarioSwitcher();
-showScenario('water');
+build();
 </script>
 </body>
 </html>

@@ -103,7 +103,7 @@ registerExample("example-ex28", (box) => {
     [["balls", "Peirce's urns, one for each proportion"],
      ["letters", "Which urn was this paper drawn from?"]], "balls"));
   $("#ex28-control", content).appendChild(
-    slider("ex28_n", "Balls in each urn:", 1, 6, 4, 1, null, "k1"));
+    slider("ex28_n", "Balls in each urn:", 1, 14, 4, 1, null, "k1"));
   urnsAdopt();
   vcBuild();
 

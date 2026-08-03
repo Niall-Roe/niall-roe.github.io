@@ -1,0 +1,883 @@
+PASTE PLAIN PROSE TEXT BELOW THIS LINE.
+Resume from: page 116, the paragraph beginning "The importance of average numbers arises from the fact that..."
+(Everything up through the middle of page 116 — ending "...but it is usually called the probability that anything is a man." — is already in index.html.)
+
+Skip: the big number tables on pages 25-46 of the source PDF (the raw observation data — not needed).
+Keep: the small comparison table on page 125 (Bradley's Sirius/Procyon table) — just paste it as plain rows, I'll turn it into an HTML table.
+Leave formulas/equations out — just type "[FORMULA]" as a placeholder where one occurs and I'll fill those in myself from the page images, since that's the part I actually need to do carefully (especially the π/e symbols).
+
+---START PASTING BELOW---
+
+
+114
+114 WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+On the Theory of Errors of Observations
+P 77: Coast Survey Report 1870, 200-224
+The object of this paper is to give a general account of the theory
+of errors of observations, with the design of showing what the limita-
+tions to the applicability of the method of least squares are, and what
+course is to be pursued when that method fails. We shall begin with
+an elementary account of the general principles of the subject, in
+order to state them with a little more accuracy than is commonly
+done.
+The notation employed is one which has been suggested by the
+study of the logic of relations. Small Roman letters will denote objects
+partly indeterminate. Thus m may denote a man, without saying
+what man. Small Italics will be used for relative terms; thus / may
+denote a lover. The correlates of such relative terms will be written
+after them on the same line; thus tm or /m may denote a tooth of
+a man or a lover of a man, if m denotes man, t a tooth of and / a lover
+of something undetermined. Then, /w will denote a lover of a
+woman, it being indeterminate what lover and what woman, tl w will
+denote a tooth of a lover of a woman. If we wish to denote that which
+is a lover of all women, we must have a symbol to denote all women.
+As [x] is commonly used in the method of least squares to denote the
+sum of all the quantities x, so we may write [w] to denote all women,
+and then / [w] will denote something which is a lover of all women,
+or we may write the same thing thus, / w. A relative term has a double
+indeterminacy, being indeterminate in reference to the relate and
+also in reference to the correlate. A lover may be this lover, that
+lover, or the other lover, and each of these may be lover of this, or
+that, or the other. Corresponding, therefore, to the [/], which
+denotes all lovers, we may write {/} to denote the lover to whomever
+he is a lover. Thus, {/ j w will denote a lover of nothing but women,
+or we may write the same thing thus, lw. We may denote "loved by"
+by*'.
+Theory of Errors of Observation, 1873 115
+Corresponding to any absolute term, as man, there is a relative
+term, "man that is," as in the expression "a man that is rich." I shall
+denote a relative of this sort by the symbol for the absolute term, with
+an inverted comma after it, as mv Thus, if b denotes anything black,
+m< b will denote a man that is black.
+Let V be the relative "a general name which is applicable to."
+Thus, Vm will denote a general term which is applicable to some
+man. Vm will denote a general term which is applicable to every
+man. Vm< Fw will be a general term which is applicable to every man
+and to every woman. K V [Vm< Vw] will denote that to which every
+general term is applicable which is applicable to every man and to
+every woman; in other words, this denotes either a man or a woman.
+I shall write this for short m +, w.
+Zero is defined by the general equation x +, 0 = x, whatever x
+may be. Then, zero generally denotes nothing.
+Unity is defined by the general equation x< 1 = x, whatever x may
+be, and then 1 generally will denote anything.
+But 1 and 0 have sometimes to be interpreted as relative terms.
+Now, it can be proved by the principles of the logic of relatives that
+so considered Ox = 0, unless x = 0, when 0° = 1; and that Ix = 1,
+unless x = 0, when 10 = 0. It follows that Ox is such a logical functionl
+of x that it signifies "the case of the non-existence of," while 1* is such
+a logical function of x that it signifies "the case of the existence of."
+[m]
+Since [m] denotes all men, we may naturally write -—- to denote m
+what all men become when that factor is removed which makes [m]
+refer to men rather than to anything else; that is to say, to denote the
+number of men. We may write this for short [m] with heavy brackets.
+Then t being a relative term, ("a tooth of,") by [tl] will be denoted
+the total number of teeth in the universe. But [t] will be used as
+[tl]
+equivalent to -WA or the average number of teeth that anything has.
+[l]
+But "anything" is not to be taken here in an absolute sense. We
+always limit our considerations entirely to a certain class. As De
+Morgan expresses it, we always have a limited universe. When we
+reckon up the number of all things to find the average number of
+teeth per thing, it would be absurd to count among things the virtues,
+1. A mathematical function of*, such as yx, is something whose value is obtained
+by mathematical processes when x is given. A logical function of x, of which we have,
+as common examples, letters with a subscript x, as Px, is something whose signification
+is logically deducible when the signification of x is known.
+116
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+shades of color, days or seconds of time. Anything which belongs to
+the limited universe under consideration is called, in the theory of
+probabilities, an event. An expression like [t], where t is a relative
+term, is termed a relative number, average number, or probable
+number. If the relative term to which the average number refers is
+one of those relatives which are formed by adding a comma to the
+symbol for an absolute term, as m, then the relative number is called
+a probability. For example, [mj is the average number of men that
+anything is, but it is usually called the probability that anything is a
+man.
+The importance of average numbers arises from the fact that all
+our knowledge really consists of nothing but average numbers; for all
+our knowledge is derived from induction, and its analogue, hypothe-
+sis. Now, the scientific conduct of this kind of reasoning is highly
+complex, because all sorts of precautions have to be attended to, and
+it has to be accompanied by a great deal of deduction. But the
+general nature of induction is everywhere the same, and is com-
+pletely typified in the following example. From a bag of mixed black
+and white beans I take out a handful, and count the number of black
+and the number of white beans, and I assume that the black and
+white are nearly in the same ratio throughout the bag. If I am in error
+in this conclusion, it is an error which a repetition of the same process
+must tend to rectify. It is, therefore, a valid inference. But it clearly
+teaches me nothing in reference to the color of any particular bean.
+Of that I am as ignorant as before. The case is not in the least altered
+if I find all the beans of my handful to be black, or all to be white.
+I can still infer only the approximate general ratio, and it is only this
+I express when I say the observation makes the probability of any one
+bean being white or being black very great; for a probability is itself
+only an average number. At first thought it is hard to admit this; but
+the difficulty will be in great measure removed if we consider how
+it is that the knowledge of average numbers becomes useful in partic-
+ular cases. Suppose we know the relative number of black beans in
+a certain bag; then, if we draw a large number of beans out of it, we
+know that the total number of black beans we shall draw will be
+equal to the number of drawings multiplied by the average number
+of beans in the bag. Suppose we know the relative numbers of black
+beans in a large number of bags, containing different proportions;
+then, if the beans are well mixed up in each, we may only draw a
+single bean from each, and yet we can predict nearly the total num-
+ber of black beans which would be drawn by simply taking the sum
+Theory of Errors of Observation, 1873
+117
+of the relative numbers. If the black beans had a value while the
+white ones were worthless, then the total number of black beans
+which would be drawn would be the important thing to know. But
+as knowledge derives its practical importance from its influence
+upon our conduct, let us suppose that at every drawing we have our
+choice between two bags to draw from; then the man who knew the
+relative number of black beans in every bag would act in every case
+as though the bean he would draw from the bag which contained the
+larger proportion of black ones were known to be black, and as
+though the bean he would draw from the other were certainly white.
+Strictly speaking, he would know nothing about the beans that would
+be drawn in the particular case, but he would have a knowledge
+which would be so far equivalent to that that it would influence his
+conduct in the particular case. This is the only knowledge we ever
+have, a knowledge of what assumption to make in the particular case
+in order to do the best in the long run. Whenever, then, we have to
+do with a value, the sum-total of which in the long run is the only
+thing which concerns us, the average amount of it is important to be
+known; but in all other cases the average numbers are of no conse-
+quence.
+It is evident that in the example just given it would be a valuable
+increase of knowledge to know, for instance, what the difference in
+the relative number of black beans at the top and bottom of a bag
+was, and any limitation of the "universe" used which should separate
+a relative number into two different ones would be advantageous.
+There are many problems in probabilities, which, being solved,
+give a relative number composed of two terms, one known and the
+other unknown. Such an indeterminate result shows that a wider
+"universe" must be adopted for one of the terms of the relative
+number.
+The fundamental arithmetical formulae relating to relative num-
+bers are as follows:
+We have seen that the relative number of things that are men, or
+[m,1]
+the probability that a thing is a man, is equal to * . By "thing"
+[1]
+here is meant any object of our limited universe, as, for example, an
+animal. But we may wish to consider the relative number of animals
+that are men when our limited universe is a wider class than animal.
+[m,1]
+In this case, a denoting an animal, we write this probability _\ .
+[a]
+Let us suppose that, our universe being "day," we wish to know the
+118
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+probability that if it thunders on any day it will rain on that day. To
+say that if it thunders it will rain on the same day is the same as to
+say that every day on which it thunders is a day on which it rains.
+Then let t be a day on which it thunders and r a day on which it rains,
+[ t , r ]
+and the probability in question is * . In general, the probability
+[ t [
+that if one event happens another will happen is equal to the proba-
+bility that both will happen, divided by the probability that the first
+will happen.
+Let us now see how to express the probability that a certain
+quantity will have a certain value. It is clearly implied that the quan-
+tity is defined in some other way than by its value. It might be, for
+instance, the length of time a bird will be on wing. Let x be this
+[ t , r ]
+quantity, and let n be any definite value. Then * , or the number LXJ
+of cases in which the time a bird is flying has that value, divided by
+the whole number of cases of a bird's flying, is the probability that
+a bird will fly for that length of time. But since time is continuous,
+the length of time a bird may be up may have an infinite number of
+different values. Consequently, the probability of any one is zero.
+We, therefore, seek the probability that the time lies between n and
+n + An; and if An is infinitesimal, (say dn,) then the probability is
+proportional to dn. We may, therefore, write this probability thus,
+[nx] dn. Here nx denotes the case of the value of x being about n.
+The probability that if one quantity, x, has a value lying between
+m and m + dm, then another quantity, y, has a value lying between
+n and n + dn, will, according to what has been said, be equal to
+the probability that both x and y will have the supposed values,
+divided by the probability that x will have the supposed value, or
+[mx,ny]
+will be -—— , or, since the am disappeared by cancella-
+[ m x , n y ]
+[mx,ny]
+tion, ——————dn
+[mx,ny]
+Given, the probability of A, the probability of B, and the probabil-
+ity that if A happens, B happens. Required, the probability that if B
+happens, A happens.
+The probability of A is [A].
+The probability of B is [B].
+[mx,ny]The probability that if A then B is ^J^.
+[A]
+Theory of Errors of Observation, 1873
+[A,B]
+The probability that if B then A is ^*f^. [B]
+Then we have—
+119
+[A, B] _ [A, B]
+~[BT " TAT [ J " [ ] [formula]
+" [A] -[B[
+or the probability, if B happens that A happens, is equal to the
+probability if A happens th B happens, multiplied by the probabil-
+ity of A and divided by the robability of B.
+We now pass to the theory of observations. An observation gives
+us the value of a certain quantity which is connected with an un-
+known quantity in such a way as to be partly dependent on the latter
+value, and partly on accidental circumstances, not capable of being
+separately taken account of.
+These accidental variations are, however, in all cases subject to a
+statistical law, so that (observations of a certain kind forming the
+limited universe, X being the unknown quantity, S the quantity
+observed) the quantity,
+KEC* n^rd*[formula]
+or the probability that if the unknown quantity X has a certain value
+x, then the observed quantity 5 will have a value between £ and
+| 4- d|, is a certain arithmetical function of the values | and x. If we
+write e for £ — x, or the error of observation, then we may put <p for
+such a function that—[formula]
+Ks. *xl , .
+The special form of the function (p is called the law of the facility
+of the errors. Except so far as this law is known, an observation can
+afford us no information whatever. The following conditions are in-
+variably fulfilled by this function. (It must be understood that only
+real quantities are considered.)
+1. It has but one value for each set of values of its variables.
+2. Its value is always positive and less than unity.
+3. It vanishes when € is infinite.
+130
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+4. Its integral relatively to e from — oo to + oo is always unity.
+Beyond this the form of the function is determined by the
+peculiarities of the kind of observations.
+The probability that if the observed quantity H has the value £,
+then the unknown quantity X has the value x is—
+[xx, ?=]/[?=] dx
+The value of this probability is for any particular kind of observations
+an arithmetical function of € and £, which we may write x|/ (€, £) de.
+The probability that the unknown quantity X has the value x
+without reference to observation is [:rx]d:r. This is in any case a
+function of x, which may be written Wx . dx.
+The probability that the quantity given by observation E has the
+value £, without reference to the value of the unknown quantity, is
+[£~] d£. This an arithmetical function of £, which may be 4>£ . d£.
+If <!>!, Wx, and <p (€, x) are given, then we can obtain \\t (e, £) thus:
+?(e,? = f (e, X)/? ? ?x[formula]
+Suppose a numb of independent observations to be made. Then
+we shall have a series of functions—
+    f1 (e1,x)
+  f2 (e2,x)
+  f3 (e3,x)
+&c.[formula]
+  ?1 ?1
+?2 ?2
+  ?3 ?3
+&c.
+then the probability that if the quantities observed have the values
+£ i > £ 2 * £ s > & c - > t h e u n k n o w n q u a n t i t y X h a s t h e v a l u e x w i l l b e —
+^x . — . — . — .&c.
+^x . — . — . — .&c.
+^x . — . — . — .&c.
+or—[formula]
+^x . — . — . — .&c.
+Theory of Errors of Observation, 1873
+121
+The probability Vx . dx antecedent to all observations will be
+simply dr, and, therefore, the factor ** may be omitted in the above
+expression.
+It will be perceived that observation never gives us to know a
+number expressing the value of the unknown quantity, but only a
+function expressing the probability of each value. It happens, how-
+ever, in a very comprehensive case, that this function assumes a form
+which involves but two constants, so that in this case observation may
+be said to give us two numbers, a value for the unknown quantity,
+and the probable error of that value.
+Mr. Crofton's method of considering this case seems to me to
+make it more comprehensible than any other. Suppose that the un-
+known quantity X has been observed twice, the values given by
+observation being ?1 and ?2. Put [?] for ?1 + ?2. What then is the
+probability that if x is the value of X, the sum of the values given by
+the two observations will be [£]. It is clearly—
+?+8 -8 f1 (e1, x). f2([e] — e1, x). de1
+Developing cp2([e] — €1? x) by powers of €1? this integral becomes—
+f2([e], x) — f'2([e], x) ?+8 -8 e1 f1(e1, x).de1
++ 1/2 f"2([e], x) ?+8 -8 e2/1 f1 (e1, x).de1
++ 1/2 f"2([e], x) ?+8 -8 e2/1 f1 (e1, x).de1
+If in place of two we have n observations, the probability that the
+sum of all will be [£] is—
++ 1/2 f"2([e], x) ?+8 -8 e2/1 f1 (e1, x).de1
++ 1/2 f"2([e], x) ?+8 -8 e2/1 f1 (e1, x).de1
+Of these co-efficients—
+?+8 -8 ei fi (ei, x)[formula]
+122
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+is the probable or mean value of the error of the observed quantity-
+?+8 -8 ei fi (ei, x)
+is half the probable value of the square of this error, and so on. The
+probable value of the error is often less than the probable value of
+its square, owing to positive and negative errors balancing. But the
+co-efficients which involve the cube and higher powers of the error
+may often become insignificant. This, for example, will be the case
+if n is very great; for then, in comparison with the sum of all the
+errors, the value of any one will be very small. In fact, in this case
+we may neglect a quantity a certain number of times, say M, larger
+than what we could neglect before, and may take a unit of measure-
+ment M times larger. Then if—
+W, [*2]> t*3], &c.,[formula]
+be the probable value of the error, the error square, the error cube,
+&c., on the old scale of measures, their numerical values on the new
+scale will be—
+M' M2' M3
+Consequently if M is sufficiently large, the higher co-efficients may
+be neglected. It also frequently happens that the error of each obser-
+vation is due to the combined effect of a great number of indepen-
+dent or nearly independent causes, each one of which alone would
+produce but an insignificant effect. In this case, by the same reason-
+ing the higher co-efficients will disappear.
+The manner in which sensation and volition are propagated
+through the nerves is unknown, but it must be by some very compli-
+cated process, because it is very slow compared with the rate of
+propagation of sound. It is, therefore, probable that there may be
+variations of the rate of passage, and that the velocity through each
+small portion of the whole length of the nerve is to some extent
+independent of the velocity through the other parts. If this is so, the
+whole time of propagation would be subject to a variation, the proba-
+Theory of Errors of Observation, 1873
+123
+bl lues of whose cube and higher powers would be insignificant.
+H ver this may be, it appears to be a fact that in all carefully-made
+observations, the error of which is due to the inevitable inaccuracy
+of the action of the human nerves, the probable values of the cube,
+&c., of the errors are very small.
+Whenever these quantities disappear it can be proved by an ana-
+lytical process which need not be reproduced here that—
+<P(*, x) = 77^6[formula]
+where h and E are quantities which depend upon x. We thus reach
+the fundamental formula of the method of least squares.
+It is not the object of this paper to explain that method itself. Only
+it may be remarked that in the deduction of it which is usually given,
+it is assumed that what we wish to obtain from observations in any
+case (whether the method of least squares is applicable or not) is the
+most probable value of the unknown quantity. This is not the case,
+for there is but an infinitesimal probability in favor of any one value.
+Suppose that the cause of error in observing the place of a star were
+a nearly simple oscillation of the image about its mean point. Then
+the most probable errors would be the extreme ones. But we should
+much prefer to assume as the value the probable or mean value than
+the most probable value, which would be removed the furthest possi-
+ble from that value. The conception of the matter is this. What
+observation has to teach us is & function, i|/ (c, Q, not a mere number.
+But in cases to which the method of least squares is applicable, this
+function is completely determined by two numbers, which are the
+value of the unknown quantity derived from the application of that
+method and the value of its probable error.2
+It is assumed in treatises on least squares that 4>£. d£, or the
+probability (without regard to the value of the unknown quantity)
+that the quantity observed will have a value between £ and £ -f d(j,
+is equal to d£. When this is not the case it is only necessary to weight
+each observation by dividing by 4>£.
+If the probability of error does not follow that law which the
+method of least squares supposes, that is to say, if the probability of
+2. The term probable error is here used in its usual but unanalogical sense, and
+not for the probable value of the error, which is always assumed to be zero in least
+squares, or else determined by some special research.
+124
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+the error x in the mean of a large number of observations is not equal
+t o — — 6 x , w h e r e h i s a c o n s t a n t i n d e p e n d e n t o f x , t h e n i t m u s t
+to —— 6 x , where h is a constant independent of x, then it must VQ
+at least be of this form if h be considered to be a function of x. Now,
+h2 is the weight which has to be assigned to an observation in the
+application of the method of least squares; and therefore when this
+method does not apply in its unmodified form, it is only necessary to
+find what function of x, h must be in order to give the required law
+of facility of errors, and then proceed according to the method of
+least squares, after having weighted each observation by h2. Let the
+equation which represents the facility of error be plotted, the error
+being taken as abscissae, and the probability of that error as ordinate;
+1 -x2
+then plot on the same diagram the curve y = —j—6 - Let us
+V0[formula]
+suppose, then, that a certain value of x, y, is A times as great for the
+actual curve of errors as it is for the normal least-squares curve. Now,
+if h be increased in the ratio A, the ordinates will be increased in this
+same ratio, and the abscissae will be diminished in the inverse ratio
+so that the area of the curve is preserved. But if the ordinates at any
+one point are to be increased in the ratio A, then the abscissae at that
+point must be contracted in the inverse ratio, so as to preserve the
+area; so that if we had a function fx such that Dx fx = J, then the
+probability of this function of the error would follow the law
+1 ( f x ) 2[formula]
+1y = —— 6~ , and consequently is the weight which
+| Q |Q
+has to be assigned to any such observation in applying the method
+of least squares. It will be observed that since the weight depends on
+the value of the error, it will be necessary first to make an approxi-
+mate solution of the problem in order to get an approximate value
+of the error from which to determine the weight, so that when the
+method of least squares is not applicable in its unmodified form, an
+approximate method must necessarily be resorted to.
+Let us now proceed to consider the method of ascertaining the
+law of facility of error. In any case, if the error is compounded of an
+infinite number of infinitely small errors, or approximates to being
+so, then the law of facility of errors is of that general form which the
+method of least squares prescribes, and nothing remains indetermi-
+nate excepting the value of h. Observation has sufficiently shown that
+Theory of Errors of Observation, 1873 125
+in transit-observations the law of error is of this sort. I copy, for
+example, from Chauvenet's Astronomy the following table, taken
+from BesseFs Fundamenta Astronomiae, showing the errors made by
+Bradley in observing Sirius and Procyon:
+Between —
+No. of errors
+by the theory
+No. of errors
+by experience[formula]
+" "
+0.0 and 0.1
+95
+94
+0.1 and 0.2
+89
+88
+0.2 and 0.3
+78
+78
+0.3 and 0.4
+64
+58
+0.4 and 0.5
+50
+51
+0.5 and 0.6
+36
+36
+0.6 and 0.7
+24
+26
+0.7 and 0.8
+15
+14
+0.8 and 0.9
+9
+10
+0.9 and 1.0
+5
+7
+Over 1.0
+5
+8
+Fechner, in his Elemente der Psychophysik, has, in connection
+with his psychophysical law, discussed the applicability of the
+method to cases of sensation generally such as the estimate of the
+relative weights of two masses, and he finds that if v be the energy
+of the force which produces the excitation of any nerve, then if log v
+be considered as the observed quantity, the errors of the observed
+quantity will follow the law of least squares. Strictly speaking, the law
+of least squares recognizes the possibility of any error positive or
+negative, however great, although the probability of indefinitely
+great errors will be indefinitely small. It occurred to me that in the
+case of the emersion of a star from an occultation, since it was impos-
+sible to strike the chronograph-key too early, while it might be struck
+indefinitely too late, the law of least squares could hardly apply, and
+I have made some experiments upon this point, which I will narrate
+in detail at the end of this paper, merely remarking in this place that
+the divergence from the theoretical law proved to be insignificant.
+On the other hand, there are many cases in which we have no reason
+126
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+to expect that the errors will vary according to the least-squares
+curve. Let us consider, for example, a chemical analysis. Here the
+error is generally not due to the combined action of a very great
+number of very small causes, but, on the contrary, there are gener-
+ally two or three leading causes of error, depending upon some
+defect in the theory of the analysis or on some error in the manipula-
+tion, which is likely to result from a single one, such as cannot be
+regarded as in any way compounded of a large number of indepen-
+dent parts. Thus, a drop may be spilled or a portion thrown out of
+the crucible too small to be detected, but the whole drop is spilled
+at once, or the whole portion goes at once. In very exact analysis, in
+which such causes are almost altogether eliminated, the remaining
+and chief cause of error will be an error of weighing, due to a want
+of delicacy of the balance, and will be of the same nature as an error
+of computation, due to the fact that the number of decimal places
+used has been limited. The method of considering such errors is
+treated by Dr. Bremiker, in the preface to his Tabula Logarith-
+morum Sex Decimalium, a work to which the attention of chemists
+ought to be drawn. When the law of facility of errors cannot be
+deduced a priori from the consideration of the causes to which it is
+due, a large number of experimental observations must be made
+upon a known quantity in order to find in what manner the errors
+vary, or the same series of observations may be used both to deter-
+mine what the value of the unknown quantity is and also what the
+law of the variation of errors is. Thus, in the method of least squares,
+h is to be determined empirically, and the common way of doing it
+is to use the actual observations by which the unknown quantity is
+determined to determine also the value of h. In doing this, it should
+be remembered that a precise and trustworthy determination can
+only be obtained from a large number of observations. This proce-
+dure amounts, in fact, to adding an additional unknown quantity, a
+very obvious fact, and yet one which is habitually overlooked. Encke,
+in his Astronomisches Jahrbuch for 1834, has given the most com-
+plete formulas that I have anywhere found for determining the value
+of h, as well as its uncertainty. These formulae require correction on
+account of the circumstance just mentioned.
+When it is necessary to combine, by least squares, observations of
+different orders of precision, they are weighted proportionately to
+h2
+. If we have two series of observations, one of which is as accurate
+Theory of Errors of Observation, 1873 127
+as you please, and the other as inaccurate as you please, a better
+result than that which the most accurate series of measures gives can
+always be got by combining with it the least accurate series, provided
+the proper weights are given to the two series. This proposition
+seems paradoxical, and is not admitted by many very competent
+heads, but I cannot see how the conclusion can possibly be evaded.
+It does not depend at all upon any of the peculiar principles used by
+the method of least squares, but rests on the fundamental axioms of
+probabilities. Indeed, it may conveniently be based directly upon the
+principles of logic itself. The least accurate series of measures offers
+certain facts, which may be used as premises, and it cannot be that
+if those facts are properly used they leave us in greater ignorance
+than we were before. Additional facts must increase our knowledge,
+if the proper inferences are made from them, and, therefore, an
+additional series of observations, if it have any weight at all, must, if
+its proper weight be assigned to it, improve the value of the unknown
+quantity. On the other hand, when it is considered that there is an
+uncertainty in the value of h, it may be that if the two series of
+observations differ greatly in accuracy, and the value of h is not
+determined with much precision, it may be better at once to take the
+result of the best series of observations than to combine the two
+series with the best weights that we are able to give.
+Let—
+Xj be the value from any set of observations;
+€j the mean error of this set;
+{€{ the mean error of €{;
+Wj the true weight;
+E the mean error of weight one; and
+x the truly weighted mean.
+derive wi y the formula,
+The best approximation we can get to x will be subject to two
+kinds of error: first, those arising from errors of xi; and, secondly,
+those arising from errors in our assumed values of €j, from which we
+derive wi y the formula,
+128
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+Wi = E²/ei²
+The mean error of wi will be wi² gi²
+The mean error of wi will be wi² gi²
+T h e m e a n e r r o r o f w i w i l l b e w i ² g i²
+Then we have—
+••-^(^r)1-'*'
+••-^(^r)1-'*'
+••-^(^r)1-'*'[formula]
+These are the two common rules by which € may be calculated. Call
+their results €; and e", so that—
+their results €; and e", so that—
+their results €; and e", so that—
+where m is the number of determinations.
+The first gives—
+their results €; and e", so that—
+Theory of Errors of Observation, 1873 129
+If m - 2,
+lXl + w2x2 w2
+(Xi — X) = X; = Xi — Xo
+Wj_
++ W[formula]
+Wj_ + W
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+Put w2 =r,
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+Now, suppose e2 < e1²< e2²; then r < 1; then—
+e 1 ² > e 1 ² + r / ( 1 + r )² ( g 1² + g 2² ) e "²[formula]
+But—
+e1² > e1² + r/(1 + r)² (g1² + g2²) e"²
+1030
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+r—^— >gf +gl
+r—^— >gf +glx
+r — ^ — > g f + g l
+r—^— >gf +gl
+r—^— >gf +gl
+r—^— >gf +gl[formula]
+r—^— >gf +gl
+r—^— >gf +gl
+r—^— >gf +gl
+Unless this condition is satisfied, the combination is worse than
+the best determination.
+It is generally admitted that m{ being the number of observations
+from which c
+gi =
+Then
+Then
+Theory of Errors of Observation, 1873 131
+or we may write—
+hardly be supposed that the best observer has so small a range of
+or—
+e1² + e2²
+/ (x1 – x2)² (1 + r)² >
+1/m1 + 1/m2
+2
+or we may write—
+(x1 – x2)² (x1 – x2)²
+(x1 – x2)² (x1 – x2)²[formula]
+(x1 – x2)²
+(x1 – x2)²
+(x1 – x2)² (x1 – x2)²
+Some writers upon the subject have wished to assign a smaller
+weight to those observations which differ largely from the mean than
+to those which come close to it. They have reasoned as if h, or the
+precision of an observation, were something which belonged to a
+single observation; whereas, in fact, it is a statistical quantity alto-
+gether, and belongs only to an observation as a member of a certain
+series. We may have a large series of observations for which h has a
+certain value, and those observations may perhaps be separated into
+two series on some principle or other for which h shall have two
+different values, and if this can be done there is an advantage in
+doing it. It is, in fact, limiting our universe. In probabilities generally
+h is a mean or probable quantity for a series of observations, and if
+we can divide our universe into two parts, getting different values of
+h, it will be an increase of knowledge to do so. For example, suppose
+that some of the observations were taken under one set of circum-
+stances and the rest under another set of circumstances. That would
+afford a principle upon which the observations could be distin-
+guished, and if the value of h for the two sets turned out different,
+it would be an advantage to separate them and to give them different
+weights. Now, the degree of discordance of observations from the
+most probable value of the unknown quantity may be taken as a
+13.2
+WRITINGS LES S. PEIRCE, 1872-1878
+means of estimating the relative degrees of care, &c., used in making
+them, and so to discriminate between them. But it would certainly
+be very absurd to allow no weight to the fact that we have endeav-
+ored to make them all with equal care. It must never be forgotten
+that h is a statistical quantity; not one which belongs to a single
+observation, but one which belongs to an infinite series of observa-
+tions.
+It is entirely in accordance with the method of least squares to
+reject discordant observations, and this has always been done, even
+by those who object to an exact criterion for determining what obser-
+vations should be rejected. For example, Mr. Glaisher says that no
+observation should be rejected excepting obvious mistakes, thereby
+admitting that it is proper sometimes to reject observations, and
+nobody is more opposed to the rejection of observations than he. But
+no line of demarkation can be drawn between mistakes which are
+obvious and mistakes which are not obvious. In some cases it may be
+obvious that 53 has been written by the recorder instead of 35. In
+other cases it may be doubtful whether it ought to be called an
+obvious mistake or whether there may be some doubt hanging over
+it, and there is every grade of probability, from the greatest to the
+least; and when we examine into the facts of observation, and do not
+attempt to make our way through a vacuous space of pure theory, it
+will be found that the occasional rejection of observations is justified
+from every point of view; and if observations are to be rejected, exact
+criteria are necessary to determine upon principles of probabilities
+in what cases they should be rejected. The criterion of Professor
+Peirce is the only one which conforms rigidly to those principles, and,
+indeed, I am not aware that it has been attacked upon the ground
+of not conforming to the principles of probabilities, although it has
+been attacked on the ground that no such criterion should be used,
+and that no observation should be rejected except upon principles of
+guesswork, for that is what it amounts to to say that none but obvious
+mistakes should be rejected. Experience has shown that the errors
+which this criterion rejects are almost precisely those which a person
+of sound judgment would pronounce to be obvious mistakes, but
+some other criteria have been proposed, which are confessedly inex-
+act, but which have the advantage of involving less calculation, but
+these are no better than the unaided judgment of an experienced
+person, and in some cases not so good.
+Theory of Errors of Observation, 1873
+133
+Account of the experiments
+These experiments were made in order to study the distribution
+of errors in the observation of a phenomenon not seen coming on,
+as in the case of a transit, but sudden, as in the case of the emersion
+of a star from behind the moon. The time was noted upon a Hipp
+chronoscope, which is a modification of an invention of Wheat-
+stone's. The train of clock-work moved by weight is regulated by the
+vibration of a little spring or reed striking against a toothed wheel a
+thousand times a second. There are two hands, one of which marks
+tenths of a second, and the other thousandths of a second. These
+hands are thrown into gear when the first event occurs, and out of
+gear when the second event occurs, so that the amount that they
+have moved measures the interval. The manner in which they are
+thrown in and out of gear is this: The axis of one of the wheels of the
+main train is hung, and the axis of one of the wheels of the hand-
+gearing passes completely through it and comes out behind, where
+it rests upon a spring, which spring is influenced by an electro-
+magnet. There are two crown-wheels, one upon the hollow axis be-
+longing to the main train already mentioned, the other facing it at
+a very small distance from it, and fixed in position and upon the axis
+of the wheel belonging to the hand-gearing, which moves backward
+and forward inside, and the other axis as described. There is a little
+arm, which will catch in the teeth of one or other of these crown-
+wheels. Before the first event it is in the teeth of the fixed crown-
+wheel, which thus prevents the hands from turning round. When the
+first event occurs this arm is thrown forward into the teeth of the
+rapidly rotating crown-wheel, and thus the hands begin to turn
+round. When the second event occurs the arm is thrown into the
+teeth of the first crown-wheel, and so the hands are suddenly
+stopped.
+It will be observed that although the instrument only registers to
+thousandths of a second, yet if an event can be repeated many times
+with a variation of time much smaller than that, the instrument
+ought, theoretically, in the mean of a large number of observations,
+to give a much closer result than 0.001 second; for when the first
+event occurs, and the arm is thrown into the moving crown-wheel,
+it probably will not strike exactly in any catch, but will strike on the
+inclined side of a tooth. If it strikes on the forward side of the tooth,
+134
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+the hands will be carried forward by the fraction of a thousandth of
+a second more as the arm glides down this side to the bottom of the
+catch. But if it strikes on the back side of the tooth, the hands will
+be carried relatively back the fraction of the thousandth part of a
+second as the arm glides back to the bottom of the catch. Now, if the
+top of the tooth is midway between the bottom of two catches, it is
+equally likely to be carried forward or back. The same thing occurs
+when the second event happens and the arm strikes upon the fixed
+crown-wheel. An error in the marked interval will thus result, which
+error may amount to —0.001 second in the extreme, or to + 0.001
+second, and any one error between these limits is as likely as any
+other; consequently, these errors, being entirely incidental and inde-
+pendent of one another, they will balance one another in the mean
+of a large number of observations, and thus a much higher degree of
+accuracy may be reached. This, however, is a matter which has no
+influence on the experiments which I have made, inasmuch as the
+interval measured by me was a variable one, and in point of fact I
+have never been able to make the instrument work with such nicety
+as to measure much closer than 0.001 second. In the descriptions of
+this instrument which I have seen, only two instrumental corrections
+have been mentioned; one is owing to the rate with which the instru-
+ment goes, and the other is with reference to the time occupied by
+the arm in passing from one crown-wheel to the other. To determine
+these two constants, a little apparatus accompanies the instrument,
+by which the time of the fall of a ball from different heights may be
+registered, and by registering the time from two different heights
+these two corrections, one of which is proportional to the time and
+the other is a constant, may be determined. The ball is held in a pair
+of jaws; when these jaws separate, the contact is broken, the hands
+begin to move, and the ball begins to fall. Care should be taken that
+the ball is so small that the jaws cannot be separated for any apprecia-
+ble time before the ball is free to fall, but if the spring with which
+they open is sufficiently strong the ball may fall freely from the very
+first. At the bottom the ball strikes upon a platform made of wood and
+covered with green cloth, and it throws this platform down upon two
+metallic springs below it, through which contact is made again, so
+that the hand stops, and then the platform is held down by a catch.
+As the instrument came from the makers it was found that when
+the ball struck upon the platform it threw one of the springs down,
+so that the contact was made, and then immediately interrupted
+Theory of Errors of Observation, 1873 135
+before there was time for the hand to stop, so that a slight error of
+about 0.001 second arose in this way. This was usually corrected by
+putting little wooden wedges beneath these springs, so that they
+could not be thrown down in this way. In order further to test the
+instrument, I made use of a break-circuit chronometer, and mea-
+sured the interval of two seconds upon the instrument for this pur-
+pose. It was necessary to employ two telegraph-repeaters. There are
+two ways in which this can be arranged, so as to correct a break-
+circuit chronometer with a Hipp chronoscope. It is sufficient to de-
+scribe one of them. The arrangement is shown in the accompanying
+figure:
+Bat. is the battery; Ch., the chronoscope; Chr., the chronometer;
+R., a resistance-coil; and I and II, two telegraph-repeaters. I is a
+common telegraph-repeater, with the non-conducting screw so far
+raised that when the armature once flies up the magnet cannot bring
+it down again. F is the magnet end of this repeater; B, the end at the
+second circuit. When the first circuit is broken the armature flies up
+and instantly breaks the second circuit. II is arranged differently
+from common repeaters. As long as there is a current through the
+first circuit and the armature is held down, there is no connection in
+the second circuit. When the first circuit is broken, the armature,
+under the influence of a very strong spring, flies up for a distance of
+a tenth of a millimeter, and there makes the connection in the second
+circuit.
+This repeater can be extemporized out of a common relay. The
+resistance-coil should always be used in connection with the chrono-
+scope in such a way that when the circuit is broken in the first place
+the current shall be so weak as just to be able to hold the hands still,
+while when it is made again the current shall be so strong as to make
+the circuit as quickly as possible.
+The rate as given by the break-circuit chronometer did not agree
+with that found by the fall-apparatus, and indeed there was a slight
+discrepancy in the rate given by the latter for different heights of fall.
+Professor J. E. Oliver suggested to me that this discrepancy was due
+to a retardation of the instrument when the hands were geared in,
+which took place somewhat gradually, and I found that this was the
+case, and that the ear could detect that when the hands were geared
+in, during the space of three-fourths of a second, the note produced
+by the vibration of the reed was lowered about the sixth of a tone.
+The supposition that this took place uniformly sufficiently accounted
+136
+WRITINGS OF CHARLES S. PEIRCE, 1872-1878
+for all the discrepancy, and this gave me two more instrumental
+constants, viz: the amount of retardation on gearing in the hands, and
+the time during which that retardation was brought about. With this
+instrument as well as with the other chronometer I made a large
+number of experiments upon the time occupied in answering signals
+of various kinds, such as the emission of points upon paper from
+behind a screen, the appearance of induction-sparks from a Ruhm-
+korff coil, flashes of light thrown upon a screen, sudden changes from
+one magic-lantern figure to another, &c., the general result of which
+was to confirm the facts already in our possession, and which are due
+to the researches of Hirsch, Daumbusch, and others. But there was
+one series of experiments which deserves particular description. I
+employed a young man about eighteen years of age, who had had no
+previous experience whatever in observations, to answer a signal
+consisting of a sharp sound like a rap, the answer being made upon
+a telegraph-operator's key nicely adjusted. Five hundred observa-
+tions were made on every week-day during a month, twenty-four
+days' observations in all. The results are given in the accompanying
+table, and are also shown upon plate No. 27. On this plate the abscissae
+represent the interval of time between the signal and the answer as
+indicated on the Hipp chronoscope, the ordinates measure the num-
+ber of observations, which were subject to a large amount of error.
+The curve has, however, not been plotted directly from the observa-
+tions, but after they have been smoothed off by the addition of adja-
+cent numbers in the table eight times over, so as to diminish the
+irregularities of the curve. The smoother curve on the figures is a
+mean curve for every day drawn by eye so as to eliminate the ir-
+regularities entirely. It was found that after the first two or three days
+the curve differed very little from that derived from the theory of
+least squares. It will be noticed that on the first day, when the ob-
+server was entirely inexperienced, the observations scattered to such
+an extent that I have been obliged to draw the curve upon a different
+scale from that adopted for the other days. It will also be seen that
+the personal equation from the mean amount by which the answer
+came too late rapidly decreased for the first five days, until it was
+about one seventh of a second, and that it then gradually increased
+until the twelfth day, when it amounted to about 0.22 seconds. But
+while the personal equation was thus first diminishing and afterward
+increasing, the probable error or range of errors was constantly de-
+creasing after the twelfth day. There was some variation in the per-
+Theory of Errors of Observation, 1873
+137
+sonal equat n, but not much, but the range of errors continually
+decreased as long as the observations lasted, and so remarkably that
+for the twenty-fourth day the probable error does not exceed one-
+eightieth of a second. I think that this clearly demonstrates the value
+of such practice in training the nerves for observation, for it can
+hardly be supposed that the best observer has so small a range of
+error as this, and I would therefore recommend that transit-observ-
+ers be kept in constant training by means of some observations of an
+artificial event which can be repeated with rapidity, so that several
+hundred can be taken daily without great labor, and I do not think
+that it is essential that these observations should very closely imitate
+the transit of a star over wires, inasmuch as it is the general condition
+of the nerves which it is important to keep in training more than
+anything peculiar to this or that kind of observation.

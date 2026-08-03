@@ -6,9 +6,9 @@
    Part 1: statistical primitives (replacing R's stats package)
    Part 2: a small canvas renderer that mimics R base graphics
    Part 3: tiny DOM / control-building utilities
-   Shared lineage with ../roc-and-hypothesis-testing/src/03_lib.js. The normal
-   family and the renderer are the same code; the discrete family (lgamma,
-   choose, dhyper, pbinom) is added here for the tornado and tea scenarios.
+   Shared lineage with ../roc-and-hypothesis-testing/src/03_lib.js, trimmed to
+   what this page actually calls and extended with a top axis, a draggable
+   marker line, and the pointer plumbing behind it.
    ==========================================================================*/
 
 /* ---------------------------------------------------------------- MATH --- */
@@ -69,50 +69,6 @@ function qnorm(p, mean = 0, sd = 1) {
   return mean + sd * x;
 }
 
-/* ---- the discrete family: Fisher's tea design and the binomial capability
-   model both need exact combinatorics. Everything is routed through a log
-   gamma so the factorials never overflow, even though the counts here are
-   small enough that they would not.                                        */
-
-// Lanczos g=7, n=9 — the standard coefficients; good to ~15 digits.
-function lgamma(x) {
-  const g = [0.99999999999980993, 676.5203681218851, -1259.1392167224028,
-    771.32342877765313, -176.61502916214059, 12.507343278686905,
-    -0.13857109526572012, 9.9843695780195716e-6, 1.5056327351493116e-7];
-  if (x < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * x)) - lgamma(1 - x);
-  x -= 1;
-  let a = g[0];
-  const t = x + 7.5;
-  for (let i = 1; i < 9; i++) a += g[i] / (x + i);
-  return 0.5 * Math.log(2 * Math.PI) + (x + 0.5) * Math.log(t) - t + Math.log(a);
-}
-const lchoose = (n, k) => (k < 0 || k > n) ? -Infinity
-  : lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
-const choose = (n, k) => Math.round(Math.exp(lchoose(n, k)));
-// B(a,b) = Γ(a)Γ(b)/Γ(a+b)
-const beta = (a, b) => Math.exp(lgamma(a) + lgamma(b) - lgamma(a + b));
-
-// P(X = x) for X ~ Hypergeometric: x white drawn from m white and n black in k draws
-function dhyper(x, m, n, k) {
-  if (x < Math.max(0, k - n) || x > Math.min(k, m)) return 0;
-  return Math.exp(lchoose(m, x) + lchoose(n, k - x) - lchoose(m + n, k));
-}
-function dbinom(x, size, prob) {
-  if (x < 0 || x > size) return 0;
-  if (prob <= 0) return x === 0 ? 1 : 0;
-  if (prob >= 1) return x === size ? 1 : 0;
-  return Math.exp(lchoose(size, x) + x * Math.log(prob) + (size - x) * Math.log(1 - prob));
-}
-// P(X <= q); q is floored, as in R
-function pbinom(q, size, prob) {
-  const k = Math.floor(q + 1e-9);
-  if (k < 0) return 0;
-  if (k >= size) return 1;
-  let s = 0;
-  for (let i = 0; i <= k; i++) s += dbinom(i, size, prob);
-  return Math.min(1, s);
-}
-
 /* ---------------------------------------------------------- FORMATTING --- */
 
 // R's round(x, d) then default printing: 0.5 -> "0.5", not "0.5000"
@@ -121,12 +77,9 @@ function rround(x, d) {
   const r = Number(x.toFixed(d));
   return String(r);
 }
-const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
-  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
-
 /* ------------------------------------------------------------ PLOTTING --- */
 /* A minimal re-implementation of the parts of R base graphics the app uses:
-   plot(NULL)/rect/text/lines/points/segments/polygon/abline/axis/legend.
+   plot(NULL)/text/lines/points/segments/polygon/abline/axis/legend.
    Coordinates passed to these methods are USER (data) coordinates.          */
 
 const BASE_FONT = 12;
@@ -148,16 +101,6 @@ class RPlot {
     }
     const [mb, ml, mt, mr] = this.mar;
     let px0 = ml, px1 = this.W - mr, py0 = this.H - mb, py1 = mt;
-    /* `square` shrinks the PLOT REGION to a square and centres it, so a 1:1
-       plot really looks 1:1. (R's coord_fixed instead widens the roomier
-       axis's limits, which leaves the box itself a rectangle — not what an
-       ROC square wants.) Assumes xlim and ylim already span equal ranges. */
-    if (o.square) {
-      const side = Math.min(px1 - px0, py0 - py1);
-      const cx = (px0 + px1) / 2;
-      px0 = cx - side / 2; px1 = cx + side / 2;
-      py1 = py0 - side;
-    }
     this.xlim = xlim; this.ylim = ylim;
     this.px0 = px0; this.px1 = px1; this.py0 = py0; this.py1 = py1;
     return this;
@@ -212,17 +155,6 @@ class RPlot {
       if (o.pch === 21) { c.fillStyle = o.fill || "white"; c.fill(); c.stroke(); } else c.fill();
     }
   }
-  // axis-aligned rectangle in user coordinates — the tea scenario's bars
-  rect(x0, y0, x1, y1, o = {}) {
-    const c = this.ctx;
-    const px = this.X(x0), py = this.Y(y1);
-    const w = this.X(x1) - px, hgt = this.Y(y0) - py;
-    if (o.col) { c.fillStyle = o.col; c.fillRect(px, py, w, hgt); }
-    if (o.border) {
-      c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; c.setLineDash([]);
-      c.strokeRect(px, py, w, hgt);
-    }
-  }
   segments(x0, y0, x1, y1, o = {}) {
     const c = this.ctx;
     c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
@@ -254,19 +186,6 @@ class RPlot {
     const bottom = pts.slice().reverse().map((p) => [p[0], baseline]);
     const all = top.concat(bottom);
     this.polygon(all.map((p) => p[0]), all.map((p) => p[1]), o);
-  }
-  arrow(x0, y0, x1, y1, o = {}) {
-    const c = this.ctx;
-    this.segments(x0, y0, x1, y1, o);
-    const P0 = [this.X(x0), this.Y(y0)], P1 = [this.X(x1), this.Y(y1)];
-    const len = o.length || 8;
-    const ang = Math.atan2(P1[1] - P0[1], P1[0] - P0[0]);
-    const spread = (o.angle || 20) * Math.PI / 180;
-    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1;
-    c.beginPath();
-    c.moveTo(P1[0], P1[1]); c.lineTo(P1[0] - len * Math.cos(ang - spread), P1[1] - len * Math.sin(ang - spread));
-    c.moveTo(P1[0], P1[1]); c.lineTo(P1[0] - len * Math.cos(ang + spread), P1[1] - len * Math.sin(ang + spread));
-    c.stroke();
   }
   static ticks(lo, hi, n = 5) {
     const span = hi - lo;
@@ -504,7 +423,6 @@ function h(html) {
   return t.content.firstElementChild;
 }
 const $ = (sel, root) => (root || document).querySelector(sel);
-const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
 
 function slider(id, label, min, max, value, step, fmtFn) {
   const d = document.createElement("div");
@@ -517,27 +435,7 @@ function slider(id, label, min, max, value, step, fmtFn) {
   show();
   return d;
 }
-function select(id, label, choices, selected) {
-  const opts = choices.map(([v, t]) => `<option value="${esc(v)}"${String(v) === String(selected) ? " selected" : ""}>${esc(t)}</option>`).join("");
-  return h(`<div class="ctl"><label for="${id}">${label}</label><select id="${id}">${opts}</select></div>`);
-}
-function checkbox(id, label, checked) {
-  return h(`<div class="ctl checkbox"><label><input type="checkbox" id="${id}"${checked ? " checked" : ""}> ${label}</label></div>`);
-}
-function radios(name, label, choices, selected, stacked) {
-  const items = choices.map(([v, t]) =>
-    `<label><input type="radio" name="${name}" value="${esc(v)}"${v === selected ? " checked" : ""}> ${esc(t)}</label>`).join("");
-  return h(`<div class="ctl"><label>${label}</label><div class="radio-row${stacked ? " stacked" : ""}">${items}</div></div>`);
-}
 function helpText(str) { return h(`<p class="help-text">${str}</p>`); }
-function numberInput(id, label, value, min, max, step) {
-  return h(`<div class="ctl"><label for="${id}">${label}</label>
-    <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}"></div>`);
-}
-function readonlyRow(label, value, id, note) {
-  return h(`<div class="ctl"><label>${label}</label>
-    <div class="readonly-val"${id ? ` id="${id}"` : ''}>${value}${note ? ` <span class="ro-note">${note}</span>` : ''}</div></div>`);
-}
 // update a slider's position and its printed value together
 function setSliderValue(id, v, fmtFn) {
   const e = document.getElementById(id);
@@ -546,8 +444,4 @@ function setSliderValue(id, v, fmtFn) {
   const out = document.getElementById(id + '_val');
   if (out) out.textContent = fmtFn ? fmtFn(+v) : v;
 }
-const val = (id) => { const e = document.getElementById(id); return e ? e.value : null; };
-const num = (id) => +val(id);
-const chk = (id) => { const e = document.getElementById(id); return e ? e.checked : false; };
-const radioVal = (name) => { const e = document.querySelector(`input[name="${name}"]:checked`); return e ? e.value : null; };
 </script>

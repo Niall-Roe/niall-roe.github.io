@@ -1,0 +1,1827 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Three ways to measure a person</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300..700&family=Karla:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{--ground:#E9E9E1;--panel:#F7F7F2;--ink:#1D201B;--soft:#5A5E56;--faint:#8C9086;
+ --rule:#CECEC3;--rule2:#DEDED4;--data:#35566B;--data2:#7C9AAB;--live:#5F7333;--flag:#8C4A2F;--gold:#8A6D1F}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:Karla,system-ui,sans-serif;
+ font-weight:300;font-size:16.5px;line-height:1.65}
+.mono,code{font-family:"Space Mono",ui-monospace,monospace}
+.wrap{max-width:830px;margin:0 auto;padding:0 30px 140px}
+header.mast{padding:58px 0 26px}
+h1{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:46px;line-height:1.05;
+ letter-spacing:-.02em;margin:0 0 18px;max-width:16ch}
+.stand{font-size:18px;color:var(--soft);max-width:60ch;margin:0}
+.stand em{font-style:italic;color:var(--ink)}
+nav{position:sticky;top:0;z-index:20;background:var(--ground);border-bottom:1px solid var(--ink);
+ display:flex;gap:0;margin:30px 0 0;flex-wrap:wrap}
+nav button{font-family:Karla,sans-serif;font-size:14.5px;background:none;border:none;
+ border-bottom:2px solid transparent;color:var(--faint);padding:15px 18px 12px;cursor:pointer;
+ text-align:left;line-height:1.3}
+nav button b{display:block;font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.13em;
+ font-weight:400;margin-bottom:3px}
+nav button:hover{color:var(--ink)}
+nav button.sel{color:var(--ink);border-bottom-color:var(--live)}
+nav button:focus-visible{outline:2px solid var(--flag);outline-offset:-2px}
+.tab{display:none}.tab.sel{display:block}
+.strip{display:flex;gap:0;margin:0 0 8px;flex-wrap:wrap;padding:16px 0 0}
+.strip span{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.08em;color:var(--faint);
+ padding:5px 13px 5px 0;border-top:2px solid var(--rule2);flex:1;min-width:80px;margin-right:6px}
+.strip span.done{color:var(--live);border-top-color:var(--live)}
+article{padding:44px 0;border-top:1px solid var(--rule)}
+.act-n{font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.16em;color:var(--live);margin:0 0 11px}
+h2{font-family:Fraunces,Georgia,serif;font-weight:400;font-size:29px;line-height:1.2;margin:0 0 13px;letter-spacing:-.01em}
+h2 small{font-family:Karla;font-size:15px;color:var(--faint);font-weight:300;display:block;margin-top:5px}
+p{max-width:62ch}p.q{font-size:17px;color:var(--soft)}
+.panel{background:var(--panel);border:1px solid var(--rule2);padding:20px;margin:24px 0}
+.panel h3{font-family:"Space Mono",monospace;font-weight:400;font-size:10.5px;letter-spacing:.13em;
+ text-transform:uppercase;color:var(--faint);margin:0 0 13px}
+canvas{display:block;width:100%}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:18px 0}
+button.b{font-family:Karla,sans-serif;font-size:14.5px;font-weight:400;background:var(--panel);
+ border:1px solid var(--ink);color:var(--ink);padding:9px 16px;cursor:pointer}
+button.b:hover:not(:disabled){background:var(--ink);color:var(--panel)}
+button.b:disabled{opacity:.3;cursor:default}
+button.b.go{background:var(--live);border-color:var(--live);color:#fff}
+button.b.go:hover:not(:disabled){background:var(--ink);border-color:var(--ink)}
+button.b.ghost{border-color:var(--rule);color:var(--soft)}
+button.b:focus-visible{outline:2px solid var(--flag);outline-offset:3px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(126px,1fr));gap:1px;
+ background:var(--rule2);border:1px solid var(--rule2);margin:20px 0}
+.stat{background:var(--panel);padding:12px 14px}
+.stat .k{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.09em;text-transform:uppercase;
+ color:var(--faint);display:block;margin-bottom:4px}
+.stat .v{font-family:"Space Mono",monospace;font-size:20px;letter-spacing:-.02em}
+.stat .v.d{color:var(--data)}.stat .v.g{color:var(--live)}.stat .v.f{color:var(--flag)}.stat .v.g{color:var(--live)}
+.reveal{border-left:2px solid var(--live);background:rgba(95,115,51,.07);padding:15px 18px;
+ margin:22px 0 0;max-width:64ch;font-size:15.5px;display:none}
+.reveal.on{display:block}.reveal strong{font-weight:500}
+.hist{border-left:2px solid var(--gold);background:rgba(138,109,31,.07);padding:15px 18px;
+ margin:22px 0;max-width:64ch;font-size:15.5px}
+.hist strong{font-weight:500}
+.ctl{display:grid;grid-template-columns:180px 1fr 92px;align-items:center;gap:14px;margin:13px 0}
+@media(max-width:620px){.ctl{grid-template-columns:1fr}}
+.ctl label{font-size:14px;color:var(--soft)}
+.ctl .v{font-family:"Space Mono",monospace;font-size:13.5px;text-align:right}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:20px;background:transparent;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:1px;background:var(--ink)}
+input[type=range]::-moz-range-track{height:1px;background:var(--ink)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;
+ background:var(--live);border:none;margin-top:-6.5px}
+input[type=range]::-moz-range-thumb{width:14px;height:14px;border-radius:50%;background:var(--live);border:none}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-family:"Space Mono",monospace;margin:6px 0}
+th,td{padding:6px 9px;text-align:right;border-bottom:1px solid var(--rule2)}
+th{font-weight:400;color:var(--faint);font-size:10px;letter-spacing:.07em;text-transform:uppercase}
+td:first-child,th:first-child{text-align:left}
+tr.hi td{background:rgba(95,115,51,.1)}
+.stage{background:#3A3A3A;padding:44px 30px;display:flex;gap:44px;justify-content:center;align-items:center;margin:20px 0}
+.patch{width:146px;height:146px;border-radius:2px}
+.patch.solo{width:190px;height:190px}
+@media(max-width:600px){.patch{width:108px;height:108px}.patch.solo{width:150px;height:150px}.stage{gap:22px;padding:30px 16px}}
+.keys{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin:14px 0 0}
+.keys button.b{min-width:138px;font-size:14.5px}
+.kk{display:block;font-family:"Space Mono",monospace;font-size:10px;color:var(--faint);margin-top:2px}
+button.b:hover .kk{color:inherit}
+.prog{height:3px;background:var(--rule2);margin:18px 0 8px}.prog i{display:block;height:100%;background:var(--live);width:0}
+.small{font-size:13.5px;color:var(--faint);max-width:60ch}
+.instr{font-family:Fraunces,serif;font-style:italic;font-size:19px;text-align:center;margin:0 0 4px}
+.hidden{display:none}
+.conf{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:9px;margin:14px 0 0}
+.conf button.b{text-align:left;padding:11px 14px;font-size:13.5px;line-height:1.35}
+.conf button.b em{font-style:normal;font-family:"Space Mono",monospace;font-size:15px;
+ color:var(--live);display:block;margin-bottom:3px}
+.conf button.b:hover em{color:inherit}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+<header class="mast">
+  <h1>Three ways to measure a person</h1>
+  <p class="stand">Two of Fechner's methods and the experiment that broke them apart. Each tab derives its scale from simulated data you generate yourself, then hands the apparatus over: <em>the last stage of every tab is run on you.</em></p>
+</header>
+
+<nav class="lvl1">
+  <button class="sel" data-s="F">Fechner's laboratory</button>
+  <button data-s="P">Peirce's reaction times</button>
+</nav>
+
+<div class="sect sel" id="sectF">
+<nav class="lvl2">
+  <button class="sel" data-t="1"><b>METHOD I</b>Right and wrong cases</button>
+  <button data-t="2"><b>METHOD II</b>Just noticeable differences</button>
+  <button data-t="3"><b>1884</b>Peirce and Jastrow</button>
+  <button data-t="4"><b>SUMMARY</b>The pipeline, side by side</button>
+</nav>
+
+
+<!-- ================= TAB 1 ================= -->
+<div class="tab sel" id="tab1">
+<div class="strip" id="strip1"></div>
+
+<article>
+  <p class="act-n">STAGE 01</p>
+  <h2>One judgement at a time</h2>
+  <p class="q">A subject lifts a 100 g standard and a 103 g comparison and says which is heavier. That is the whole task. Run it and watch the running proportion.</p>
+  <div class="row">
+    <button class="b go" id="t1a">Run one trial</button><button class="b" id="t1b">Run 10</button>
+    <button class="b" id="t1c">Run 100</button><button class="b ghost" id="t1r">Reset</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="k">Trials</span><span class="v" id="t1n">0</span></div>
+    <div class="stat"><span class="k">Correct</span><span class="v" id="t1k">0</span></div>
+    <div class="stat"><span class="k">Proportion</span><span class="v d" id="t1p">—</span></div>
+  </div>
+  <div class="panel"><h3>Running proportion correct</h3><canvas id="t1plot" height="175"></canvas></div>
+  <div class="reveal" id="t1rev"><strong>These trials are kept.</strong> A 100 g standard against a 103 g comparison is a 3 g difference, so everything you have just run becomes the 3 g point of the next stage — you will find it already plotted there. <strong>And notice that no single trial carried a magnitude.</strong> Each one was a direction — left or right — and yet the proportion has settled on a stable number. Fechner was explicit that in this method an individual observation has next to no meaning, and that a few determinations, however exact, give no accuracy at all. An astronomer's transit timing is nothing like this: there each observation is already a measurement.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 02</p>
+  <h2>Vary the difference</h2>
+  <p class="q">Each button runs 120 trials at one difference.</p>
+  <div class="row" id="t2btns"></div>
+  <div class="row"><button class="b ghost" id="t2r">Reset</button></div>
+  <div class="panel"><h3>Proportion correct against difference</h3><canvas id="t2plot" height="240"></canvas></div>
+  <p class="q" style="font-family:Fraunces,serif;font-style:italic;font-size:19px">If the subject had a genuine threshold — a difference below which he truly cannot tell — what shape should these points make?</p>
+  <div class="row">
+    <button class="b" id="t2step">Overlay: a real threshold</button>
+    <button class="b" id="t2sm">Overlay: no threshold, fitted to your data</button>
+    <button class="b ghost" id="t2cl">Clear</button>
+  </div>
+  <div class="reveal" id="t2rev"><strong>A true threshold predicts a corner: flat at chance, then rising.</strong> The data have no corner. Performance climbs smoothly out of chance from the smallest difference upward, which means the subject does better than guessing at differences he would tell you he cannot feel. Peirce and Jastrow built an experiment on precisely this, and it is visible inside Fechner's own method.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 03</p>
+  <h2>What would produce that curve?<small>Tune \u03c3 until the prediction matches the proportions you collected</small></h2>
+  <p class="q">Suppose each lift registers as the true weight plus a random error. Two lifts give two noisy values and the subject reports whichever felt larger. Tune the noise until the prediction matches your data.</p>
+  <div class="row"><button class="b go" id="t3two">View: the two lifts</button><button class="b" id="t3diff">View: the difference between them</button></div>
+  <p class="small" id="t3cap">Each lift lands somewhere under its own curve. He reports whichever felt heavier, so he is right whenever the noise does not overturn the true order.</p>
+  <div class="panel"><h3 id="t3h">Internal values for the two lifts</h3><canvas id="t3plot" height="240"></canvas></div>
+  <div class="ctl"><label for="t3s">Noise per lift, σ</label><input type="range" id="t3s" min="1" max="14" step=".05" value="11"><span class="v" id="t3sv"></span></div>
+  <div class="row"><button class="b go" id="t3snap">Snap σ to the least-squares fit</button></div>
+  <div class="panel"><h3>Prediction against your data</h3><canvas id="t3fit" height="225"></canvas></div>
+  <div class="stats">
+    <div class="stat"><span class="k">σ per lift</span><span class="v d" id="t3r1">—</span></div>
+    <div class="stat"><span class="k">σ of the difference</span><span class="v d" id="t3r2">—</span></div>
+    <div class="stat"><span class="k">Precision h</span><span class="v" id="t3r3">—</span></div>
+    <div class="stat"><span class="k">Misfit</span><span class="v" id="t3r4">—</span></div>
+  </div>
+  <div class="reveal" id="t3rev"><strong>You have measured something invisible — but look where the number came from.</strong> Not from any observation: from a curve you assumed, adjusted until its predictions matched a set of proportions. Change the assumed shape and the number changes with it.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 04</p>
+  <h2>The threshold<small>Fechner\u2019s decision rule, after Link (1994) Fig. 1</small></h2>
+  <p class="q">The average of the two true heavinesses is the criterion. He errs when the light weight is pushed above it, or the heavy one falls below. Each difference D gives one diagram, and one point on the curve.</p>
+  <div class="panel"><canvas id="t4all" height="440"></canvas></div>
+  <div class="ctl"><label for="t4sig">Noise per lift, \u03c3</label><input type="range" id="t4sig" min="1" max="14" step=".05" value="11"><span class="v" id="t4sigv"></span></div>
+  <div class="ctl"><label for="t4b">Criterion, offset from the midpoint</label><input type="range" id="t4b" min="-6" max="6" step=".1" value="0"><span class="v" id="t4bv"></span></div>
+  <div class="ctl"><label for="t4c">Performance called a threshold</label><input type="range" id="t4c" min=".55" max=".95" step=".005" value=".75"><span class="v" id="t4cv"></span></div>
+  <div class="row">
+    <button class="b go" id="t4c75">Snap to 75%</button>
+    <button class="b" id="t4mid">Criterion back to the midpoint</button>
+    <button class="b" id="t4fit">Snap \u03c3 to the fit</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="k">Precision h = 1/\u221a2\u03c3</span><span class="v d" id="t4h">\u2014</span></div>
+    <div class="stat"><span class="k">Threshold D</span><span class="v g" id="t4t">\u2014</span></div>
+    <div class="stat"><span class="k">t = hD/2 there</span><span class="v g" id="t4tt">\u2014</span></div>
+    <div class="stat"><span class="k">In units of \u03c3</span><span class="v g" id="t4t1">\u2014</span></div>
+    <div class="stat"><span class="k">Probable error 0.6745\u03c3</span><span class="v" id="t4pev">\u2014</span></div>
+    <div class="stat"><span class="k">Ceiling of the curve</span><span class="v" id="t4ceil">\u2014</span></div>
+  </div>
+  <div class="reveal on" id="t4note"></div>
+
+  <div class="panel"><h3>The probable error of one lift</h3><canvas id="t4pe" height="215"></canvas></div>
+  <p class="small">Half of all sensory errors fall inside the green band. Fechner\u2019s criterion is that width: errors reach a quarter exactly when the two weights are twice the probable error apart, which is where t = 0.4769.</p>
+
+  <p class="act-n">STAGE 05 · YOUR TURN</p>
+  <h2>Run it on yourself<small>Method of constant stimuli — 50 trials, about three minutes</small></h2>
+  <p class="q">Two grey squares. Say which is lighter, by click or with <code>F</code> and <code>J</code>. Five difference levels shuffled together. Some pairs will look identical. Answer anyway.</p>
+  <p class="small">Dim room, full brightness.</p>
+  <div class="row"><button class="b go" id="t5go">Begin</button></div>
+  <div id="t5box" class="hidden">
+    <p class="instr">Which is lighter?</p>
+    <div class="stage"><div class="patch" id="t5L"></div><div class="patch" id="t5R"></div></div>
+    <div class="keys"><button class="b" id="t5l">Left<span class="kk">F</span></button><button class="b" id="t5rr">Right<span class="kk">J</span></button></div>
+    <div class="prog"><i id="t5bar"></i></div>
+    <p class="small mono" id="t5c" style="text-align:center"></p>
+  </div>
+  <div id="t5done" class="hidden">
+    <div class="panel"><h3>Your psychometric function</h3><canvas id="t5plot" height="235"></canvas></div>
+    <div class="stats">
+      <div class="stat"><span class="k">Your σ</span><span class="v d" id="t5s">—</span></div>
+      <div class="stat"><span class="k">Your threshold</span><span class="v d" id="t5t">—</span></div>
+      <div class="stat"><span class="k">Weber fraction</span><span class="v d" id="t5w">—</span></div>
+      <div class="stat"><span class="k">Hardest level</span><span class="v" id="t5h">—</span></div>
+    </div>
+    <div class="reveal on" id="t5rev"></div>
+    <div class="row"><button class="b ghost" id="t5again">Run again</button></div>
+  </div>
+</article>
+</div>
+
+<!-- ================= TAB 2 ================= -->
+<div class="tab" id="tab2">
+<div class="strip" id="strip2"></div>
+
+<article>
+  <p class="act-n">STAGE 01</p>
+  <h2>A single series</h2>
+  <p class="q">Different question entirely. The comparison weight starts equal to the standard and creeps upward; the subject says when a difference becomes apparent. Step through it one judgement at a time.</p>
+  <div class="row"><button class="b go" id="u1step">Next step</button><button class="b" id="u1run">Run the whole series</button><button class="b ghost" id="u1r">Reset</button></div>
+  <div class="panel"><h3>The series so far</h3><canvas id="u1plot" height="170"></canvas></div>
+  <div class="stats">
+    <div class="stat"><span class="k">Judgements</span><span class="v" id="u1n">0</span></div>
+    <div class="stat"><span class="k">Current difference</span><span class="v" id="u1d">0.0 g</span></div>
+    <div class="stat"><span class="k">Transition point</span><span class="v d" id="u1t">—</span></div>
+  </div>
+  <div class="reveal" id="u1rev"><strong>About ten judgements, and a number with a magnitude already in it.</strong> Compare the other method, where two hundred trials were needed before anything stable emerged. Here the series <em>is</em> the measurement, and no distribution has been assumed to get it.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 02</p>
+  <h2>Direction matters</h2>
+  <p class="q">Run the series downward as well and the two disagree. Coming up from below the subject has been saying “the same” and carries on a little too long; coming down he persists in “different.” Set his habituation bias and run sixteen series.</p>
+  <div class="ctl"><label for="u2b">Habituation bias</label><input type="range" id="u2b" min="0" max="2.5" step=".05" value="1"><span class="v" id="u2bv"></span></div>
+  <div class="row"><button class="b go" id="u2run">Run 16 series</button></div>
+  <div class="panel"><h3>Transition points, ascending and descending</h3><canvas id="u2plot" height="195"></canvas></div>
+  <div class="stats">
+    <div class="stat"><span class="k">Ascending mean</span><span class="v" id="u2a">—</span></div>
+    <div class="stat"><span class="k">Descending mean</span><span class="v" id="u2d">—</span></div>
+    <div class="stat"><span class="k">Their average</span><span class="v d" id="u2t">—</span></div>
+    <div class="stat"><span class="k">Gap</span><span class="v" id="u2g">—</span></div>
+  </div>
+  <div class="reveal" id="u2rev"><strong>Move the bias slider and run again.</strong> The two directions pull apart by exactly what you set — and their average does not move. That invariance is the whole reason the procedure is built this way: averaging cancels a bias whose size nobody needs to know. It is a genuine repair, and it is worth noticing that the other method has no equivalent, because it never asks the subject where a boundary lies.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 03</p>
+  <h2>Certainty is a free parameter</h2>
+  <p class="q">The subject has been answering a question that was never made precise. Say so when you <em>suspect</em> a difference and the threshold falls; say so only when <em>certain</em> and it rises. Nothing about his eyes changes.</p>
+  <div class="row"><button class="b go" id="u3run">Run all three instructions</button></div>
+  <div class="panel"><h3>One subject, three thresholds</h3><canvas id="u3plot" height="200"></canvas></div>
+  <div class="stats" id="u3stats"></div>
+  <div class="reveal" id="u3rev"><strong>There are as many just noticeable differences as there are levels of certainty you might demand.</strong> So the threshold is never a fact about a subject alone; it is a fact about a subject plus an unstated convention about how sure he must be before speaking. Fechner's procedure leaves that convention out of the report, which is exactly why the number looks like it belongs to the subject.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 04</p>
+  <h2>Counting your way to a scale</h2>
+  <p class="q">Declare one threshold to be one unit of sensation. Start at the faintest detectable weight and climb, one unit at a time.</p>
+  <div class="row">
+    <button class="b go" id="u4a">Add one unit</button><button class="b" id="u4b">Add 10</button>
+    <button class="b" id="u4c">Climb to 100 g</button><button class="b ghost" id="u4r">Back to the start</button>
+  </div>
+  <div class="stats">
+    <div class="stat"><span class="k">Units climbed</span><span class="v d" id="u4n">0</span></div>
+    <div class="stat"><span class="k">Weight now</span><span class="v" id="u4w">1.00 g</span></div>
+    <div class="stat"><span class="k">This step</span><span class="v" id="u4s">—</span></div>
+  </div>
+  <div class="panel"><h3>Each unit is a fixed ratio, so the steps grow</h3><canvas id="u4plot" height="265"></canvas></div>
+  <div class="ctl"><label for="u4w0">Absolute threshold W₀</label><input type="range" id="u4w0" min=".2" max="5" step=".05" value="1"><span class="v" id="u4w0v"></span></div>
+  <div class="reveal" id="u4rev"><strong>You did not assume a logarithm; you counted, and a logarithm appeared.</strong> Note what this route needed and what it did not. No Gaussian, no probable error, no criterion of percentage correct — none of the apparatus the other method cannot do without. What it did need is the assumption that every just noticeable difference counts for the same amount of sensation everywhere on the scale, which nothing in the procedure tests. And it needed a starting point, which the slider shows you fixing by hand.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 05 · YOUR TURN</p>
+  <h2>Find your own boundary<small>Six series, three ascending and three descending</small></h2>
+  <p class="q">Two grey squares, identical to start. Keep saying they look the same; the moment a difference appears, say so and the series ends. Then the same in reverse. Keys <code>S</code> and <code>D</code>.</p>
+  <div class="row"><button class="b go" id="u5go">Begin</button><button class="b ghost" id="u5r">Start over</button></div>
+  <div id="u5box" class="hidden">
+    <p class="instr" id="u5instr"></p>
+    <div class="stage"><div class="patch" id="u5L"></div><div class="patch" id="u5R"></div></div>
+    <div class="keys"><button class="b" id="u5s">They look the same<span class="kk">S</span></button><button class="b" id="u5d">I can see a difference<span class="kk">D</span></button></div>
+    <div class="prog"><i id="u5bar"></i></div>
+    <p class="small mono" id="u5c" style="text-align:center"></p>
+  </div>
+  <div class="panel"><h3>Your transition points</h3><canvas id="u5plot" height="195"></canvas></div>
+  <div class="stats">
+    <div class="stat"><span class="k">Ascending mean</span><span class="v" id="u5am">—</span></div>
+    <div class="stat"><span class="k">Descending mean</span><span class="v" id="u5dm">—</span></div>
+    <div class="stat"><span class="k">Your JND</span><span class="v d" id="u5j">—</span></div>
+    <div class="stat"><span class="k">Weber fraction</span><span class="v d" id="u5w">—</span></div>
+  </div>
+  <div class="reveal" id="u5rev"><strong>A threshold of your own, measured, with nothing assumed about the shape of anything.</strong> Your two directions will have disagreed — that gap is the error of habituation, produced by you, in about two minutes. Hold on to this number: the third tab will show you what it fails to notice about your own eyes.</div>
+</article>
+</div>
+
+<!-- ================= TAB 3 ================= -->
+<div class="tab" id="tab3">
+<div class="strip" id="strip3"></div>
+
+<article>
+  <p class="act-n">STAGE 01</p>
+  <h2>The question, and the apparatus</h2>
+  <p class="q">Peirce and Jastrow saw that the two methods make incompatible predictions below the threshold. If a least perceptible difference exists, sub-threshold pairs must be judged wrongly as often as rightly. If the theory of errors is right, they must be judged rightly more often — and in a ratio calculable in advance.</p>
+  <div class="hist"><strong>The apparatus, December 1883 to April 1884.</strong> A Fairbanks post-office scale with a half-inch square plate fixed to the beam, capped in India rubber so the finger felt no cold metal. A kilogram in the pan delivered a quarter of its weight to the fingertip. The differential weight sat in a small cork-bottomed pan lowered by a stretched rubber thread, so that nothing jarred. A screen hid the operator. Peirce used his left forefinger, Jastrow his left middle finger. Fifty trials to a set, one hundred and fifty to a two-hour sitting.</div>
+  <p class="q">And a detail that matters more than it looks: the order of each trial was set by a shuffled pack of twenty-five cards, twelve red and thirteen black, their corners punched to record the confidence mark. This is the first deliberately randomised experiment in the human sciences.</p>
+  <div class="panel"><h3>What randomisation buys you</h3><canvas id="v1plot" height="215"></canvas></div>
+  <div class="row"><button class="b go" id="v1run">Run 200 sittings, each way</button><button class="b ghost" id="v1r">Reset</button></div>
+  <div class="stats">
+    <div class="stat"><span class="k">Shuffled deck</span><span class="v d" id="v1a">—</span></div>
+    <div class="stat"><span class="k">Operator free to choose</span><span class="v" id="v1b">—</span></div>
+  </div>
+  <div class="reveal" id="v1rev"><strong>The simulated subject is identical in both conditions.</strong> The only difference is that in the second an operator with unconscious habits — a slight tendency to alternate — hands the subject a pattern to lock onto. The estimate inflates, and no amount of care in the measurement itself would reveal it. The deck is not a nicety. It is what makes the observed proportion an estimate of discrimination rather than of pattern-learning.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 02</p>
+  <h2>Their real data</h2>
+  <p class="q">Errors per fifty trials, at each ratio of pressures. Jastrow's runs are grouped because his probable error fell steadily through the winter with practice. Move the slider to find the probable error that best fits each group, exactly as they did.</p>
+  <div class="row" id="v2btns"></div>
+  <div class="panel"><h3>Observed errors in fifty, against the theory of errors</h3><canvas id="v2plot" height="255"></canvas></div>
+  <div class="ctl"><label for="v2pe">Probable error</label><input type="range" id="v2pe" min=".008" max=".07" step=".0005" value="0.05"><span class="v" id="v2pev"></span></div>
+  <div class="row"><button class="b" id="v2best">Snap to their published value</button></div>
+  <div class="stats">
+    <div class="stat"><span class="k">Group</span><span class="v" id="v2g" style="font-size:14px">—</span></div>
+    <div class="stat"><span class="k">Their probable error</span><span class="v g" id="v2pub">—</span></div>
+    <div class="stat"><span class="k">Mean misfit, errors in 50</span><span class="v d" id="v2mis">—</span></div>
+  </div>
+  <div class="hist"><strong>Their prediction rule, footnote 2.</strong> Divide the logarithm of the ratio of excitations by the probable error, multiply by 0.477, and enter the result in the ordinary table of the error integral. That 0.477 is the constant relating probable error to Gauss's precision, and the table is the one every observatory kept on the shelf. The rule that predicts a fingertip's errors is the astronomers' apparatus, unmodified.</div>
+  <div class="reveal" id="v2rev"><strong>It fits — down to a pressure ratio of 1.005, a difference of half a per cent.</strong> No corner appears anywhere, no floor at fifty per cent, and the fitted probable error keeps shrinking as the observers practise rather than settling at some fixed sensory limit. This is what they meant by destroying the presumption in favour of a threshold: not a refutation from principle but a curve that keeps on behaving.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 03</p>
+  <h2>The innovation: recording confidence</h2>
+  <p class="q">On every trial the observer also marked how sure he was, on a four-point scale. Zero did not mean a weak impression. It meant no preference at all — that answering seemed pointless.</p>
+  <div class="panel"><h3>Jastrow's trials, split by confidence mark</h3><canvas id="v3plot" height="255"></canvas></div>
+  <div class="row" id="v3btns"></div>
+  <div id="v3tab"></div>
+  <div class="reveal on"><strong>Read along the confidence-zero row.</strong> At a pressure ratio of 1.005 — half a per cent — Jastrow was right on 294 of 497 trials he described as pure guesswork: 59.2 per cent. Peirce, across his own 706 zero-confidence trials, was right 61.8 per cent of the time; Jastrow across 1,123 such trials, 69.7 per cent. The judgements were affected by differences the observer had no awareness of noticing, which is why they concluded that the confidence itself has no threshold and fades only as the difference it refers to fades.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 04</p>
+  <h2>Confidence as a measured regularity</h2>
+  <p class="q">They then proposed that the confidence mark varies as the logarithm of the odds of being right, with a constant they called the index of confidence. Fit it against their published means.</p>
+  <div class="panel"><h3>Mean confidence against the log-odds of a correct answer</h3><canvas id="v4plot" height="245"></canvas></div>
+  <div class="ctl"><label for="v4c">Index of confidence, c</label><input type="range" id="v4c" min="0" max="2.5" step=".01" value="1.25"><span class="v" id="v4cv"></span></div>
+  <div class="row" id="v4btns"></div>
+  <div class="hist"><strong>A wrinkle worth knowing before you cite this.</strong> The two formulas in the paper use different logarithms. The error rule of footnote 2 needs natural logs to reproduce the published error tables; the confidence relation needs common logs to reproduce the published confidence columns — with natural logs it overshoots by a factor of 2.3 throughout. Neither formula says which is meant. On common logs the relation recovers ten of their twelve calculated values to within 0.05, and the two misses are cells where their own observed and calculated columns already disagree.</div>
+  <div class="reveal on"><strong>This is a different kind of commitment from Fechner's.</strong> The relation is offered as a regularity open to disconfirmation by the very data that support it, and they say plainly that the marks were rough and might be improved in later work. Compare the posit of a continuously varying sensation, which is required in advance so that two methods can be counted as measuring one thing, and which no operation in either method could test. Peirce theorises past his data here too — but the debt is one his experiment could call in.</div>
+</article>
+
+<article>
+  <p class="act-n">STAGE 05 · YOUR TURN</p>
+  <h2>Their design, run on you<small>36 trials with confidence marks, about five minutes</small></h2>
+  <p class="q">Faithful to the original in the ways that matter. A single patch changes and changes back: it either brightens then returns, or darkens then returns, and you say which — Peirce's double change, which held the sensation of increase and decrease constant across every trial. Order comes from a shuffled deck. After each answer you mark your confidence on their four-point scale.</p>
+  <p class="small">Mark zero honestly. It is the whole experiment.</p>
+  <div class="row"><button class="b go" id="v5go">Begin</button></div>
+  <div id="v5box" class="hidden">
+    <p class="instr" id="v5instr">Watch</p>
+    <div class="stage"><div class="patch solo" id="v5P"></div></div>
+    <div id="v5ansbox" class="hidden">
+      <div class="keys"><button class="b" id="v5up">It brightened, then returned<span class="kk">F</span></button><button class="b" id="v5dn">It darkened, then returned<span class="kk">J</span></button></div>
+    </div>
+    <div id="v5confbox" class="hidden">
+      <p class="small" style="text-align:center;margin:6px auto 0">How confident are you?</p>
+      <div class="conf">
+        <button class="b" data-c="0"><em>0</em>No preference either way; answering feels pointless</button>
+        <button class="b" data-c="1"><em>1</em>A definite leaning toward one answer</button>
+        <button class="b" data-c="2"><em>2</em>Some little confidence of being right</button>
+        <button class="b" data-c="3"><em>3</em>As sure as one gets about such things</button>
+      </div>
+    </div>
+    <div class="prog"><i id="v5bar"></i></div>
+    <p class="small mono" id="v5c" style="text-align:center"></p>
+  </div>
+  <div id="v5done" class="hidden">
+    <div class="panel"><h3>Your trials, split by confidence mark</h3><canvas id="v5plot" height="240"></canvas></div>
+    <div class="stats">
+      <div class="stat"><span class="k">Trials at mark 0</span><span class="v" id="v5n0">—</span></div>
+      <div class="stat"><span class="k">Correct at mark 0</span><span class="v d" id="v5p0">—</span></div>
+      <div class="stat"><span class="k">Odds against chance</span><span class="v" id="v5odds">—</span></div>
+      <div class="stat"><span class="k">Overall correct</span><span class="v" id="v5all">—</span></div>
+    </div>
+    <div class="panel"><h3>Your zero-confidence trials beside theirs</h3><canvas id="v5cmp" height="185"></canvas></div>
+    <div class="reveal on" id="v5rev"></div>
+    <div class="row"><button class="b ghost" id="v5again">Run again</button></div>
+  </div>
+</article>
+
+<article style="border-bottom:1px solid var(--rule)">
+  <p class="act-n">CLOSING</p>
+  <h2>What the confidence mark separated</h2>
+  <p class="q">Tab two measured a boundary: the point at which a difference became apparent. Tab one measured a capacity: how often the right answer comes up. Fechner treated these as two routes to a single quantity, and supplied the quantity — a sensation varying continuously beneath both — because without it the two methods have no common object.</p>
+  <p class="q">Adding one column to the record was enough to pull them apart. The zero-confidence trials are exactly the ones the method of limits scores as nothing, and they are right well above chance. Discrimination and awareness came apart in the data, which is why Peirce concluded that we draw on impressions too faint for us to be aware of having, and left the underlying quantity alone.</p>
+</article>
+</div>
+
+<!-- ================= TAB 4 ================= -->
+<div class="tab" id="tab4">
+<article style="border-top:none">
+  <p class="act-n">THE WHOLE CHAIN</p>
+  <h2>From a judgement to a magnitude of sensation</h2>
+  <p class="q">Both columns start with a person responding to a stimulus and end with a number said to measure his sensation. They pass through the same four way-stations and arrive at different values. What separates them is not accuracy but what each had to be given along the way.</p>
+  <p class="small">Numbers update live from whatever you have run in the other tabs; defaults stand in until then.</p>
+  <div class="pipe" id="pipe"></div>
+</article>
+
+<article>
+  <p class="act-n">THE BILL</p>
+  <h2>What each method had to be given</h2>
+  <div id="ledger"></div>
+  <div class="reveal on"><strong>The two columns divide unevenly.</strong> The distributional debt falls entirely on the method of right and wrong cases: it cannot convert a proportion into a magnitude without assuming a curve, and it cannot mark any point on that curve as a threshold without a criterion imported from outside. The method of limits owes neither — it reaches a full logarithmic scale of sensation with no error law anywhere in it. But the identity debt falls on both. Neither method contains any operation that could test whether a just noticeable difference at 20 grams is the same amount of sensation as one at 200, and without that, counting steps means nothing. That assumption is what makes the two methods appear to have a single object, and it is supplied rather than found in each of them.</div>
+</article>
+
+<article style="border-bottom:1px solid var(--rule)">
+  <p class="act-n">WHERE IT BREAKS</p>
+  <h2>The join that Peirce and Jastrow tested</h2>
+  <p class="q">Read across the first row of the pipeline. One method's raw datum is a boundary report — the point at which a difference becomes apparent. The other's is a forced choice — which of two is greater, apparent or not. Fechner's system requires these to be two windows onto one quantity, and supplies a continuously varying sensation to make them so.</p>
+  <p class="q">The third tab is what happens when you record, on every trial, whether anything was apparent. The trials marked zero are precisely the ones the boundary method scores as nothing, and they are right well above chance. At that point the two columns below are no longer two routes to one number; they are measurements of two different things that a posit had been holding together.</p>
+</article>
+</div>
+</div><!-- /sectF -->
+
+<div class="sect" id="sectP">
+<nav class="lvl2">
+  <button class="sel" data-t="5"><b>1872</b>Peirce's own reading</button>
+  <button data-t="6"><b>1929</b>What Wilson noticed</button>
+  <button data-t="7"><b>2009</b>Koenker's verdict</button>
+</nav>
+
+<div class="tab sel" id="tab5">
+<article style="border-top:none">
+  <p class="act-n">SUMMER 1872 · 11,803 RESPONSES</p>
+  <h2>The experiment that was meant to settle it</h2>
+  <p class="q">A young man of about eighteen, with no experience of scientific observation, sat for twenty-four days between the first of July and the third of August and responded to a sharp rap by depressing a telegraph key. A Hipp chronoscope recorded each response to the millisecond. Roughly five hundred responses a day. Peirce's question was whether errors of observation follow the Gaussian law — and therefore whether least squares is the right way to treat astronomical data.</p>
+  <div class="row" id="r1view"></div>
+  <div class="ctl" id="r1dayctl"><label for="r1day">Day</label><input type="range" id="r1day" min="0" max="23" step="1" value="0"><span class="v" id="r1dayv"></span></div>
+  <div class="panel"><h3 id="r1h">The raw frequencies</h3><canvas id="r1plot" height="330"></canvas></div>
+  <div class="ctl"><label for="r1sm">Smoothing passes</label><input type="range" id="r1sm" min="0" max="8" step="1" value="0"><span class="v" id="r1smv"></span></div>
+  <div class="row" id="r1scheme"></div>
+  <div class="row">
+    <button class="b go" id="r1eye">Draw the mean curve by eye</button>
+    <button class="b" id="r1hand">Let me draw it myself</button>
+    <button class="b" id="r1g">Lay the theoretical Gaussian over it</button>
+    <button class="b ghost" id="r1gr">Clear the overlays</button>
+  </div>
+  <p class="small" id="r1hint"></p>
+  <div class="stats" id="r1stats"></div>
+  <div class="hist"><strong>What Peirce actually did, in his own description.</strong> The plotted curve is not drawn from the observations directly. The figures were smoothed by adding adjacent numbers in the table eight times over, to reduce the irregularities. Adding adjacent entries repeatedly is convolution with a binomial kernel: eight passes gives the eighth row of Pascal's triangle, a near-Gaussian weighting about 1.4 rows wide. The rows of his table are single milliseconds, which is the resolution used here — at roughly 1.5 responses per millisecond, eight passes leave about a third of the sampling noise standing, which is why his plotted curves oscillate as they do. Then — and this is the step that matters most — the smoother curve on each figure is a mean curve <em>drawn by eye</em>, to eliminate the irregularities entirely. No fitting, no least squares, no estimated parameters stand between the observations and the shape being judged. A hand does.</div>
+  <div class="reveal on" id="r1rev"></div>
+</article>
+</div>
+
+<div class="tab" id="tab6">
+<article style="border-top:none">
+  <p class="act-n">WILSON AND HILFERTY, PNAS, 1929</p>
+  <h2>What the moments say</h2>
+  <p class="q">Fifty-seven years later, while preparing Peirce's official biography for the Academy, Edwin Wilson came across the experiment and looked again. He and Margaret Hilferty computed twenty-three statistics for every one of the twenty-four days, by hand. Their conclusion was the opposite of Peirce's.</p>
+  <div class="ctl"><label for="r2day">Day</label><input type="range" id="r2day" min="0" max="23" step="1" value="0"><span class="v" id="r2dayv"></span></div>
+  <h2 style="margin-top:40px">The same day, four ways</h2>
+  <p class="q">Start where the first section left off. This is one of Peirce's days rendered exactly as he rendered it, and then rendered three other ways. Nothing about the data changes between the views. What changes is what the picture lets you see.</p>
+  <div class="row" id="r2cv"></div>
+  <div class="panel"><h3 id="r2cmph">As Peirce plotted it</h3><canvas id="r2cmp" height="320"></canvas></div>
+  <div class="ctl"><label for="r2drop">Drop the slowest responses</label><input type="range" id="r2drop" min="0" max="15" step="1" value="0"><span class="v" id="r2dropv"></span></div>
+  <div class="stats" id="r2cmps"></div>
+  <div class="reveal on" id="r2cmprev"></div>
+
+  <div class="row" id="r2ref"></div>
+  <div class="panel"><h3 id="r2qqh">Sorted observations against theoretical quantiles</h3><canvas id="r2qq" height="310"></canvas></div>
+  <div class="stats" id="r2qqs"></div>
+  <div class="reveal on">A straight line means the law fits. Switch the reference between the two candidates: Laplace's second law, the Gaussian, which Peirce set out to confirm, and Laplace's first law, the double exponential, which Fréchet and then Wilson and Hilferty preferred. The Gaussian plot bends away at both ends on almost every day. The Laplace plot is straighter through much more of its range — not perfect, but the difference is not subtle.</div>
+
+  <div class="panel"><h3>Too peaked at the centre and too heavy in the tails, at once</h3><canvas id="r2pk" height="290"></canvas></div>
+  <div class="ctl"><label for="r2beta">Shape parameter \u03b2</label><input type="range" id="r2beta" min="0.5" max="2.6" step="0.01" value="2"><span class="v" id="r2betav"></span></div>
+  <div class="row">
+    <button class="b go" id="r2fit">Fit \u03b2 to this day</button>
+    <button class="b" id="r2g2">Set \u03b2 = 2 (Gaussian)</button>
+    <button class="b" id="r2g1">Set \u03b2 = 1 (Laplace)</button>
+  </div>
+  <div class="stats" id="r2stats"></div>
+  <div class="reveal on"><strong>The family being slid through is exp(\u2212|x/\u03b1|<sup>\u03b2</sup>).</strong> At \u03b2 = 2 it is the Gaussian, at \u03b2 = 1 Laplace's first law; below 1 it is heavier-tailed than either. Fit it to each day and the answer never once comes back near 2. The mean of the twenty-four maximum-likelihood estimates is 1.10, the range runs from 0.73 to 1.48, and Laplace outscores the Gaussian on likelihood on 22 of the 24 days. This is the modern restatement of what Wilson and Hilferty saw in their columns: the ratio of half the interquartile range to 0.6745\u03c3 would be 1 for a Gaussian and is below 1 every day, so the middle is tighter than the spread implies, while the count beyond 3.1\u03c3 is far above what a Gaussian permits. More concentrated at the centre <em>and</em> more extended at the extremes is the signature of a smaller \u03b2.</div>
+
+  <div class="row" id="r2sel"></div>
+  <div class="panel"><h3 id="r2momh">Across the twenty-four days</h3><canvas id="r2mom" height="300"></canvas></div>
+  <div class="reveal on">Gaussian kurtosis is 3 and Laplace is 6; the mean across Peirce's days is 27.5. Using the tests Koenker applies, Gaussian skewness is rejected on 19 of the 24 days and Gaussian kurtosis on all 24. Watch the second half of the series in particular: as the observer settles down and his spread narrows, the excursions do not go away, so the kurtosis climbs rather than falls.</div>
+
+  <div class="panel"><h3>Every day, every column \u2014 click a heading to sort</h3><div id="r2tab"></div></div>
+  <p class="small">Reproduces the portion of Wilson and Hilferty's table given in Koenker (2009), Tables 2 and 3. D\u2019Agostino and Anscombe\u2013Glynn statistics are his; everything else is computed here from the raw counts and agrees with his to the digit.</p>
+</article>
+</div>
+
+<div class="tab" id="tab7">
+<article style="border-top:none">
+  <p class="act-n">KOENKER, THE AMERICAN STATISTICIAN, 2009</p>
+  <h2>The median is the message</h2>
+  <p class="q">Koenker set out to evaluate Wilson and Hilferty's methods against later statistical developments, and to see how much of a hand computation from 1929 could be reproduced. His verdict on their central claim is that it is entirely vindicated: for Peirce's data the median is a competitive estimator, and normality is implausible.</p>
+  <div class="row" id="r3view"></div>
+  <div class="panel"><h3 id="r3h">Daily means and medians, with pointwise error bands</h3><canvas id="r3plot" height="340"></canvas></div>
+  <div class="stats" id="r3stats"></div>
+  <div class="reveal on"><strong>The day-to-day movement swamps everything inside a day.</strong> The first week's fall is learning \u2014 the young man gets faster with practice. The slow climb afterwards is harder to account for; Koenker wonders about ennui. Either way the error bands for the mean and the median are indistinguishable at this scale, which is his point: the median costs you nothing here. Switch to the quantile view and the asymmetry becomes visible directly \u2014 the upper quantiles wander far more than the lower ones, because the long right tail is where the instability lives.</div>
+
+  <h2 style="margin-top:44px">Which estimator would you actually want?</h2>
+  <p class="q">Koenker frames it as mean against median. There is a whole road between them: trim a fraction from each end before averaging, and you get the mean at 0 and the median at one half. Four hundred bootstrap replications per day, per setting.</p>
+  <div class="ctl"><label for="r3trim">Trim from each end</label><input type="range" id="r3trim" min="0" max="4" step="1" value="0"><span class="v" id="r3trimv"></span></div>
+  <div class="panel"><h3>Bootstrap standard error, by day</h3><canvas id="r3eff" height="300"></canvas></div>
+  <div class="stats" id="r3effs"></div>
+  <div class="reveal on"><strong>The untrimmed mean is not the best estimator on a single one of the twenty-four days.</strong> Trimming a tenth from each end wins outright on ten of them, a twentieth on five, a quarter on six, and the median on three. So the honest summary is slightly stronger than the one Koenker states: it is not merely that the median is competitive with the mean, but that almost any modest trimming beats the mean everywhere, which is what Stigler's 1977 survey of robust estimators on real data would lead you to expect. The mean is the one choice the data never support.</div>
+
+  <h2 style="margin-top:44px">The column nobody can reconstruct</h2>
+  <p class="q">Wilson and Hilferty's argument turns on comparing the precision of the median against the mean. But the phrase "standard deviation of the median" had no settled meaning in 1929, and Koenker tried seven reconstructions. Toggle them against the values they published.</p>
+  <div class="row" id="r3meth"></div>
+  <div class="panel"><h3>Standard deviation of the median: theirs, and seven attempts at it</h3><canvas id="r3sd" height="300"></canvas></div>
+  <div class="panel"><h3>How close each reconstruction comes</h3><div id="r3tab"></div></div>
+  <div class="reveal on"><strong>All of them support their conclusion. None of them reproduces their numbers.</strong> The Laplace route \u2014 taking their faith in the first law wholeheartedly and using the mean absolute deviation \u2014 is much too small, averaging 1.16 against their 1.54. Yule's textbook density estimate and Siddiqui's sparsity function both come close but need bandwidths far smaller than anything a 1929 reader would have chosen. The bootstrap, which they could not possibly have used, fits best of all. The question stands open.</div>
+
+  <div class="hist"><strong>Why this matters beyond the arithmetic.</strong> Peirce ran the experiment to license least squares, and least squares is optimal under the Gaussian law. Laplace's first law licenses the median instead. So the question of which law fits is not idle curiosity about a shape: it decides which estimator the whole apparatus of nineteenth-century observational astronomy should have been built on. Peirce concluded the Gaussian was verified. Fr\u00e9chet, Wilson and Hilferty, and Koenker all read the same numbers the other way.</div>
+</article>
+</div>
+</div><!-- /sectP -->
+</div>
+
+<style>
+.sect{display:none}.sect.sel{display:block}
+nav.lvl1{border-bottom:1px solid var(--rule);margin:30px 0 0;top:0}
+nav.lvl1 button{font-family:Fraunces,serif;font-size:19px;padding:13px 22px 11px;border-bottom:2px solid transparent}
+nav.lvl1 button.sel{border-bottom-color:var(--ink);color:var(--ink)}
+nav.lvl2{top:52px;margin:0}
+.plots2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:760px){.plots2{grid-template-columns:1fr}}
+.pipe{margin:26px 0 0}
+.prow{display:grid;grid-template-columns:132px 1fr 1fr;gap:1px;background:var(--rule2);
+ border-left:1px solid var(--rule2);border-right:1px solid var(--rule2)}
+.prow:first-child{border-top:1px solid var(--rule2)}
+.prow:last-child{border-bottom:1px solid var(--rule2)}
+@media(max-width:700px){.prow{grid-template-columns:1fr}}
+.pcell{background:var(--panel);padding:13px 15px;font-size:14.5px;line-height:1.5}
+.pcell.lab{background:var(--ground);font-family:"Space Mono",monospace;font-size:10px;
+ letter-spacing:.09em;text-transform:uppercase;color:var(--faint);padding-top:16px}
+.prow.head .pcell{background:var(--ground);font-family:Fraunces,serif;font-size:17px;padding:8px 15px 12px}
+.pcell .val{font-family:"Space Mono",monospace;font-size:19px;color:var(--data);display:block;margin-top:5px}
+.pcell .req{display:block;margin-top:9px;padding-top:8px;border-top:1px solid var(--rule2);
+ font-size:12.5px;color:var(--flag)}
+.pcell .req b{font-family:"Space Mono",monospace;font-size:9.5px;letter-spacing:.08em;
+ text-transform:uppercase;font-weight:400;display:block;margin-bottom:2px;color:var(--faint)}
+.pcell .none{color:var(--live)}
+</style>
+
+<script>
+/* ---------------- shared ---------------- */
+function ncdf(z){const t=1/(1+.2316419*Math.abs(z)),d=.3989423*Math.exp(-z*z/2);
+ let p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p;}
+function npdf(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*Math.sqrt(2*Math.PI));}
+function ninv(p){const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.3577518672690,-30.66479806614716,2.506628277459239],
+ b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],
+ c=[-.007784894002430293,-.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],
+ d=[.007784695709041462,.3224671290700398,2.445134137142996,3.754408661907416];
+ const pl=.02425;let q,r;
+ if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
+ q=p-.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
+const erf=x=>2*ncdf(x*Math.SQRT2)-1;
+let sp=null;
+function randn(){if(sp!==null){const s=sp;sp=null;return s;}let u,v,s2;
+ do{u=Math.random()*2-1;v=Math.random()*2-1;s2=u*u+v*v;}while(s2>=1||s2===0);
+ const f=Math.sqrt(-2*Math.log(s2)/s2);sp=v*f;return u*f;}
+const mean=a=>a.length?a.reduce((x,y)=>x+y,0)/a.length:0;
+const $=id=>document.getElementById(id);
+const lin=v=>{const c=v/255;return c<=.04045?c/12.92:Math.pow((c+.055)/1.055,2.4);};
+const C={ink:'#1D201B',soft:'#5A5E56',faint:'#8C9086',rule:'#CECEC3',rule2:'#DEDED4',
+ data:'#35566B',data2:'#7C9AAB',live:'#5F7333',flag:'#8C4A2F',gold:'#8A6D1F',panel:'#F7F7F2'};
+function cv(id,h){const el=$(id);
+ if(!el||el.tagName!=='CANVAS'){if(el)console.warn('cv(): #'+id+' is a '+el.tagName+', not a canvas');return null;}
+ if(!el.clientWidth)return null;
+ const dpr=window.devicePixelRatio||1,w=el.clientWidth;
+ el.width=w*dpr;el.height=h*dpr;el.style.height=h+'px';
+ const x=el.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);x.clearRect(0,0,w,h);
+ x.font='10px "Space Mono", monospace';return{x,w,h};}
+function axes(x,L,R,T,B,w,h,yt,yf,xt,xf,xlab){
+ x.strokeStyle=C.rule2;x.lineWidth=1;x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';
+ x.textAlign='right';x.textBaseline='middle';
+ yt.forEach(([v,py])=>{x.beginPath();x.moveTo(L,py);x.lineTo(w-R,py);x.stroke();x.fillText(yf(v),L-8,py);});
+ x.textAlign='center';x.textBaseline='top';
+ xt.forEach(([v,px])=>x.fillText(xf(v),px,h-B+8));
+ x.strokeStyle=C.rule;x.beginPath();x.moveTo(L,h-B);x.lineTo(w-R,h-B);x.stroke();
+ if(xlab){x.font='9.5px "Space Mono", monospace';x.fillText(xlab,(L+w-R)/2,h-11);}}
+
+const WEBER=.0715,PEZ=.6745,SIGD=WEBER*100,SIGL=SIGD/Math.SQRT2,BASE=128;
+const lift=(W,d)=>{const s=WEBER*W/Math.SQRT2;return (W+d+randn()*s)>(W+randn()*s);};
+
+/* strips */
+const STRIP={1:['judgements','a curve','a dispersion','a threshold','your turn'],
+ 2:['one series','both directions','certainty','a scale','your turn'],
+ 3:['the design','their data','confidence','the index','your turn']};
+const DONE={1:[],2:[],3:[]};
+function strip(t){$('strip'+t).innerHTML=STRIP[t].map((s,i)=>
+ `<span class="${DONE[t][i]?'done':''}">0${i+1} · ${s}</span>`).join('');}
+function mark(t,i){DONE[t][i]=1;strip(t);}
+[1,2,3].forEach(strip);
+
+/* tabs */
+let SECT='F',TAB=1;
+const ALLT=[1,2,3,4,5,6,7];
+function showTab(t){TAB=t;ALLT.forEach(k=>{const e=$('tab'+k);if(e)e.classList.toggle('sel',k===t);});
+ window.scrollTo({top:0,behavior:'instant'});redrawAll();}
+document.querySelectorAll('nav.lvl1 button').forEach(b=>b.onclick=()=>{
+ SECT=b.dataset.s;
+ document.querySelectorAll('nav.lvl1 button').forEach(x=>x.classList.toggle('sel',x===b));
+ $('sectF').classList.toggle('sel',SECT==='F');$('sectP').classList.toggle('sel',SECT==='P');
+ const host=SECT==='F'?$('sectF'):$('sectP');
+ const bs=host.querySelectorAll('nav.lvl2 button');
+ bs.forEach((x,i)=>x.classList.toggle('sel',i===0));
+ showTab(+bs[0].dataset.t);});
+document.querySelectorAll('nav.lvl2 button').forEach(b=>b.onclick=()=>{
+ b.parentElement.querySelectorAll('button').forEach(x=>x.classList.toggle('sel',x===b));
+ showTab(+b.dataset.t);});
+
+/* ============ TAB 1 ============ */
+const A={n:0,c:0,hist:[]},LV=[1,2,3,4,6,8,10],B={d:{},ov:null},D3={s:11,view:'two'},D4={crit:.75,bias:0};
+function a1(k){let kc=0;
+ for(let i=0;i<k;i++){const ok=lift(100,3);A.n++;if(ok){A.c++;kc++;}A.hist.push(A.c/A.n);}
+ if(k){B.d[3]=B.d[3]||{n:0,c:0};B.d[3].n+=k;B.d[3].c+=kc;a2p();a3f();a4p();}
+ $('t1n').textContent=A.n;$('t1k').textContent=A.c;$('t1p').textContent=A.n?(A.c/A.n).toFixed(3):'—';
+ a1p();if(A.n>=50){$('t1rev').classList.add('on');mark(1,0);}}
+function a1p(){const p=cv('t1plot',175);if(!p)return;const{x,w,h}=p,L=42,R=12,T=14,B2=28;
+ const N=Math.max(A.hist.length,20),X=i=>L+i/(N-1||1)*(w-L-R),Y=v=>h-B2-(v-.3)/.6*(h-T-B2);
+ axes(x,L,R,T,B2,w,h,[.3,.5,.7,.9].map(v=>[v,Y(v)]),v=>v.toFixed(1),[],()=>'','trial number');
+ x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(L,Y(.5));x.lineTo(w-R,Y(.5));x.stroke();x.setLineDash([]);
+ if(!A.hist.length)return;x.beginPath();
+ A.hist.forEach((v,i)=>{const px=X(i),py=Y(Math.max(.3,Math.min(.9,v)));i?x.lineTo(px,py):x.moveTo(px,py);});
+ x.strokeStyle=C.data;x.lineWidth=1.6;x.stroke();}
+$('t1a').onclick=()=>a1(1);$('t1b').onclick=()=>a1(10);$('t1c').onclick=()=>a1(100);
+$('t1r').onclick=()=>{A.n=A.c=0;A.hist=[];delete B.d[3];a1(0);a2p();a3f();a4p();};
+
+function fitSig(){let num=0,den=0;
+ Object.entries(B.d).forEach(([L,o])=>{if(o.n<20)return;
+  const pr=Math.min(.995,Math.max(.505,o.c/o.n));num+=(+L)*ninv(pr);den+=(+L)*(+L);});
+ return num>0?den/num:null;}
+$('t2btns').innerHTML=LV.map(v=>`<button class="b" data-l="${v}">${v} g</button>`).join('');
+$('t2btns').querySelectorAll('button').forEach(b=>b.onclick=()=>{const L=+b.dataset.l;let c=0;
+ for(let i=0;i<120;i++)if(lift(100,L))c++;
+ B.d[L]=B.d[L]||{n:0,c:0};B.d[L].n+=120;B.d[L].c+=c;a2p();a3f();a4p();
+ if(Object.keys(B.d).length>=4){$('t2rev').classList.add('on');mark(1,1);}});
+$('t2r').onclick=()=>{B.d={};B.ov=null;a2p();a3f();a4p();};
+$('t2step').onclick=()=>{B.ov='step';a2p();};$('t2sm').onclick=()=>{B.ov='smooth';a2p();};
+$('t2cl').onclick=()=>{B.ov=null;a2p();};
+function pf(w,h){const L=44,R=14,T=16,B2=34;
+ return{L,R,T,B2,X:v=>L+v/11*(w-L-R),Y:p=>h-B2-(p-.4)/.62*(h-T-B2)};}
+function a2p(){const p=cv('t2plot',240);if(!p)return;const{x,w,h}=p,f=pf(w,h);
+ axes(x,f.L,f.R,f.T,f.B2,w,h,[.5,.6,.7,.8,.9,1].map(v=>[v,f.Y(v)]),v=>v.toFixed(1),
+  [0,2,4,6,8,10].map(v=>[v,f.X(v)]),v=>v,'difference between the weights (g)');
+ x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(f.L,f.Y(.5));x.lineTo(w-f.R,f.Y(.5));x.stroke();x.setLineDash([]);
+ if(B.ov==='step'){const th=4.8;x.strokeStyle=C.flag;x.lineWidth=1.7;x.setLineDash([5,4]);x.beginPath();
+  x.moveTo(f.X(0),f.Y(.5));x.lineTo(f.X(th),f.Y(.5));
+  for(let v=th;v<=11;v+=.1)x.lineTo(f.X(v),f.Y(Math.min(1,.5+(v-th)*.075)));x.stroke();x.setLineDash([]);
+  x.fillStyle=C.flag;x.textAlign='left';x.fillText('if a real threshold',f.X(.3),f.Y(.545));}
+ if(B.ov==='smooth'){const sg=fitSig();
+  if(sg){x.strokeStyle=C.live;x.lineWidth=1.7;x.setLineDash([5,4]);x.beginPath();
+   for(let v=0;v<=11;v+=.1){const px=f.X(v),py=f.Y(ncdf(v/sg));v?x.lineTo(px,py):x.moveTo(px,py);}
+   x.stroke();x.setLineDash([]);x.fillStyle=C.live;x.textAlign='left';
+   x.fillText('if no threshold \u2014 fitted to your points, \u03c3d = '+sg.toFixed(2)+' g',f.X(.3),f.Y(.545));}
+  else{x.fillStyle=C.faint;x.textAlign='left';x.fillText('collect some points first',f.X(.3),f.Y(.545));}}
+ Object.entries(B.d).forEach(([L,o])=>{const pr=o.c/o.n;
+  x.beginPath();x.arc(f.X(+L),f.Y(pr),4.5,0,7);x.fillStyle=C.panel;x.fill();
+  x.strokeStyle=C.data;x.lineWidth=1.8;x.stroke();
+  x.fillStyle=C.soft;x.textAlign='center';x.textBaseline='bottom';x.fillText(pr.toFixed(2),f.X(+L),f.Y(pr)-8);});}
+$('t3two').onclick=()=>{D3.view='two';$('t3h').textContent='Internal values for the two lifts';
+ $('t3cap').textContent='Each lift lands somewhere under its own curve. He reports whichever felt heavier, so he is right whenever the noise does not overturn the true order.';
+ $('t3two').classList.add('go');$('t3diff').classList.remove('go');a3p();};
+$('t3diff').onclick=()=>{D3.view='diff';$('t3h').textContent='The difference between them';
+ $('t3cap').textContent='Subtract one lift from the other and that single quantity decides the answer: positive means he is right. The shaded area right of zero is the proportion correct \u2014 the number you counted in stage 01. Slide \u03c3 until the red line meets the black one, or until the two markers on the strip above coincide; both say the same thing.';
+ $('t3diff').classList.add('go');$('t3two').classList.remove('go');a3p();};
+$('t3s').oninput=e=>{D3.s=+e.target.value;if($('t4sig'))$('t4sig').value=D3.s;a3p();a3f();a4p();};
+$('t3snap').onclick=()=>{const g=fitSig();if(g){D3.s=g/Math.SQRT2;$('t3s').value=D3.s;
+ if($('t4sig'))$('t4sig').value=D3.s;a3p();a3f();a4p();}};
+function a3p(){const p=cv('t3plot',205);if(!p)return;const{x,w,h}=p,L=16,R=16,T=16,B2=30,s=D3.s,sd=s*Math.SQRT2;
+ if(D3.view==='two'){const lo=66,hi=137,pk=npdf(0,0,s),X=v=>L+(v-lo)/(hi-lo)*(w-L-R),Y=v=>h-B2-v/(pk*1.15)*(h-T-B2);
+  x.strokeStyle=C.rule;x.beginPath();x.moveTo(L,h-B2);x.lineTo(w-R,h-B2);x.stroke();
+  [[100,C.data2,'standard 100 g'],[103,C.data,'comparison 103 g']].forEach(([m,col,lab],i)=>{
+   x.beginPath();for(let v=lo;v<=hi;v+=.2){const px=X(v),py=Y(npdf(v,m,s));v===lo?x.moveTo(px,py):x.lineTo(px,py);}
+   x.strokeStyle=col;x.lineWidth=1.8;x.stroke();
+   x.fillStyle=col;x.textAlign='center';x.textBaseline='bottom';x.fillText(lab,X(m),Y(npdf(m,m,s))-6-i*13);});
+  x.fillStyle=C.faint;x.textAlign='center';x.textBaseline='top';
+  [70,85,100,115,130].forEach(v=>x.fillText(v,X(v),h-B2+8));
+  x.font='9.5px "Space Mono", monospace';x.fillText('felt weight of a single lift (g)',(L+w-R)/2,h-12);
+ }else{const lo=-40,hi=40,pk=npdf(0,0,sd);
+  const SY=T+16;                       /* the proportion strip sits above the curve */
+  const T2=SY+30;
+  const X=v=>L+(v-lo)/(hi-lo)*(w-L-R),Y=v=>h-B2-v/(pk*1.15)*(h-T2-B2);
+  const pred=ncdf(3/sd), obs=B.d[3]?B.d[3].c/B.d[3].n:null;
+  /* shaded region = the trials he gets right */
+  x.beginPath();x.moveTo(X(0),h-B2);
+  for(let v=0;v<=hi;v+=.2)x.lineTo(X(v),Y(npdf(v,3,sd)));
+  x.lineTo(X(hi),h-B2);x.closePath();x.fillStyle='rgba(53,86,107,.16)';x.fill();
+  x.beginPath();for(let v=lo;v<=hi;v+=.2){const px=X(v),py=Y(npdf(v,3,sd));
+   v===lo?x.moveTo(px,py):x.lineTo(px,py);}
+  x.strokeStyle=C.data;x.lineWidth=1.8;x.stroke();
+  /* the fixed line: he is right to the right of zero */
+  x.strokeStyle=C.ink;x.lineWidth=1.6;x.beginPath();x.moveTo(X(0),T2);x.lineTo(X(0),h-B2);x.stroke();
+  x.fillStyle=C.ink;x.font='10px "Space Mono", monospace';x.textAlign='right';x.textBaseline='top';
+  x.fillText('wrong \u2190',X(0)-7,T2+2);x.textAlign='left';x.fillText('\u2192 right',X(0)+7,T2+2);
+  /* the moving line: where your observed proportion says the cut falls */
+  let matched=false;
+  if(obs!==null&&obs>.505&&obs<.995){
+   const vObs=3-sd*ninv(obs);matched=Math.abs(vObs)<.35;
+   x.strokeStyle=matched?C.live:C.flag;x.lineWidth=1.8;x.setLineDash(matched?[]:[5,4]);
+   x.beginPath();x.moveTo(X(vObs),T2);x.lineTo(X(vObs),h-B2);x.stroke();x.setLineDash([]);
+   x.fillStyle=matched?C.live:C.flag;x.font='10px "Space Mono", monospace';
+   x.textAlign='center';x.textBaseline='bottom';
+   x.fillText(matched?'lined up':'your data put the cut here',X(vObs),h-B2-6);}
+  /* proportion strip */
+  const SL=L+70,SR=w-R-70;
+  const P=q=>SL+(q-.5)/.5*(SR-SL);
+  x.strokeStyle=C.rule;x.lineWidth=1;x.beginPath();x.moveTo(SL,SY);x.lineTo(SR,SY);x.stroke();
+  x.fillStyle=C.faint;x.font='9px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  [.5,.6,.7,.8,.9,1].forEach(q=>{x.strokeStyle=C.rule2;
+   x.beginPath();x.moveTo(P(q),SY);x.lineTo(P(q),SY+4);x.stroke();
+   x.fillText((q*100).toFixed(0)+'%',P(q),SY+6);});
+  x.fillStyle=C.faint;x.textAlign='right';x.textBaseline='middle';
+  x.fillText('proportion correct',SL-8,SY);
+  x.beginPath();x.arc(P(pred),SY,5,0,7);x.fillStyle=C.data;x.fill();
+  x.fillStyle=C.data;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='bottom';
+  x.fillText('predicted '+(pred*100).toFixed(1)+'%',P(pred),SY-8);
+  if(obs!==null){x.beginPath();x.arc(P(obs),SY,5.5,0,7);x.fillStyle=C.panel;x.fill();
+   x.strokeStyle=matched?C.live:C.flag;x.lineWidth=2;x.stroke();
+   x.fillStyle=matched?C.live:C.flag;x.textAlign='center';x.textBaseline='top';
+   x.fillText('observed '+(obs*100).toFixed(1)+'%',P(obs),SY+18);}
+  x.fillStyle=C.faint;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  [-30,-15,0,15,30].forEach(v=>x.fillText(v,X(v),h-B2+8));
+  x.font='9.5px "Space Mono", monospace';
+  x.fillText('how much heavier the comparison felt, this trial (g)',(L+w-R)/2,h-12);}}
+function a3f(){const p=cv('t3fit',225);if(!p)return;const{x,w,h}=p,f=pf(w,h),sd=D3.s*Math.SQRT2;
+ axes(x,f.L,f.R,f.T,f.B2,w,h,[.5,.6,.7,.8,.9,1].map(v=>[v,f.Y(v)]),v=>v.toFixed(1),
+  [0,2,4,6,8,10].map(v=>[v,f.X(v)]),v=>v,'difference between the weights (g)');
+ x.beginPath();for(let v=0;v<=11;v+=.1){const px=f.X(v),py=f.Y(ncdf(v/sd));v?x.lineTo(px,py):x.moveTo(px,py);}
+ x.strokeStyle=C.live;x.lineWidth=1.8;x.stroke();let ss=0,k=0;
+ Object.entries(B.d).forEach(([L,o])=>{const pr=o.c/o.n;ss+=(pr-ncdf(+L/sd))**2;k++;
+  x.beginPath();x.arc(f.X(+L),f.Y(pr),4.5,0,7);x.fillStyle=C.panel;x.fill();
+  x.strokeStyle=C.data;x.lineWidth=1.8;x.stroke();});
+ $('t3sv').textContent=D3.s.toFixed(2)+' g';$('t3r1').textContent=D3.s.toFixed(2);
+ $('t3r2').textContent=sd.toFixed(2);$('t3r3').textContent=(1/(sd*Math.SQRT2)).toFixed(4);
+ const rms=k?Math.sqrt(ss/k):null;$('t3r4').textContent=k?rms.toFixed(4):'—';
+ if(k>=4&&rms<.02){$('t3rev').classList.add('on');mark(1,2);}}
+$('t4c').oninput=e=>{D4.crit=+e.target.value;a4p();};
+$('t4b').oninput=e=>{D4.bias=+e.target.value;a4p();};
+$('t4mid').onclick=()=>{D4.bias=0;$('t4b').value=0;a4p();};
+$('t4sig').oninput=e=>{D3.s=+e.target.value;$('t3s').value=D3.s;a3p();a3f();a4p();};
+$('t4c75').onclick=()=>{D4.crit=.75;$('t4c').value=.75;a4p();};
+$('t4fit').onclick=()=>{const g=fitSig();if(g){D3.s=g/Math.SQRT2;
+ $('t3s').value=D3.s;$('t4sig').value=D3.s;a3p();a3f();a4p();}};
+function a4p(){
+ const sg=D3.s, b=D4.bias, h0=1/(Math.SQRT2*sg), PE=PEZ*sg;
+ const pOf=D=>(ncdf((D/2+b)/sg)+ncdf((D/2-b)/sg))/2;   /* criterion at D/2 + b */
+ const thOf=cr=>{let lo=0,hi=60;for(let i=0;i<70;i++){const m=(lo+hi)/2;pOf(m)<cr?lo=m:hi=m;}return (lo+hi)/2;};
+ const th=thOf(D4.crit), atMid=Math.abs(b)<.05;
+ const DS=[2,6,10,14], XMAX=16, AL=-18, AR=32;
+ const p=cv('t4all',440);
+ if(p){const{x,w,h}=p;
+  const gap=10, mw=(w-16-gap*3)/4, mtop=36, mh=104;
+  const L=48,R=18,cTop=232,BM=46;
+  const CX=v=>L+v/XMAX*(w-L-R), CY=q=>h-BM-(q-.45)/.58*(h-cTop-BM);
+  const pts=DS.map((D,i)=>{
+   const cx=8+i*(mw+gap), pk=npdf(0,0,sg), cut=D/2+b;
+   const MX=v=>cx+(v-AL)/(AR-AL)*mw, MY=q=>mtop+mh-q/(pk*1.25)*mh;
+   const cl=v=>Math.max(cx,Math.min(cx+mw,v));
+   x.save();x.beginPath();x.rect(cx,mtop-2,mw,mh+4);x.clip();
+   x.strokeStyle=C.rule2;x.lineWidth=1;
+   x.beginPath();x.moveTo(cx,mtop+mh);x.lineTo(cx+mw,mtop+mh);x.stroke();
+   x.fillStyle='rgba(140,74,47,.30)';
+   x.beginPath();x.moveTo(MX(cut),mtop+mh);
+   for(let v=cut;v<=AR;v+=(AR-AL)/300)x.lineTo(MX(v),MY(npdf(v,0,sg)));
+   x.lineTo(MX(AR),mtop+mh);x.closePath();x.fill();
+   x.beginPath();x.moveTo(MX(AL),mtop+mh);
+   for(let v=AL;v<=cut;v+=(AR-AL)/300)x.lineTo(MX(v),MY(npdf(v,D,sg)));
+   x.lineTo(MX(cut),mtop+mh);x.closePath();x.fill();
+   [[0,C.data2],[D,C.data]].forEach(([m,col])=>{
+    x.beginPath();for(let v=AL;v<=AR;v+=(AR-AL)/300){const px=MX(v),py=MY(npdf(v,m,sg));
+     v===AL?x.moveTo(px,py):x.lineTo(px,py);}
+    x.strokeStyle=col;x.lineWidth=1.4;x.stroke();
+    x.strokeStyle=col;x.lineWidth=1;x.setLineDash([2,3]);
+    x.beginPath();x.moveTo(MX(m),mtop+mh);x.lineTo(MX(m),mtop+mh-6);x.stroke();x.setLineDash([]);});
+   x.strokeStyle=atMid?C.ink:C.flag;x.lineWidth=atMid?1.5:2;
+   x.beginPath();x.moveTo(cl(MX(cut)),mtop+2);x.lineTo(cl(MX(cut)),mtop+mh);x.stroke();
+   x.restore();
+   const pc=pOf(D);
+   x.fillStyle=C.soft;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='bottom';
+   x.fillText('D = '+D+' g',cx+mw/2,mtop-15);
+   x.fillStyle=C.data;x.font='9.5px "Space Mono", monospace';
+   x.fillText((pc*100).toFixed(1)+'% correct',cx+mw/2,mtop-4);
+   x.fillStyle=C.live;x.textBaseline='top';
+   x.fillText('t = '+(h0*D/2).toFixed(4),cx+mw/2,mtop+mh+5);
+   return {D,pc,cx,mw};});
+  axes(x,L,R,cTop,BM,w,h,[.5,.6,.7,.8,.9,1].map(v=>[v,CY(v)]),v=>v.toFixed(1),
+   [0,4,8,12,16].map(v=>[v,CX(v)]),v=>v,'difference between the weights, D (g)');
+  if(!atMid){x.beginPath();for(let v=0;v<=XMAX;v+=.05){const px=CX(v),py=CY(ncdf(v/(2*sg)));
+    v?x.lineTo(px,py):x.moveTo(px,py);}
+   x.strokeStyle=C.rule;x.lineWidth=1.4;x.setLineDash([4,3]);x.stroke();x.setLineDash([]);}
+  x.beginPath();for(let v=0;v<=XMAX;v+=.05){const px=CX(v),py=CY(pOf(v));
+   v?x.lineTo(px,py):x.moveTo(px,py);}
+  x.strokeStyle=C.data;x.lineWidth=2;x.stroke();
+  Object.entries(B.d).forEach(([Lv,o])=>{if(+Lv>XMAX)return;
+   x.beginPath();x.arc(CX(+Lv),CY(o.c/o.n),3.2,0,7);x.fillStyle=C.panel;x.fill();
+   x.strokeStyle=C.data2;x.lineWidth=1.3;x.stroke();});
+  x.strokeStyle=C.flag;x.lineWidth=1.4;x.setLineDash([4,3]);
+  x.beginPath();x.moveTo(L,CY(D4.crit));x.lineTo(w-R,CY(D4.crit));x.stroke();x.setLineDash([]);
+  x.fillStyle=C.flag;x.font='9.5px "Space Mono", monospace';x.textAlign='right';x.textBaseline='bottom';
+  x.fillText((D4.crit*100).toFixed(1)+'%',w-R-3,CY(D4.crit)-4);
+  pts.forEach(o=>{
+   x.strokeStyle='rgba(140,144,134,.32)';x.lineWidth=1;x.setLineDash([2,4]);
+   x.beginPath();x.moveTo(o.cx+o.mw/2,mtop+mh+20);x.lineTo(CX(o.D),CY(o.pc));x.stroke();x.setLineDash([]);
+   x.beginPath();x.arc(CX(o.D),CY(o.pc),4.5,0,7);x.fillStyle=C.data;x.fill();});
+  if(th<=XMAX){x.strokeStyle=C.live;x.lineWidth=1.8;x.setLineDash([4,3]);
+   x.beginPath();x.moveTo(CX(th),h-BM);x.lineTo(CX(th),CY(D4.crit));x.stroke();x.setLineDash([]);
+   x.beginPath();x.arc(CX(th),CY(D4.crit),6,0,7);x.fillStyle=C.live;x.fill();
+   x.fillStyle=C.live;x.font='10.5px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+   x.fillText('threshold '+th.toFixed(2)+' g',CX(th),h-BM-18);}
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText('proportion correct',L+2,cTop+2);}
+ const q=cv('t4pe',215);
+ if(q){const{x,w,h}=q,L=30,R=30,T=26,B=42;
+  const lo=-3.6*sg,hi=3.6*sg,pk=npdf(0,0,sg);
+  const X=v=>L+(v-lo)/(hi-lo)*(w-L-R),Y=r=>h-B-r/(pk*1.2)*(h-T-B);
+  x.strokeStyle=C.rule;x.lineWidth=1;x.beginPath();x.moveTo(L,h-B);x.lineTo(w-R,h-B);x.stroke();
+  x.fillStyle='rgba(95,115,51,.22)';x.beginPath();x.moveTo(X(-PE),h-B);
+  for(let v=-PE;v<=PE;v+=(hi-lo)/400)x.lineTo(X(v),Y(npdf(v,0,sg)));
+  x.lineTo(X(PE),h-B);x.closePath();x.fill();
+  [[lo,-PE],[PE,hi]].forEach(([a,bb])=>{x.fillStyle='rgba(140,74,47,.20)';
+   x.beginPath();x.moveTo(X(a),h-B);
+   for(let v=a;v<=bb;v+=(hi-lo)/400)x.lineTo(X(v),Y(npdf(v,0,sg)));
+   x.lineTo(X(bb),h-B);x.closePath();x.fill();});
+  x.beginPath();for(let v=lo;v<=hi;v+=(hi-lo)/400){const px=X(v),py=Y(npdf(v,0,sg));
+   v===lo?x.moveTo(px,py):x.lineTo(px,py);}
+  x.strokeStyle=C.ink;x.lineWidth=1.7;x.stroke();
+  [-PE,PE].forEach(v=>{x.strokeStyle=C.live;x.lineWidth=2;
+   x.beginPath();x.moveTo(X(v),h-B);x.lineTo(X(v),Y(npdf(v,0,sg)));x.stroke();});
+  x.fillStyle=C.live;x.font='10px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  x.fillText('\u00b1'+PE.toFixed(2)+' g \u2014 half the errors',X(0),Y(0)+4);
+  x.fillStyle=C.flag;x.textBaseline='bottom';
+  x.fillText('25%',X((PE+hi)/2),h-B-6);x.fillText('25%',X((lo-PE)/2),h-B-6);
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textBaseline='top';
+  x.fillText('error added to one lift (g)',(L+w-R)/2,h-13);}
+ $('t4sigv').textContent=sg.toFixed(2)+' g';
+ $('t4bv').textContent=atMid?'at the midpoint':(b>0?'+':'')+b.toFixed(1)+' g';
+ $('t4cv').textContent=(D4.crit*100).toFixed(1)+'%';
+ $('t4h').textContent=h0.toFixed(4);
+ $('t4t').textContent=th<60?th.toFixed(2)+' g':'never reached';
+ $('t4tt').textContent=th<60?(h0*th/2).toFixed(4):'\u2014';
+ $('t4t1').textContent=th<60?(th/sg).toFixed(3)+' \u03c3':'\u2014';
+ $('t4pev').textContent=PE.toFixed(2)+' g';
+ $('t4ceil').textContent=(pOf(200)*100).toFixed(1)+'%';
+ $('t4note').innerHTML=atMid
+  ? '<strong>The criterion sits at D/2 in every diagram \u2014 that is Fechner\u2019s rule, not a setting.</strong> The two lines you can move are on different axes and do different jobs. The criterion is a place on the <em>sensation</em> axis, inside a single trial, and it fixes the error rate at each D, which is to say it fixes the whole curve. The 75 per cent is a height on the <em>performance</em> axis, across trials, and it picks which D on that curve gets called the threshold. Move the criterion off the midpoint and you will see they are not independent: the curve itself sags, so the same 75 per cent line meets it somewhere else.'
+  : '<strong>The criterion is now '+(b>0?'+':'')+b.toFixed(1)+' g off the midpoint, and the curve has sagged below the grey dashed line where it sat before.</strong> The threshold has moved from '+
+    (2*ninv(D4.crit)*sg).toFixed(2)+' g to '+(th<60?th.toFixed(2)+' g':'out of reach')+
+    ' \u2014 not because the observer is any less sensitive, but because a badly placed cut wastes some of his sensitivity. So the two are linked after all: move the criterion and the whole curve changes, so the same 75 per cent line meets it somewhere else. They remain different kinds of thing \u2014 one is where the cut falls on the sensation axis, the other is how good you demand the result be \u2014 but only one of them belongs to Fechner. His criterion is fixed at D/2 by the stimuli; a criterion you can slide is what signal detection theory added later.'
+ mark(1,3);}
+
+/* stage 5 */
+const DIFFS=[2,4,7,11,16],E={q:[],i:0,res:{},on:false};
+function e5b(){E.q=[];DIFFS.forEach(d=>{for(let r=0;r<10;r++)E.q.push({d,left:Math.random()<.5});});
+ for(let i=E.q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[E.q[i],E.q[j]]=[E.q[j],E.q[i]];}
+ E.i=0;E.res={};DIFFS.forEach(d=>E.res[d]={n:0,c:0});}
+function e5d(){const t=E.q[E.i];if(!t)return e5e();const hi=BASE+t.d;
+ $('t5L').style.background=`rgb(${t.left?hi:BASE},${t.left?hi:BASE},${t.left?hi:BASE})`;
+ $('t5R').style.background=`rgb(${t.left?BASE:hi},${t.left?BASE:hi},${t.left?BASE:hi})`;
+ $('t5bar').style.width=(E.i/E.q.length*100)+'%';$('t5c').textContent='trial '+(E.i+1)+' of '+E.q.length;}
+function e5a(l){const t=E.q[E.i];if(!t)return;E.res[t.d].n++;if(l===t.left)E.res[t.d].c++;
+ E.i++;E.i<E.q.length?e5d():e5e();}
+function e5e(){E.on=false;$('t5box').classList.add('hidden');$('t5done').classList.remove('hidden');
+ let num=0,den=0;DIFFS.forEach(d=>{const pr=Math.min(.995,Math.max(.505,E.res[d].c/E.res[d].n));
+  num+=d*ninv(pr);den+=d*d;});
+ const sd=den/num,th=PEZ*sd;
+ $('t5s').textContent=sd.toFixed(2);$('t5t').textContent=th.toFixed(2);
+ $('t5w').textContent=((lin(BASE+th)-lin(BASE))/lin(BASE)*100).toFixed(2)+'%';
+ const e=E.res[DIFFS[0]];$('t5h').textContent=e.c+'/'+e.n;
+ $('t5rev').innerHTML=e.c/e.n>.55
+  ?'<strong>At the hardest level the pairs almost certainly looked identical, and you were right '+e.c+' times in '+e.n+'.</strong> You discriminated a difference you could not feel. Tab three turns that observation into an experiment.'
+  :'<strong>You came out near chance at the hardest level ('+e.c+'/'+e.n+').</strong> On most displays a two-level step is lost to rounding or ambient glare. Worth retrying in a darker room — and note that a null at this sample size is not evidence for a threshold either.';
+ mark(1,4);e5p(sd);}
+function e5p(sd){const p=cv('t5plot',235);if(!p)return;const{x,w,h}=p,L=44,R=16,T=16,B2=36;
+ const X=v=>L+v/18*(w-L-R),Y=pr=>h-B2-(pr-.4)/.62*(h-T-B2);
+ axes(x,L,R,T,B2,w,h,[.5,.6,.7,.8,.9,1].map(v=>[v,Y(v)]),v=>v.toFixed(1),
+  [0,4,8,12,16].map(v=>[v,X(v)]),v=>v,'difference in grey level (of 255)');
+ x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(L,Y(.5));x.lineTo(w-R,Y(.5));x.stroke();x.setLineDash([]);
+ x.beginPath();for(let v=0;v<=18;v+=.2){const px=X(v),py=Y(ncdf(v/sd));v?x.lineTo(px,py):x.moveTo(px,py);}
+ x.strokeStyle=C.live;x.lineWidth=1.8;x.stroke();
+ DIFFS.forEach(d=>{const pr=Math.max(.4,Math.min(1,E.res[d].c/E.res[d].n));
+  x.beginPath();x.arc(X(d),Y(pr),5,0,7);x.fillStyle=C.panel;x.fill();x.strokeStyle=C.data;x.lineWidth=2;x.stroke();
+  x.fillStyle=C.soft;x.textAlign='center';x.textBaseline='bottom';x.fillText(E.res[d].c+'/'+E.res[d].n,X(d),Y(pr)-9);});}
+$('t5go').onclick=()=>{e5b();E.on=true;$('t5box').classList.remove('hidden');
+ $('t5done').classList.add('hidden');$('t5go').classList.add('hidden');e5d();};
+$('t5again').onclick=()=>{e5b();E.on=true;$('t5box').classList.remove('hidden');$('t5done').classList.add('hidden');e5d();};
+$('t5l').onclick=()=>e5a(true);$('t5rr').onclick=()=>e5a(false);
+
+/* ============ TAB 2 ============ */
+const CRIT=PEZ*SIGD,SS=.15*SIGD;
+const U1={d:0,n:0,t:null,path:[]},U2={bias:1,asc:[],desc:[]},U3={},U4={n:0,w0:1};
+const stepq=v=>Math.max(0,Math.round(v*2)/2);
+function u1s(){if(U1.t!==null)return;
+ const target=U1.target===undefined?(U1.target=stepq(CRIT+randn()*SS)):U1.target;
+ U1.n++;U1.path.push(U1.d);
+ if(U1.d>=target){U1.t=U1.d;}else U1.d+=.5;
+ $('u1n').textContent=U1.n;$('u1d').textContent=U1.d.toFixed(1)+' g';
+ $('u1t').textContent=U1.t===null?'—':U1.t.toFixed(1)+' g';u1p();
+ if(U1.t!==null){$('u1rev').classList.add('on');mark(2,0);}}
+function u1p(){const p=cv('u1plot',170);if(!p)return;const{x,w,h}=p,L=40,R=16,T=22,B2=34;
+ const X=v=>L+v/14*(w-L-R);
+ axes(x,L,R,T,B2,w,h,[],()=>'',[0,2,4,6,8,10,12,14].map(v=>[v,X(v)]),v=>v,'difference above the standard (g)');
+ const y=T+42;
+ U1.path.forEach(v=>{x.beginPath();x.arc(X(v),y,4,0,7);x.fillStyle=C.panel;x.fill();
+  x.strokeStyle=C.data2;x.lineWidth=1.5;x.stroke();
+  x.fillStyle=C.faint;x.textAlign='center';x.textBaseline='top';x.fillText('same',X(v),y+10);});
+ if(U1.t!==null){x.beginPath();x.arc(X(U1.t),y,6,0,7);x.fillStyle=C.live;x.fill();
+  x.fillStyle=C.live;x.textAlign='center';x.textBaseline='bottom';
+  x.fillText('difference seen at '+U1.t.toFixed(1)+' g',X(U1.t),y-12);}}
+$('u1step').onclick=u1s;
+$('u1run').onclick=()=>{let g=0;while(U1.t===null&&g++<60)u1s();};
+$('u1r').onclick=()=>{U1.d=0;U1.n=0;U1.t=null;U1.path=[];U1.target=undefined;
+ $('u1n').textContent=0;$('u1d').textContent='0.0 g';$('u1t').textContent='—';u1p();};
+$('u2b').oninput=e=>{U2.bias=+e.target.value;$('u2bv').textContent=U2.bias.toFixed(2)+' g';};
+$('u2bv').textContent='1.00 g';
+$('u2run').onclick=()=>{U2.asc=[];U2.desc=[];
+ for(let i=0;i<8;i++)U2.asc.push(stepq(CRIT+U2.bias+randn()*SS));
+ for(let i=0;i<8;i++)U2.desc.push(stepq(CRIT-U2.bias+randn()*SS));
+ u2p();const a=mean(U2.asc),d=mean(U2.desc);
+ $('u2a').textContent=a.toFixed(2)+' g';$('u2d').textContent=d.toFixed(2)+' g';
+ $('u2t').textContent=((a+d)/2).toFixed(2)+' g';$('u2g').textContent=(a-d).toFixed(2)+' g';
+ $('u2rev').classList.add('on');mark(2,1);};
+function u2p(){const p=cv('u2plot',195);if(!p)return;const{x,w,h}=p,L=76,R=16,T=20,B2=34;
+ const X=v=>L+v/16*(w-L-R);
+ axes(x,L,R,T,B2,w,h,[],()=>'',[0,4,8,12,16].map(v=>[v,X(v)]),v=>v,'transition point (g above the standard)');
+ x.fillStyle=C.soft;x.textAlign='right';x.textBaseline='middle';x.font='10.5px "Space Mono", monospace';
+ const rA=T+32,rD=T+82;x.fillText('ascending',L-12,rA);x.fillText('descending',L-12,rD);
+ if(!U2.asc.length){x.fillStyle=C.faint;x.textAlign='center';x.fillText('run the series',(L+w-R)/2,(T+h-B2)/2);return;}
+ [[U2.asc,rA],[U2.desc,rD]].forEach(([arr,r])=>{arr.forEach((v,i)=>{
+   x.beginPath();x.arc(X(v),r+((i%2)?7:-7),4,0,7);x.fillStyle=C.panel;x.fill();
+   x.strokeStyle=C.data;x.lineWidth=1.6;x.stroke();});
+  const m=mean(arr);x.strokeStyle=C.data;x.lineWidth=1.5;
+  x.beginPath();x.moveTo(X(m),r-20);x.lineTo(X(m),r+20);x.stroke();});
+ const t=(mean(U2.asc)+mean(U2.desc))/2;
+ x.strokeStyle=C.live;x.lineWidth=1.8;x.setLineDash([5,4]);
+ x.beginPath();x.moveTo(X(t),T);x.lineTo(X(t),h-B2);x.stroke();x.setLineDash([]);
+ x.fillStyle=C.live;x.textAlign='center';x.textBaseline='top';x.fillText('average '+t.toFixed(2)+' g',X(t),T+1);}
+const INST=[['suspect',-.35],['think',0],['certain',.5]];
+$('u3run').onclick=()=>{INST.forEach(([k,off])=>{const a=[],d=[];
+  for(let i=0;i<4;i++)a.push(stepq(CRIT*(1+off)+1+randn()*SS));
+  for(let i=0;i<4;i++)d.push(stepq(CRIT*(1+off)-1+randn()*SS));
+  U3[k]=[...a,...d];});u3p();$('u3rev').classList.add('on');mark(2,2);};
+function u3p(){const p=cv('u3plot',200);if(!p)return;const{x,w,h}=p,L=68,R=20,T=20,B2=36;
+ const X=v=>L+v/14*(w-L-R);
+ axes(x,L,R,T,B2,w,h,[],()=>'',[0,4,8,12].map(v=>[v,X(v)]),v=>v,'threshold in grams');
+ INST.forEach(([k],i)=>{const y=T+26+i*44;
+  x.fillStyle=C.soft;x.textAlign='right';x.textBaseline='middle';x.font='10.5px "Space Mono", monospace';
+  x.fillText(k,L-12,y);if(!U3[k])return;
+  U3[k].forEach(v=>{x.beginPath();x.arc(X(v),y,4.5,0,7);x.fillStyle=C.panel;x.fill();
+   x.strokeStyle=C.data2;x.lineWidth=1.6;x.stroke();});
+  const m=mean(U3[k]);x.beginPath();x.arc(X(m),y,6,0,7);x.fillStyle=C.data;x.fill();
+  x.fillStyle=C.ink;x.textAlign='center';x.textBaseline='bottom';x.fillText(m.toFixed(1),X(m),y-11);});
+ $('u3stats').innerHTML=INST.map(([k])=>
+  `<div class="stat"><span class="k">${k}</span><span class="v d">${U3[k]?mean(U3[k]).toFixed(2):'—'}</span></div>`).join('');}
+const kw=()=>PEZ*WEBER,mlt=()=>1+kw(),wat=n=>U4.w0*Math.pow(mlt(),n);
+function u4u(){const W=wat(U4.n);
+ $('u4n').textContent=U4.n;$('u4w').textContent=W.toFixed(2)+' g';
+ $('u4s').textContent=U4.n?(W-wat(U4.n-1)).toFixed(3)+' g':'—';
+ $('u4w0v').textContent=U4.w0.toFixed(2)+' g';u4p();
+ if(U4.n>=25){$('u4rev').classList.add('on');mark(2,3);}}
+function u4p(){const p=cv('u4plot',265);if(!p)return;const{x,w,h}=p,L=44,R=16,T=18,B2=40;
+ const nM=Math.log(120/U4.w0)/Math.log(mlt()),X=v=>L+v/120*(w-L-R),Y=n=>h-B2-n/(nM*1.05)*(h-T-B2);
+ axes(x,L,R,T,B2,w,h,[0,25,50,75,100].filter(v=>v<=nM*1.05).map(v=>[v,Y(v)]),v=>v,
+  [0,20,40,60,80,100,120].map(v=>[v,X(v)]),v=>v,'weight (g) — ticks mark units of sensation');
+ for(let i=0;i<=U4.n;i++){const W=wat(i);if(W>120)break;
+  x.strokeStyle=i===U4.n?C.live:'rgba(95,115,51,.32)';x.lineWidth=i===U4.n?1.8:1;
+  x.beginPath();x.moveTo(X(W),h-B2);x.lineTo(X(W),h-B2-(i===U4.n?15:8));x.stroke();}
+ if(U4.n>0){x.beginPath();for(let i=0;i<=U4.n;i++){const W=wat(i);if(W>120)break;
+   const px=X(W),py=Y(i);i?x.lineTo(px,py):x.moveTo(px,py);}
+  x.strokeStyle=C.data;x.lineWidth=2;x.stroke();
+  const W=Math.min(120,wat(U4.n));x.beginPath();x.arc(X(W),Y(U4.n),4.5,0,7);x.fillStyle=C.data;x.fill();
+  x.fillStyle=C.ink;x.textAlign='right';x.textBaseline='bottom';
+  x.fillText(U4.n+' units at '+W.toFixed(1)+' g',X(W)-9,Y(U4.n)-5);}
+ x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+ x.fillText('units of sensation',L+2,T);}
+$('u4a').onclick=()=>{U4.n++;u4u();};$('u4b').onclick=()=>{U4.n+=10;u4u();};
+$('u4c').onclick=()=>{U4.n=Math.round(Math.log(100/U4.w0)/Math.log(mlt()));u4u();};
+$('u4r').onclick=()=>{U4.n=0;u4u();};
+$('u4w0').oninput=e=>{U4.w0=+e.target.value;u4u();};
+/* stage 5 : real series */
+const U5={q:[],i:0,asc:[],desc:[],d:0,dir:'up',on:false,last:null};
+function u5start(){U5.q=['up','down','up','down','up','down'];U5.i=0;U5.asc=[];U5.desc=[];u5next();}
+function u5next(){if(U5.i>=U5.q.length){U5.on=false;$('u5box').classList.add('hidden');u5done();return;}
+ U5.dir=U5.q[U5.i];U5.d=U5.dir==='up'?0:Math.round(18+Math.random()*6);U5.last=null;U5.on=true;
+ $('u5box').classList.remove('hidden');
+ $('u5instr').textContent=U5.dir==='up'?'Can you see a difference?':'Can you still see a difference?';
+ $('u5bar').style.width=(U5.i/U5.q.length*100)+'%';
+ $('u5c').textContent='series '+(U5.i+1)+' of '+U5.q.length;u5paint();}
+function u5paint(){const left=Math.random()<.5,hi=BASE+U5.d;
+ U5.left=left;
+ $('u5L').style.background=`rgb(${left?hi:BASE},${left?hi:BASE},${left?hi:BASE})`;
+ $('u5R').style.background=`rgb(${left?BASE:hi},${left?BASE:hi},${left?BASE:hi})`;}
+function u5ans(saw){if(!U5.on)return;
+ if(U5.dir==='up'){if(saw){U5.asc.push(U5.d);U5.i++;u5plot();u5next();return;}
+  U5.d++;if(U5.d>26){U5.asc.push(26);U5.i++;u5plot();u5next();return;}}
+ else{if(saw){U5.last=U5.d;U5.d--;if(U5.d<0){U5.desc.push(0);U5.i++;u5plot();u5next();return;}}
+  else{U5.desc.push(U5.last===null?U5.d+1:U5.last);U5.i++;u5plot();u5next();return;}}
+ u5paint();}
+function u5done(){const j=(mean(U5.asc)+mean(U5.desc))/2;
+ $('u5am').textContent=mean(U5.asc).toFixed(2);$('u5dm').textContent=mean(U5.desc).toFixed(2);
+ $('u5j').textContent=j.toFixed(2);
+ $('u5w').textContent=((lin(BASE+j)-lin(BASE))/lin(BASE)*100).toFixed(2)+'%';
+ $('u5rev').classList.add('on');mark(2,4);u5plot();}
+function u5plot(){const p=cv('u5plot',195);if(!p)return;const{x,w,h}=p,L=76,R=16,T=20,B2=34;
+ const X=v=>L+v/26*(w-L-R);
+ axes(x,L,R,T,B2,w,h,[],()=>'',[0,5,10,15,20,25].map(v=>[v,X(v)]),v=>v,'difference in grey level at the transition');
+ x.fillStyle=C.soft;x.textAlign='right';x.textBaseline='middle';x.font='10.5px "Space Mono", monospace';
+ const rA=T+32,rD=T+82;x.fillText('ascending',L-12,rA);x.fillText('descending',L-12,rD);
+ [[U5.asc,rA],[U5.desc,rD]].forEach(([arr,r])=>{arr.forEach((v,i)=>{
+  x.beginPath();x.arc(X(v),r+((i%2)?7:-7),4.5,0,7);x.fillStyle=C.panel;x.fill();
+  x.strokeStyle=C.data;x.lineWidth=1.8;x.stroke();});
+  if(arr.length){const m=mean(arr);x.strokeStyle=C.data;x.lineWidth=1.5;
+   x.beginPath();x.moveTo(X(m),r-20);x.lineTo(X(m),r+20);x.stroke();}});
+ if(U5.asc.length===3&&U5.desc.length===3){const t=(mean(U5.asc)+mean(U5.desc))/2;
+  x.strokeStyle=C.live;x.lineWidth=1.8;x.setLineDash([5,4]);
+  x.beginPath();x.moveTo(X(t),T);x.lineTo(X(t),h-B2);x.stroke();x.setLineDash([]);
+  x.fillStyle=C.live;x.textAlign='center';x.textBaseline='top';x.fillText('your JND '+t.toFixed(2),X(t),T+1);}}
+$('u5go').onclick=()=>{$('u5go').classList.add('hidden');u5start();};
+$('u5r').onclick=()=>{U5.asc=[];U5.desc=[];U5.on=false;$('u5box').classList.add('hidden');
+ $('u5go').classList.remove('hidden');u5plot();};
+$('u5s').onclick=()=>u5ans(false);$('u5d').onclick=()=>u5ans(true);
+
+/* ============ TAB 3 ============ */
+const GROUPS={
+ 'Peirce, all days':[.051,[[1.100,2],[1.080,4],[1.060,10.4],[1.050,13],[1.040,15],[1.030,19.3],[1.015,21.6]]],
+ 'Jastrow, first group':[.05,[[1.100,5],[1.080,9],[1.060,11.0],[1.050,19],[1.040,15],[1.030,13.8],[1.015,20.8]]],
+ 'Jastrow, second group':[.0235,[[1.060,2.2],[1.030,9.4],[1.015,17.0]]],
+ 'Jastrow, third group':[.02,[[1.020,12.8],[1.010,17.7],[1.005,20.7]]],
+ 'Jastrow, fourth group':[.0155,[[1.060,0],[1.030,5],[1.020,10.0],[1.015,14],[1.010,16.0],[1.005,20.8]]]};
+const perr=(ratio,PE)=>(1-erf(.477*Math.log(ratio)/PE))/2*50;
+const V2={g:'Jastrow, third group',pe:.02};
+$('v2btns').innerHTML=Object.keys(GROUPS).map(k=>`<button class="b" data-g="${k}">${k}</button>`).join('');
+$('v2btns').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+ V2.g=b.dataset.g;V2.pe=GROUPS[V2.g][0];$('v2pe').value=V2.pe;v2p();});
+$('v2pe').oninput=e=>{V2.pe=+e.target.value;v2p();};
+$('v2best').onclick=()=>{V2.pe=GROUPS[V2.g][0];$('v2pe').value=V2.pe;v2p();};
+function v2p(){const p=cv('v2plot',255);if(!p)return;const{x,w,h}=p,L=44,R=18,T=18,B2=38;
+ const [PE,rows]=GROUPS[V2.g];
+ const X=r=>L+(Math.log(r)/Math.log(1.10))*(w-L-R),Y=e=>h-B2-e/26*(h-T-B2);
+ axes(x,L,R,T,B2,w,h,[0,5,10,15,20,25].map(v=>[v,Y(v)]),v=>v,
+  [1.005,1.015,1.030,1.060,1.100].map(v=>[v,X(v)]),v=>v.toFixed(3),'ratio of pressures (log spacing)');
+ x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(L,Y(25));x.lineTo(w-R,Y(25));x.stroke();x.setLineDash([]);
+ x.fillStyle=C.faint;x.textAlign='left';x.textBaseline='bottom';x.fillText('pure chance',L+3,Y(25)-4);
+ x.beginPath();let st=false;
+ for(let lr=Math.log(1.002);lr<=Math.log(1.105);lr+=.0008){const r=Math.exp(lr),px=X(r),py=Y(perr(r,V2.pe));
+  st?x.lineTo(px,py):(x.moveTo(px,py),st=true);}
+ x.strokeStyle=C.live;x.lineWidth=1.9;x.stroke();
+ let ss=0;rows.forEach(([r,obs])=>{ss+=Math.abs(obs-perr(r,V2.pe));
+  x.beginPath();x.arc(X(r),Y(obs),5,0,7);x.fillStyle=C.panel;x.fill();
+  x.strokeStyle=C.data;x.lineWidth=2;x.stroke();
+  x.fillStyle=C.soft;x.textAlign='center';x.textBaseline='bottom';x.fillText(obs,X(r),Y(obs)-9);});
+ $('v2pev').textContent=V2.pe.toFixed(4);$('v2g').textContent=V2.g;
+ $('v2pub').textContent=PE.toFixed(4);$('v2mis').textContent=(ss/rows.length).toFixed(2);
+ if(Math.abs(V2.pe-PE)<.001){$('v2rev').classList.add('on');mark(3,1);}}
+/* randomisation */
+const V1={a:null,b:null};
+$('v1run').onclick=()=>{
+ const sim=(patterned)=>{let c=0,n=0,prev=null;
+  for(let s=0;s<200;s++)for(let i=0;i<50;i++){
+   let up;
+   if(patterned){up=prev===null?Math.random()<.5:(Math.random()<.72?!prev:prev);}
+   else up=Math.random()<.5;
+   const felt=(up?1:-1)*1.2+randn()*7.15;
+   let guess=felt>0;
+   if(patterned&&prev!==null&&Math.abs(felt)<3)guess=!prev;
+   if(guess===up)c++;n++;prev=up;}
+  return c/n;};
+ V1.a=sim(false);V1.b=sim(true);
+ $('v1a').textContent=(V1.a*100).toFixed(1)+'%';$('v1b').textContent=(V1.b*100).toFixed(1)+'%';
+ v1p();$('v1rev').classList.add('on');mark(3,0);};
+$('v1r').onclick=()=>{V1.a=V1.b=null;$('v1a').textContent='—';$('v1b').textContent='—';v1p();};
+function v1p(){const p=cv('v1plot',215);if(!p)return;const{x,w,h}=p,L=150,R=40,T=24,B2=38;
+ const X=v=>L+(v-.5)/.28*(w-L-R);
+ axes(x,L,R,T,B2,w,h,[],()=>'',[.5,.6,.7].map(v=>[v,X(v)]),v=>(v*100).toFixed(0)+'%','proportion correct');
+ x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(X(.5),T);x.lineTo(X(.5),h-B2);x.stroke();x.setLineDash([]);
+ const truth=ncdf(1.2/7.15);
+ x.strokeStyle=C.gold;x.lineWidth=1.6;x.beginPath();x.moveTo(X(truth),T);x.lineTo(X(truth),h-B2);x.stroke();
+ x.fillStyle=C.gold;x.textAlign='center';x.textBaseline='top';x.font='9.5px "Space Mono", monospace';
+ x.fillText('true discrimination',X(truth),T+1);
+ [['shuffled deck',V1.a,C.live],['operator chooses',V1.b,C.flag]].forEach(([lab,v,col],i)=>{
+  const y=T+52+i*46;x.fillStyle=C.soft;x.textAlign='right';x.textBaseline='middle';
+  x.font='10.5px "Space Mono", monospace';x.fillText(lab,L-12,y);
+  if(v===null){x.fillStyle=C.faint;x.textAlign='left';x.fillText('—',L+6,y);return;}
+  x.fillStyle=col;x.fillRect(X(.5),y-7,X(v)-X(.5),14);
+  x.fillStyle=C.ink;x.textAlign='left';x.textBaseline='middle';x.fillText((v*100).toFixed(1)+'%',X(v)+8,y);});}
+/* confidence tables */
+const CT={
+ 'Jastrow, second group':{marks:4,rows:{'1.015':[[110,66],[51,17],[3,2],[1,0]],
+  '1.030':[[106,35],[72,11],[23,1],[2,0]],'1.060':[[86,8],[75,1],[54,2],[24,0]]}},
+ 'Jastrow, third and fourth groups':{marks:2,rows:{'1.005':[[294,203],[2,1]],
+  '1.010':[[366,192],[32,30]],'1.020':[[395,131],[68,6]]}}};
+let V3='Jastrow, third and fourth groups';
+$('v3btns').innerHTML=Object.keys(CT).map(k=>`<button class="b" data-k="${k}">${k}</button>`).join('');
+$('v3btns').querySelectorAll('button').forEach(b=>b.onclick=()=>{V3=b.dataset.k;v3p();});
+function v3p(){const t=CT[V3],ratios=Object.keys(t.rows);
+ let html='<table><tr><th>ratio</th>';
+ for(let m=0;m<t.marks;m++)html+=`<th>mark ${m}</th>`;
+ html+='</tr>';
+ ratios.forEach(r=>{html+=`<tr class="${r==='1.005'?'hi':''}"><td>${r}</td>`;
+  t.rows[r].forEach(([ri,wr])=>{const n=ri+wr;
+   html+=`<td>${n?(ri/n*100).toFixed(1)+'%':'—'}<br><span style="color:var(--faint);font-size:11px">${ri}/${n}</span></td>`;});
+  html+='</tr>';});
+ html+='</table><p class="small">Proportion correct, with right-answers over total beneath.</p>';
+ $('v3tab').innerHTML=html;
+ const p=cv('v3plot',255);if(!p)return;const{x,w,h}=p,L=46,R=90,T=18,B2=38;
+ const lo=Math.log(1.004),hi2=Math.log(1.065);
+ const X=r=>L+(Math.log(r)-lo)/(hi2-lo)*(w-L-R),Y=pr=>h-B2-(pr-.45)/.6*(h-T-B2);
+ axes(x,L,R,T,B2,w,h,[.5,.6,.7,.8,.9,1].map(v=>[v,Y(v)]),v=>v.toFixed(1),
+  ratios.map(r=>[+r,X(+r)]),v=>v.toFixed(3),'ratio of pressures');
+ x.strokeStyle=C.flag;x.setLineDash([4,3]);x.lineWidth=1.3;
+ x.beginPath();x.moveTo(L,Y(.5));x.lineTo(w-R,Y(.5));x.stroke();x.setLineDash([]);
+ x.fillStyle=C.flag;x.textAlign='left';x.textBaseline='bottom';x.fillText('chance',L+3,Y(.5)-4);
+ const cols=[C.live,C.data,C.data2,C.gold];
+ for(let m=0;m<t.marks;m++){const pts=ratios.map(r=>{const [ri,wr]=t.rows[r][m];const n=ri+wr;
+   return n>=3?[+r,ri/n,n]:null;}).filter(Boolean);
+  if(pts.length>1){x.beginPath();pts.forEach(([r,pr],i)=>{const px=X(r),py=Y(Math.min(1,pr));
+    i?x.lineTo(px,py):x.moveTo(px,py);});x.strokeStyle=cols[m];x.lineWidth=1.7;x.stroke();}
+  pts.forEach(([r,pr,n])=>{x.beginPath();x.arc(X(r),Y(Math.min(1,pr)),4.5,0,7);x.fillStyle=cols[m];x.fill();});
+  if(pts.length){const last=pts[pts.length-1];
+   x.fillStyle=cols[m];x.textAlign='left';x.textBaseline='middle';x.font='10px "Space Mono", monospace';
+   x.fillText('mark '+m,X(last[0])+9,Y(Math.min(1,last[1])));}}
+ mark(3,2);}
+/* index of confidence */
+const CONF={'Peirce (c = 1.25)':[1.25,.051,[[1.015,.14],[1.030,.30],[1.060,.70]]],
+ 'Jastrow, first group (c = 1.5)':[1.5,.05,[[1.015,.30],[1.030,.40],[1.060,.85]]],
+ 'Jastrow, third group (c = 0.25)':[.25,.02,[[1.005,.00],[1.010,.07],[1.020,.12]]],
+ 'Jastrow, fourth group (c = 0.4)':[.4,.0155,[[1.005,.00],[1.010,.05],[1.020,.50]]]};
+let V4='Peirce (c = 1.25)',V4c=1.25;
+$('v4btns').innerHTML=Object.keys(CONF).map(k=>`<button class="b" data-k="${k}">${k.split(' (')[0]}</button>`).join('');
+$('v4btns').querySelectorAll('button').forEach(b=>b.onclick=()=>{V4=b.dataset.k;V4c=CONF[V4][0];
+ $('v4c').value=V4c;v4p();});
+$('v4c').oninput=e=>{V4c=+e.target.value;v4p();};
+function v4p(){const p=cv('v4plot',245);if(!p)return;const{x,w,h}=p,L=48,R=18,T=18,B2=40;
+ const [cPub,PE,rows]=CONF[V4];
+ const lodds=r=>{const pr=1-(1-erf(.477*Math.log(r)/PE))/2;return Math.log10(pr/(1-pr));};
+ const maxL=Math.max(...rows.map(([r])=>lodds(r)))*1.15,maxM=Math.max(1,...rows.map(([,m])=>m))*1.2;
+ const X=l=>L+l/maxL*(w-L-R),Y=m=>h-B2-m/maxM*(h-T-B2);
+ axes(x,L,R,T,B2,w,h,[0,maxM/2,maxM].map(v=>[v,Y(v)]),v=>v.toFixed(2),
+  [0,maxL/2,maxL].map(v=>[v,X(v)]),v=>v.toFixed(2),'log₁₀ odds of being right');
+ x.strokeStyle=C.live;x.lineWidth=1.9;x.beginPath();
+ x.moveTo(X(0),Y(0));x.lineTo(X(maxL),Y(V4c*maxL));x.stroke();
+ rows.forEach(([r,m])=>{const l=lodds(r);
+  x.beginPath();x.arc(X(l),Y(m),5,0,7);x.fillStyle=C.panel;x.fill();
+  x.strokeStyle=C.data;x.lineWidth=2;x.stroke();
+  x.fillStyle=C.soft;x.textAlign='center';x.textBaseline='bottom';x.font='9.5px "Space Mono", monospace';
+  x.fillText(r.toFixed(3),X(l),Y(m)-9);});
+ $('v4cv').textContent=V4c.toFixed(2)+(Math.abs(V4c-cPub)<.02?'  ✓':'');
+ mark(3,3);}
+/* their design, run on you */
+const VD=[2,4,7],V5={q:[],i:0,tr:[],phase:'idle',dir:null,timer:null};
+function v5build(){V5.q=[];VD.forEach(d=>{for(let r=0;r<12;r++)V5.q.push({d,up:Math.random()<.5});});
+ for(let i=V5.q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[V5.q[i],V5.q[j]]=[V5.q[j],V5.q[i]];}
+ V5.i=0;V5.tr=[];}
+function v5show(){const t=V5.q[V5.i];if(!t)return v5end();
+ V5.phase='show';$('v5ansbox').classList.add('hidden');$('v5confbox').classList.add('hidden');
+ $('v5instr').textContent='Watch';
+ $('v5bar').style.width=(V5.i/V5.q.length*100)+'%';
+ $('v5c').textContent='trial '+(V5.i+1)+' of '+V5.q.length;
+ const g=v=>`rgb(${v},${v},${v})`;
+ $('v5P').style.background=g(BASE);
+ const ex=BASE+(t.up?t.d:-t.d);
+ clearTimeout(V5.timer);
+ V5.timer=setTimeout(()=>{$('v5P').style.background=g(ex);
+  V5.timer=setTimeout(()=>{$('v5P').style.background=g(BASE);
+   V5.timer=setTimeout(()=>{V5.phase='answer';$('v5instr').textContent='Which way did it go?';
+    $('v5ansbox').classList.remove('hidden');},700);},1100);},900);}
+function v5ans(up){if(V5.phase!=='answer')return;V5.dir=up;V5.phase='conf';
+ $('v5ansbox').classList.add('hidden');$('v5instr').textContent='Mark your confidence';
+ $('v5confbox').classList.remove('hidden');}
+function v5conf(c){if(V5.phase!=='conf')return;const t=V5.q[V5.i];
+ V5.tr.push({d:t.d,correct:V5.dir===t.up,conf:c});V5.i++;
+ V5.i<V5.q.length?v5show():v5end();}
+function v5end(){V5.phase='idle';clearTimeout(V5.timer);
+ $('v5box').classList.add('hidden');$('v5done').classList.remove('hidden');
+ const z0=V5.tr.filter(t=>t.conf===0),c0=z0.filter(t=>t.correct).length;
+ const allc=V5.tr.filter(t=>t.correct).length;
+ $('v5n0').textContent=z0.length;
+ $('v5p0').textContent=z0.length?(c0/z0.length*100).toFixed(1)+'%':'—';
+ $('v5all').textContent=(allc/V5.tr.length*100).toFixed(1)+'%';
+ let odds='—';
+ if(z0.length){const z=(c0-z0.length/2)/(Math.sqrt(z0.length)/2),pv=1-ncdf(z);
+  odds=pv<.001?'< 1 in 1000':'1 in '+Math.round(1/Math.max(pv,1e-6));}
+ $('v5odds').textContent=odds;
+ const r=$('v5rev');
+ if(z0.length<6)r.innerHTML='<strong>You marked zero on only '+z0.length+' trials.</strong> The excursions were visible to you, which is a legitimate outcome but leaves the crucial category almost empty — Peirce marked zero on 63 per cent of his trials and Jastrow on 93 per cent of his hardest group. Run it again and be stricter about what counts as a leaning.';
+ else if(c0/z0.length>.55)r.innerHTML='<strong>On '+z0.length+' trials you said answering felt pointless, and you were right '+(c0/z0.length*100).toFixed(1)+' per cent of the time.</strong> Peirce recorded 61.8 per cent across 706 such trials, Jastrow 69.7 per cent across 1,123. You have just reproduced the finding that made the confidence column worth adding — the judgement was shaped by a difference you had no awareness of registering.';
+ else r.innerHTML='<strong>Your zero-confidence trials came out near chance ('+c0+'/'+z0.length+').</strong> With this few trials that is weak evidence either way — Peirce needed a thousand. It may also be your display: a two-level excursion is often lost to rounding. A darker room and a second run would tell you more.';
+ mark(3,4);v5plot();v5cmp();}
+function v5plot(){const p=cv('v5plot',240);if(!p)return;const{x,w,h}=p,L=46,R=60,T=18,B2=38;
+ const X=d=>L+(d-1)/(Math.max(...VD))*(w-L-R),Y=pr=>h-B2-(pr-.3)/.75*(h-T-B2);
+ axes(x,L,R,T,B2,w,h,[.3,.5,.7,.9].map(v=>[v,Y(v)]),v=>v.toFixed(1),
+  VD.map(d=>[d,X(d)]),v=>v,'grey-level excursion');
+ x.strokeStyle=C.flag;x.setLineDash([4,3]);x.lineWidth=1.3;
+ x.beginPath();x.moveTo(L,Y(.5));x.lineTo(w-R,Y(.5));x.stroke();x.setLineDash([]);
+ x.fillStyle=C.flag;x.textAlign='left';x.textBaseline='bottom';x.fillText('chance',L+3,Y(.5)-4);
+ [[0,'mark 0',C.live],[1,'marks 1+',C.data]].forEach(([g,lab,col])=>{
+  const pts=VD.map(d=>{const sub=V5.tr.filter(t=>t.d===d&&(g===0?t.conf===0:t.conf>0));
+   return sub.length>=3?[d,sub.filter(t=>t.correct).length/sub.length,sub.length]:null;}).filter(Boolean);
+  if(pts.length>1){x.beginPath();pts.forEach(([d,pr],i)=>{const px=X(d),py=Y(Math.max(.3,Math.min(1,pr)));
+    i?x.lineTo(px,py):x.moveTo(px,py);});x.strokeStyle=col;x.lineWidth=1.7;x.stroke();}
+  pts.forEach(([d,pr,n])=>{x.beginPath();x.arc(X(d),Y(Math.max(.3,Math.min(1,pr))),5,0,7);
+   x.fillStyle=col;x.fill();x.fillStyle=C.soft;x.textAlign='center';x.textBaseline='bottom';
+   x.font='9.5px "Space Mono", monospace';x.fillText('n='+n,X(d),Y(Math.max(.3,Math.min(1,pr)))-9);});
+  if(pts.length){const l=pts[pts.length-1];x.fillStyle=col;x.textAlign='left';x.textBaseline='middle';
+   x.fillText(lab,X(l[0])+9,Y(Math.max(.3,Math.min(1,l[1]))));}});}
+function v5cmp(){const p=cv('v5cmp',185);if(!p)return;const{x,w,h}=p,L=132,R=48,T=20,B2=34;
+ const z0=V5.tr.filter(t=>t.conf===0),c0=z0.length?z0.filter(t=>t.correct).length/z0.length:null;
+ const X=v=>L+(v-.5)/.28*(w-L-R);
+ axes(x,L,R,T,B2,w,h,[],()=>'',[.5,.6,.7].map(v=>[v,X(v)]),v=>(v*100).toFixed(0)+'%',
+  'proportion correct on trials marked zero');
+ x.strokeStyle=C.faint;x.setLineDash([3,3]);x.beginPath();x.moveTo(X(.5),T);x.lineTo(X(.5),h-B2);x.stroke();x.setLineDash([]);
+ [['Peirce, n=706',.618,C.data2],['Jastrow, n=1123',.697,C.data2],['you, n='+z0.length,c0,C.live]]
+  .forEach(([lab,v,col],i)=>{const y=T+22+i*34;
+   x.fillStyle=C.soft;x.textAlign='right';x.textBaseline='middle';x.font='10.5px "Space Mono", monospace';
+   x.fillText(lab,L-12,y);
+   if(v===null||!isFinite(v))return;
+   x.fillStyle=col;x.fillRect(X(.5),y-8,Math.max(1,X(Math.min(v,.78))-X(.5)),16);
+   x.fillStyle=C.ink;x.textAlign='left';x.fillText((v*100).toFixed(1)+'%',X(Math.min(v,.78))+8,y);});}
+$('v5go').onclick=()=>{v5build();$('v5box').classList.remove('hidden');
+ $('v5done').classList.add('hidden');$('v5go').classList.add('hidden');v5show();};
+$('v5again').onclick=()=>{v5build();$('v5box').classList.remove('hidden');$('v5done').classList.add('hidden');v5show();};
+$('v5up').onclick=()=>v5ans(true);$('v5dn').onclick=()=>v5ans(false);
+document.querySelectorAll('#v5confbox button').forEach(b=>b.onclick=()=>v5conf(+b.dataset.c));
+
+const PD=[{"date":"July 1","n":495,"x":[158,240,261,277,296,312,315,316,321,323,324,325,332,337,339,342,343,344,345,347,349,353,354,355,357,358,359,361,362,363,364,366,367,368,369,370,371,372,374,375,377,378,379,380,381,384,386,387,388,389,390,391,392,393,394,395,396,397,399,400,401,404,405,406,407,408,409,410,411,412,413,414,415,416,417,418,419,420,421,423,424,425,426,428,429,431,433,434,435,436,437,438,440,441,442,443,444,445,446,447,448,449,450,451,452,453,454,455,456,457,458,459,460,461,462,463,464,465,466,467,468,469,470,471,472,473,474,475,476,477,478,479,480,481,482,484,485,486,488,489,490,492,493,495,496,497,498,499,501,502,503,505,506,507,508,509,510,512,513,514,515,516,517,519,520,523,525,526,527,528,529,530,531,532,533,535,537,538,539,540,541,542,543,544,546,548,549,550,551,552,554,555,556,557,559,560,561,562,565,567,569,570,571,572,574,576,577,578,579,580,581,583,584,586,587,589,590,591,592,593,594,597,599,600,602,606,608,609,611,616,620,621,622,623,625,626,628,631,632,633,634,635,636,637,638,646,652,659,660,664,682,692,732,748,757,900,919,978],"y":[1,1,1,1,1,1,1,1,2,1,1,2,1,2,1,1,1,2,2,3,1,1,2,2,1,2,1,3,3,2,1,2,3,1,1,1,1,1,1,1,2,1,1,1,1,1,4,2,1,1,3,2,3,4,2,1,4,2,3,1,3,3,2,2,2,3,3,2,3,3,1,4,3,6,2,2,2,2,1,3,2,4,3,4,2,2,3,2,1,5,1,2,2,3,1,1,1,3,3,5,2,1,1,1,1,2,2,3,3,2,2,1,3,6,1,3,1,1,3,6,4,4,4,1,4,4,2,1,2,1,3,1,5,2,1,4,2,2,1,6,2,6,2,1,2,3,2,2,3,3,5,2,4,6,4,1,2,1,2,2,3,2,1,2,1,1,3,1,1,2,1,2,2,1,2,3,1,1,2,3,3,1,1,1,1,2,2,1,1,2,1,1,2,2,1,3,1,1,2,2,1,1,1,2,1,1,1,1,2,1,2,3,2,2,1,1,1,2,2,1,1,1,1,1,2,1,1,1,1,1,1,1,1,2,1,1,2,1,2,2,1,1,3,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1],"mean":475.6,"med":468,"sd":92.1,"semean":4.1,"iqr2":58.5,"ksig":62.1,"ratio":0.942,"mad":70.1,"lo":1,"hi":3,"tot":4,"oin":111,"ein":98,"ex":13,"skew":0.881,"kurt":6.113,"min":158,"max":978,"dag":4.663,"ans":6.3,"wh":3.0,"lap":3.1,"yul":2.5,"boo":3.6,"beta":1.39,"llG":-2942.7,"llL":-2938.8,"se":[4.02,3.96,3.87,4.07,3.84],"est":[475.6,472.6,471.0,467.9,468],"q":[347,412,468,529,632],"t4":[3.0,3.1,2.5,3.3,3.8,3.8,3.8,3.6]},{"date":"July 5","n":490,"x":[97,106,119,124,127,129,134,136,139,140,144,153,154,155,159,164,165,167,168,170,172,175,176,177,178,179,180,181,182,183,185,187,188,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,276,277,278,279,280,281,282,283,284,286,288,290,291,292,293,294,296,297,298,299,300,301,302,304,305,306,307,308,309,313,314,316,317,318,319,322,326,327,336,339,344,346,350,352,355,359,361,363,366,369,379,381,383,384,385,386],"y":[1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,6,3,1,1,2,2,2,1,1,2,1,2,1,2,4,2,1,4,1,4,3,3,2,6,7,3,4,3,1,4,4,3,3,6,4,5,4,4,7,4,8,2,7,7,3,7,6,3,4,2,2,9,8,10,6,5,1,5,3,7,7,7,6,1,2,3,6,4,7,3,4,2,5,1,7,5,5,6,3,3,7,2,3,2,3,5,5,1,3,2,8,1,3,3,3,1,1,2,2,2,5,3,1,1,1,5,1,4,1,2,1,1,1,4,4,1,3,5,1,3,1,2,1,2,3,1,2,2,2,1,3,1,1,1,1,1,1,1,2,1,3,1,1,1,1,2,1,1,1,1,1,1,1],"mean":241.5,"med":237.0,"sd":46.9,"semean":2.1,"iqr2":26.5,"ksig":31.6,"ratio":0.838,"mad":35.6,"lo":0,"hi":0,"tot":0,"oin":115,"ein":97,"ex":18,"skew":0.437,"kurt":3.87,"min":97,"max":386,"dag":2.535,"ans":3.012,"wh":2.4,"lap":1.6,"yul":2.1,"boo":2.4,"beta":1.31,"llG":-2582.9,"llL":-2576.0,"se":[2.19,1.99,2.04,1.85,2.28],"est":[241.5,240.3,239.5,237.5,237.0],"q":[175,213,237,266,322],"t4":[2.4,1.6,2.1,2.6,2.3,2.1,2.3,2.4]},{"date":"July 6","n":489,"x":[90,106,111,113,124,125,126,127,128,130,132,134,136,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,245,246,247,248,249,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,268,269,271,272,274,275,276,278,280,281,282,283,285,287,289,291,292,293,295,303,318,323,347,356,364,365,381,445,452],"y":[2,1,1,1,2,2,2,2,2,1,2,1,2,1,1,3,1,1,1,3,1,3,5,5,2,4,7,2,3,1,1,5,1,3,4,6,1,3,2,3,3,5,2,5,4,8,1,3,4,6,2,3,6,2,6,5,2,2,8,2,4,4,2,2,2,6,4,5,10,10,1,4,5,10,8,3,4,4,4,8,4,5,5,4,3,4,3,1,9,9,5,1,2,7,3,4,7,5,3,2,5,8,3,3,2,6,4,2,3,2,2,1,4,3,2,1,3,1,3,4,2,1,1,1,2,5,1,2,2,2,2,4,1,2,1,2,1,3,1,1,1,2,2,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"mean":203.2,"med":200,"sd":45.3,"semean":2.0,"iqr2":27.0,"ksig":30.6,"ratio":0.883,"mad":33.8,"lo":0,"hi":7,"tot":7,"oin":118,"ein":97,"ex":21,"skew":1.082,"kurt":6.775,"min":90,"max":452,"dag":5.423,"ans":6.828,"wh":1.8,"lap":1.5,"yul":1.7,"boo":2.1,"beta":1.3,"llG":-2559.9,"llL":-2547.5,"se":[2.1,2.01,1.94,1.93,1.93],"est":[203.2,201.1,200.6,200.4,200],"q":[140,173,200,227,276],"t4":[1.8,1.5,1.7,1.5,2.3,2.2,2.6,2.1]},{"date":"July 8","n":499,"x":[65,97,111,126,131,134,135,138,141,143,144,146,147,148,149,151,152,153,154,155,157,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,246,247,249,251,252,253,254,255,256,259,260,261,263,264,267,268,271,272,273,277,279,283,287,294,297,299,314,319,323,327,343,347,352,355,365,381,521],"y":[1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,1,2,3,5,2,3,2,1,3,2,3,3,2,2,4,7,5,4,5,3,6,10,4,4,2,1,8,13,10,5,4,3,6,6,6,9,9,4,7,9,5,6,5,5,10,12,8,6,10,6,6,3,6,6,8,10,6,9,8,6,1,6,1,5,5,5,5,4,8,3,4,3,3,5,4,3,5,3,3,3,3,2,3,2,3,1,1,1,1,1,3,1,1,2,2,1,1,2,2,1,2,4,3,1,1,2,1,2,1,1,1,1,1,2,2,1,1,1,1,1,1,1,1,1,1,1],"mean":205.6,"med":201,"sd":39.4,"semean":1.8,"iqr2":19.5,"ksig":26.6,"ratio":0.734,"mad":26.9,"lo":1,"hi":7,"tot":8,"oin":141,"ein":99,"ex":42,"skew":1.843,"kurt":13.234,"min":65,"max":521,"dag":7.803,"ans":9.722,"wh":1.2,"lap":1.2,"yul":1.2,"boo":1.2,"beta":0.97,"llG":-2544.6,"llL":-2481.9,"se":[1.69,1.54,1.49,1.46,1.4],"est":[205.6,203.2,202.3,201.5,201],"q":[157,183,201,222,271],"t4":[1.2,1.2,1.2,1.3,1.3,1.3,1.3,1.2]},{"date":"July 9","n":490,"x":[62,65,67,68,72,73,74,76,77,78,79,80,83,86,90,91,92,93,95,96,97,100,101,102,103,104,105,107,108,109,110,111,112,114,115,116,117,118,119,120,121,122,123,124,125,126,127,128,129,130,131,132,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,200,202,203,204,207,208,209,210,211,212,216,218,220,225,237,247,249,256,259,270,285,310],"y":[1,2,1,1,1,1,1,1,2,2,1,2,1,2,2,1,3,3,3,2,2,3,7,5,2,3,4,1,3,2,3,2,2,3,4,6,4,4,1,3,3,4,5,1,4,2,4,4,1,6,6,5,4,7,7,8,6,9,8,7,5,8,8,11,4,8,6,4,3,5,4,5,8,4,7,10,5,2,8,6,9,7,3,4,3,3,3,4,2,7,6,5,8,6,3,3,6,3,6,5,3,5,3,5,3,4,4,3,2,2,1,4,3,1,1,1,1,1,2,2,1,2,2,2,2,3,1,1,1,1,1,1,1,1,1,1,1,1],"mean":148.5,"med":147.0,"sd":34.8,"semean":1.6,"iqr2":21.5,"ksig":23.5,"ratio":0.916,"mad":26.7,"lo":0,"hi":4,"tot":4,"oin":112,"ein":97,"ex":15,"skew":0.387,"kurt":4.401,"min":62,"max":310,"dag":2.26,"ans":4.096,"wh":2.1,"lap":1.2,"yul":2.0,"boo":2.1,"beta":1.48,"llG":-2435.0,"llL":-2438.2,"se":[1.54,1.51,1.55,1.63,2.27],"est":[148.5,147.9,148.1,148.6,147.0],"q":[92,128,147,171,204],"t4":[2.1,1.2,2.0,2.3,2.0,2.0,2.0,2.1]},{"date":"July 10","n":489,"x":[66,72,75,87,88,101,104,105,106,107,108,109,111,112,113,115,116,118,119,120,121,122,123,124,125,128,129,130,131,132,134,135,136,137,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,228,229,230,233,237,238,239,242,244,245,246,259,260,264,272,277,280,285,287,290,316,327,367,376,392,411],"y":[1,1,1,2,1,2,1,1,1,1,1,2,1,2,2,1,3,1,1,1,1,3,2,2,1,1,2,1,4,2,5,4,1,2,5,5,3,6,3,4,1,6,8,3,4,5,4,7,4,7,4,5,5,6,7,7,7,3,10,6,12,2,4,5,6,9,5,9,5,5,5,7,4,3,7,3,4,11,9,7,6,8,9,2,7,7,6,7,5,6,2,7,3,3,1,5,1,8,2,4,2,1,2,1,4,3,3,1,4,3,3,1,3,2,3,1,1,1,1,2,1,1,3,1,1,1,1,2,1,3,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1],"mean":175.6,"med":172,"sd":39.9,"semean":1.8,"iqr2":19.5,"ksig":26.9,"ratio":0.724,"mad":27.9,"lo":0,"hi":6,"tot":6,"oin":116,"ein":97,"ex":19,"skew":1.472,"kurt":9.43,"min":66,"max":411,"dag":6.715,"ans":8.365,"wh":1.8,"lap":1.3,"yul":1.9,"boo":1.9,"beta":1.07,"llG":-2499.0,"llL":-2454.2,"se":[1.75,1.48,1.46,1.37,1.8],"est":[175.6,173.5,173.3,173.0,172],"q":[118,153,172,192,238],"t4":[1.8,1.3,1.9,1.8,1.5,1.5,1.8,1.9]},{"date":"July 15","n":496,"x":[65,67,76,82,89,90,96,100,102,104,106,108,109,110,112,114,115,116,117,121,126,127,128,129,130,131,132,133,134,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,240,241,243,244,245,246,247,248,250,251,252,255,257,261,263,265,268,278,282,301,314,336,357,373,376,386,459,687],"y":[1,1,1,1,1,1,1,1,2,1,1,1,2,1,1,4,3,2,3,1,1,2,1,2,6,1,2,2,1,1,1,2,2,1,1,2,3,2,3,2,7,4,2,1,5,4,6,5,2,5,4,5,2,3,4,5,4,2,7,4,14,4,2,7,3,5,6,3,5,4,2,6,6,9,13,6,8,7,6,7,4,5,4,7,1,7,5,4,4,7,4,6,2,4,1,5,5,2,4,7,4,6,4,5,4,8,2,5,3,5,4,1,4,2,4,3,1,5,3,4,4,1,5,1,3,2,2,1,3,1,1,1,2,1,2,3,2,2,2,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1],"mean":186.9,"med":184.0,"sd":48.8,"semean":2.2,"iqr2":24.5,"ksig":32.9,"ratio":0.745,"mad":32.3,"lo":0,"hi":6,"tot":6,"oin":137,"ein":98,"ex":39,"skew":2.88,"kurt":27.392,"min":65,"max":687,"dag":9.906,"ans":11.814,"wh":1.6,"lap":1.4,"yul":1.7,"boo":1.5,"beta":1.0,"llG":-2632.6,"llL":-2561.2,"se":[2.24,1.65,1.74,1.72,1.57],"est":[186.9,184.8,184.9,184.7,184.0],"q":[116,161,184,210,247],"t4":[1.6,1.4,1.7,1.8,1.3,1.3,1.3,1.5]},{"date":"July 16","n":490,"x":[61,85,105,111,119,122,123,126,131,132,137,138,139,143,144,146,147,148,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,237,238,239,241,242,243,244,247,251,253,255,257,260,262,264,265,274,288,312,318,335,360],"y":[1,1,1,1,1,1,1,1,1,1,2,2,1,3,1,4,2,2,2,1,2,2,1,4,5,3,2,4,1,3,2,2,4,3,4,4,3,5,7,3,3,5,7,4,4,8,3,5,6,9,5,6,10,4,11,9,10,3,11,6,8,11,8,8,8,7,8,8,6,4,13,7,9,10,3,8,5,5,4,3,10,7,9,3,3,6,5,2,10,5,7,2,1,4,1,2,3,5,4,2,3,1,1,3,1,1,1,2,1,1,1,1,1,2,1,1,1,1,1,1,1,2,1,1,1,1],"mean":194.1,"med":194.0,"sd":30.4,"semean":1.4,"iqr2":17.5,"ksig":20.5,"ratio":0.853,"mad":22.0,"lo":2,"hi":4,"tot":6,"oin":115,"ein":97,"ex":18,"skew":0.481,"kurt":7.068,"min":61,"max":360,"dag":2.764,"ans":7.051,"wh":1.2,"lap":1.0,"yul":1.3,"boo":1.3,"beta":1.17,"llG":-2368.8,"llL":-2343.3,"se":[1.32,1.15,1.2,1.22,1.38],"est":[194.1,193.6,193.8,194.1,194.0],"q":[147,177,194,212,237],"t4":[1.2,1.0,1.3,0.9,1.5,1.3,1.5,1.3]},{"date":"July 17","n":495,"x":[71,77,88,106,114,115,124,127,129,132,134,135,136,138,139,140,141,142,143,145,146,147,149,150,151,152,153,154,155,156,157,158,159,160,161,162,163,164,165,166,167,168,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,227,228,229,230,232,233,234,235,236,237,238,239,240,244,246,247,249,250,253,254,255,258,261,264,276,281,286,301,302,307,347,368,505],"y":[1,1,1,1,1,1,1,1,2,2,2,1,1,1,2,1,1,1,3,1,3,2,2,2,2,1,2,4,3,1,3,3,2,1,2,2,1,5,4,5,2,2,5,8,2,2,6,5,8,6,6,4,7,2,8,7,5,8,5,8,6,11,6,9,6,5,8,6,10,7,6,14,7,8,10,6,3,8,6,9,3,6,8,5,8,6,7,5,6,6,4,7,3,8,3,5,2,4,5,5,1,4,2,3,4,2,1,2,2,3,4,1,2,4,1,1,2,1,1,1,1,1,1,1,2,1,2,1,1,1,1,1],"mean":195.8,"med":195,"sd":35.2,"semean":1.6,"iqr2":18.0,"ksig":23.8,"ratio":0.758,"mad":24.0,"lo":2,"hi":4,"tot":6,"oin":136,"ein":98,"ex":38,"skew":1.673,"kurt":16.633,"min":71,"max":505,"dag":7.328,"ans":10.435,"wh":1.4,"lap":1.1,"yul":1.5,"boo":1.4,"beta":1.04,"llG":-2465.6,"llL":-2412.0,"se":[1.62,1.33,1.24,1.36,1.41],"est":[195.8,194.8,194.9,195.1,195],"q":[143,177,195,213,246],"t4":[1.4,1.1,1.5,1.3,1.3,1.3,1.5,1.4]},{"date":"July 18","n":498,"x":[81,122,130,150,151,156,157,159,161,162,163,164,166,167,169,170,171,172,173,174,175,176,177,178,179,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,264,265,267,272,274,275,281,285,288,294,299,302,416],"y":[1,1,1,1,1,1,1,1,1,2,1,3,2,2,1,2,3,3,1,1,2,1,1,5,2,2,4,5,5,1,6,4,5,4,5,3,4,3,7,1,9,7,6,2,8,5,4,5,6,5,7,7,10,13,6,11,8,11,5,8,10,4,7,10,9,10,9,5,4,11,4,9,8,10,5,8,9,7,1,4,2,9,6,4,9,4,4,1,6,7,2,3,2,2,3,6,2,4,2,5,2,1,2,1,2,2,2,1,3,1,2,1,1,1,1,1,1,1,1,1],"mean":215.5,"med":215.0,"sd":28.2,"semean":1.3,"iqr2":16.0,"ksig":19.0,"ratio":0.842,"mad":21.0,"lo":2,"hi":1,"tot":3,"oin":113,"ein":98,"ex":15,"skew":0.516,"kurt":8.728,"min":81,"max":416,"dag":2.97,"ans":8.095,"wh":1.5,"lap":0.9,"yul":1.6,"boo":1.5,"beta":1.32,"llG":-2369.3,"llL":-2358.0,"se":[1.28,1.21,1.23,1.2,1.57],"est":[215.5,215.3,215.3,215.4,215.0],"q":[171,199,215,231,258],"t4":[1.5,0.9,1.6,1.3,1.5,1.5,1.5,1.5]},{"date":"July 19","n":499,"x":[68,114,135,141,142,144,145,146,149,151,154,155,156,158,159,160,161,162,163,165,166,168,169,171,174,175,176,177,178,180,181,182,183,184,185,186,187,188,189,190,191,192,193,194,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,257,258,259,260,261,262,264,265,266,268,270,271,273,274,275,277,278,281,287,292,293,300,303,305,307,312,360,379,400,437,491],"y":[1,1,1,2,2,1,1,1,1,1,2,2,2,1,3,1,1,3,1,1,3,2,3,2,2,2,3,3,1,3,1,4,2,2,2,3,6,3,5,3,5,12,9,10,10,5,4,7,8,7,9,5,4,7,4,5,9,6,7,12,12,5,5,7,5,7,5,11,5,10,7,3,3,9,11,2,8,4,2,5,3,7,4,5,4,4,3,8,5,2,7,5,3,1,6,2,3,3,6,4,5,2,2,2,2,4,1,1,3,1,2,1,1,2,1,2,1,1,3,1,1,2,1,1,3,1,1,1,1,1,3,1,1,1,1,1],"mean":216.6,"med":213,"sd":37.4,"semean":1.7,"iqr2":20.0,"ksig":25.2,"ratio":0.793,"mad":25.8,"lo":1,"hi":5,"tot":6,"oin":130,"ein":99,"ex":31,"skew":1.634,"kurt":12.722,"min":68,"max":491,"dag":7.251,"ans":9.584,"wh":1.8,"lap":1.1,"yul":2.1,"boo":1.7,"beta":1.05,"llG":-2517.4,"llL":-2464.6,"se":[1.68,1.4,1.3,1.4,1.79],"est":[216.6,215.0,214.8,213.8,213],"q":[162,195,213,235,274],"t4":[1.8,1.1,2.1,1.8,1.8,1.8,1.8,1.7]},{"date":"July 20","n":396,"x":[95,109,126,141,157,162,164,170,172,173,175,179,181,182,187,191,193,194,196,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,279,281,283,284,286,289,292,296,297,298,300,304,305,314,316,318,322,329,354,365,374,390,391],"y":[1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,3,2,2,5,4,1,3,2,2,1,1,2,4,5,3,4,2,1,2,6,5,5,7,5,8,6,12,8,11,4,4,6,5,5,13,6,8,4,3,9,6,6,5,4,4,6,11,4,7,6,5,5,6,3,1,2,2,7,3,3,3,5,6,5,1,3,2,4,3,1,1,5,3,5,1,4,4,2,1,1,3,1,1,1,1,3,2,3,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"mean":235.6,"med":233.0,"sd":33.3,"semean":1.7,"iqr2":17.0,"ksig":22.4,"ratio":0.757,"mad":23.4,"lo":3,"hi":5,"tot":8,"oin":102,"ein":78,"ex":24,"skew":0.634,"kurt":7.511,"min":95,"max":391,"dag":3.192,"ans":6.751,"wh":1.9,"lap":1.2,"yul":1.8,"boo":1.7,"beta":1.04,"llG":-1951.0,"llL":-1916.0,"se":[1.68,1.34,1.36,1.46,1.73],"est":[235.6,234.8,234.4,233.1,233.0],"q":[193,218,233,252,286],"t4":[1.9,1.2,1.8,2.0,1.8,1.8,1.8,1.7]},{"date":"July 22","n":489,"x":[133,140,148,149,157,158,164,177,184,188,194,195,198,200,203,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,282,283,284,285,287,290,291,293,294,295,296,297,298,304,306,310,311,312,316,373],"y":[1,1,1,1,1,1,1,1,1,1,1,2,2,1,2,1,3,3,4,2,2,6,4,1,3,2,3,2,4,4,5,10,5,8,5,9,5,5,9,4,8,13,7,6,13,8,6,3,10,5,5,7,8,11,8,9,7,9,7,9,5,9,8,8,5,13,2,7,4,7,5,14,8,4,7,2,6,4,5,6,5,6,3,2,5,5,3,2,2,3,3,3,6,2,1,4,1,1,1,1,2,3,1,2,1,1,1,1,1,1,1],"mean":244.5,"med":244,"sd":26.3,"semean":1.2,"iqr2":16.5,"ksig":17.7,"ratio":0.93,"mad":19.9,"lo":6,"hi":1,"tot":7,"oin":109,"ein":97,"ex":12,"skew":-0.214,"kurt":5.522,"min":133,"max":373,"dag":-1.279,"ans":5.667,"wh":1.3,"lap":0.9,"yul":1.3,"boo":1.3,"beta":1.4,"llG":-2293.0,"llL":-2290.2,"se":[1.2,1.1,1.05,1.22,1.36],"est":[244.5,244.8,244.7,244.4,244],"q":[207,228,244,261,284],"t4":[1.3,0.9,1.3,1.4,1.3,1.3,1.3,1.3]},{"date":"July 23","n":500,"x":[63,105,119,132,157,158,166,174,179,180,181,184,187,188,189,191,192,193,195,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,270,271,272,273,275,278,279,280,281,282,283,286,289,290,297,304,305,306,317,319,359,470,693,705],"y":[1,1,1,1,1,1,1,1,1,1,1,3,4,2,2,3,1,1,2,4,3,2,1,4,4,1,4,2,3,5,2,1,8,5,8,1,5,4,3,2,4,7,3,4,6,9,5,10,9,6,6,11,14,10,11,5,8,6,9,8,11,12,13,6,10,9,11,8,9,11,5,8,3,5,7,9,9,8,7,12,1,6,2,6,6,2,5,3,1,4,2,1,1,3,4,2,3,2,1,1,1,1,1,1,1,2,1,1,1,2,2,1,1,1,1,1],"mean":236.7,"med":236.0,"sd":41.3,"semean":1.8,"iqr2":14.5,"ksig":27.9,"ratio":0.52,"mad":21.6,"lo":2,"hi":3,"tot":5,"oin":193,"ein":99,"ex":94,"skew":5.693,"kurt":66.242,"min":63,"max":705,"dag":13.34,"ans":13.688,"wh":1.2,"lap":1.0,"yul":1.3,"boo":1.2,"beta":0.8,"llG":-2570.6,"llL":-2383.6,"se":[1.86,1.04,1.01,1.09,1.24],"est":[236.7,235.0,235.2,235.7,236.0],"q":[192,222,236,251,275],"t4":[1.2,1.0,1.3,0.9,1.3,1.3,1.3,1.2]},{"date":"July 24","n":498,"x":[73,105,110,112,140,148,158,166,168,169,174,175,179,184,186,187,192,193,194,195,196,197,198,199,201,202,203,204,205,206,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,282,284,285,287,288,289,290,292,293,295,296,302,309,310,311,315,406,443,467],"y":[1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,3,2,4,1,2,1,1,3,1,1,4,1,2,2,1,5,4,6,5,5,4,9,8,4,8,7,9,5,5,10,12,7,6,7,8,11,8,12,5,11,8,8,9,15,7,12,10,15,9,8,14,4,4,7,7,8,4,7,4,6,3,4,7,8,6,3,1,2,3,8,3,1,1,2,1,7,1,4,3,4,1,1,2,1,1,1,3,1,1,1,1,1,2,1,1,1,1,2,1,1,2,1,1,1,1,1,2],"mean":236.0,"med":235.0,"sd":33.2,"semean":1.5,"iqr2":14.0,"ksig":22.4,"ratio":0.625,"mad":20.8,"lo":4,"hi":4,"tot":8,"oin":166,"ein":98,"ex":68,"skew":1.518,"kurt":17.542,"min":73,"max":467,"dag":6.911,"ans":10.622,"wh":1.0,"lap":0.9,"yul":1.1,"boo":1.2,"beta":0.87,"llG":-2451.2,"llL":-2354.3,"se":[1.61,1.1,1.09,1.06,1.1],"est":[236.0,235.4,235.2,234.7,235.0],"q":[193,221,235,249,279],"t4":[1.0,0.9,1.1,0.9,1.0,1.0,1.0,1.2]},{"date":"July 25","n":498,"x":[67,86,103,114,157,161,162,170,176,178,179,180,181,182,183,184,185,187,188,190,192,193,194,196,197,198,199,200,201,202,203,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,261,262,263,265,266,267,268,269,270,271,272,273,274,278,279,280,281,282,284,287,291,303,312,313,333,357,784],"y":[1,1,1,1,1,1,1,2,3,1,1,2,1,2,2,1,3,3,3,1,2,4,1,2,1,3,4,5,6,2,4,1,10,3,6,4,3,1,7,5,3,3,2,4,5,6,8,8,5,3,3,6,10,7,8,9,12,15,13,6,8,8,10,8,5,7,7,6,11,11,12,9,7,6,7,7,8,6,10,6,3,5,4,10,7,4,3,2,3,2,2,4,5,6,3,4,4,1,3,2,1,1,4,2,2,2,1,1,1,1,1,1,1,1],"mean":233.2,"med":233.0,"sd":37.8,"semean":1.7,"iqr2":15.5,"ksig":25.5,"ratio":0.609,"mad":21.7,"lo":4,"hi":2,"tot":6,"oin":167,"ein":98,"ex":69,"skew":5.851,"kurt":93.55,"min":67,"max":784,"dag":13.452,"ans":14.233,"wh":1.4,"lap":1.0,"yul":1.6,"boo":1.4,"beta":0.91,"llG":-2515.0,"llL":-2375.0,"se":[1.71,1.18,1.1,1.12,1.37],"est":[233.2,232.8,233.0,233.8,233.0],"q":[185,218,233,249,273],"t4":[1.4,1.0,1.6,1.3,1.3,1.3,1.3,1.4]},{"date":"July 26","n":507,"x":[76,104,128,147,162,166,180,186,190,193,196,200,201,203,206,207,208,209,210,211,212,213,214,215,216,218,219,220,221,223,224,225,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,295,296,297,298,299,300,302,303,304,305,306,308,309,310,311,312,314,315,316,317,320,321,323,324,325,326,332,337,338,339,341,342,344,345,347,348,353,366,372,380,390,392,394,448,467],"y":[1,1,1,1,1,1,1,3,1,1,2,1,1,1,1,2,5,4,2,2,2,2,2,2,1,1,2,3,3,4,3,2,2,1,3,6,2,4,3,3,4,3,5,2,5,7,2,4,5,4,9,2,5,4,8,5,7,4,5,7,7,5,7,9,7,11,9,8,5,7,8,5,3,7,2,6,5,6,7,5,6,11,2,5,10,4,7,6,7,7,3,6,7,3,5,5,6,7,5,5,3,5,1,3,3,4,1,1,1,1,2,2,5,6,1,4,1,4,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1,3,1,2,1,1,1,1,1,1,1,1,1],"mean":265.5,"med":264,"sd":38.6,"semean":1.7,"iqr2":20.5,"ksig":26.0,"ratio":0.788,"mad":27.6,"lo":3,"hi":5,"tot":8,"oin":128,"ein":100,"ex":28,"skew":0.244,"kurt":7.257,"min":76,"max":467,"dag":1.479,"ans":7.284,"wh":1.7,"lap":1.2,"yul":1.8,"boo":1.8,"beta":1.14,"llG":-2571.4,"llL":-2540.8,"se":[1.65,1.48,1.44,1.38,1.75],"est":[265.5,264.9,265.0,265.2,264],"q":[209,245,264,286,323],"t4":[1.7,1.2,1.8,1.8,1.8,1.8,1.8,1.8]},{"date":"July 27","n":495,"x":[184,188,192,197,199,201,202,203,204,206,207,208,209,212,213,214,215,216,217,219,220,221,223,224,225,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,291,292,293,294,299,302,303,305,306,315,322,330,341,366,367],"y":[2,1,1,1,1,3,1,2,2,6,1,1,3,3,3,1,3,4,4,3,2,3,4,6,2,5,3,8,7,2,10,3,6,4,10,5,2,5,6,5,3,8,6,5,7,14,8,11,12,3,16,6,10,11,8,7,7,8,13,9,5,16,11,4,6,8,5,5,11,10,6,6,5,7,5,5,3,6,3,1,4,5,5,4,6,4,1,1,1,3,1,1,2,2,2,1,1,1,1,1,1,1,1,1],"mean":253.0,"med":254,"sd":24.5,"semean":1.1,"iqr2":16.0,"ksig":16.5,"ratio":0.97,"mad":18.7,"lo":0,"hi":4,"tot":4,"oin":121,"ein":98,"ex":23,"skew":0.257,"kurt":4.746,"min":184,"max":367,"dag":1.536,"ans":4.681,"wh":1.3,"lap":0.8,"yul":1.3,"boo":1.2,"beta":1.43,"llG":-2285.5,"llL":-2285.9,"se":[1.08,1.09,1.07,1.16,1.27],"est":[253.0,252.9,253.3,253.9,254],"q":[209,237,254,269,287],"t4":[1.3,0.8,1.3,1.3,1.0,1.0,1.0,1.2]},{"date":"July 29","n":500,"x":[119,148,152,157,187,190,191,198,199,203,205,207,210,212,214,215,216,218,219,220,221,222,224,226,227,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,290,292,293,294,295,296,298,299,300,301,302,308,309,310,311,318,321,324,334,359,366,591,779,851],"y":[1,1,1,1,1,1,1,1,1,1,1,2,2,1,1,1,1,1,2,3,3,3,1,2,7,3,3,4,3,6,5,2,7,7,9,4,11,8,7,8,7,10,11,8,11,13,7,11,10,13,15,11,12,7,11,6,11,8,11,4,4,4,8,8,6,11,6,10,12,9,10,4,5,5,4,2,7,5,4,2,1,3,5,4,4,5,1,1,2,1,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1],"mean":258.7,"med":255.0,"sd":45.3,"semean":2.0,"iqr2":14.0,"ksig":30.6,"ratio":0.458,"mad":20.4,"lo":0,"hi":3,"tot":3,"oin":208,"ein":99,"ex":109,"skew":8.162,"kurt":99.494,"min":119,"max":851,"dag":15.161,"ans":14.349,"wh":0.9,"lap":0.9,"yul":0.9,"boo":1.0,"beta":0.73,"llG":-2618.0,"llL":-2346.6,"se":[2.04,1.01,0.92,0.98,1.0],"est":[258.7,256.3,256.3,256.0,255.0],"q":[221,243,255,271,293],"t4":[0.9,0.9,0.9,0.9,1.0,1.0,1.0,1.0]},{"date":"July 30","n":494,"x":[130,159,183,186,187,198,199,202,203,204,206,208,210,211,212,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,285,286,287,288,289,290,291,292,293,295,296,297,299,301,303,306,308,309,312,320,324,327,329,330,337,342,360,486,754,817],"y":[1,1,1,1,1,1,2,1,2,2,1,2,2,2,1,2,3,1,5,2,2,9,6,2,2,4,3,4,4,3,2,4,4,4,10,4,8,6,9,5,6,13,12,9,4,6,7,8,7,9,3,12,9,12,9,4,7,9,8,8,6,8,9,8,14,7,11,6,8,7,6,12,1,8,7,5,3,8,6,2,4,5,2,7,2,1,1,3,2,3,1,1,3,1,1,2,3,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],"mean":255.4,"med":253.0,"sd":43.5,"semean":2.0,"iqr2":15.5,"ksig":29.3,"ratio":0.529,"mad":21.7,"lo":0,"hi":3,"tot":3,"oin":181,"ein":98,"ex":83,"skew":7.685,"kurt":93.784,"min":130,"max":817,"dag":14.771,"ans":14.192,"wh":1.3,"lap":1.0,"yul":1.4,"boo":1.3,"beta":0.84,"llG":-2564.9,"llL":-2353.6,"se":[1.89,1.02,1.02,1.2,1.41],"est":[255.4,252.7,252.7,252.9,253.0],"q":[215,237,253,268,295],"t4":[1.3,1.0,1.4,1.3,1.5,1.3,1.5,1.3]},{"date":"July 31","n":502,"x":[75,137,160,161,181,183,185,189,191,192,196,197,198,200,201,202,204,205,206,208,210,211,212,213,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,285,286,287,289,290,291,292,293,297,298,299,302,312,313,331,348,349,438],"y":[1,1,1,2,1,1,1,2,2,1,1,1,2,1,3,2,2,2,3,2,1,3,1,3,3,5,5,2,2,9,4,6,5,3,7,7,7,6,9,8,10,6,10,4,8,8,11,9,10,10,10,7,10,8,3,10,11,11,9,7,8,8,9,7,10,10,8,7,10,5,11,6,8,6,7,3,7,5,3,4,1,3,1,4,2,3,1,3,4,4,1,2,1,4,1,5,3,1,2,2,2,1,1,1,1,1,1,1,1,1,1],"mean":245.0,"med":245.0,"sd":27.2,"semean":1.2,"iqr2":14.5,"ksig":18.3,"ratio":0.79,"mad":19.2,"lo":3,"hi":4,"tot":7,"oin":114,"ein":99,"ex":15,"skew":0.217,"kurt":11.556,"min":75,"max":438,"dag":1.315,"ans":9.259,"wh":1.6,"lap":0.9,"yul":1.7,"boo":1.5,"beta":1.15,"llG":-2370.6,"llL":-2334.3,"se":[1.13,1.05,1.03,1.12,1.49],"est":[245.0,245.1,244.9,244.9,245.0],"q":[205,230,245,259,286],"t4":[1.6,0.9,1.7,1.8,1.5,1.4,1.3,1.5]},{"date":"August 1","n":499,"x":[139,157,171,192,193,194,196,197,205,206,207,209,210,211,212,213,214,215,216,219,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,285,286,287,288,289,291,292,294,296,297,298,299,300,303,307,309,325,339,342,382,406,410,689],"y":[1,1,1,1,1,1,1,1,2,1,2,1,1,2,2,2,1,1,3,2,1,6,1,4,4,4,4,1,6,5,10,6,2,7,6,6,6,12,10,4,7,10,7,3,6,10,7,10,3,8,13,8,14,8,6,8,6,8,10,9,14,8,12,7,8,17,8,6,5,5,9,7,9,2,12,3,4,8,4,2,4,7,3,1,4,5,3,1,6,1,1,2,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1],"mean":255.6,"med":255,"sd":32.0,"semean":1.4,"iqr2":15.0,"ksig":21.6,"ratio":0.694,"mad":19.2,"lo":1,"hi":4,"tot":5,"oin":145,"ein":99,"ex":46,"skew":5.305,"kurt":71.157,"min":139,"max":689,"dag":12.972,"ans":13.801,"wh":1.5,"lap":0.9,"yul":1.6,"boo":1.5,"beta":0.98,"llG":-2438.0,"llL":-2318.2,"se":[1.49,1.02,0.93,1.07,1.51],"est":[255.6,254.5,254.6,254.8,255],"q":[216,239,255,269,289],"t4":[1.5,0.9,1.6,1.8,1.3,1.3,1.3,1.5]},{"date":"August 2","n":498,"x":[142,166,167,172,175,179,180,183,185,189,193,196,202,204,206,207,210,212,213,214,215,216,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,276,277,278,279,280,281,282,283,284,286,287,288,289,290,291,293,294,295,298,302,306,309,310,314,316,322,323,340,371,406,661],"y":[1,1,2,2,1,1,1,1,1,1,1,3,1,1,1,1,1,3,3,2,4,1,5,2,1,6,5,6,5,6,4,3,4,5,4,9,8,6,6,6,4,2,5,9,8,8,7,12,9,7,7,6,6,12,9,8,10,12,9,5,10,10,11,9,8,9,13,6,11,7,6,8,8,6,14,3,7,4,7,3,1,3,4,7,3,2,3,4,1,3,1,1,1,2,1,4,1,2,2,1,1,1,1,1,1,1,1,1,1,1,1],"mean":251.4,"med":252.0,"sd":31.9,"semean":1.4,"iqr2":15.0,"ksig":21.5,"ratio":0.697,"mad":19.7,"lo":1,"hi":3,"tot":4,"oin":140,"ein":98,"ex":42,"skew":4.293,"kurt":57.699,"min":142,"max":661,"dag":11.899,"ans":13.419,"wh":1.1,"lap":0.9,"yul":1.2,"boo":1.2,"beta":0.97,"llG":-2431.4,"llL":-2327.9,"se":[1.4,1.02,1.03,1.09,1.1],"est":[251.4,250.8,250.9,251.6,252.0],"q":[213,235,252,265,289],"t4":[1.1,0.9,1.2,0.9,1.3,1.1,1.3,1.2]},{"date":"August 3","n":497,"x":[119,134,156,172,175,188,190,192,198,199,200,201,204,205,206,207,208,209,210,211,212,213,214,215,216,217,218,219,220,221,222,223,224,225,226,227,228,229,230,231,232,233,234,235,236,237,238,239,240,241,242,243,244,245,246,247,248,249,250,251,252,253,254,255,256,257,258,259,260,261,262,263,264,265,266,267,268,269,270,271,272,273,274,275,277,280,281,282,283,285,286,288,290,292,294,297,302,307,309,334,340,374],"y":[1,1,1,1,1,2,1,1,2,1,2,1,1,1,1,1,2,6,3,3,3,3,4,1,1,4,7,5,3,6,3,1,4,8,6,5,9,4,7,11,12,18,5,7,11,10,8,8,6,9,8,12,10,16,9,7,11,13,13,14,14,12,12,6,8,12,5,8,6,9,2,6,4,1,1,2,2,3,3,3,1,4,1,5,2,3,2,1,1,1,4,1,2,4,3,1,1,2,1,1,1,1],"mean":243.4,"med":244,"sd":23.6,"semean":1.1,"iqr2":11.5,"ksig":15.9,"ratio":0.723,"mad":16.7,"lo":3,"hi":3,"tot":6,"oin":117,"ein":98,"ex":19,"skew":0.064,"kurt":7.931,"min":119,"max":374,"dag":0.386,"ans":7.654,"wh":0.9,"lap":0.8,"yul":0.9,"boo":0.9,"beta":1.1,"llG":-2276.5,"llL":-2241.5,"se":[1.06,0.92,0.89,0.92,0.98],"est":[243.4,243.2,243.1,243.4,244],"q":[209,231,244,254,282],"t4":[0.9,0.8,0.9,0.9,1.0,1.0,1.0,0.9]}];
+
+/* ============ TAB 4 : the pipeline ============ */
+function pipe(){
+ const sd=D3.s*Math.SQRT2, z=ninv(D4.crit), thA=z*sd, w0=U4.w0;
+ const userJ=(U5.asc.length===3&&U5.desc.length===3);
+ const simJ=U2.asc.length?(mean(U2.asc)+mean(U2.desc))/2:null;
+ const thB=userJ?(mean(U5.asc)+mean(U5.desc))/2*(SIGD/8):(simJ!==null?simJ:PEZ*SIGD);
+ const kA=thA/100, kB=thB/100;
+ const sA=Math.log(100/w0)/Math.log(1+kA), sB=Math.log(100/w0)/Math.log(1+kB);
+ const nA=Object.values(B.d).reduce((s,o)=>s+o.n,0);
+ const R=[
+  ['the raw datum',
+   'A direction — which of the two felt heavier. No magnitude of any kind is contained in it.',
+   'A boundary — the difference at which one became apparent. Already in grams.', null, null],
+  ['what must be collected',
+   'Enough trials at each difference for a proportion to steady. Aggregation is not a refinement here; it is where the quantity comes from.'
+    +(nA?'<span class="val">'+nA+' trials so far</span>':''),
+   'A few series, run upward and downward. Each one is already an estimate.'
+    +(simJ!==null||userJ?'<span class="val">'+(userJ?6:16)+' series</span>':''), null, null],
+  ['first derived quantity',
+   'The dispersion of the difference distribution, back-calculated from the proportions.<span class="val">σ<sub>d</sub> = '+sd.toFixed(2)+' g</span>',
+   'The average of the two directions, which cancels the habituation bias without anyone needing to know its size.<span class="val">'+thB.toFixed(2)+' g</span>',
+   'A Gaussian error law. Nothing observed says the errors take that shape; assume another and the number changes.',
+   null],
+  ['the threshold',
+   'Nominate a level of performance and call it the boundary. Fechner takes the probable error — 75 per cent correct.<span class="val">'+thA.toFixed(2)+' g</span>',
+   'The average <em>is</em> the threshold. Nothing further is computed.<span class="val">'+thB.toFixed(2)+' g</span>',
+   'A criterion. The curve has no kink, so the threshold is wherever the criterion is placed: presently '+(D4.crit*100).toFixed(1)+' per cent.',
+   'A convention about how certain the subject must be before he speaks — which the procedure never states, so it travels inside the number unrecorded.'],
+  ['sensitivity',
+   'The reciprocal of the threshold.<span class="val">'+(1/thA).toFixed(3)+' /g</span>',
+   'The reciprocal of the threshold.<span class="val">'+(1/thB).toFixed(3)+' /g</span>',
+   null,null],
+  ['sensation',
+   'Count thresholds upward from the faintest detectable weight. Each is a fixed ratio, so counting yields a logarithm.<span class="val">'+sA.toFixed(1)+' units at 100 g</span>',
+   'Identical construction, different unit — so a different scale.<span class="val">'+sB.toFixed(1)+' units at 100 g</span>',
+   'That every threshold counts for one unit of sensation everywhere on the range; and a starting point W₀ = '+w0.toFixed(2)+' g, which this method cannot measure and must borrow.',
+   'That every threshold counts for one unit of sensation everywhere on the range; and a starting point W₀ = '+w0.toFixed(2)+' g, which this method <em>can</em> measure directly.']];
+ let h='<div class="prow head"><div class="pcell lab" style="background:var(--ground)"></div>'
+  +'<div class="pcell">Right and wrong cases</div><div class="pcell">Just noticeable differences</div></div>';
+ R.forEach(([lab,a,b,ra,rb])=>{
+  h+='<div class="prow"><div class="pcell lab">'+lab+'</div>'
+   +'<div class="pcell">'+a+(ra?'<span class="req"><b>requires</b>'+ra+'</span>':'')+'</div>'
+   +'<div class="pcell">'+b+(rb?'<span class="req"><b>requires</b>'+rb+'</span>':'')+'</div></div>';});
+ $('pipe').innerHTML=h;
+ const L=[['A Gaussian error law','required — it is what turns a proportion into a magnitude','not used anywhere'],
+  ['A criterion of percentage correct','required — presently '+(D4.crit*100).toFixed(1)+'%','not used'],
+  ['A convention about required certainty','absorbed into the criterion above','required, and left unstated in the report'],
+  ['Every threshold = one unit of sensation','required','required'],
+  ['A zero point W₀ for the scale','required, and must be borrowed from the other method','required, and measurable within this one']];
+ $('ledger').innerHTML='<table><tr><th>ingredient</th><th style="text-align:left">right and wrong cases</th>'
+  +'<th style="text-align:left">just noticeable differences</th></tr>'
+  +L.map(([k,a,b])=>'<tr><td>'+k+'</td><td style="text-align:left;'
+   +(a.startsWith('not')?'color:var(--live)':'color:var(--flag)')+'">'+a+'</td><td style="text-align:left;'
+   +(b.startsWith('not')?'color:var(--live)':'color:var(--flag)')+'">'+b+'</td></tr>').join('')+'</table>';
+}
+
+
+/* ============ PEIRCE'S REACTION TIMES ============ */
+const RT={view:'one',day:0,sm:0,gauss:false,wday:0,scheme:'pair',eye:false,hand:null,NB:54};
+const expand=d=>{const o=[];for(let i=0;i<d.x.length;i++)for(let j=0;j<d.y[i];j++)o.push(d.x[i]);return o;};
+const RAW=PD.map(expand);
+function histo(v,lo,hi,bw){const nb=Math.max(4,Math.round((hi-lo)/bw));const c=new Array(nb).fill(0);let out=0;
+ v.forEach(t=>{const k=Math.floor((t-lo)/bw);if(k>=0&&k<nb)c[k]++;else out++;});return{c,bw,out,nb};}
+function kern(c,bw,sig){ /* centred Gaussian smoother, edge-normalised: a curve drawn by eye */
+ const n=c.length,s=Math.max(.5,sig/bw),R=Math.ceil(3*s),w=[];
+ for(let d=-R;d<=R;d++)w.push(Math.exp(-d*d/(2*s*s)));
+ const o=new Array(n).fill(0);
+ for(let i=0;i<n;i++){let a=0,t=0;
+  for(let d=-R;d<=R;d++){const j=i+d;if(j>=0&&j<n){a+=c[j]*w[d+R];t+=w[d+R];}}
+  o[i]=t?a/t:0;}
+ return o;}
+function smooth(a,k,scheme){let r=a.slice(),n=r.length;
+ for(let p=0;p<k;p++){const o=r.slice();
+  if((scheme||RT.scheme)==='pair'){ /* Peirce: add adjacent numbers -> binomial kernel */
+   for(let i=0;i<n;i++)r[i]=o[i]+(i<n-1?o[i+1]:0);
+  }else{ for(let i=0;i<n;i++)r[i]=(i?o[i-1]:0)+o[i]+(i<n-1?o[i+1]:0); }}
+ if(k&&(scheme||RT.scheme)==='pair'){ /* recentre: pairwise summing walks the curve left */
+  const sh=k/2,out=new Array(n).fill(0);
+  for(let i=0;i<n;i++){const src=i-sh,lo=Math.floor(src),f=src-lo;
+   const a0=lo>=0&&lo<n?r[lo]:0,a1=lo+1>=0&&lo+1<n?r[lo+1]:0;out[i]=a0*(1-f)+a1*f;}
+  r=out;}
+ return r;}
+function curveKurt(c,lo,bw){const tot=c.reduce((a,b)=>a+b,0);if(!tot)return 0;
+ const m=c.reduce((a,v,i)=>a+(lo+(i+.5)*bw)*v,0)/tot;
+ const vr=c.reduce((a,v,i)=>a+v*Math.pow(lo+(i+.5)*bw-m,2),0)/tot;
+ return c.reduce((a,v,i)=>a+v*Math.pow(lo+(i+.5)*bw-m,4),0)/tot/(vr*vr);}
+function curve(x,pts,col,wd){x.beginPath();pts.forEach(([a,b],i)=>i?x.lineTo(a,b):x.moveTo(a,b));
+ x.strokeStyle=col;x.lineWidth=wd||2;x.stroke();}
+
+$('r1view').innerHTML=[['one','A single day'],['multi','All twenty-four'],['pool','All days pooled']]
+ .map(([k,l])=>`<button class="b${k==='one'?' go':''}" data-v="${k}">${l}</button>`).join('');
+$('r1view').querySelectorAll('button').forEach(b=>b.onclick=()=>{RT.view=b.dataset.v;
+ $('r1view').querySelectorAll('button').forEach(x=>x.classList.toggle('go',x===b));
+ $('r1dayctl').style.display=RT.view==='one'?'':'none';rt1();});
+$('r1day').oninput=e=>{RT.day=+e.target.value;rt1();};
+$('r1sm').oninput=e=>{RT.sm=+e.target.value;rt1();};
+$('r1scheme').innerHTML=[['pair','Add adjacent numbers (Peirce)'],['tri','Add both neighbours']]
+ .map(([k,l])=>`<button class="b${k==='pair'?' go':''}" data-s="${k}">${l}</button>`).join('');
+$('r1scheme').querySelectorAll('button').forEach(b=>b.onclick=()=>{RT.scheme=b.dataset.s;
+ $('r1scheme').querySelectorAll('button').forEach(x=>x.classList.toggle('go',x===b));rt1();});
+$('r1g').onclick=()=>{RT.gauss=true;rt1();};
+$('r1eye').onclick=()=>{RT.eye=true;RT.hand=null;rt1();};
+$('r1hand').onclick=()=>{RT.hand=new Array(RT.NB||400).fill(null);RT.eye=false;HAND.on=true;
+ $('r1hint').textContent='Drag across the plot to draw your own mean curve through the smoothed data.';rt1();};
+$('r1gr').onclick=()=>{RT.gauss=false;RT.eye=false;RT.hand=null;HAND.on=false;
+ $('r1hint').textContent='';rt1();};
+const HAND={on:false,down:false};
+(function(){const el=$('r1plot');
+ const rec=e=>{if(!HAND.on||!RT.hand)return;const r=el.getBoundingClientRect();
+  const t=e.touches?e.touches[0]:e;
+  const fx=(t.clientX-r.left)/r.width,fy=(t.clientY-r.top)/r.height;
+  const n=RT.hand.length,i=Math.round(fx*(n-1));if(i>=0&&i<n){RT.hand[i]=fy;rt1();}};
+ el.addEventListener('mousedown',e=>{if(HAND.on){HAND.down=true;rec(e);e.preventDefault();}});
+ el.addEventListener('mousemove',e=>{if(HAND.down)rec(e);});
+ window.addEventListener('mouseup',()=>{HAND.down=false;});
+ el.addEventListener('touchstart',e=>{if(HAND.on){HAND.down=true;rec(e);e.preventDefault();}},{passive:false});
+ el.addEventListener('touchmove',e=>{if(HAND.down){rec(e);e.preventDefault();}},{passive:false});
+ el.addEventListener('touchend',()=>{HAND.down=false;});})();
+
+function rt1(){
+ const d=PD[RT.day];
+ $('r1dayv').textContent=d.date;
+ $('r1smv').textContent=RT.sm+(RT.sm===1?' pass':' passes');
+ const p=cv('r1plot',330);if(!p)return;const{x,w,h}=p;
+ if(RT.view==='multi'){
+  $('r1h').textContent='All twenty-four days, each centred and scaled';
+  const cols=6,rows=4,mw=(w-20)/cols,mh=(h-24)/rows;
+  PD.forEach((dd,i)=>{const cx=10+(i%cols)*mw,cy=12+Math.floor(i/cols)*mh;
+   const z=RAW[i].map(v=>(v-dd.med)/dd.sd);
+   const H=histo(z,-3,5,0.05);let c=smooth(H.c,RT.sm);const mx=Math.max(...c)||1;
+   const pts=c.map((v,k)=>[cx+6+(k/(H.nb-1))*(mw-16),cy+mh-22-(v/mx)*(mh-34)]);
+   curve(x,pts,C.data,1.4);
+   x.strokeStyle=C.rule2;x.beginPath();x.moveTo(cx+6,cy+mh-22);x.lineTo(cx+mw-10,cy+mh-22);x.stroke();
+   x.fillStyle=C.faint;x.font='8.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+   x.fillText(dd.date,cx+6,cy+mh-19);});
+  $('r1stats').innerHTML='';
+  $('r1rev').innerHTML='<strong>Twenty-four days, each centred on its own median and divided by its own spread.</strong> Raise the smoothing and every one of them becomes a clean symmetric hump. That is the shape Peirce was reading, and on that evidence his conclusion is not unreasonable.';
+  return;}
+ if(RT.view==='pool'){
+  $('r1h').textContent='All 11,803 responses, each centred on its day and scaled by its day';
+  const z=[];PD.forEach((dd,i)=>RAW[i].forEach(v=>z.push((v-dd.med)/dd.sd)));
+  drawDens(x,w,h,z,-4,6,'standard deviations from the day\u2019s median',null,null,0.03);
+  $('r1stats').innerHTML=stat('Responses',z.length)+stat('Days',24)+
+   stat('Beyond \u00b13.1\u03c3',z.filter(v=>Math.abs(v)>3.1).length,'d')+
+   stat('Expected',Math.round(z.length*2*(1-ncdf(3.1))));
+  $('r1rev').innerHTML='<strong>Pooled, the excess in the tails is impossible to miss: '+
+   z.filter(v=>Math.abs(v)>3.1).length+' responses beyond 3.1 standard deviations where a Gaussian predicts about '+
+   Math.round(z.length*2*(1-ncdf(3.1)))+'.</strong> Smoothing does nothing to those. It cannot: they are too sparse to survive an average, which is exactly why they vanish from a smoothed curve and stay in the moments.';
+  return;}
+ $('r1h').textContent='Response times, '+d.date+' 1872';
+ const v=RAW[RT.day];
+ drawDens(x,w,h,v,Math.round(d.mean-4*d.sd),Math.round(d.mean+4*d.sd),'response time (ms)',d,RT.gauss,1);
+ $('r1stats').innerHTML=stat('Responses',d.n)+stat('Mean',d.mean+' ms','d')+stat('Median',d.med+' ms','d')+
+  stat('Kurtosis, raw data',d.kurt.toFixed(1),d.kurt>3?'f':'')+
+  stat('Kurtosis, plotted curve',(RT.kPlot||0).toFixed(2),'d')+
+  (RT.kEye?stat('Kurtosis, smooth curve',RT.kEye.toFixed(2),'d'):stat('Gaussian value','3.00'));
+ const gap=d.kurt/(RT.kPlot||1);
+ $('r1rev').innerHTML='<strong>The fourth moment of this day is '+d.kurt.toFixed(1)+
+  '. The curve on the screen has a fourth moment of '+(RT.kPlot||0).toFixed(2)+
+  ', against 3 for a Gaussian.</strong> Most of that gap is not the smoothing at all — it is the plotting. '+
+  (RT.nOut? 'The '+RT.nOut+' response'+(RT.nOut>1?'s':'')+' lying beyond this axis '+(RT.nOut>1?'are':'is')+
+   ' precisely what the fourth moment responds to, and no frequency curve drawn over a sensible range can contain '+
+   (RT.nOut>1?'them':'it')+'. ':'')+
+  'The eightfold smoothing then takes off a little more, and the mean curve drawn by eye removes what irregularity survives. Three filters sit between the observations and the judgement — the plotting window, the binomial smoother, and a hand instructed to eliminate the irregularities entirely — and each of them works in the same direction. Peirce is not being careless. He is reading the best rendering of his data that his craft afforded, and that rendering has the answer built into it.';
+}
+function stat(k,v,cls){return '<div class="stat"><span class="k">'+k+'</span><span class="v'+
+ (cls==='d'?' d':cls==='f'?'" style="color:var(--flag)':'')+'">'+v+'</span></div>';}
+function drawDens(x,w,h,v,lo,hi,xlab,d,gauss,bw){
+ const L=48,R=18,T=20,B=40;
+ const H=histo(v,lo,hi,bw||1);const NB=H.nb;RT.NB=NB;
+ const c=smooth(H.c,RT.sm);
+ const eyeS=d?0.35*d.sd:(hi-lo)*0.055;
+ const mx=Math.max(...c)||1;
+ const X=t=>L+(t-lo)/(hi-lo)*(w-L-R),Y=n=>h-B-n/(mx*1.12)*(h-T-B);
+ const tk=[];for(let i=0;i<=4;i++)tk.push(lo+i*(hi-lo)/4);
+ axes(x,L,R,T,B,w,h,[],()=>'',tk.map(t=>[t,X(t)]),t=>Math.round(t),xlab);
+ x.strokeStyle='rgba(53,86,107,.22)';x.lineWidth=1;
+ H.c.forEach((n,i)=>{if(!n)return;const bx=X(lo+(i+.5)*H.bw);
+  x.beginPath();x.moveTo(bx,h-B);x.lineTo(bx,Y(n));x.stroke();});
+ curve(x,c.map((n,i)=>[X(lo+(i+.5)*H.bw),Y(n)]),C.data,1.5);
+ RT.kPlot=curveKurt(c,lo,H.bw);RT.kEye=null;
+ if(RT.eye){const e=kern(c,H.bw,eyeS);
+  curve(x,e.map((n,i)=>[X(lo+(i+.5)*H.bw),Y(n)]),C.gold,2.4);
+  RT.kEye=curveKurt(e,lo,H.bw);
+  x.fillStyle=C.gold;x.font='10px "Space Mono", monospace';x.textAlign='right';x.textBaseline='top';
+  x.fillText('mean curve, drawn by eye',w-R-4,T+15);}
+ if(RT.hand){const pts=[];RT.hand.forEach((fy,i)=>{if(fy===null)return;
+   pts.push([X(lo+(i+.5)*H.bw),fy*h]);});
+  if(pts.length>1)curve(x,pts,C.live,2.4);
+  if(pts.length>3){const cc=RT.hand.map(fy=>fy===null?0:Math.max(0,h-B-fy*h));
+   RT.kEye=curveKurt(cc,lo,H.bw);}
+  x.fillStyle=C.live;x.font='10px "Space Mono", monospace';x.textAlign='right';x.textBaseline='top';
+  x.fillText('your curve',w-R-4,T+30);}
+ if(gauss&&d){const peak=npdf(d.mean,d.mean,d.sd),sc=(Math.max(...kern(c,H.bw,eyeS))||1)/peak;
+  const g=[];for(let t=lo;t<=hi;t+=(hi-lo)/400)g.push([X(t),Y(npdf(t,d.mean,d.sd)*sc)]);
+  curve(x,g,C.flag,2);
+  x.fillStyle=C.flag;x.font='10px "Space Mono", monospace';x.textAlign='right';x.textBaseline='top';
+  x.fillText('theoretical Gaussian',w-R-4,T);}
+ if(H.out){x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText(H.out+' response'+(H.out>1?'s':'')+' lie beyond this axis',L+4,T);}
+ RT.nOut=H.out;
+}
+
+/* ---- Wilson and Hilferty ---- */
+function lgamma(z){const g=[676.5203681218851,-1259.1392167224028,771.32342877765313,
+ -176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+ if(z<0.5)return Math.log(Math.PI/Math.sin(Math.PI*z))-lgamma(1-z);
+ z-=1;let x=0.99999999999980993;for(let i=0;i<8;i++)x+=g[i]/(z+i+1);
+ const t=z+7.5;return .5*Math.log(2*Math.PI)+(z+.5)*Math.log(t)-t+Math.log(x);}
+const gnAlpha=(xs,mu,b)=>Math.pow(b*xs.reduce((a,v)=>a+Math.pow(Math.abs(v-mu),b),0)/xs.length,1/b);
+const gnPdf=(x,mu,a,b)=>Math.exp(Math.log(b)-Math.log(2*a)-lgamma(1/b)-Math.pow(Math.abs(x-mu)/a,b));
+const lapQ=pp=>pp<.5?Math.log(2*pp):-Math.log(2*(1-pp));
+RT.ref='norm';RT.beta=2;RT.sel='kurt';
+const SELS=[['kurt','Kurtosis',3,6],['skew','Skewness',0,null],['ratio','IQR/2 \u00f7 0.6745\u03c3',1,null],
+ ['ex','Excess inside \u00b10.25\u03c3',0,null],['tot','Count beyond \u00b13.1\u03c3',0,null],['beta','Fitted shape \u03b2',2,1]];
+$('r2ref').innerHTML=[['norm','Gaussian reference'],['lap','Laplace reference']]
+ .map(([k,l])=>`<button class="b${k==='norm'?' go':''}" data-r="${k}">${l}</button>`).join('');
+$('r2ref').querySelectorAll('button').forEach(b=>b.onclick=()=>{RT.ref=b.dataset.r;
+ $('r2ref').querySelectorAll('button').forEach(x=>x.classList.toggle('go',x===b));rt2();});
+$('r2sel').innerHTML=SELS.map(([k,l])=>`<button class="b${k==='kurt'?' go':''}" data-k="${k}">${l}</button>`).join('');
+$('r2sel').querySelectorAll('button').forEach(b=>b.onclick=()=>{RT.sel=b.dataset.k;
+ $('r2sel').querySelectorAll('button').forEach(x=>x.classList.toggle('go',x===b));rt2();});
+$('r2day').oninput=e=>{RT.wday=+e.target.value;rt2();};
+$('r2beta').oninput=e=>{RT.beta=+e.target.value;rt2();};
+$('r2fit').onclick=()=>{RT.beta=PD[RT.wday].beta;$('r2beta').value=RT.beta;rt2();};
+$('r2g2').onclick=()=>{RT.beta=2;$('r2beta').value=2;rt2();};
+$('r2g1').onclick=()=>{RT.beta=1;$('r2beta').value=1;rt2();};
+let SORT={k:'day',dir:1};
+
+/* ---- the same day, four ways ---- */
+RT.cv='peirce';RT.drop=0;
+const CVIEWS=[['peirce','As Peirce plotted it'],['all','Every response'],
+ ['rank','In rank order'],['infl','What can move the estimate']];
+$('r2cv').innerHTML=CVIEWS.map(([k,l])=>
+ `<button class="b${k==='peirce'?' go':''}" data-v="${k}">${l}</button>`).join('');
+$('r2cv').querySelectorAll('button').forEach(b=>b.onclick=()=>{RT.cv=b.dataset.v;
+ $('r2cv').querySelectorAll('button').forEach(x=>x.classList.toggle('go',x===b));rt2cmp();});
+$('r2drop').oninput=e=>{RT.drop=+e.target.value;rt2cmp();};
+const medOf=a=>{const n=a.length;return n%2?a[(n-1)/2]:(a[n/2-1]+a[n/2])/2;};
+
+function rt2cmp(){
+ const d=PD[RT.wday],srt=RAW[RT.wday].slice().sort((a,b)=>a-b),n=srt.length;
+ const kept=srt.slice(0,n-RT.drop);
+ const mn=kept.reduce((a,b)=>a+b,0)/kept.length, md=medOf(kept);
+ const mn0=srt.reduce((a,b)=>a+b,0)/n, md0=medOf(srt);
+ $('r2dropv').textContent=RT.drop?RT.drop+' dropped':'as recorded';
+ $('r2cmph').textContent=CVIEWS.find(c=>c[0]===RT.cv)[1]+' \u2014 '+d.date+' 1872';
+ const p=cv('r2cmp',320);if(!p)return;const{x,w,h}=p;
+ const L=54,R=20,T=22,B=46;
+ if(RT.cv==='peirce'){
+  const lo=Math.round(d.mean-3*d.sd),hi=Math.round(d.mean+3*d.sd);
+  const H=histo(kept,lo,hi,1),c=smooth(H.c,8,'pair'),e=kern(c,1,.35*d.sd);
+  const mx=Math.max(...c)||1;
+  const X=t=>L+(t-lo)/(hi-lo)*(w-L-R),Y=q=>h-B-q/(mx*1.15)*(h-T-B);
+  const tk=[];for(let i=0;i<=4;i++)tk.push(lo+i*(hi-lo)/4);
+  axes(x,L,R,T,B,w,h,[],()=>'',tk.map(t=>[t,X(t)]),t=>Math.round(t),'response time (ms)');
+  x.strokeStyle='rgba(53,86,107,.22)';x.lineWidth=1;
+  H.c.forEach((q,i)=>{if(!q)return;const bx=X(lo+i+.5);
+   x.beginPath();x.moveTo(bx,h-B);x.lineTo(bx,Y(q));x.stroke();});
+  curve(x,c.map((q,i)=>[X(lo+i+.5),Y(q)]),C.data,1.5);
+  curve(x,e.map((q,i)=>[X(lo+i+.5),Y(q)]),C.gold,2.4);
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText(H.out+' response'+(H.out===1?'':'s')+' lie beyond this axis',L+3,T);
+  x.fillStyle=C.gold;x.textAlign='right';x.font='10px "Space Mono", monospace';
+  x.fillText('the curve he judged',w-R-3,T);
+ }else if(RT.cv==='all'){
+  const lo=Math.min(...srt)-10,hi=Math.max(...srt)+10;
+  const X=t=>L+(t-lo)/(hi-lo)*(w-L-R);
+  const tk=[];for(let i=0;i<=5;i++)tk.push(lo+i*(hi-lo)/5);
+  axes(x,L,R,T,B,w,h,[],()=>'',tk.map(t=>[t,X(t)]),t=>Math.round(t),'response time (ms)');
+  const H=histo(kept,lo,hi,Math.max(1,(hi-lo)/260)),mx=Math.max(...H.c)||1;
+  x.strokeStyle='rgba(53,86,107,.5)';x.lineWidth=1;
+  H.c.forEach((q,i)=>{if(!q)return;const bx=X(lo+(i+.5)*H.bw);
+   x.beginPath();x.moveTo(bx,h-B);x.lineTo(bx,h-B-(q/mx)*(h-T-B)*.92);x.stroke();});
+  const wl=Math.round(d.mean-3*d.sd),wh=Math.round(d.mean+3*d.sd);
+  x.strokeStyle=C.gold;x.lineWidth=1.2;x.setLineDash([4,3]);
+  [wl,wh].forEach(t=>{x.beginPath();x.moveTo(X(t),T);x.lineTo(X(t),h-B);x.stroke();});
+  x.setLineDash([]);
+  x.fillStyle=C.gold;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText('edge of the plot he drew',X(wh)+5,T+2);
+  [[mn,C.flag,'mean'],[md,C.live,'median']].forEach(([v,col,lab],i)=>{
+   x.strokeStyle=col;x.lineWidth=1.8;x.beginPath();x.moveTo(X(v),T);x.lineTo(X(v),h-B);x.stroke();
+   x.fillStyle=col;x.textAlign='center';x.textBaseline='bottom';x.font='10px "Space Mono", monospace';
+   x.fillText(lab+' '+v.toFixed(1),X(v),T+12+i*13);});
+ }else if(RT.cv==='rank'){
+  const lo=Math.min(...srt)-10,hi=Math.max(...srt)+10;
+  const X=i=>L+i/(n-1)*(w-L-R),Y=t=>h-B-(t-lo)/(hi-lo)*(h-T-B);
+  const yt=[0,.25,.5,.75,1].map(f=>lo+f*(hi-lo));
+  axes(x,L,R,T,B,w,h,yt.map(t=>[t,Y(t)]),t=>Math.round(t),
+   [0,n>>2,n>>1,(3*n)>>2,n-1].map(i=>[i,X(i)]),i=>i+1,'rank of the response, slowest at the right');
+  x.strokeStyle=C.flag;x.lineWidth=1.6;x.setLineDash([5,4]);
+  x.beginPath();x.moveTo(L,Y(mn));x.lineTo(w-R,Y(mn));x.stroke();x.setLineDash([]);
+  curve(x,srt.map((t,i)=>[X(i),Y(t)]),C.data,1.8);
+  const mi=(n-1)/2;
+  x.beginPath();x.arc(X(mi),Y(md0),6,0,7);x.fillStyle=C.live;x.fill();
+  x.strokeStyle=C.live;x.lineWidth=1.2;x.setLineDash([3,3]);
+  x.beginPath();x.moveTo(X(mi),h-B);x.lineTo(X(mi),Y(md0));x.lineTo(L,Y(md0));x.stroke();x.setLineDash([]);
+  if(RT.drop){x.fillStyle='rgba(140,74,47,.5)';
+   srt.slice(n-RT.drop).forEach((t,i)=>{x.beginPath();x.arc(X(n-RT.drop+i),Y(t),4,0,7);x.fill();});}
+  x.fillStyle=C.live;x.font='10px "Space Mono", monospace';x.textAlign='left';x.textBaseline='bottom';
+  x.fillText('median \u2014 simply the middle one',X(mi)+8,Y(md0)-8);
+  x.fillStyle=C.flag;x.textAlign='right';x.textBaseline='bottom';
+  x.fillText('mean '+mn.toFixed(1),w-R-3,Y(mn)-5);
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText('response time (ms)',L+2,T);
+ }else{
+  const lo=Math.min(...srt)-10,hi=Math.max(...srt)+10;
+  let cnt=0,hh=Math.max(2,.12*d.sd);
+  srt.forEach(t=>{if(Math.abs(t-md0)<hh)cnt++;});
+  const f0=cnt/(2*hh*n), bound=1/(2*f0);
+  const im=t=>t-mn0, id=t=>(t>md0?1:-1)*bound;
+  const ymax=Math.max(Math.abs(im(srt[0])),Math.abs(im(srt[n-1])))*1.1;
+  const X=t=>L+(t-lo)/(hi-lo)*(w-L-R),Y=v=>h-B-(v+ymax)/(2*ymax)*(h-T-B);
+  const tk=[];for(let i=0;i<=5;i++)tk.push(lo+i*(hi-lo)/5);
+  axes(x,L,R,T,B,w,h,[-ymax,0,ymax].map(v=>[v,Y(v)]),v=>Math.round(v),
+   tk.map(t=>[t,X(t)]),t=>Math.round(t),'value of a single response (ms)');
+  x.strokeStyle='rgba(53,86,107,.35)';x.lineWidth=1;
+  srt.forEach(t=>{x.beginPath();x.moveTo(X(t),h-B);x.lineTo(X(t),h-B-9);x.stroke();});
+  curve(x,[[X(lo),Y(im(lo))],[X(hi),Y(im(hi))]],C.flag,2);
+  curve(x,[[X(lo),Y(-bound)],[X(md0),Y(-bound)]],C.live,2.4);
+  curve(x,[[X(md0),Y(bound)],[X(hi),Y(bound)]],C.live,2.4);
+  x.strokeStyle=C.rule;x.lineWidth=1;x.setLineDash([3,3]);
+  x.beginPath();x.moveTo(L,Y(0));x.lineTo(w-R,Y(0));x.stroke();x.setLineDash([]);
+  const worst=srt[n-1];
+  x.beginPath();x.arc(X(worst),Y(im(worst)),5,0,7);x.fillStyle=C.flag;x.fill();
+  x.beginPath();x.arc(X(worst),Y(bound),5,0,7);x.fillStyle=C.live;x.fill();
+  x.font='10px "Space Mono", monospace';x.textAlign='right';x.textBaseline='top';
+  x.fillStyle=C.flag;x.fillText('influence on the mean \u2014 unbounded',w-R-3,T);
+  x.fillStyle=C.live;x.fillText('influence on the median \u2014 capped at \u00b1'+bound.toFixed(0),w-R-3,T+15);
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';
+  x.fillText('the slowest response of the day pulls the mean by '+im(worst).toFixed(0)+
+   ' ms\u00b7n\u207b\u00b9 and the median by at most '+bound.toFixed(0),L+3,T);
+ }
+ $('r2cmps').innerHTML=stat('Mean',mn.toFixed(1)+' ms','f')+stat('Median',md.toFixed(1)+' ms','g')+
+  stat('Mean has moved',(mn-mn0).toFixed(2)+' ms','f')+
+  stat('Median has moved',(md-md0).toFixed(2)+' ms','g')+
+  stat('Slowest kept',kept[kept.length-1]+' ms')+
+  stat('That is',((kept[kept.length-1]-d.mean)/d.sd).toFixed(1)+'\u03c3 out');
+ const rv={peirce:'<strong>This is the object Peirce judged.</strong> A curve, smoothed eightfold, with a mean curve drawn through it by eye \u2014 and a plotting window that cannot reach the responses which decide the fourth moment. The '+
+   (d.tot||'few')+' responses beyond 3.1\u03c3 are not visible anywhere on this view, and no honest choice of axis would show them without flattening everything else to a line.',
+  all:'<strong>Now the axis reaches every response.</strong> The dashed lines mark where his plot stopped. Notice how much of the range lies outside them, and how few responses occupy it \u2014 that combination is precisely what a heavy tail is. On '+d.date+
+   ' the slowest response sits '+((srt[n-1]-d.mean)/d.sd).toFixed(1)+'\u03c3 from the mean. The mean sits to the right of the median because those stragglers pull it there.',
+  rank:'<strong>Sorted, the median stops being a formula and becomes a position.</strong> It is the middle point of the line, and where the line goes at either end is irrelevant to it. The mean is the dashed level, and it sits above the median on almost every day because the line rises so steeply at the right. Drag the drop slider and watch the right-hand end disappear: the dashed level moves, the green point does not.',
+  infl:'<strong>This is the whole of the difference between the two estimators.</strong> A response arriving at any value shifts the mean in proportion to how far out it is \u2014 the red line has no ceiling, so one lapse of attention can move the mean as far as you like. The same response shifts the median by a fixed amount no matter where it lands, because the median counts observations rather than measuring them. On '+d.date+
+   ' the slowest response is '+srt[n-1]+' ms; it enters the mean weighted by its distance and the median weighted by nothing but its sign.'}[RT.cv];
+ $('r2cmprev').innerHTML=rv;
+}
+
+function rt2(){
+ const d=PD[RT.wday],v=RAW[RT.wday];$('r2dayv').textContent=d.date;
+ const srt=v.slice().sort((a,b)=>a-b),n=srt.length;
+ const isN=RT.ref==='norm';
+ $('r2qqh').textContent='Sorted observations against '+(isN?'Gaussian':'Laplace')+' quantiles';
+ const bMLE=srt.reduce((a,t)=>a+Math.abs(t-d.med),0)/n;
+ const th=srt.map((_,i)=>{const pp=(i+.5)/n;return isN?ninv(pp):lapQ(pp);});
+ const int=isN?d.mean:d.med, slope=isN?d.sd:bMLE;
+ let ss=0;srt.forEach((t,i)=>{ss+=Math.pow(t-(int+slope*th[i]),2);});
+ let p=cv('r2qq',310);
+ if(p){const{x,w,h}=p,L=56,R=18,T=18,B=42;
+  const tlo=Math.min(...th),thi=Math.max(...th);
+  const ylo=Math.min(...srt),yhi=Math.max(...srt);
+  const X=z=>L+(z-tlo)/(thi-tlo)*(w-L-R),Y=t=>h-B-(t-ylo)/(yhi-ylo)*(h-T-B);
+  const yt=[0,.25,.5,.75,1].map(f=>ylo+f*(yhi-ylo));
+  const xt=[];for(let k=0;k<=4;k++)xt.push(tlo+k*(thi-tlo)/4);
+  axes(x,L,R,T,B,w,h,yt.map(t=>[t,Y(t)]),t=>Math.round(t),xt.map(z=>[z,X(z)]),z=>z.toFixed(1),
+   (isN?'Gaussian':'Laplace')+' quantile');
+  curve(x,[[X(tlo),Y(int+slope*tlo)],[X(thi),Y(int+slope*thi)]],C.flag,1.6);
+  x.fillStyle=C.data;
+  srt.forEach((t,i)=>{x.beginPath();x.arc(X(th[i]),Y(t),1.8,0,7);x.fill();});
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText('response time (ms)',L+2,T);}
+ $('r2qqs').innerHTML=stat('Reference law',isN?'Gaussian':'Laplace')+
+  stat('Root mean square departure',Math.sqrt(ss/n).toFixed(2)+' ms','d')+
+  stat('Log-likelihood, Gaussian',d.llG.toFixed(0),d.llG<d.llL?'':'d')+
+  stat('Log-likelihood, Laplace',d.llL.toFixed(0),d.llL>d.llG?'d':'');
+
+ p=cv('r2pk',290);
+ if(p){const{x,w,h}=p,L=48,R=18,T=20,B=48,BW=.125;
+  const z=v.map(t=>(t-d.mean)/d.sd);
+  const H=histo(z,-4,4,BW),mx=Math.max(...H.c)||1;
+  const X=t=>L+(t+4)/8*(w-L-R),Y=q=>h-B-q/(mx*1.18)*(h-T-B);
+  axes(x,L,R,T,B,w,h,[],()=>'',[-4,-3,-2,-1,0,1,2,3,4].map(t=>[t,X(t)]),t=>t,
+   'standard deviations from the mean');
+  x.fillStyle='rgba(95,115,51,.16)';x.fillRect(X(-.25),T,X(.25)-X(-.25),h-B-T);
+  x.fillStyle='rgba(53,86,107,.28)';
+  const bw2=Math.max((w-L-R)/H.nb-1,1);
+  H.c.forEach((q,i)=>{if(q)x.fillRect(X(-4+i*H.bw),Y(q),bw2,h-B-Y(q));});
+  const sc=v.length*H.bw, zm=(d.med-d.mean)/d.sd, al=gnAlpha(z,zm,RT.beta);
+  const g=[],gn=[];
+  for(let t=-4;t<=4.001;t+=.02){g.push([X(t),Y(npdf(t,0,1)*sc)]);
+   gn.push([X(t),Y(gnPdf(t,zm,al,RT.beta)*sc)]);}
+  curve(x,g,C.flag,1.4);curve(x,gn,C.gold,2.2);
+  [-3.1,3.1].forEach(t=>{x.strokeStyle=C.flag;x.lineWidth=1.2;x.setLineDash([3,3]);
+   x.beginPath();x.moveTo(X(t),h-B);x.lineTo(X(t),T+40);x.stroke();x.setLineDash([]);});
+  x.fillStyle=C.flag;x.font='9.5px "Space Mono", monospace';x.textAlign='center';x.textBaseline='top';
+  x.fillText('\u00b13.1\u03c3',X(3.1),T+42);x.fillText(d.tot+' beyond',X(3.1),T+54);
+  x.font='10px "Space Mono", monospace';x.textAlign='right';x.textBaseline='top';
+  x.fillStyle=C.flag;x.fillText('Gaussian',w-R-4,T);
+  x.fillStyle=C.gold;x.fillText('\u03b2 = '+RT.beta.toFixed(2),w-R-4,T+15);
+  x.fillStyle=C.live;x.textAlign='center';x.textBaseline='bottom';
+  x.font='9.5px "Space Mono", monospace';
+  x.fillText('\u00b10.25\u03c3 \u2014 '+d.oin+' here, '+d.ein+' expected',X(0),h-B-6);}
+ $('r2betav').textContent=RT.beta.toFixed(2)+(Math.abs(RT.beta-d.beta)<.02?'  \u2713':'');
+ $('r2stats').innerHTML=stat('Best fit for this day','\u03b2 = '+d.beta.toFixed(2),'d')+
+  stat('IQR/2 \u00f7 0.6745\u03c3',d.ratio.toFixed(3),d.ratio<1?'f':'')+
+  stat('Inside \u00b10.25\u03c3',d.oin+' vs '+d.ein,'d')+
+  stat('Beyond \u00b13.1\u03c3',d.tot,d.tot>1?'f':'')+
+  stat('Skewness',d.skew.toFixed(2))+stat('Kurtosis',d.kurt.toFixed(1),d.kurt>3?'f':'');
+
+ const S=SELS.find(a=>a[0]===RT.sel);
+ $('r2momh').textContent=S[1]+', all twenty-four days';
+ p=cv('r2mom',300);
+ if(p){const{x,w,h}=p,L=54,R=18,T=22,B=46;
+  const vals=PD.map(dd=>dd[RT.sel]);
+  const log=RT.sel==='kurt';
+  const lo=log?3:Math.min(0,...vals)*1.15, hi=log?110:Math.max(...vals)*1.15;
+  const X=i=>L+i/23*(w-L-R);
+  const Y=q=>log?h-B-(Math.log(Math.max(q,3))-Math.log(3))/(Math.log(110)-Math.log(3))*(h-T-B)
+                :h-B-(q-lo)/(hi-lo)*(h-T-B);
+  const yt=log?[3,6,10,30,100]:[lo,(lo+hi)/2,hi];
+  axes(x,L,R,T,B,w,h,yt.map(q=>[q,Y(q)]),q=>log?q:(Math.abs(q)<10?q.toFixed(1):q.toFixed(0)),
+   [0,5,10,15,20,23].map(i=>[i,X(i)]),i=>PD[i].date.split(' ')[1],'day of the experiment');
+  [[S[2],C.flag,'Gaussian'],[S[3],C.gold,'Laplace']].forEach(([q,col,lab])=>{
+   if(q===null||q===undefined)return;
+   x.strokeStyle=col;x.lineWidth=1.5;x.setLineDash([5,4]);
+   x.beginPath();x.moveTo(L,Y(q));x.lineTo(w-R,Y(q));x.stroke();x.setLineDash([]);
+   x.fillStyle=col;x.font='10px "Space Mono", monospace';x.textAlign='left';x.textBaseline='bottom';
+   x.fillText(lab,L+3,Y(q)-3);});
+  curve(x,PD.map((dd,i)=>[X(i),Y(dd[RT.sel])]),C.data,1.6);
+  PD.forEach((dd,i)=>{x.beginPath();x.arc(X(i),Y(dd[RT.sel]),i===RT.wday?5.5:3.2,0,7);
+   x.fillStyle=i===RT.wday?C.live:C.data;x.fill();});
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText(S[1]+(log?', log scale':''),L+2,T);}
+ r2table();rt2cmp();
+}
+const COLS=[['date','day',d=>d.date],['n','n',d=>d.n],['med','median',d=>d.med],['mean','mean',d=>d.mean],
+ ['sd','\u03c3',d=>d.sd],['iqr2','IQR/2',d=>d.iqr2],['ratio','ratio',d=>d.ratio.toFixed(3)],
+ ['mad','MAD',d=>d.mad],['tot','>3.1\u03c3',d=>d.tot],['ex','excess',d=>d.ex],
+ ['skew','skew',d=>d.skew.toFixed(2)],['dag','D\u2019Ag',d=>d.dag.toFixed(1)],
+ ['kurt','kurt',d=>d.kurt.toFixed(1)],['ans','Ansc',d=>d.ans.toFixed(1)],['beta','\u03b2',d=>d.beta.toFixed(2)]];
+function r2table(){
+ const rows=PD.map((d,i)=>({d,i})).sort((a,b)=>{
+  if(SORT.k==='day')return (a.i-b.i)*SORT.dir;
+  const x=a.d[SORT.k],y=b.d[SORT.k];return (x<y?-1:x>y?1:0)*SORT.dir;});
+ let h='<table><tr>'+COLS.map(c=>
+  `<th style="cursor:pointer;${SORT.k===(c[0]==='date'?'day':c[0])?'color:var(--live)':''}" data-c="${c[0]}">${c[1]}</th>`).join('')+'</tr>';
+ rows.forEach(({d,i})=>{h+='<tr class="'+(i===RT.wday?'hi':'')+'" data-i="'+i+'" style="cursor:pointer">'
+  +COLS.map(c=>'<td'+(c[0]==='date'?' style="text-align:left"':'')+'>'+c[2](d)+'</td>').join('')+'</tr>';});
+ $('r2tab').innerHTML=h+'</table>';
+ $('r2tab').querySelectorAll('th').forEach(th=>th.onclick=()=>{
+  const k=th.dataset.c==='date'?'day':th.dataset.c;
+  SORT.dir=SORT.k===k?-SORT.dir:1;SORT.k=k;r2table();});
+ $('r2tab').querySelectorAll('tr[data-i]').forEach(tr=>tr.onclick=()=>{
+  RT.wday=+tr.dataset.i;$('r2day').value=RT.wday;rt2();});
+}
+
+/* ---- Koenker ---- */
+const TRIMS=['mean','5% trimmed','10% trimmed','25% trimmed','median'];
+const METH=[['t4_1','Laplace',C.flag],['t4_2','Yule',C.gold],['t4_3','Siddiqui',C.data2],
+ ['t4_7','bootstrap',C.live]];
+RT.k3='mean';RT.trim=0;RT.meth={t4_1:1,t4_2:1,t4_3:0,t4_7:1};
+$('r3view').innerHTML=[['mean','Means and medians'],['quant','Quantile fan']]
+ .map(([k,l])=>`<button class="b${k==='mean'?' go':''}" data-v="${k}">${l}</button>`).join('');
+$('r3view').querySelectorAll('button').forEach(b=>b.onclick=()=>{RT.k3=b.dataset.v;
+ $('r3view').querySelectorAll('button').forEach(x=>x.classList.toggle('go',x===b));rt3();});
+$('r3trim').oninput=e=>{RT.trim=+e.target.value;rt3();};
+$('r3meth').innerHTML=METH.map(([k,l])=>
+ `<button class="b${RT.meth[k]?' go':''}" data-m="${k}">${l}</button>`).join('');
+$('r3meth').querySelectorAll('button').forEach(b=>b.onclick=()=>{
+ RT.meth[b.dataset.m]=!RT.meth[b.dataset.m];b.classList.toggle('go',!!RT.meth[b.dataset.m]);rt3();});
+
+function rt3(){
+ let p=cv('r3plot',340);
+ const QL=['5th','25th','median','75th','95th'];
+ if(p){const{x,w,h}=p,L=54,R=18,T=22,B=46;
+  const quant=RT.k3==='quant';
+  $('r3h').textContent=quant?'Five quantiles of the response time, day by day'
+   :'Daily means and medians, with pointwise error bands';
+  const lo=quant?100:130, hi=quant?560:500;
+  const X=i=>L+i/23*(w-L-R),Y=t=>h-B-(t-lo)/(hi-lo)*(h-T-B);
+  axes(x,L,R,T,B,w,h,[150,250,350,450].filter(t=>t>=lo&&t<=hi).map(t=>[t,Y(t)]),t=>t,
+   [0,5,10,15,20,23].map(i=>[i,X(i)]),i=>PD[i].date.split(' ')[1],'day of the experiment');
+  if(quant){
+   const cols=['rgba(53,86,107,.35)','rgba(53,86,107,.6)',C.live,'rgba(53,86,107,.6)','rgba(53,86,107,.35)'];
+   for(let q=0;q<5;q++){curve(x,PD.map((d,i)=>[X(i),Y(d.q[q])]),cols[q],q===2?2.2:1.5);
+    x.fillStyle=q===2?C.live:C.data2;x.font='9.5px "Space Mono", monospace';
+    x.textAlign='left';x.textBaseline='middle';x.fillText(QL[q],X(23)+6,Y(PD[23].q[q]));}
+  }else{
+   PD.forEach((d,i)=>{x.strokeStyle='rgba(53,86,107,.45)';x.lineWidth=6;
+    x.beginPath();x.moveTo(X(i),Y(d.mean-1.96*d.semean));x.lineTo(X(i),Y(d.mean+1.96*d.semean));x.stroke();});
+   curve(x,PD.map((d,i)=>[X(i),Y(d.mean)]),C.data,1.8);
+   curve(x,PD.map((d,i)=>[X(i),Y(d.med)]),C.live,1.8);
+   PD.forEach((d,i)=>{x.beginPath();x.arc(X(i),Y(d.mean),3.4,0,7);x.fillStyle=C.data;x.fill();
+    x.beginPath();x.arc(X(i),Y(d.med),3.4,0,7);x.fillStyle=C.live;x.fill();});
+   x.font='10px "Space Mono", monospace';x.textAlign='right';x.textBaseline='top';
+   x.fillStyle=C.data;x.fillText('mean',w-R-4,T);
+   x.fillStyle=C.live;x.fillText('median',w-R-4,T+15);}
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText('response time (ms)',L+2,T);}
+ $('r3stats').innerHTML=stat('Day 1 mean',PD[0].mean+' ms','d')+stat('Day 5 mean',PD[4].mean+' ms','d')+
+  stat('Learning, days 1\u20135','\u2212'+(PD[0].mean-PD[4].mean).toFixed(0)+' ms')+
+  stat('Spread, day 1 vs 24',PD[0].sd+' \u2192 '+PD[23].sd+' ms');
+
+ $('r3trimv').textContent=TRIMS[RT.trim];
+ p=cv('r3eff',300);
+ if(p){const{x,w,h}=p,L=54,R=76,T=22,B=46;
+  const all=PD.flatMap(d=>d.se),hi=Math.max(...all)*1.1;
+  const X=i=>L+i/23*(w-L-R),Y=v=>h-B-v/hi*(h-T-B);
+  axes(x,L,R,T,B,w,h,[0,1,2,3,4].filter(v=>v<=hi).map(v=>[v,Y(v)]),v=>v,
+   [0,5,10,15,20,23].map(i=>[i,X(i)]),i=>PD[i].date.split(' ')[1],'day of the experiment');
+  curve(x,PD.map((d,i)=>[X(i),Y(d.se[0])]),'rgba(140,74,47,.55)',1.5);
+  x.fillStyle=C.flag;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='middle';
+  x.fillText('mean',X(23)+7,Y(PD[23].se[0]));
+  if(RT.trim>0){curve(x,PD.map((d,i)=>[X(i),Y(d.se[RT.trim])]),C.live,2.2);
+   x.fillStyle=C.live;x.fillText(TRIMS[RT.trim],X(23)+7,Y(PD[23].se[RT.trim]));}
+  PD.forEach((d,i)=>{x.beginPath();x.arc(X(i),Y(d.se[RT.trim]),3.6,0,7);
+   x.fillStyle=RT.trim?C.live:C.flag;x.fill();});
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText('bootstrap standard error (ms)',L+2,T);}
+ const wins=[0,0,0,0,0];PD.forEach(d=>wins[d.se.indexOf(Math.min(...d.se))]++);
+ const beat=PD.filter(d=>d.se[RT.trim]<d.se[0]).length;
+ const gain=PD.reduce((a,d)=>a+(d.se[0]-d.se[RT.trim])/d.se[0],0)/24*100;
+ $('r3effs').innerHTML=stat('Estimator',TRIMS[RT.trim])+
+  stat('Beats the mean on',beat+' of 24','d')+
+  stat('Mean reduction in error',(gain>0?'':'+')+(-gain).toFixed(0)+'%',gain>0?'d':'f')+
+  stat('Days this one wins',wins[RT.trim],'d');
+
+ p=cv('r3sd',300);
+ if(p){const{x,w,h}=p,L=54,R=86,T=22,B=46;
+  const X=i=>L+i/23*(w-L-R),Y=v=>h-B-(v-.6)/3.0*(h-T-B);
+  axes(x,L,R,T,B,w,h,[1,2,3].map(v=>[v,Y(v)]),v=>v.toFixed(1),
+   [0,5,10,15,20,23].map(i=>[i,X(i)]),i=>PD[i].date.split(' ')[1],'day of the experiment');
+  METH.forEach(([k,lab,col],mi)=>{if(!RT.meth[k])return;
+   const c=+k.split('_')[1];
+   curve(x,PD.map((d,i)=>[X(i),Y(d.t4[c])]),col,1.4);
+   x.fillStyle=col;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='middle';
+   x.fillText(lab,X(23)+7,Y(PD[23].t4[c]));});
+  curve(x,PD.map((d,i)=>[X(i),Y(d.t4[0])]),C.ink,2.4);
+  PD.forEach((d,i)=>{x.beginPath();x.arc(X(i),Y(d.t4[0]),3.8,0,7);x.fillStyle=C.ink;x.fill();});
+  x.fillStyle=C.ink;x.font='10px "Space Mono", monospace';x.textAlign='left';x.textBaseline='middle';
+  x.fillText('published',X(23)+7,Y(PD[23].t4[0])-11);
+  x.fillStyle=C.faint;x.font='9.5px "Space Mono", monospace';x.textAlign='left';x.textBaseline='top';
+  x.fillText('standard deviation of the median (ms)',L+2,T);}
+ const names=['published','Laplace','Yule','Siddiqui','exact I','exact II','Jeffreys','bootstrap'];
+ let th='<table><tr><th>method</th><th>mean</th><th>mean abs error</th><th>mean sq error</th><th>worst miss</th></tr>';
+ for(let c=0;c<8;c++){
+  const dif=PD.map(d=>d.t4[c]-d.t4[0]);
+  const mn=PD.reduce((a,d)=>a+d.t4[c],0)/24;
+  const mae=dif.reduce((a,v)=>a+Math.abs(v),0)/24;
+  const mse=dif.reduce((a,v)=>a+v*v,0)/24;
+  const mxe=Math.max(...dif.map(Math.abs));
+  const best=c&&mae===Math.min(...[1,2,3,4,5,6,7].map(k=>
+   PD.reduce((a,d)=>a+Math.abs(d.t4[k]-d.t4[0]),0)/24));
+  th+='<tr class="'+(best?'hi':'')+'"><td>'+names[c]+'</td><td>'+mn.toFixed(3)+'</td><td>'+
+   mae.toFixed(3)+'</td><td>'+mse.toFixed(3)+'</td><td>'+mxe.toFixed(3)+'</td></tr>';}
+ $('r3tab').innerHTML=th+'</table><p class="small">Reproduces Koenker (2009) Table 4. The highlighted row is the closest reconstruction \u2014 the bootstrap, which Wilson and Hilferty had no way of computing.</p>';
+}
+
+/* keyboard */
+document.addEventListener('keydown',e=>{const k=e.key.toLowerCase();
+ if(TAB===1&&E.on){if(k==='f')e5a(true);if(k==='j')e5a(false);return;}
+ if(TAB===2&&U5.on){if(k==='s')u5ans(false);if(k==='d')u5ans(true);return;}
+ if(TAB===3){if(V5.phase==='answer'){if(k==='f')v5ans(true);if(k==='j')v5ans(false);}
+  else if(V5.phase==='conf'&&['0','1','2','3'].includes(k))v5conf(+k);}});
+
+function redrawAll(){
+ if(TAB===1){a1p();a2p();a3p();a3f();a4p();if(E.q.length&&!E.on)e5p(D3.s*Math.SQRT2);}
+ if(TAB===2){u1p();u2p();u3p();u4p();u5plot();}
+ if(TAB===3){v1p();v2p();v3p();v4p();if(V5.tr.length){v5plot();v5cmp();}}
+ if(TAB===4)pipe();
+ if(TAB===5)rt1();
+ if(TAB===6)rt2();
+ if(TAB===7)rt3();}
+window.addEventListener('resize',redrawAll);
+a1p();a2p();a3p();a3f();a4p();u1p();u4u();
+setTimeout(()=>{v2p();v3p();v4p();v1p();pipe();rt1();rt2();rt3();},0);
+</script>
