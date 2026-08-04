@@ -1,6 +1,55 @@
 On the Theory of Errors of Observation - Examples
 
 
+BUILD NOTE (added as examples are made)
+
+The page is now assembled from parts, as the Probability of Induction page is:
+run ./build.sh in this folder to write index.html from src/. One part file per
+example, so an example can be edited without touching the text. ./build.sh
+--check says whether index.html is behind src/.
+
+Examples are numbered in the order they are built, and the number appears in
+the left margin beside the passage that opens it. Built so far: 1 and 2, both
+in "The Theory of Observations". The examples for "Probability and Relative
+Numbers" are not built — that section is still marked "##1 / Text /
+Interactive Diagram" with no spec, so I have left the numbers free and started
+at the first section that has one. If you would rather the numbering follow the
+paper rather than the order of building, say so and I will renumber; it is a
+one-line change per example.
+
+
+Genearl:
+
+always when possible have the examples coded into values or formulae in the text, clearly colour coded. 
+
+Peirce uses esoteric notation here, so the standard should be to have a modern formula appear beneath his with the same colour code, each should then have = [version with the numbers filled in, colour coded] and then = [the answer]. if all goes well the answers should be the same... 
+
+In general, we should let the text do the explaining, and let the graphic help make sense of the text. 
+
+Avoid any sort of AI speak: its not x, its y, and that matters. etc etc. 
+
+When appropriate to give additional context to the text or how the example relates., do not be rhetorical or pompous, just explain it simply. 
+
+
+I have been giving descriptions to the examples. when you build them, please give them a number and place that number in the margin, like in the Probability of induction html. also include it in this document. 
+
+for many of these, i want you to provide a graphical demonstration. i will then suggest any tweaks. For graphical demonstrations, we want the user imnput to happen as much as possible through sliders that change a graphic and corresponding numbers in real time. 
+
+as much as possible, you should try to tie new examples in to ones that the user will be familiar with, rather than trying to show it in a new way, show how this example is really like a previous one, but with this or that aspect of it added, removed, changed, etc. 
+
+
+WHen you are done, do not move the eamples or anything off of this list. Add to the bottom of each example a sort of progress log that i can read, so i can update as we go. 
+
+
+# Probability and Relative Numbers
+
+Should have graphics for all the main bits, the universe under consideration,, how different formulae pick out different bits of it, how the dividing works...  ideally it would be nice to also show the modern notation beside it. 
+it ends with Bayes theorem. 
+
+will have to make a note here about Gauss and the different ways of justifying the ToE. Peirce's set up looks Laplacean / bayesian, but the rest of the paper shows he is in fact gaussian / frequentist about it. 
+
+
+
 ##1
 
 Text
@@ -13,31 +62,396 @@ Interactive Diagram
 
 
 
+# The Theory of Observations
+
+## Gaussian Theory of Errors 
+
+"We now pass to the theory of observations. An observation gives us the value of a certain quantity which is connected with an unknown quantity in such a way as to be partly dependent on the latter value, and partly on accidental circumstances, not capable of being separately taken account of."
+
+can say that this is the Gaussian Theory of Errors  and now we put this in terms like this: Oi = T + \epsilon_i 
+
+--- BUILT: EXAMPLE 1 --------------------------------------------------------
+
+Margin number: 1.  Trigger: the whole sentence "We now pass to the theory of
+observations..."  Source: src/05_ex1.js.
+
+What it does. Three colour-coded phrases in Peirce's own sentence (the quantity
+observed, blue; the unknown quantity, green; the accidental circumstances, red)
+light up when the example opens. Sliders set T and the reach of the accidental
+circumstances; buttons observe once or fifty times. A number line shows T as a
+green rule and each observation as a dot, with the newest one bracketed back to
+T and the bracket labelled with its own epsilon. Under it the series piles up
+into a histogram. Then the three-row ladder, aligned in columns and colour
+coded:
+
+    the quantity observed = the unknown quantity + the accidental circumstances
+             O_i          =          T           +           e_i
+            4.911         =        5.000         +         -0.089
+
+A checkbox hides the unknown quantity. Nothing in the data changes when it goes
+— same dots, same places — which is the observer's actual position, and the
+argument for why a law of error is needed at all. The closing note changes with
+the checkbox and hands off to the next section.
+
+Open questions for you:
+- Is the transit-instrument framing right this early, or should the first
+  example be neutral about what is being measured?
+- The ladder is the pattern I propose to reuse for every formula in the paper:
+  words, then Peirce's symbols, then the numbers. Say if you want it the other
+  way up, or the modern line added as a fourth row rather than a footnote.
+
+
+## Law of the Facility of Errors
+
+"The special form of the function φ is called the law of the facility of the errors."
+
+This should let Peirce's symbols become live and colour coded, so that the formula = a copy of the formula with numbers filled in = the modern version. 
+
+Then there should be a graphical display. the universe is observations of a certain kind. these observations lead to a certain distribution. we could have observations of different "kinds" leading to different distributions.
+
+could simultaneously have a marksman analogy. have a target with bullseye and hit marks scattered around the target in the appropriate ways to match the "type" of observation.  
+
+--- BUILT: EXAMPLE 2 --------------------------------------------------------
+
+Margin number: 2.  Trigger: "The special form of the function phi is called the
+law of the facility of the errors."  Source: src/06_ex2.js.
+
+What it does. Four kinds of observation to choose between, all of them ones
+Peirce himself names: transit observations (normal), a star out from behind the
+moon (skewed right, no mass to the left — his occultation case), a coarse
+instrument (uniform, the chemist's balance and the dropped decimal places), and
+two observers run together (bimodal, the case he returns to at the end of the
+paper). Choosing a kind clears the shots, since the old ones were not fired
+under this law.
+
+The marksman is on the left and the law on the right, and they are the same
+fact drawn twice: the horizontal scatter of the shots is what the curve
+describes. A strip of width d-epsilon runs across both. The ladder reads
+
+    the height of the law at that error x the width of the strip = how often
+    phi(e, x) . de = P
+    0.807 x 0.10 = 0.0807
+
+and the readout says how many shots actually fell in the strip — the point
+being that phi is only worth anything because it predicts frequencies. The
+closing note is different for each of the four kinds, tying each to where in
+the paper Peirce discusses it.
+
+The four laws are defined once, in src/04_scaffold.js as ERROR_LAWS, so every
+later example that needs a law of error draws on the same four shapes and the
+reader keeps meeting the same curves.
+
+Open questions for you:
+- The strip is fixed at 0.10 wide. Should it be a slider, so that d-epsilon
+  getting small is something you can watch?
+- "Two observers run together" anticipates the splitting-the-universe section a
+  long way ahead. Keep it here, or hold it back?
+
+
+## Need for a law of error
+
+"Except so far as this law is known, an observation can afford us no information whatever."
+
+have the same marksman / gaussian analogy, but this time take away the target / true value. 
+
+show how the same set of data can be explained by any number of combinations of other distributions or multiple shooters. 
+
+might need something about how the empirical distribution is not a law of error. 
+
+this shows how we need to have warrant for believing that we are working in the same universe (one shooter / observer)  and that we know the law governing those shots / observtions. 
+
+please suggest ideas for how to visualize the stronger point that w/o a LoE there is no information whatever. 
+
+## Conditions
+
+We should visualize the following (and what it would mean to break them):
+
+It has but one value for each set of values of its variables.
+Its value is always positive and less than unity.
+It vanishes when ε is infinite.
+Its integral relatively to ε from −∞ to +∞ is always unity.
+
+this should be graphical, but also show the function itself in action, so that you can see the values change. see what happens to the whole if one or another is not satisfied. 
+
+we shoudl say what the modern name for these assumptions is. is this zero conditional mean? we should say. 
+
+## x-z
+
+Show this:
+
+"The value of this probability is for any particular kind of observations an arithmetical function of ε and ξ, which we may write ψ (ε, ξ) dε."
+
+then this:
+
+"The probability that the unknown quantity X has the value x without reference to observation is [xx]dx. This is in any case a function of x, which may be written Ψx . dx."
+
+and this:
+
+"The probability that the quantity given by observation Ξ has the value ξ, without reference to the value of the unknown quantity, is [ξΞ] dξ. This an arithmetical function of ξ, which may be Φξ . dξ."
+
+and this:
+
+"If Φξ, Ψx, and φ (ε, x) are given, then we can obtain ψ (ε, ξ) thus:"
+
+(this final one should clearly show how it is the result of the others, letting the user see it expanded or contracted, with colour coded terms, a modern equivalent, and a graphical example)
+
+## Series of observations. 
+
+"Suppose a number of independent observations to be made. Then we shall have a series of functions—"
+
+this should let the user set how many series, which would add additional functions to the list we can give them numbers, and these shoudl carry into the next bit too. 
+
+## x
+
+"The probability Ψx . dx antecedent to all observations will be simply dx, and, therefore, the factor Ψx may be omitted in the above expression."
+
+not sure how to show this. 
+
+
+## Observation teaches a function (least squares)
+
+This paragraph "It will be perceived that observation never gives us to know a number expressing the value of the unknown quantity, but only a function expressing the probability of each value."
+
+This can use the above machinery to show that we never get T=O but always Oi = T +ei, and the ei bit is sort of where the function comes in (as it is a function of the type of observation).
+
+at first let them select from  / create a whole host of distributions
+
+have a button that sets it to the very comprehensive case, and show how it lets you describe the whole thing in terms of mean and PE. colour coded etc. 
+
+
+##MR. Crofton
+
+give us two observations of X. so X1 = zeta 1 = number and X2 = zeta 2 = number, just numbers to carry through. (user could change them on slider. ) let the user add a third - 5th one too. interacting with this bit :"If in place of two we have n observations, the probability that the sum of all will"
+
+then carry these through the math, colour coding and showing any appropriate graphics. 
+
+we will want to demonstrate this bit "is half the probable value of the square of this error, and so on. "
+
+
+##M is large
+
+"he probable value of the error is often less than the probable value of its square, owing to positive and negative errors balancing. But the co-efficients which involve the cube and higher powers of the error may often become insignificant." to "Consequently if M is sufficiently large, the higher co-efficients may be neglected."
+
+we will want to make the formulas live and show peirce's point graphically
 
 
 
 
+## Galton Board
 
-##n
+"The manner in which sensation and volition are propagated through the nerves is unknown, but it must be by some very complicated process, because it is very slow compared with the rate of propagation of sound. It is, therefore, probable that there may be variations of the rate of passage, and that the velocity through each small portion of the whole length of the nerve is to some extent independent of the velocity through the other parts. If this is so, the whole time of propagation would be subject to a variation, the probable values of whose cube and higher powers would be insignificant. However this may be, it appears to be a fact that in all carefully-made observations, the error of which is due to the inevitable inaccuracy of the action of the human nerves, the probable values of the cube, &c., of the errors are very small."
 
-Text: The math leading up to ""Some writers upon the subject have wished to assign a smaller weight to those observations which differ largely""
+Have a graphic that is like a horizontal galton board. have a slider for how complex the process is. at its simplest, it is just a stimulus and like a single line to the brain. as it gets more complicated, it is more of a tangled branching set of lines, and as the stimulus hits, you can watch it travel through the lines in a sort of complicated way (each one of the lines carries it at a different speed. 
 
-Interactive Diagram:
-
-we should have two series of observations. the user can set some parameters of them. then we have peirce's math's guess as to whether it would be better to combine. a button reveals the true value and we see if CSP was right. 
-
+connect this to the cube etc stuff, with corresponding graphic. 
 
 
+##CLT
 
+"We thus reach the fundamental formula of the method of least squares."
+
+we need to do two things here. first, show how it relates to modern CLT, which should be next to it.  show how h relates to sigma. have sliders that really show how "h and E are quantities which depend upon x."
+
+
+##FUnctino not a number again
+
+"It is not the object of this paper to explain that method itself. Only it may be remarked that in the deduction of it which is usually given, it is assumed that what we wish to obtain from observations in any case (whether the method of least squares is applicable or not) is the most probable value of the unknown quantity. This is not the case, for there is but an infinitesimal probability in favor of any one value. Suppose that the cause of error in observing the place of a star were a nearly simple oscillation of the image about its mean point. Then the most probable errors would be the extreme ones. But we should much prefer to assume as the value the probable or mean value than the most probable value, which would be removed the furthest possible from that value. The conception of the matter is this. What observation has to teach us is a function, ψ (ε, ξ), not a mere number. But in cases to which the method of least squares is applicable, this function is completely determined by two numbers, which are the value of the unknown quantity derived from the application of that method and the value of its probable error.2"
+
+we will sort of have this from above, so we can build it out to make these points. 
+
+##Weighting
+
+"It is assumed in treatises on least squares that Φξ . dξ, or the probability (without regard to the value of the unknown quantity) that the quantity observed will have a value between ξ and ξ + dξ, is equal to dξ. When this is not the case it is only necessary to weight each observation by dividing by Φξ."
+
+we will want a graphical demonstration of this. 
+
+show this:
+"If the probability of error does not follow that law which the method of least squares supposes, that is to say, if the probability of
+
+the error x in the mean of a large number of observations is not equal to 
+h
+√∂
+G−h²x², where h is a constant independent of x, then it must at least be of this form if h be considered to be a function of x. "
+
+
+
+##weighting again
+
+"Now, h² is the weight which has to be assigned to an observation in the application of the method of least squares; and therefore when this method does not apply in its unmodified form, it is only necessary to find what function of x, h must be in order to give the required law of facility of errors, and then proceed according to the method of least squares, after having weighted each observation by h². "
+
+we will want to show this using the example he gives just after. i.e.,:
+
+""Let the equation which represents the facility of error be plotted, the error being taken as abscissæ, and the probability of that error as ordinate;
+
+then plot on the same diagram the curve y = 
+1
+√∂
+ G−x². Let us suppose, then, that a certain value of x, y, is A times as great for the actual curve of errors as it is for the normal least-squares curve. Now, if h be increased in the ratio A, the ordinates will be increased in this same ratio, and the abscissæ will be diminished in the inverse ratio so that the area of the curve is preserved. But if the ordinates at any one point are to be increased in the ratio A, then the abscissae at that point must be contracted in the inverse ratio, so as to preserve the area; so that if we had a function fx such that Dx fx = 
+1
+a
+, then the probability of this function of the error would follow the law y = 
+1
+√∂
+ G−(fx)², and consequently 
+1
+(Dx fx)²
+ is the weight which has to be assigned to any such observation in applying the method of least squares. "
+ 
+ 
+ this graph should appear after that paragraph. make it visually clear how the weight depends on the value of the error.  and show this approximate step and its importance:
+ 
+ "it will be necessary first to make an approximate solution of the problem in order to get an approximate value of the error from which to determine the weight, so that when the method of least squares is not applicable in its unmodified form, an approximate method must necessarily be resorted to."
+ 
+ ##Ascertaining the law of the facility of error
+
+"In any case, if the error is compounded of an infinite number of infinitely small errors, or approximates to being so, then the law of facility of errors is of that general form which the method of least squares prescribes, and nothing remains indeterminate excepting the value of h." 
+
+hve a graphic showing this. could be a sort of galton board or something. 
+
+## Table
+
+"I copy, for example, from Chauvenet’s Astronomy the following table, taken from Bessel’s Fundamenta Astronomiæ, showing the errors made by Bradley in observing Sirius and Procyon:"
+ 
+ lets have a graph of this table.
+ 
+ ##Fechner
+ 
+ "Fechner, in his Elemente der Psychophysik, has, in connection with his psychophysical law, discussed the applicability of the method to cases of sensation generally such as the estimate of the relative weights of two masses, and he finds that if v be the energy of the force which produces the excitation of any nerve, then if log v be considered as the observed quantity, the errors of the observed quantity will follow the law of least squares. Strictly speaking, the law of least squares recognizes the possibility of any error positive or negative, however great, although the probability of indefinitely great errors will be indefinitely small. "
+ 
+ Use the nerve galton board again, but showing how the results at the far end will give a normal distribution. 
+ 
+ Link to Fechner's Lab
+ 
+## Occultation
+
+"It occurred to me that in the case of the emersion of a star from an occultation, since it was impossible to strike the chronograph-key too early, while it might be struck indefinitely too late, the law of least squares could hardly apply, and I have made some experiments upon this point, which I will narrate in detail at the end of this paper, merely remarking in this place that the divergence from the theoretical law proved to be insignificant. "
+
+Have two views of a transit observation, one where the star is seen coming and one where it appears suddenly from behind a moon. have a button to run one simulation, which releases on star on each and has an imaginary person "observe" it, making a line where their observation time is. have this line also appear as a data point on a chart below the observation screens. Have another button that observes like 100 or 1000 transits, which would fill in the regular one as normal and the occultation one as having only a skew to the right. making it clear that his is peirce's supposition. 
+
+there could also be a mode that lets the user try it out but the stars would have to move pretty fast for it to be any fun. it would clear the other data and let them try for themselves with the same mechanism. 
+
+
+## Large errors in chemistry. 
+
+Show the point made in the paragraph up to "The method of considering such errors is treated by Dr. Bremiker, in the preface to his Tabula Logarith- morum Sex Decimalium, a work to which the attention of chemists ought to be drawn."
+
+let the user add a large error in and all that. 
+
+if you can find or understand the theory peirce refers to, lets display it as well. 
+
+## Not a priori
+
+Show this:
+
+"When the law of facility of errors cannot be deduced a priori from the consideration of the causes to which it is due, a large number of experimental observations must be made upon a known quantity in order to find in what manner the errors vary, or the same series of observations may be used both to deter- mine what the value of the unknown quantity is and also what the law of the variation of errors is. Thus, in the method of least squares, h is to be determined empirically, and the common way of doing it is to use the actual observations by which the unknown quantity is determined to determine also the value of h. In doing this, it should be remembered that a precise and trustworthy determination can only be obtained from a large number of observations. "
+
+## New unkonwn
+
+show this "his proce- dure amounts, in fact, to adding an additional unknown quantity, a very obvious fact, and yet one which is habitually overlooked. Encke, in his Astronomisches Jahrbuch for 1834, has given the most com- plete formulas that I have anywhere found for determining the value of h, as well as its uncertainty. "
+
+##Combination
+
+"These formulae require correction on account of the circumstance just mentioned. When it is necessary to combine, by least squares, observations of different orders of precision, they are weighted proportionately to h2. If we have two series of observations, one of which is as accurate
+
+as you please, and the other as inaccurate as you please, a better result than that which the most accurate series of measures gives can always be got by combining with it the least accurate series, provided the proper weights are given to the two series. ... The least accurate series of measures offers certain facts, which may be used as premises, and it cannot be that if those facts are properly used they leave us in greater ignorance than we were before. Additional facts must increase our knowledge, if the proper inferences are made from them, and, therefore, an additional series of observations, if it have any weight at all, must, if its proper weight be assigned to it, improve the value of the unknown quantity. "
+
+have two distributions, one for each series, and then a combined one. let the user change the weights and see how the combined distributino changes. We can note that CSP's method for showing this is coming up. 
+
+
+## Combination 2
+
+"On the other hand, when it is considered that there is an uncertainty in the value of h, it may be that if the two series of observations differ greatly in accuracy, and the value of h is not determined with much precision, it may be better at once to take the result of the best series of observations than to combine the two series with the best weights that we are able to give."
+
+show this in a similar way, letting the determined value of h cahage too. the user sohuld be reminded visually of the earlier example where the value of h is determined empirically. 
+
+## formula
+
+"xi be the value from any set of observations;
+εi the mean error of this set;
+giεi the mean error of εi;
+wi the true weight;
+E the mean error of weight one; and
+x the truly weighted mean.
+x = 
+Σi(wixi)
+Σiwi"
+
+usual color coding etc. 
+
+tie these together using graphics the user is now familiar with. 
+
+
+we will want a graphic for each stage of the math until "Some writers upon the subject have wished to assign a smaller weight to those observations which differ largely from the mean than to those which come close to it."
+
+we should have two series of observations. the user can set some parameters of them. then we have peirce's math's guess as to whether it would be better to combine. a button reveals the true value and we see if CSP was right.  (If that is what he is doing... to be honest i am not sure. so you let me know what he is up to here. take this part seriously as it is the core of the paper and something hard for me to check)
+
+
+## H is a statistical quantity. 
+
+show how h cannot belong to a single observatoin, but only and lawys to a series. 
+
+
+
+## Splitting the universe
+
+"They have reasoned as if h, or the precision of an observation, were something which belonged to a single observation; whereas, in fact, it is a statistical quantity alto- gether, and belongs only to an observation as a member of a certain series. We may have a large series of observations for which h has a certain value, and those observations may perhaps be separated into two series on some principle or other for which h shall have two different values, and if this can be done there is an advantage in doing it. It is, in fact, limiting our universe. In probabilities generally h is a mean or probable quantity for a series of observations, and if we can divide our universe into two parts, getting different values of h, it will be an increase of knowledge to do so. For example, suppose that some of the observations were taken under one set of circum- stances and the rest under another set of circumstances. That would afford a principle upon which the observations could be distin- guished, and if the value of h for the two sets turned out different, it would be an advantage to separate them and to give them different weights. "
+
+show how a single set can be splipt up, and how the different distributions can be recombined to advantage. this shoudl recall grahpics for the universes from the probability section. 
+
+
+
+## Peirce's Criterion
+
+Let the user apply Peirce's Criterion
+
+"f observations are to be rejected, exact criteria are necessary to determine upon principles of probabilities in what cases they should be rejected. The criterion of Professor Peirce is the only one which conforms rigidly to those principles, and, indeed, I am not aware that it has been attacked upon the ground of not conforming to the principles of probabilities, although it has been attacked on the ground that no such criterion should be used, and that no observation should be rejected except upon principles of guesswork, for that is what it amounts to to say that none but obvious mistakes should be rejected."
+
+It sohudl show the data graphically of course, show how things change for each observation being considered the error, and make red those considered to be outliers. 
+
+Details here: 
+
+Gould, B. A. 1855. “On Peirce’s Criterion for the Rejection of Doubtful Observations, with Tables for Facilitating Its Application.” The Astronomical Journal 4 (April): 81. https://doi.org/10.1086/100480.
+Peirce, Benjamin. 1877. “On Peirce’s Criterion.” Proceedings of the American Academy of Arts and Sciences 13: 348. https://doi.org/10.2307/25138498.
+Ross, Stephen M. 2003. “Peirce’s Criterion for the Elimination of Suspect Experimental Data.” Journal of Engineering Technology.
+
+
+ "Experience has shown that the errors which this criterion rejects are almost precisely those which a person of sound judgment would pronounce to be obvious mistakes, but some other criteria have been proposed, which are confessedly inex- act, but which have the advantage of involving less calculation, but these are no better than the unaided judgment of an experienced person, and in some cases not so good."
+ 
+ let the user guess at the outliers, and see if they are right. 
+ 
+ do you know of any of the other methods? they could be incorporated if so. 
+
+
+#Experiments
+
+## Accuracy
+
+Show this with a simple simulaiton. even with precision capped at 1ms, the mean can get better. 
+
+"e instrument ought, theoretically, in the mean of a large number of observations, to give a much closer result than 0.001 second; for when the first event occurs, and the arm is thrown into the moving crown-wheel, it probably will not strike exactly in any catch, but will strike on the inclined side of a tooth. If it strikes on the forward side of the tooth,
+
+the hands will be carried forward by the fraction of a thousandth of a second more as the arm glides down this side to the bottom of the catch. But if it strikes on the back side of the tooth, the hands will be carried relatively back the fraction of the thousandth part of a second as the arm glides back to the bottom of the catch. Now, if the top of the tooth is midway between the bottom of two catches, it is equally likely to be carried forward or back. The same thing occurs when the second event happens and the arm strikes upon the fixed crown-wheel. An error in the marked interval will thus result, which error may amount to −0.001 second in the extreme, or to +0.001 second, and any one error between these limits is as likely as any other; consequently, these errors, being entirely incidental and inde- pendent of one another, they will balance one another in the mean of a large number of observations, and thus a much higher degree of accuracy may be reached. "
+
+##Experiment
+
+Copy the occultation simulation from above. let the user try it. have. button to simulate 500 and give a graph like those Peirce found. 
+
+#Graphs and table
+
+have the graphs and table both ready, but part of a set of tabs. it can display tables, or graphs, or the tables and graph for a particular day. 
 
 ##Table
 
 Recreate Peirce's tables of data from Koneker's data*.  Copy the style from the text. 
 
+(while doing so, check for any issues or discrepencies)
+
 ##Graphs
 
 reproduce Peirce's graphs (including their style and layout) using Koenker's data*.
-
+ 
+ Let the user set the level of smoothing and drawing curves using the same sort of app as in the three methods html in the folder. 
+ 
 
 
 * Koenker's data is available in the folder of the same name and the smoothing procedure is described in three-methods html. 

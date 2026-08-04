@@ -1,0 +1,755 @@
+A Theory of Probable Inference — Examples
+
+
+STATUS
+
+Nothing is built yet. This is the survey pass: every place in the paper where I
+think an interactive example earns its keep, numbered in the order it appears in
+the text, with the passage it would hang off and what it would do.
+
+Numbers are assigned in reading order, not build order. (The Errors of
+Observation page numbered in build order and left gaps; here the paper is
+already whole, so reading order costs nothing and the margin numerals will run
+down the page in sequence.) If you would rather number as they are built, say
+so — it is one line per example.
+
+The page itself has been reformatted to match the Probability of Induction
+edition: same palette, same type, same margin gutter, and the whole example
+scaffolding from that page (.example-trigger, .example-container,
+.example-header, .ex-num, .live/.k1–k4, .hl-text, .hl-band, .mode-tabs, the row
+/ col grid) is already in the stylesheet here. So an example written for that
+page drops into this one with no restyling, and the margin number appears beside
+its trigger automatically from the container id.
+
+The page-number and paragraph-number marginalia are gone.
+
+
+GENERAL, CARRIED OVER FROM THE OTHER TWO PAPERS
+
+- Wherever a number or a phrase of Peirce's is being driven, drive it in his own
+  sentence: wrap it in .live and colour-code it to the control that moves it.
+  Sliders in preference to number entry wherever the quantity is ordered.
+
+- Continuity matters more here than anywhere, because this paper is Peirce
+  rebuilding the same three arguments — deduction, induction, hypothesis — from
+  five different angles. Where an example restates something the reader already
+  met in the Probability of Induction, reuse that example's graphic and say so,
+  rather than inventing a second picture of the same thing. Several of the
+  examples below are explicitly "PoI's ex-N, re-pointed."
+
+- This paper is more schematic than the other two: its content is very often a
+  three-line argument form. So the default graphic here is the argument itself,
+  set out, with the terms live and colour-coded, and a population picture beside
+  it — not a chart hanging off to one side.
+
+- Peirce's Forms I–V and the "(bis)" variants are already set off with hairlines
+  in the page. Those blocks are the natural anchors: an example that belongs to
+  a Form should open under that Form's block, not three paragraphs later.
+
+- Let the text do the explaining. Where an example needs a word of its own, say
+  it plainly.
+
+- [square brackets] as before: something for the reader to set.
+
+
+============================================================================
+SECTION I — SIMPLE PROBABLE DEDUCTION
+============================================================================
+
+## 1
+
+Text: "THE following is an example of the simplest kind of probable inference:—
+About two per cent of persons wounded in the liver recover; This man has been
+wounded in the liver; Therefore, there are two chances out of a hundred that he
+will recover." — through the Enoch syllogism and Forms I and II.
+
+Suggestion. The whole point of the opening is that Forms I and II are the same
+argument with one knob turned, so build one argument and turn the knob. A single
+slider for [rho], from 0 to 1, sitting under Form II. At the left of the track a
+hundred figures, [rho] of them marked as recoveries; the conclusion sentence
+under it reads back the chance. As [rho] runs to 1 the block goes solid, the
+premise reads "Every M is a P", and Form II's three lines visibly become Form
+I's — same layout, the words swapping in place. The liver figure (2 per cent)
+and the Enoch figure (100 per cent) are two marked stops on the same slider, so
+the reader can flip between Peirce's two examples without leaving the control.
+
+The thing to make unmissable: nothing about the *form* changes as [rho] moves.
+Only the strength does. That is the claim of the section and it is made in one
+gesture.
+
+
+## 2
+
+Text: "It is to be observed that the ratio ρ need not be exactly specified. We
+may reason from the premise that not more than two per cent of persons wounded
+in the liver recover, or from 'not less than a certain proportion of the M's are
+P's,' or from 'no very large nor very small proportion, etc.' In short, ρ is
+subject to every kind of indeterminacy; it simply excludes some ratios and
+admits the possibility of the rest."
+
+Suggestion. A 0–1 bar for the value of ρ, on which the reader paints the
+admitted region — a two-handled range for "not more than 2 per cent" or "no very
+large nor very small proportion", and a scatter of admitted/excluded bands for
+the messier cases. Buttons for Peirce's three phrasings, plus a free one the
+reader draws. Under it, the conclusion, which is now itself a region and not a
+number: "it follows, with probability [between .00 and .02], that S is a P."
+
+This is the first appearance of a thing the paper keeps needing — a probability
+that is a set of values rather than one value — so it is worth spending a
+graphic on it early, and reusing that bar later (16, 22) rather than drawing a
+new one.
+
+
+## 3
+
+Text: "Thus, there being four aces in a picquet pack of thirty-two cards, the
+chance is one eighth that a given card not looked at is an ace; but this is only
+on the supposition that the card has been drawn at random from the whole pack.
+If, for instance, it had been drawn from the cards discarded by the players at
+piquet or euchre, the probability would be quite different." — and, four
+paragraphs on, "But after we have looked at the card, we can no longer reason in
+that way."
+
+Suggestion. Reuse the card grid from the Probability of Induction (examples 1–4
+there — createGrid / evaluateConsequent already handle the piquet pack). Deck
+choice: whole piquet pack, or the discards. Draw a card face down; the grid
+beside it shades the cells still live and reports the chance. Then a "look at
+the card" button, which turns it face up and collapses the grid to a single
+cell — the chance is now 1 or 0, and the argument the reader was making a moment
+ago is not available any more.
+
+Two conditions of the same maxim in one control, which is how Peirce presents
+them: the drawing has to be random, and the conclusion has to be drawn in
+advance of any other knowledge. Worth colour-coding the two premises in his
+sentence to the two halves of the control.
+
+
+## 4
+
+Text: "The celebrated law of Fechner is, that as the force acting upon an organ
+of sense increases in geometrical progression, the intensity of the sensation
+increases in arithmetical progression. In this case the odds ... take the place
+of the exciting cause, while the sensation itself is the feeling of confidence.
+When two arguments tend to the same conclusion, our confidence in the latter is
+equal to the sum of what the two arguments separately would produce; the odds
+are the product of the odds in favor of the two arguments separately."
+
+Suggestion. This is the Probability of Induction's example 26 (the logarithm of
+the chance) arriving from the other direction, and the graphic should be
+recognisably the same one: the odds on one scale, the feeling of belief on the
+log scale beside it, null at odds 1/1. Add what this passage has that the other
+did not — two arguments, each with its own odds, whose chances multiply while
+their beliefs add. Two sliders, two bars, and the sum/product shown on both
+scales at once so the reader sees the same fact twice.
+
+If the reader has come from the other paper, say in a line that this is the same
+thermometer.
+
+
+============================================================================
+SECTION II — COMPLEX AND STATISTICAL DEDUCTION
+============================================================================
+
+## 5
+
+Text: Form III (Complex Probable Deduction), the factorial formula for q, and
+"As an example, let us assume the proportion r = 2/3 and the number of M's in a
+set n = 15. Then the values of the probability q for different numbers, m, of
+P's, are fractions having for their common denominator 14,348,907..."
+
+Suggestion. The table of numerators is on the page already; make it the example.
+Sliders for [r] and [n], both live in Peirce's sentence; the table redraws, and
+the common denominator with it. Beside it the same numbers as a bar chart, with
+the bar at the maximum marked and the value (n+1)r drawn as a rule across the
+chart so the reader can watch the claim in the next paragraph — that q peaks at
+the m next below (n+1)r, and is very small elsewhere — hold as they drag.
+
+Footnote 1's case (when (n+1)r is a whole number, two bars tie) should be
+reachable: at r = 1/2, n = 15 it happens, and the two equal bars are worth
+seeing rather than reading.
+
+
+## 6
+
+Text: "When this is the case, there is a more convenient way of obtaining (not
+exactly, but quite near enough for all practical purposes) either a single value
+of q or the sum of successive values..." — the t1 / t2 formulae and the table
+of Θt.
+
+Suggestion. Same chart as 5, now with a shaded band from [m1] to [m2]. Two
+readouts side by side: the exact sum of the q's in the band, and Peirce's
+½Θt2 − ½Θt1. The Θ table on the page lights the two rows being read, the way
+the probable-error table does in the other paper's example 17.
+
+The point to land is "quite near enough": show the difference between the two
+numbers, and let the reader push n up until it stops mattering. His rough rule —
+Θt ≈ t below 0.7, Θt ≈ 1 above 1.4 — can be a third readout that goes green when
+it is safe to use.
+
+
+## 7
+
+Text: Form IV (Statistical Deduction) and Form V (Induction), and the paragraph
+between them: "If, then, this principle justifies our inferring the value of the
+second proportion from the known value of the first, it equally justifies our
+inferring the value of the first from that of the second, if the first is
+unknown but the second has been observed."
+
+Suggestion. The hinge of the paper, and it deserves the biggest example in it.
+One population, one sample, two arrows. Mode tabs: DEDUCTION runs the arrow
+downward — set [r] in the population, draw [n], watch the sample proportions
+scatter about r. INDUCTION runs it upward — the population is hidden, the reader
+draws a sample and the inference points back at a region of the population bar.
+Same graphic, same numbers, arrow reversed; nothing else changes, which is
+exactly Peirce's argument for why their validity is the same.
+
+Then the second half of the passage, which is the part people miss: keep drawing
+in each mode. In deduction the prediction is *vindicated* — the running
+proportion settles onto the r you set. In induction it is *corrected* — the
+inferred region moves off the first guess and closes on the truth. Two little
+running-trace plots, one per mode, both labelled in his words.
+
+Peirce's own instances belong here as preset buttons: the bag of coffee (nine
+tenths of the beans perfect) and the 1870 census births (478,774 to 463,320
+white, 75,985 to 76,637 colored). The census one is the same data as example 16
+in the Probability of Induction — link to it rather than re-deriving the
+probable errors here.
+
+
+============================================================================
+SECTION IV — DEDUCTION AND HYPOTHESIS "IN DEPTH"
+============================================================================
+
+## 8
+
+Text: "We often speak of one thing being very much like another, and thus apply
+a vague quantity to resemblance... We may then measure resemblance by a scale of
+numbers from zero up to unity. To say that S has a 1-likeness to a P will mean
+that it has every character of a P" — through Form II (bis) and Form IV (bis),
+and the French/Italian example.
+
+Suggestion. The whole trick of this section is that "in depth" is the same
+picture with characters on the axis instead of individuals, so build the mirror
+of 7 and let the reader see the axis swap. A strip of marks P′, P″, P‴… instead
+of a row of objects; a slider for [r]-likeness; the marks S shares light up.
+At r = 1 every mark is shared and the form reduces to Barbara — same collapse as
+example 1, and worth animating the same way for the rhyme.
+
+For Form IV (bis), Peirce's boy travelling through France and Italy: the "really
+numerous though relatively few respects in which he will be able to compare the
+two people" is a random sample of the marks, and the shared proportion in the
+sample tracks r. That is a two-panel version of the same strip — the full run of
+marks and the few he actually gets to compare.
+
+A toggle marked "count them / weigh them" belongs somewhere here or in 9, for
+the objection Peirce raises himself on the next page: characters cannot be
+counted like individuals — antimony bluish-gray, bismuth rose-gray, and gold,
+silver, copper, tin further off. Give the marks weights and the proportion
+becomes a weighted one; his own complaint about his own form, made visible.
+
+
+## 9
+
+Text: Form V (bis), Hypothesis, and "Thus, we know, that the ancient
+Mound-builders of North America present, in all those respects in which we have
+been able to make the comparison, a limited degree of resemblance with the
+Pueblo Indians. The inference is, then, that in all respects there is about the
+same degree of resemblance between these races."
+
+Suggestion. Invert 8, exactly as 7 inverts its own first mode, and reuse its
+graphic: the marks compared so far are the sample, the r-likeness inferred is
+the conclusion, the full run of characters is hidden. Draw more comparisons and
+watch the inferred likeness get corrected rather than vindicated.
+
+The three inferences now all exist as the same picture at two axes and two
+directions. Worth a small four-cell diagram, once, showing where the reader has
+been: breadth/depth × deduction/ampliation, with Peirce's Form numbers in the
+cells and each cell clicking back to its own example.
+
+
+============================================================================
+SECTION V — DEDUCTION, INDUCTION, HYPOTHESIS DISTINGUISHED
+============================================================================
+
+## 10
+
+Text: "If I wished to order a font of type expressly for the printing of this
+book, knowing, as I do, that in all English writing the letter e occurs oftener
+than any other letter, I should want more e's in my font than other letters...
+This is a statistical deduction. But then the words used in logical writings are
+rather peculiar... I might, then, count the number of occurrences of the
+different letters upon a dozen or so pages of the manuscript... That would be
+inductive inference. If now I were to order the font, and if, after some days, I
+were to receive a box containing a large number of little paper parcels of very
+different sizes, I should naturally infer that this was the font of types I had
+ordered; and this would be hypothetic inference."
+
+Suggestion. The best passage in the paper for an example, because all three
+inferences run on one body of evidence, and the body of evidence can be this
+page. Reuse the letter-reading machinery from the Probability of Induction's
+vowel/consonant example (the .vc spans) over the text of *this* article.
+
+Three tabs on one letter-frequency chart:
+ - DEDUCTION: the standard English frequencies, laid over the chart as a rule.
+   Order the font from them.
+ - INDUCTION: read [a dozen or so] pages of the actual article, letter by
+   letter, watching the observed bars climb and depart from the English rule —
+   Peirce is right, logical writing is peculiar; the single letters used as
+   terms show up as a visible bulge.
+ - HYPOTHESIS: the box of parcels. Show only the parcel sizes — the bars with
+   their labels stripped off — and let the reader match that shape back to the
+   font. The point is that the characters are observed and the case is inferred.
+
+One dataset, three directions of inference, and the reader has watched the
+difference instead of being told it.
+
+
+## 11
+
+Text: "Again, if a dispatch in cipher is captured, and it is found to be written
+with twenty-six characters, one of which occurs much more frequently than any of
+the others, we are at once led to suppose that each character represents a
+letter, and that the one occurring so frequently stands for e. This is also
+hypothetic inference."
+
+Suggestion. A short ciphered dispatch on screen with its frequency bars beside
+it. Click the tallest bar and assign it e; the substitution propagates through
+the text and partial words appear. Two or three more clicks and it reads.
+
+Keep it small — it is a rider on 10, not a cryptogram puzzle. What it has to
+show is the shape of the inference: the rule (English has these frequencies)
+plus the result (this text has that profile) gives the case (it is English in
+substitution). Set the three lines out beside the bars in the same Rule / Case /
+Result type used further down the section.
+
+
+## 12
+
+Text: "Now in Barbara we have a Rule, a Case under the Rule, and the inference of
+the Result of that rule in that case. For example:— Rule. All men are mortal;
+Case. Enoch was a man. Result. Enoch was mortal." — and "Deduction proceeds from
+Rule and Case to Result... Induction proceeds from Case and Result to Rule...
+Hypothesis proceeds from Rule and Result to Case."
+
+Suggestion. Three propositions on a triangle; the reader covers one and the
+other two infer it. Cover the Result — deduction. Cover the Rule — induction.
+Cover the Case — hypothesis. Each cover changes the colour of the arrows and
+names the inference in Peirce's words underneath, with the psychological gloss
+he attaches (volition, the formation of a habit, secondary sensation) as a
+second line the reader can turn on.
+
+This is the paper's central mnemonic and it is three clicks. It should also be
+the thing that examples 7, 9, 10 and 11 all link back to, so the reader can see
+which corner each of them was covering.
+
+
+============================================================================
+SECTION VI — THE RULE, AND APAGOGIC INVERSION
+============================================================================
+
+## 13
+
+Text: "In the case of hypothesis, this syllogism is called the explanation...
+The explanation is,— Simple English ciphers have certain peculiarities; This is
+a simple English cipher: Hence, this necessarily has these peculiarities." —
+and the barrel of apples, "not 'Why is this?' but 'How is this?'"
+
+Suggestion. Take the reader's cipher from 11 and the apples together, side by
+side, and run the same three-line explanatory syllogism under each: the Why of
+hypothesis and the How of induction, identical in structure, different only in
+which premise is being recovered. Sliders on the barrel — [proportion decayed]
+and [size of the handful] — with the sample drawn and the explanation written
+out from it in Peirce's words.
+
+Then the test the rule actually imposes: a switch that makes the explanatory
+syllogism a *bad* statistical deduction (draw the handful off the top of the
+barrel, or predesignate nothing), and the inference above it greys out. The rule
+of section VI is one rule, and this is the place to make it operable rather than
+stated.
+
+
+## 14
+
+Text: "The statistical syllogism of Form IV. is invertible, because it proceeds
+upon the principle of an approximate equality between the ratio of P's in the
+whole class and the ratio in a well-drawn sample, and because equality is a
+convertible relation. But ordinary syllogism is based upon the property of the
+relation of containing and contained, and that is not a convertible relation."
+— through the three figures and the three modi, now set out on the page.
+
+Suggestion. Two little relation diagrams, side by side, each with a "reverse it"
+button. Equality reverses and stays true. Containment reverses and breaks —
+show the counter-case as two circles, one inside the other, and the false
+converse written under them.
+
+Then the schemes: the three figures and the three moods are on the page as
+columns, and the transformation between them is mechanical — take the
+conclusion and one premise, swap them, negate both. Make that an animation the
+reader steps through, one figure at a time, with the negated lines flipping in
+place. This is also the machinery the missing pages would have applied to
+Form IV, so the example partly stands in for what the scan lost; the editorial
+note about the gap sits right below it and can say so.
+
+
+============================================================================
+SECTION VII — DRAWING AT RANDOM
+============================================================================
+
+## 15
+
+Text: "Suppose that, instead of using such a precept of selection that any one M
+would in the long run be chosen as often as any other, we used a precept which
+would give a preference to a certain half of the M's, so that they would be
+drawn twice as often as the rest... we could deduce by arithmetic the further
+conclusion that, counting the M's for one each, the proportion of P's among them
+must (ρ being over 2/3) lie between 3/4 ρ + 1/4 and 3/4 ρ − 1/2."
+
+Suggestion. A population split into a preferred half and the rest, with a slider
+for [how much oftener] the preferred half gets drawn — Peirce's case is twice,
+but the general knob is more instructive. Sample from it, get ρ, and show two
+readings side by side: the weighted conclusion (which is exactly right), and the
+unweighted one, which is now the interval 3/4 ρ + 1/4 to 3/4 ρ − 1/2 painted on
+the ratio bar from example 2.
+
+Then run ρ up towards 1 and down towards 0 and watch that interval close, which
+is his consoling remark: "when ρ approximates towards 1 or 0, the effect of the
+imperfect sampling will be but slight." The bad sampling does not destroy the
+inference, it blunts it, and the reader can see how much.
+
+
+## 16
+
+Text: "Nor must we lose sight of the constant tendency of the inductive process
+to correct itself. This is of its essence. This is the marvel of it... a
+different selection, made by a different method, will be likely to vary from the
+normal in a different way, and if the ratios derived from such different
+selections are nearly equal, they may be presumed to be near the truth." — and
+the warning after footnote 6, that "the magnitude of its probable error will
+depend very much more on the worst than on the best inductions used."
+
+Suggestion. Three or four sampling precepts running down the page, each biased
+in its own direction, each producing its own inferred interval. The reader adds
+instances and watches all of the intervals move; where they overlap, a combined
+reading. Then a control that makes one precept much worse than the others, and
+the combined reading degrades with it — not to the average of the four, but
+towards the worst. Two claims, one picture, and the second is the one that gets
+forgotten.
+
+
+## 17
+
+Text: "Within the period of time M, a certain event P occurs; S is a period of
+time taken at random from M, and more than half as long: Hence, probably the
+event P will occur within the time S." — and its inversion, and "This is a sort
+of logic which is often applied by physicists in what is called extrapolation of
+an empirical law."
+
+Suggestion. A timeline for M with the event P somewhere on it, and a window S
+the reader drags and stretches. Above half the length of M, the window catches P
+more often than not — run it a thousand times and show the hit rate against the
+window length, with the half-length mark on the axis. Then the inversion: the
+window is the history available, P did not happen in it, conclude it does not
+happen in M.
+
+Worth ending on his own verdict rather than on the success rate: "as compared
+with a typical induction, it is obviously an excessively weak kind of
+inference." Show the hit rate at just over half and let it be unimpressive.
+
+
+## 18
+
+Text: "Conceive a cardboard disk revolving in its own plane about its centre,
+and pretty accurately balanced, so that when put into rotation it shall be about
+as likely to come to rest in any one position as in any other; and let a fixed
+pointer indicate a position on the disk: the number of points on the
+circumference is infinite, and on rotating the disk repeatedly the pointer
+enables us to make a selection from this infinite number."
+
+Suggestion. Spin the disk. Each stop drops a mark on the circumference and adds
+a value to a list, and the list never repeats. Then the second half of the
+passage, which is the surprising one: a finite urn sampled with replacement is
+the same thing — what is really being sampled is "not the finite collection of
+things, but the unlimited number of possible drawings." Put the urn beside the
+disk and run both; two counters, both unbounded.
+
+Small and cheap, and it sets up the footnote-8 identity in 19.
+
+
+## 19
+
+Text: "But in what is known as 'reasoning from analogy,' the class sampled is
+small, and no instance is taken twice. For example: we know that of the major
+planets the Earth, Mars, Jupiter, and Saturn revolve on their axes, and we
+conclude that the remaining four, Mercury, Venus, Uranus, and Neptune, probably
+do the like." — through the three-premise scheme, the paired syllogisms, and
+footnote 8.
+
+Suggestion. Eight planets, four observed. The three premises set out live: the
+sample of objects, the sample of characters, the conclusion. Then split the
+argument into the hypothesis and the induction that compose it — the page
+already prints them side by side — and light each half as the reader hovers it,
+with the deduction falling out below.
+
+Footnote 8 is the interesting claim and it can be checked on screen: drawing
+without replacement from a small class gives the same chances as drawing from an
+infinite class that the small class was itself drawn from. Two urns, the two
+expressions, and a run counter that converges to the same number. That is the
+justification for treating four planets as a sample of anything at all, and it
+is currently buried in a footnote.
+
+
+============================================================================
+SECTION VIII — PREDESIGNATION
+============================================================================
+
+## 20
+
+Text: "Take any human being, at random,—say Queen Elizabeth. Now a little more
+than half of all the human beings who have ever existed have been males; but it
+does not follow that it is a little more likely than not that Queen Elizabeth
+was a male, since we know she was a woman."
+
+Suggestion. Short and sharp. Draw a person at random from a population bar that
+is a little over half male; the inference reads "probably male". Then a button:
+"look at who you drew." The precept has changed because the case presented to
+the mind has changed, and the inference is not available. Same shape as the
+face-up card in example 3, deliberately — this is Peirce making the same point
+about knowledge in the second premise, and the rhyme is worth the reuse.
+
+
+## 21
+
+Text: "I take from a biographical dictionary the first five names of poets, with
+their ages at death... These five ages have the following characters in
+common:— 1. The difference of the two digits composing the number, divided by
+three, leaves a remainder of one..." — and "Yet there is not the smallest reason
+to believe that the next poet's age would possess these characters."
+
+Suggestion. The best joke in the paper and it should be playable. A button that
+draws [five] ages at random, and a machine that then hunts for characters they
+all share — digit arithmetic, prime factors, residues mod 3, the same family of
+tricks Peirce used — and prints the two or three it finds. Draw again: new ages,
+new characters, always some. A counter for how many draws in a row the machine
+has succeeded (it will not fail).
+
+Then the other half, which is what makes it an argument and not a trick:
+predesignate. The reader picks a character *first*, from the same list, and then
+draws. Now the success rate is what it should be. Two counters side by side,
+running, is the whole doctrine of predesignation.
+
+His demonstration that this must always be possible — a curve can be drawn
+through any given series of points while missing any other given series — could
+be a small second panel: points on a plane, a curve through the chosen ones,
+avoiding the rest, redrawn as the reader adds points.
+
+
+## 22
+
+Text: Playfair on the specific gravities of the allotropic forms of carbon,
+through "It thus appears that there is no more frequent agreement with
+Playfair's proposed law than what is due to chance."
+
+Suggestion. The tables are already on the page; make them the example. Stage
+one: Playfair's own progression — carbon, then silicon (needing a modified
+formula), then boron (needing another), then phosphorus, sulphur, selenium,
+tellurium, bromine, iodine. Each element arrives as a row with a tick or a
+cross, and a running count of predesignate cases: 8, of which 4 agree.
+
+Stage two is Peirce's test and it is a beautiful piece of statistics for 1883:
+pair each element's specific gravity with the atomic weight of a *different*
+element, and count the agreements again. The page prints his pairing; let the
+reader shuffle the pairing themselves and watch the hit rate stay where it was.
+A histogram of hit rates over many random re-pairings, with Playfair's own
+result marked on it, is a permutation test in everything but name, and the mark
+sits right in the middle of the distribution.
+
+Flag in a note that this is what the modern reader would call a permutation
+test — but plainly, one sentence, no fanfare.
+
+
+## 23
+
+Text: "Suppose that, before sampling a class of objects, we have predesignated
+not a single character but n characters, for which we propose to examine the
+samples. This is equivalent to making n different inductions from the same
+instances. The probable error in this case is that error whose probability for a
+simple induction is only (1/2)^n, and the theory of probabilities shows that it
+increases but slowly with n; in fact, for n = 1000 it is only about five times
+as great as for n = 1..."
+
+Suggestion. A slider for [n], the number of characters predesignated, and two
+readouts: the probable error, and the number of instances needed to buy it back.
+The shape of the curve is the message — it climbs steeply for the first few and
+then almost flattens, so 25× the instances covers n = 1000 and 100× covers ten
+billion. Mark on the same axis the sizes Peirce says actually occur: "of
+characters at all striking, or of objects at all familiar, the number will
+seldom reach 1,000."
+
+The conclusion the reader should reach by dragging, before reading it: failing
+to predesignate is a real fault, and a surprisingly cheap one when the instances
+are many. And it is the same slider that explains why "a hypothesis ought to be
+simple" — simple here meaning familiar, which is to say drawn from a small n.
+
+
+============================================================================
+SECTION IX — ANTECEDENT KNOWLEDGE
+============================================================================
+
+## 24
+
+Text: "There are thus four different kinds of uniformity and non-uniformity which
+may influence our ampliative inferences:— 1. The members of a class may present
+a greater or less general resemblance as regards a certain line of characters..."
+— with the gold, the three-toed genus, the colour that varies in almost every
+genus, and the Icelanders.
+
+Suggestion. Four knobs, one per kind, over the same population-and-sample
+picture used in 7, so the reader can feel each one separately widen or narrow
+the conclusion drawn from a fixed sample. Peirce's own instances as presets:
+gold's chemical character (kind 1, very high — two or three specimens settle
+it), three toes on each foot in a genus (kind 2, generic character), colour in a
+genus (kind 2, very low), the Icelanders (kind 1 again, but for ideas), the
+purple of cassius (kind 4, a characteristic test), the man who carries every
+opinion to its logical end (kind 4).
+
+The end state to reach: turn a knob far enough and the inference stops being
+ampliative at all — "the inference is mere deduction, that is, the application of
+a general rule already established." The example should be able to go all the
+way there and say so.
+
+
+============================================================================
+SECTION X — AGAINST INVERSE PROBABILITY
+============================================================================
+
+## 25
+
+Text: "Suppose an ancient denizen of the Mediterranean coast, who had never
+heard of the tides, had wandered to the shore of the Atlantic Ocean, and there,
+on a certain number m of successive days had witnessed the rise of the sea.
+Then, says Quetelet, he would have been entitled to conclude that there was a
+probability equal to (m+1)/(m+2)..." — and "Putting m = 0, it is seen that this
+view assumes that the probability of a totally unknown event is 1/2."
+
+Suggestion. This is the Probability of Induction's example 29 almost word for
+word, and it should be visibly the same example: same shore, same slider for
+[m], same (m+1)/(m+2) reading out in the sentence. Reuse it wholesale, with the
+m = 0 stop marked, since the whole force here is what happens at zero.
+
+What this paper adds, and the earlier one does not have: "In point of fact, we
+know that although theories are not proposed unless they present some decided
+plausibility, nothing like one half turn out to be true." Worth a second panel —
+a rate the reader can set for how often proposed theories are true, and the
+rule of succession's assumed one-half sitting there, wrong, next to it.
+
+
+## 26
+
+Text: "Suppose, for instance, there were four possible occasions upon which an
+event might occur. Then there would be 16 'constitutions of the universe,' or
+possible distributions of occurrences and non-occurrences." — both tables, and
+"assuming the different frequencies of the first event to be equally probable,
+those of this new event are not so."
+
+Suggestion. Both tables are on the page. Make the sixteen strings the object:
+a switch between EQUAL FREQUENCIES and EQUAL CONSTITUTIONS, which reweights the
+sixteen cells visibly — under the first, the five columns get equal weight and
+the six-member column's cells are each worth a sixth of it; under the second,
+every cell is worth the same.
+
+Then Peirce's actual argument, which is the derived event: define the new event
+as "a Y following a Y or an N following an N", let the reader watch each of the
+sixteen strings sort itself into the second table, and read off the induced
+weights. Under equal constitutions they stay equal; under equal frequencies they
+do not — three occurrences comes out half as large again as two, exactly as he
+says. The inconsistency is a consequence the reader derives by flipping one
+switch, which is much better than being told it.
+
+Then the sting, and it wants stating in the example: adopt equal constitutions
+and "the occurrences or non-occurrences of an event in the past in no way affect
+the probability of its occurrence in the future." Let the reader run draws under
+that assumption and see the past teach them nothing.
+
+
+## 27
+
+Text: "Suppose, for example, that I were to enter a great hall where people were
+playing rouge et noir at many tables; and suppose that I knew that the red and
+black were turned up with equal frequency... But could some devil look at each
+card before it was turned, and then influence me mentally to bet upon it or to
+refrain therefrom, the observed ratio in the cases upon which I had bet might be
+quite different from the observed ratio in those cases upon which I had not
+bet."
+
+Suggestion. A hall of tables, red and black turning up evenly. The reader bets
+at will and the two ratios — bet-on and not-bet-on — are tracked side by side.
+They agree. Then hand the devil a switch: he sees each card and nudges the
+choice. The two ratios come apart, and both the deduction and the induction
+built on them break at the same moment.
+
+That simultaneity is the point of the passage, and it is why the example is
+worth building rather than summarising: Peirce is conceding that his theory
+needs a fact supposed too, and then showing that the fact it needs is only the
+absence of a devil — the same thing deduction needs. Two panels, one devil, both
+break together.
+
+
+============================================================================
+SECTION XI — THE LOGIC OF SCIENTIFIC INVESTIGATION
+============================================================================
+
+## 28
+
+Text: "Suppose a being from some remote part of the universe... to be presented
+with a United States Census Report... He begins, perhaps, by comparing the ratio
+of indebtedness to deaths by consumption in counties whose names begin with the
+different letters of the alphabet." — through the January rain-fall and
+illiteracy table and the two plates.
+
+Suggestion. The last example, and it should be the reader taking the stranger's
+seat. A census-like table of columns, and a pair of dropdowns: compare any
+column against any other. Most pairs give a flat line and the readout says, in
+Peirce's terms, that the proportions among the M's and the non-M's do not
+differ — the induction is unimportant. Let the reader grind through several of
+those, including his own joke pairing by initial letter, before finding
+anything.
+
+Then the pairing he does find: the seven regions plotted, January rain-fall
+against illiteracy, with the two maps already on the page beside it. It is a
+real but unsatisfactory correlation and he says so — "it provokes further
+inquiry; we desire to replace the M by some different class, so that the two
+proportions may be more widely separated." Give the reader a way to split the
+regions further and watch the separation improve or not.
+
+The moral is the one the page ends on, and the example should hand off to it
+rather than restate it: the stranger cannot guess which pairs to try, and we
+can. Guessing right is the faculty, not the arithmetic.
+
+
+============================================================================
+NOT WORTH AN EXAMPLE, AND WHY
+============================================================================
+
+- The whole of the discussion of the copula of inclusion (section V, "This
+  classification of probable inference is connected with a preference for the
+  copula of inclusion over those used by Miss Ladd and by Mr. Mitchell"). It is
+  a remark to his co-authors in Studies in Logic. Nothing moves.
+
+- The decapitated frog. It is an analogy, not a mechanism, and a picture of it
+  would be either grisly or coy.
+
+- Section X's closing pages on Gratry and the miraculous intervention, and on
+  whether the mind is adapted to the universe. Argument, not quantity.
+
+- The gap at pp. 150–151. Tempting to reconstruct Form VI in a "coming soon"
+  block, since example 14 gets close to it, but reconstructing missing Peirce
+  and presenting it interactively is a different kind of act from illustrating
+  him. Left alone unless you want it.
+
+
+============================================================================
+PROGRESS LOG
+============================================================================
+
+(One block per example as it is built, appended here, per the convention in the
+Errors of Observation notes. Nothing built yet.)

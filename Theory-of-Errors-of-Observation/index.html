@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Peirce — On the Theory of Errors of Observations (plain text)</title>
+<title>Peirce — On the Theory of Errors of Observations (interactive)</title>
 <style>
   :root {
     --page:      #f4f1ea;
@@ -14,6 +14,14 @@
     --rule:      #dbd6cb;
     --rule-soft: #ece8df;
     --wash:      #faf8f3;
+    --accent:    #2f6f9f;   /* the quantity observed */
+    --accent-2:  #b0563f;   /* the error */
+    --accent-3:  #4a7c59;   /* the unknown quantity: truth, or what is approached */
+    --accent-4:  #9a7b3f;   /* remarks and asides */
+    --tint:      rgba(47, 111, 159, .10);
+    --tint-2:    rgba(176, 86, 63, .10);
+    --tint-3:    rgba(74, 124, 89, .12);
+    --tint-4:    rgba(154, 123, 63, .12);
   }
 
   body {
@@ -37,7 +45,7 @@
   h3 { text-align: center; font-variant: small-caps; margin-top: 40px; margin-bottom: 6px; letter-spacing: 1px; font-size: 1.6em; }
   h4 { text-align: center; font-weight: normal; margin-bottom: 10px; color: var(--ink-soft); }
 
-  p { text-align: justify; margin-bottom: 15px; }
+  p { text-align: justify; margin-bottom: 15px; position: relative; }  /* positioning context for .ex-num */
 
   .formula { text-align: center; margin: 24px 0; font-family: 'Times New Roman', Georgia, serif; font-style: italic; }
   .frac { display: inline-flex; flex-direction: column; vertical-align: middle; text-align: center; margin: 0 2px; }
@@ -49,6 +57,736 @@
 
   sup, sub { font-size: .75em; }
 
+  /* ======================================================================
+     Below here is the example apparatus, carried over from the Probability
+     of Induction page so that the two read as one series.
+     ==================================================================== */
+h5 {
+    font-size: .82em;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .09em;
+    color: var(--ink-faint);
+    margin: 22px 0 8px 0;
+  }
+.section-number {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 40px 0 20px 0;
+    font-weight: bold;
+  }
+/* ------------------------------------------------------------------------
+     Example numbers in the gutter, for referring to them elsewhere. The marker
+     is inserted at the head of its trigger and positioned with `left` only, so
+     its vertical place is the static one — the trigger's own first line, which
+     is what makes two examples in one paragraph land separately.
+     ----------------------------------------------------------------------*/
+.ex-num {
+    position: absolute;
+    left: -46px;
+    width: 34px;
+    text-align: right;
+    font-size: .78em;
+    line-height: 1.85;
+    letter-spacing: .03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+    user-select: none;
+    pointer-events: none;
+  }
+/* the gutter is the container's own 56px of padding, which narrows to 20 at
+     the same breakpoint the rest of the layout stacks — no room for it there */
+@media (max-width: 720px) { .ex-num { display: none; } }
+/* ------------------------------------------------------------------------
+     The trigger. A whole paragraph is often the anchor, so a fill would tint
+     half the page; a hairline under the run of text marks its extent without
+     competing with the prose. The fill appears only on hover, to show how far
+     the passage reaches.
+     ----------------------------------------------------------------------*/
+.example-trigger, .example-trigger-yellow {
+    cursor: pointer;
+    padding: 0;
+    border-radius: 1px;
+    background-color: transparent;
+    transition: background-color .22s ease, border-color .22s ease;
+  }
+/* Solid and very pale: a whole paragraph of dotted rule reads as texture,
+     a whole paragraph of this reads as a margin note. */
+.example-trigger        { border-bottom: 1px solid rgba(47, 111, 159, .28); }
+.example-trigger-yellow { border-bottom: 1px solid rgba(154, 123, 63, .32); }
+.example-trigger:hover        { background-color: var(--tint);   border-bottom-color: var(--accent); }
+.example-trigger-yellow:hover { background-color: var(--tint-4); border-bottom-color: var(--accent-4); }
+.example-trigger.is-open, .example-trigger-yellow.is-open {
+    border-bottom-style: solid;
+    border-bottom-color: var(--rule);
+    background-color: transparent;
+  }
+/* ------------------------------------------------------------------------
+     The example itself. grid-template-rows 0fr -> 1fr animates to the content's
+     own height with nothing measured in script; the inner div does the
+     clipping. Margin travels with it so the space closes up too.
+     ----------------------------------------------------------------------*/
+.example-container {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    margin: 0;
+    transition: grid-template-rows .55s cubic-bezier(.22, .61, .36, 1),
+                margin .55s cubic-bezier(.22, .61, .36, 1),
+                opacity .3s ease;
+  }
+.example-container.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin: 34px 0 38px 0;
+  }
+.example-container > .ex-inner { overflow: hidden; min-height: 0; }
+.example-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: .8em;
+    font-variant: small-caps;
+    letter-spacing: .1em;
+    font-weight: 400;
+    color: var(--ink-faint);
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 22px;
+  }
+.example-header:before {
+    content: '\25BE';
+    font-size: .9em;
+    line-height: 1;
+    transition: transform .25s ease;
+  }
+.example-header.collapsed:before { transform: rotate(-90deg); }
+.example-header:after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--rule-soft);
+  }
+.example-header:hover { color: var(--ink-soft); }
+.example-content { margin-top: 0; }
+/* ------------------------------------------------------------------------
+     Numbers in Peirce's own text, driven by the sliders below them. Dormant
+     they are indistinguishable from the prose; live they take the colour of
+     the control moving them.
+     ----------------------------------------------------------------------*/
+.live { transition: color .25s ease, background-color .4s ease; }
+.live.is-live {
+    font-variant-numeric: tabular-nums;
+    background-color: var(--tint);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+/* The tint suits a numeral. It does not suit a clause, where it becomes a
+     block of colour across three lines, nor a fraction, where it sits under
+     the rule and shifts it. In both, the colour alone does the tying. */
+.frac .live.is-live, .peirce-table .live.is-live, .live.is-live.phrase {
+    background-color: transparent;
+    padding: 0;
+  }
+.live.is-live.k1 { color: var(--accent);   background-color: var(--tint); }
+.live.is-live.k2 { color: var(--accent-2); background-color: var(--tint-2); }
+.live.is-live.k3 { color: var(--accent-3); background-color: var(--tint-3); }
+.live.is-live.k4 { color: var(--accent-4); background-color: var(--tint-4); }
+.ctl.k1 input[type=range] { accent-color: var(--accent); }
+.ctl.k2 input[type=range] { accent-color: var(--accent-2); }
+.ctl.k3 input[type=range] { accent-color: var(--accent-3); }
+.ctl.k4 input[type=range] { accent-color: var(--accent-4); }
+.ctl.k1 .slider-val { color: var(--accent); }
+.ctl.k2 .slider-val { color: var(--accent-2); }
+.ctl.k3 .slider-val { color: var(--accent-3); }
+.ctl.k4 .slider-val { color: var(--accent-4); }
+.restore-peirce {
+    font-size: .8em;
+    font-variant: small-caps;
+    letter-spacing: .07em;
+    color: var(--ink-faint);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+    padding: 0;
+    margin: 2px 0 10px 0;
+    border-bottom: 1px dotted var(--rule);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+  }
+.restore-peirce.on { opacity: 1; pointer-events: auto; }
+.mode-tabs .restore-peirce { margin: 0 0 8px 22px; align-self: center; }
+.restore-peirce:hover { color: var(--ink-soft); }
+/* ------------------------------------------------------------------------
+     Peirce's three terms, coloured in his own sentence rather than only in the
+     legend below it. Dormant they are ordinary text; the colour arrives with
+     the example, on the same rule as the live numbers.
+     ----------------------------------------------------------------------*/
+.hl-text {
+    border-radius: 2px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+    background-color: transparent;
+    transition: background-color .35s ease;
+  }
+.hl-text.hl-on.a { background-color: rgba(154, 123, 63, .16); }
+.hl-text.hl-on.c { background-color: rgba(47, 111, 159, .14); }
+.hl-text.hl-on.q { background-color: rgba(74, 124, 89, .16); }
+/* A clause that owns a stretch of a slider's travel: it lights as the slider
+     enters its range and fades as it leaves, so the paragraph reads as a
+     running commentary on where the control is. Slow enough to be a fade and
+     not a flicker while dragging. */
+.hl-band {
+    border-radius: 2px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+    background-color: transparent;
+    transition: background-color .45s ease;
+  }
+.hl-band.band-on { background-color: rgba(47, 111, 159, .26); }
+@media (prefers-reduced-motion: reduce) { .hl-band { transition: none; } }
+.calc-output {
+    background: none;
+    border: none;
+    border-left: 2px solid var(--rule);
+    border-radius: 0;
+    padding: 2px 0 2px 18px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    margin-top: 16px;
+    white-space: pre-wrap;
+    font-size: .78em;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    overflow-x: auto;
+  }
+.key-insight {
+    background: none;
+    border: none;
+    border-left: 2px solid var(--accent-4);
+    border-radius: 0;
+    padding: 1px 0 1px 18px;
+    margin: 20px 0;
+    font-style: italic;
+  }
+.key-insight strong { font-style: normal; }
+.note-block {
+    font-size: .9em;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    border-left: 2px solid var(--rule);
+    padding: 1px 0 1px 18px;
+    margin: 16px 0;
+    font-family: inherit;
+  }
+.click-info {
+    padding: 1px 0 1px 18px;
+    background: none;
+    border: none;
+    border-left: 2px solid var(--accent-4);
+    border-radius: 0;
+    margin-top: 16px;
+    font-size: .95em;
+  }
+.help-text { color: var(--ink-faint); font-style: italic; text-align: left; }
+.control-panel, .plot-container, .group-box {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0 0 18px 0;
+  }
+.plot-container { margin: 18px 0; }
+.result-box {
+    padding: 16px 0 0 0;
+    margin-top: 22px;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--rule-soft);
+    border-radius: 0;
+  }
+.mode-tabs {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+.mode-tab {
+    padding: 3px 0 8px 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: .95em;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    color: var(--ink-faint);
+    transition: color .2s, border-color .2s;
+  }
+.mode-tab:hover { color: var(--ink-soft); }
+.mode-tab.active {
+    background: none;
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+.ctl { margin-bottom: 16px; }
+.ctl > label {
+    display: block;
+    font-family: inherit;
+    font-size: .92em;
+    font-weight: 400;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+    line-height: 1.5;
+  }
+.ctl select, .ctl input[type=number] {
+    width: 100%;
+    padding: 4px 2px;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 1em;
+    color: var(--ink);
+    background: transparent;
+  }
+.ctl select:focus, .ctl input[type=number]:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+.ctl input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    margin: 2px 0;
+  }
+.ctl .slider-val {
+    font-family: inherit;
+    font-size: .95em;
+    color: var(--accent);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+.ctl.checkbox label {
+    display: flex; align-items: center; gap: 8px; font-weight: 400;
+  }
+.ctl.checkbox input { width: auto; accent-color: var(--accent); }
+.ctl .radio-row { display: flex; gap: 18px; flex-wrap: wrap; }
+.ctl .radio-row.stacked { flex-direction: column; gap: 4px; }
+.ctl .radio-row label {
+    display: flex; align-items: center; gap: 6px;
+    font-family: inherit;
+    font-size: .95em; font-weight: 400; cursor: pointer;
+    color: var(--ink-soft);
+  }
+.ctl .radio-row input { accent-color: var(--accent); }
+/* Buttons set as small caps in the text face, outlined rather than filled —
+     they sit in the column beside the prose and should not shout across it. */
+button.btn {
+    font-family: inherit;
+    font-size: .88em;
+    font-variant: small-caps;
+    letter-spacing: .05em;
+    padding: 5px 13px;
+    margin: 3px 4px 3px 0;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    cursor: pointer;
+    background: none;
+    color: var(--ink-soft);
+    transition: color .18s, border-color .18s, background-color .18s;
+  }
+button.btn:hover { background-color: var(--wash); color: var(--ink); border-color: var(--ink-faint); }
+button.btn.is-active {
+    background-color: var(--tint-4);
+    border-color: var(--accent-4);
+    color: var(--accent-4);
+  }
+button.btn-primary   { color: var(--accent);   border-color: rgba(47, 111, 159, .45); }
+button.btn-success   { color: var(--accent-3); border-color: rgba(74, 124, 89, .45); }
+button.btn-warning   { color: var(--accent-4); border-color: rgba(154, 123, 63, .50); }
+button.btn-danger    { color: var(--accent-2); border-color: rgba(176, 86, 63, .45); }
+button.btn-info      { color: var(--accent);   border-color: rgba(47, 111, 159, .45); }
+button.btn-secondary { color: var(--ink-soft); border-color: var(--rule); }
+button.btn-primary:hover   { background-color: var(--tint);   color: var(--accent); }
+button.btn-success:hover   { background-color: var(--tint-3); color: var(--accent-3); }
+button.btn-warning:hover   { background-color: var(--tint-4); color: var(--accent-4); }
+button.btn-danger:hover    { background-color: var(--tint-2); color: var(--accent-2); }
+button.btn-info:hover      { background-color: var(--tint);   color: var(--accent); }
+button.btn-block     { display: block; width: 100%; margin: 4px 0; }
+/* A row of actions laid out across the column rather than stacked down the
+     side of it, so the graphic they drive stays in view with the prose. */
+.ex-buttonbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+    margin-bottom: 16px;
+  }
+.ex-buttonbar .btn { margin: 0; }
+button.btn-lg        { font-size: 1em; padding: 8px 18px; }
+button.btn-sm        { font-size: .8em; padding: 3px 9px; }
+/* ex8 stacks two grids — the arguments, then the reading. Giving both the
+     same column template and gutter puts every track on one axis, so the
+     sliders and the number lines share a left edge, a right edge and therefore
+     a midpoint, and the values line up under each other. */
+#ex8-content .conv-grid,
+  #ex8-content .nl-grid {
+    grid-template-columns: 11em minmax(0, 1fr) 12em;
+    column-gap: 20px;
+  }
+@media (max-width: 720px) {
+    .conv-grid { grid-template-columns: 1fr; gap: 4px 0; }
+    .conv-lbl { text-align: left; margin-top: 12px; }
+    .conv-head { display: none; }
+  }
+.ex7-work-line {
+    text-align: center;
+    font-size: 1.05em;
+    margin: 0 0 4px 0;
+  }
+#ex7-plot { margin: 12px 0 0 0; }
+/* ------------------------------------------------------------------------
+     The row of urns (ex28). One urn per proportion, balls stacked inside it,
+     drawn in the text rather than in a canvas so that they scale with the page.
+     ----------------------------------------------------------------------*/
+.urn-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    gap: 14px 12px;
+    margin: 20px 0 12px 0;
+  }
+.urn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+  }
+.urn-balls {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    gap: 2px;
+    padding: 5px 5px 6px 5px;
+    border: 1px solid var(--rule);
+    border-top: none;
+    border-radius: 0 0 9px 9px;
+    background-color: var(--wash);
+  }
+.urn-ball {
+    display: inline-block;          /* so it also works outside the urn stack */
+    width: 13px; height: 13px; border-radius: 50%;
+    border: 1px solid var(--ink-faint);
+  }
+.urn-ball.w { background-color: var(--paper); }
+.urn-ball.b { background-color: #4f555c; border-color: #4f555c; }
+.urn-lab {
+    font-size: .78em;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+.urn-ball.empty { background-color: transparent; border-style: dotted; }
+.urn-row-tight { gap: 8px 5px; }
+.urn-row-tight .urn-ball { width: 8px; height: 8px; }
+.urn-row-tight .urn-balls { padding: 3px 3px 4px 3px; gap: 1px; border-radius: 0 0 6px 6px; }
+.urn-row-tight .urn-lab { display: none; }
+.urn.dim { opacity: .22; }
+.urn { transition: opacity .25s ease; }
+.urn-ball.ringed { box-shadow: 0 0 0 2px var(--accent-3); }
+.draw-row {
+    display: flex; justify-content: center; align-items: flex-start;
+    gap: 30px; margin: 18px 0 20px 0;
+  }
+.draw-slot { text-align: center; }
+.draw-ball {
+    width: 52px; height: 52px; border-radius: 50%;
+    border: 1px solid var(--ink-faint); margin: 0 auto 6px auto;
+  }
+.draw-ball.w { background-color: var(--paper); }
+.draw-ball.b { background-color: #4f555c; border-color: #4f555c; }
+.draw-ball.q {
+    background-color: var(--wash); border-style: dashed; border-color: var(--accent-3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5em; color: var(--accent-3);
+  }
+.draw-ball.q:after { content: "?"; }
+.draw-lab {
+    font-size: .76em; font-variant: small-caps; letter-spacing: .07em;
+    color: var(--ink-faint);
+  }
+.thirds-row {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 5px; margin-bottom: 4px;
+  }
+/* ------------------------------------------------------------------------
+     The argument set as a sentence, with its choices as words in it (ex1).
+     ----------------------------------------------------------------------*/
+.arg-line {
+    position: relative;          /* the little menus hang off this */
+    text-align: left;
+    font-size: 1.12em;
+    line-height: 2.2;
+    margin: 6px 0 18px 0;
+  }
+.arg-pick {
+    font-family: inherit;
+    font-size: 1em;
+    font-weight: 700;
+    color: inherit;
+    background: none;
+    border: none;
+    border-bottom: 1px dotted currentColor;
+    padding: 0 1px;
+    cursor: pointer;
+  }
+.arg-pick:hover { background-color: rgba(0, 0, 0, .06); }
+.arg-menu {
+    position: absolute;
+    z-index: 5;
+    display: flex;
+    flex-direction: column;
+    min-width: 9em;
+    padding: 3px;
+    background-color: var(--paper);
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    box-shadow: 0 3px 10px rgba(60, 50, 30, .14);
+  }
+.arg-opt {
+    font-family: inherit;
+    font-size: .82em;
+    line-height: 1.5;
+    text-align: left;
+    background: none;
+    border: none;
+    border-radius: 2px;
+    padding: 3px 7px;
+    color: var(--ink-soft);
+    cursor: pointer;
+  }
+.arg-opt:hover { background-color: var(--wash); color: var(--ink); }
+.arg-opt.on { color: var(--ink); font-weight: 700; }
+/* the arrow of the consequence, and the "then" that is the same thing in
+     words — a stronger green than the washes either side of it, since it is
+     the part that carries the probability */
+.arg-rule {
+    text-align: center;
+    font-size: 1.1em;
+    line-height: 2.2;
+    margin: 4px 0 16px 0;
+  }
+.hl-then {
+    color: #2f6b45;
+    font-weight: 700;
+    background-color: rgba(74, 124, 89, .22);
+    border-radius: 2px;
+    padding: 1px 4px;
+    margin: 0 1px;
+  }
+/* A remark of the editor's rather than a sentence of Peirce's: set in from
+     the margin behind a rule, so the page never has to be read twice to see
+     whose voice it is in. */
+.ed-note {
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+    margin-left: 2px;
+    color: var(--ink-soft);
+  }
+/* Where an example reports back inside Peirce's own paragraph, the report is
+     tinted so it cannot be mistaken for his sentence carrying on. Figures
+     inside it keep the colour of the slider that moves them. */
+.ex-reading {
+    background-color: rgba(47, 111, 159, .11);
+    color: var(--accent);
+    border-radius: 2px;
+    padding: 1px 3px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+/* ------------------------------------ the paper read as vowels and consonants
+     29 asks the rule of succession about the next letter of this article, so
+     the article itself has to show its letters. Unread ones are barely tinted;
+     the ones the reading has passed are stronger, so the head is visible as a
+     boundary running down the page. Letters are wrapped a block at a time as
+     blocks come into view — thirty thousand spans at once is not a click. */
+.vc { border-radius: 2px; }
+.vc-v { background-color: rgba(154, 123, 63, .12); }
+.vc-c { background-color: rgba(47, 111, 159, .09); }
+.vc-seen.vc-v { background-color: rgba(154, 123, 63, .42); color: #6d552b; }
+.vc-seen.vc-c { background-color: rgba(47, 111, 159, .34); color: #234f72; }
+.vc-head { outline: 2px solid var(--ink); outline-offset: 0; border-radius: 2px; }
+.vc-bar {
+    position: relative; height: 38px; margin: 4px 0 2px;
+    border: 1px solid var(--rule); border-radius: 3px;
+    background-color: rgba(154, 123, 63, .16); overflow: visible;
+  }
+.vc-bar-fill {
+    position: absolute; left: 0; top: 0; bottom: 0;
+    background-color: rgba(47, 111, 159, .26);
+    border-right: 1px solid rgba(47, 111, 159, .5);
+    transition: width .18s ease;
+  }
+.vc-mark { position: absolute; top: -6px; bottom: -6px; width: 2px; transition: left .18s ease; }
+.vc-mark-lab {
+    position: absolute; font-size: .7em; letter-spacing: .02em; white-space: nowrap;
+    transform: translateX(-50%); transition: left .18s ease;
+  }
+.vc-scale { position: relative; height: 15px; font-size: .7em; color: var(--ink-faint); }
+.vc-scale span { position: absolute; transform: translateX(-50%); }
+.vc-read {
+    font-size: .92em; line-height: 1.7; color: var(--ink-soft);
+    max-height: 96px; overflow: hidden;
+  }
+.vc-read .vc { background-color: transparent; }
+.vc-read .vc-v { color: #9a7b3f; font-weight: 700; }
+.vc-read .vc-c { color: #2f6f9f; }
+.row { display: flex; flex-wrap: wrap; margin: 0 -14px; }
+.row > .col { padding: 0 14px; box-sizing: border-box; }
+.col-3  { flex: 0 0 25%;      max-width: 25%; }
+.col-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
+.col-5  { flex: 0 0 41.6667%; max-width: 41.6667%; }
+.col-6  { flex: 0 0 50%;      max-width: 50%; }
+.col-7  { flex: 0 0 58.3333%; max-width: 58.3333%; }
+.col-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
+.col-12 { flex: 0 0 100%;     max-width: 100%; }
+@media (max-width: 720px) {
+    .row > .col { flex: 0 0 100%; max-width: 100%; }
+    .article-container { padding: 22px 20px; }
+    body { padding: 8px; }
+  }
+canvas.plot { width: 100%; display: block; }
+hr { border: none; border-top: 1px solid var(--rule-soft); margin: 20px 0; }
+table.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: inherit;
+    font-size: .92em;
+    margin-top: 16px;
+    background: none;
+  }
+table.tbl th, table.tbl td {
+    border: none;
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 5px 8px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+table.tbl th {
+    background: none;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule);
+  }
+table.tbl tbody tr:nth-child(odd) { background: none; }
+table.tbl tr.highlighted-row-90 { background-color: var(--tint) !important; font-weight: 400; color: var(--accent); }
+.table-scroll { overflow-x: auto; }
+.frac {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    text-align: center;
+    font-size: .85em;
+    line-height: 1.25;
+    margin: 0 3px;
+  }
+.frac > .num { border-bottom: 1px solid currentColor; padding: 0 4px; }
+.frac > .den { padding: 0 4px; }
+.math { font-family: 'Times New Roman', Georgia, serif; font-style: italic; }
+.math .op, .math .num-lit { font-style: normal; }
+.peirce-table {
+    margin: 22px auto;
+    border-collapse: collapse;
+    font-size: .95em;
+    max-width: 560px;
+  }
+.peirce-table td { padding: 4px 10px; vertical-align: middle; }
+.peirce-table td.lbl { text-align: right; color: var(--ink-soft); }
+.peirce-table td:last-child { text-align: left; white-space: nowrap; }
+@media (max-width: 720px) {
+    .peirce-table { font-size: .82em; }
+    .peirce-table td { padding: 4px 5px; }
+  }
+/* Peirce's probable-error table becomes selectable while ex17 is open: each
+     row picks its own confidence level. The seventh row is the reader's, so it
+     is not on the page at all until then. */
+#ex17-custom-row, #ex16-row1, #ex16-row2 { display: none; }
+.peirce-table.ex16-live #ex16-row1,
+  .peirce-table.ex16-live #ex16-row2 { display: table-row; }
+.peirce-table.ex17-live #ex17-custom-row { display: table-row; }
+.peirce-table.ex17-live tr[data-conf] { cursor: pointer; }
+.peirce-table.ex17-live tr[data-conf]:hover { background-color: var(--wash); }
+.peirce-table.ex17-live tr.conf-active { background-color: var(--tint); }
+.rad {
+    border-top: 1px solid currentColor;
+    padding: 2px 3px 0 3px;
+    display: inline-block;
+  }
+sup.fn { font-size: .7em; line-height: 0; }
+sup.fn a { text-decoration: none; color: var(--accent); }
+.footer {
+    margin-top: 44px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule-soft);
+    font-size: .9em;
+    color: var(--ink-soft);
+    font-family: inherit;
+    text-align: justify;
+  }
+@media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .example-container, .example-header:before, .live, .restore-peirce { transition: none; }
+  }
+
+  /* ------------------------------------------------------------------------
+     The colour key, used the same way throughout this paper: the quantity
+     observed, the unknown quantity it is after, and the error between them.
+     ----------------------------------------------------------------------*/
+  .k-O { color: var(--accent);   }
+  .k-T { color: var(--accent-3); }
+  .k-e { color: var(--accent-2); }
+  .hl-text.hl-on.e { background-color: rgba(176, 86, 63, .16); }
+
+  /* Peirce's expression, the modern one, and the same thing with the numbers
+     in it: three rows that must read down as well as across, so one grid holds
+     all of them and the rows are display: contents. */
+  .ex-ladder {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+    gap: 7px 14px;
+    align-items: baseline;
+    justify-items: center;
+    margin: 28px 0 22px 0;
+    text-align: center;
+  }
+  .ex-ladder .lad-row { display: contents; }
+  .ex-ladder .lad-op { color: var(--ink-faint); }
+  .lad-words > span { font-size: .88em; line-height: 1.35; color: var(--ink-soft); }
+  .lad-words > .k-O, .lad-words > .k-T, .lad-words > .k-e { color: inherit; }
+  .lad-words > .k-O { color: var(--accent); }
+  .lad-words > .k-T { color: var(--accent-3); }
+  .lad-words > .k-e { color: var(--accent-2); }
+  .lad-sym > span {
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 1.32em; font-style: italic;
+  }
+  .lad-num > span {
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 1.16em; font-variant-numeric: tabular-nums;
+  }
+  .lad-note { grid-column: 1 / -1; font-size: .85em; color: var(--ink-faint); margin-top: 6px; }
+  @media (max-width: 720px) {
+    .ex-ladder { grid-template-columns: 1fr; gap: 2px; }
+    .ex-ladder .lad-op { display: none; }
+  }
+
   .footnotes { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: .9em; color: var(--ink-soft); }
   .footnotes li { margin-bottom: 10px; }
 
@@ -56,7 +794,21 @@
   figure img { max-width: 100%; }
   figcaption { font-size: .85em; color: var(--ink-faint); margin-top: 8px; }
 
-  .peirce-pi, .peirce-e { font-style: italic; }
+  .peirce-pi { font-style: italic; }
+
+  /* Peirce's "inverted comma" (p.115): an ordinary comma, mirrored left-right,
+     sitting at normal comma height. */
+  .inv-comma { display: inline-block; transform: scaleX(-1); }
+
+  /* Peirce's glyph for e, the base of natural logarithms: a small spiral. */
+  .peirce-e { display: inline-block; width: .8em; height: .8em; vertical-align: -.06em; }
+  .peirce-e .swirl { width: 100%; height: 100%; display: block; overflow: visible; }
+
+  /* Product sign with its limits above and below, as printed. */
+  .bigprod { display: inline-flex; flex-direction: column; align-items: center;
+             vertical-align: middle; line-height: 1; margin: 0 .12em; }
+  .bigprod .lim { font-size: .6em; }
+  .bigprod .sym { font-size: 1.15em; line-height: 1; }
 
   .rad { border-top: 1px solid currentColor; padding: 2px 3px 0 3px; display: inline-block; }
   .peirce-defs { list-style: none; padding-left: 1.5em; margin-bottom: 15px; }
@@ -65,6 +817,13 @@
 </style>
 </head>
 <body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="peirce-swirl" viewBox="0 0 20 20">
+    <path d="M 13.76 3.07 L 13.48 2.91 L 13.20 2.76 L 12.91 2.62 L 12.61 2.50 L 12.31 2.39 L 12.01 2.29 L 11.70 2.21 L 11.39 2.14 L 11.08 2.08 L 10.76 2.04 L 10.45 2.01 L 10.13 2.00 L 9.81 2.00 L 9.50 2.02 L 9.18 2.05 L 8.87 2.09 L 8.55 2.15 L 8.24 2.22 L 7.94 2.31 L 7.63 2.41 L 7.34 2.52 L 7.04 2.65 L 6.75 2.78 L 6.47 2.94 L 6.19 3.10 L 5.92 3.28 L 5.66 3.47 L 5.40 3.67 L 5.16 3.88 L 4.92 4.10 L 4.69 4.33 L 4.47 4.58 L 4.26 4.83 L 4.06 5.09 L 3.87 5.36 L 3.69 5.64 L 3.53 5.93 L 3.37 6.22 L 3.23 6.52 L 3.10 6.83 L 2.98 7.14 L 2.87 7.46 L 2.77 7.78 L 2.69 8.11 L 2.62 8.44 L 2.57 8.77 L 2.53 9.11 L 2.50 9.44 L 2.48 9.78 L 2.48 10.12 L 2.49 10.45 L 2.52 10.79 L 2.55 11.12 L 2.61 11.46 L 2.67 11.79 L 2.75 12.12 L 2.84 12.44 L 2.94 12.76 L 3.06 13.07 L 3.18 13.38 L 3.32 13.68 L 3.48 13.98 L 3.64 14.27 L 3.81 14.55 L 4.00 14.82 L 4.20 15.09 L 4.40 15.34 L 4.62 15.59 L 4.85 15.83 L 5.08 16.05 L 5.33 16.27 L 5.58 16.47 L 5.84 16.66 L 6.11 16.85 L 6.38 17.01 L 6.66 17.17 L 6.95 17.31 L 7.24 17.44 L 7.54 17.56 L 7.84 17.66 L 8.15 17.75 L 8.46 17.83 L 8.77 17.89 L 9.08 17.94 L 9.40 17.97 L 9.72 17.99 L 10.03 18.00 L 10.35 17.99 L 10.67 17.97 L 10.98 17.93 L 11.30 17.88 L 11.61 17.82 L 11.91 17.74 L 12.22 17.64 L 12.52 17.54 L 12.82 17.42 L 13.11 17.28 L 13.39 17.14 L 13.67 16.98 L 13.95 16.81 L 14.21 16.63 L 14.47 16.43 L 14.72 16.22 L 14.97 16.01 L 15.20 15.78 L 15.42 15.54 L 15.64 15.29 L 15.84 15.03 L 16.04 14.77 L 16.22 14.49 L 16.39 14.21 L 16.56 13.92 L 16.71 13.62 L 16.84 13.32 L 16.97 13.01 L 17.08 12.69 L 17.18 12.37 L 17.27 12.05 L 17.34 11.72 L 17.41 11.39 L 17.45 11.06 L 17.49 10.72 L 17.51 10.38 L 17.52 10.05 L 17.52 9.71 L 17.50 9.37 L 17.47 9.04 L 17.40 8.71 L 17.26 8.39 L 17.10 8.09 L 16.93 7.80 L 16.76 7.53 L 16.57 7.26 L 16.37 7.00 L 16.17 6.76 L 15.96 6.54 L 15.74 6.32 L 15.51 6.12 L 15.28 5.93 L 15.05 5.76 L 14.81 5.59 L 14.56 5.45 L 14.31 5.32 L 14.07 5.20 L 13.81 5.09 L 13.56 5.00 L 13.31 4.92 L 13.06 4.86 L 12.81 4.81 L 12.56 4.77 L 12.31 4.75 L 12.07 4.74 L 11.83 4.74 L 11.59 4.75 L 11.35 4.77 L 11.13 4.81 L 10.90 4.86 L 10.69 4.92 L 10.47 4.98 L 10.27 5.06 L 10.07 5.15 L 9.88 5.24 L 9.70 5.35 L 9.53 5.46 L 9.36 5.58 L 9.20 5.71 L 9.05 5.84 L 8.91 5.97 L 8.78 6.12 L 8.66 6.26 L 8.55 6.41 L 8.45 6.57 L 8.36 6.72 L 8.27 6.88 L 8.20 7.04 L 8.14 7.20 L 8.08 7.36 L 8.04 7.52 L 8.00 7.68 L 7.97 7.84" fill="none" stroke="currentColor" stroke-width="1.8"
+          stroke-linecap="round" stroke-linejoin="round"/>
+  </symbol>
+</svg>
 <div class="article-container">
 
 <h3>On the Theory of Errors of Observations</h3>
@@ -77,13 +836,13 @@
 <p>The notation employed is one which has been suggested by the study of the logic of relations. Small Roman letters will denote objects partly indeterminate. Thus m may denote a man, without saying what man. Small Italics will be used for relative terms; thus <i>l</i> may denote a lover. The correlates of such relative terms will be written after them on the same line; thus <i>t</i>m or <i>l</i>m may denote a tooth of a man or a lover of a man, if m denotes man, <i>t</i> a tooth of and <i>l</i> a lover of something undetermined. Then, <i>l</i>w will denote a lover of a woman, it being indeterminate what lover and what woman. <i>tl</i>w will denote a tooth of a lover of a woman. If we wish to denote that which is a lover of all women, we must have a symbol to denote all women. As [x] is commonly used in the method of least squares to denote the sum of all the quantities x, so we may write [w] to denote all women, and then <i>l</i>[w] will denote something which is a lover of all women, or we may write the same thing thus, <i>l</i><sup>w</sup>. A relative term has a double indeterminacy, being indeterminate in reference to the relate and also in reference to the correlate. A lover may be this lover, that lover, or the other lover, and each of these may be lover of this, or that, or the other. Corresponding, therefore, to the [<i>l</i>], which denotes all lovers, we may write {<i>l</i>} to denote the lover to whomever he is a lover. Thus, {<i>l</i>}<sup>w</sup> will denote a lover of nothing but women, or we may write the same thing thus, <sup><i>l</i></sup>w. We may denote &ldquo;loved by&rdquo; by K<sup><i>l</i></sup>.</p>
 
 <!-- p.115 -->
-<p>Corresponding to any absolute term, as man, there is a relative term, &ldquo;man that is,&rdquo; as in the expression &ldquo;a man that is rich.&rdquo; I shall denote a relative of this sort by the symbol for the absolute term, with an inverted comma after it, as m<sup>,</sup>. Thus, if b denotes anything black, m<sup>,</sup> b will denote a man that is black.</p>
+<p>Corresponding to any absolute term, as man, there is a relative term, &ldquo;man that is,&rdquo; as in the expression &ldquo;a man that is rich.&rdquo; I shall denote a relative of this sort by the symbol for the absolute term, with an inverted comma after it, as m<span class="inv-comma">,</span>. Thus, if b denotes anything black, m<span class="inv-comma">,</span> b will denote a man that is black.</p>
 
-<p>Let V be the relative &ldquo;a general name which is applicable to.&rdquo; Thus, Vm will denote a general term which is applicable to some man. V<sup>m</sup> will denote a general term which is applicable to every man. V<sup>m,</sup> V<sup>w</sup> will be a general term which is applicable to every man and to every woman. K V [V<sup>m,</sup> V<sup>w</sup>] will denote that to which every general term is applicable which is applicable to every man and to every woman; in other words, this denotes either a man or a woman. I shall write this for short m &#43;<sub>,</sub> w.</p>
+<p>Let V be the relative &ldquo;a general name which is applicable to.&rdquo; Thus, Vm will denote a general term which is applicable to some man. V<sup>m</sup> will denote a general term which is applicable to every man. V<sup>m</sup><span class="inv-comma">,</span> V<sup>w</sup> will be a general term which is applicable to every man and to every woman. K V [V<sup>m</sup><span class="inv-comma">,</span> V<sup>w</sup>] will denote that to which every general term is applicable which is applicable to every man and to every woman; in other words, this denotes either a man or a woman. I shall write this for short m &#43;<span class="inv-comma">,</span> w.</p>
 
-<p>Zero is defined by the general equation x &#43;<sub>,</sub> 0 = x, whatever x may be. Then, <i>zero</i> generally denotes nothing.</p>
+<p>Zero is defined by the general equation x &#43;<span class="inv-comma">,</span> 0 = x, whatever x may be. Then, <i>zero</i> generally denotes nothing.</p>
 
-<p>Unity is defined by the general equation x<sup>,</sup> 1 = x, whatever x may be, and then 1 generally will denote anything.</p>
+<p>Unity is defined by the general equation x<span class="inv-comma">,</span> 1 = x, whatever x may be, and then 1 generally will denote anything.</p>
 
 <p>But 1 and 0 have sometimes to be interpreted as relative terms. Now, it can be proved by the principles of the logic of relatives that so considered 0<sup>x</sup> = 0, unless x = 0, when 0<sup>0</sup> = 1; and that 1x = 1, unless x = 0, when 10 = 0. It follows that 0<sup>x</sup> is such a logical function<sup><a href="#fn1" id="fnref1">1</a></sup> of x that it signifies &ldquo;the case of the non-existence of,&rdquo; while 1<i>x</i> is such a logical function of x that it signifies &ldquo;the case of the existence of.&rdquo;</p>
 
@@ -92,7 +851,7 @@
 <!-- p.116 -->
 <p>shades of color, days or seconds of time.</p>
 
-<p>Anything which belongs to the limited universe under consideration is called, in the theory of probabilities, an <i>event</i>. An expression like [<i>t</i>], where <i>t</i> is a relative term, is termed a relative number, average number, or probable number. If the relative term to which the average number refers is one of those relatives which are formed by adding a comma to the symbol for an absolute term, as m, then the relative number is called a <i>probability</i>. For example, [m<sup>,</sup>] is the average number of men that anything is, but it is usually called the probability that anything is a man.</p>
+<p>Anything which belongs to the limited universe under consideration is called, in the theory of probabilities, an <i>event</i>. An expression like [<i>t</i>], where <i>t</i> is a relative term, is termed a relative number, average number, or probable number. If the relative term to which the average number refers is one of those relatives which are formed by adding a comma to the symbol for an absolute term, as m, then the relative number is called a <i>probability</i>. For example, [m<span class="inv-comma">,</span>] is the average number of men that anything is, but it is usually called the probability that anything is a man.</p>
 
 <p>The importance of average numbers arises from the fact that all our knowledge really consists of nothing but average numbers; for all our knowledge is derived from induction, and its analogue, hypothesis. Now, the scientific conduct of this kind of reasoning is highly complex, because all sorts of precautions have to be attended to, and it has to be accompanied by a great deal of deduction. But the general nature of induction is everywhere the same, and is completely typified in the following example.</p>
 
@@ -111,50 +870,54 @@
 
 <p>The fundamental arithmetical formul&aelig; relating to relative numbers are as follows:</p>
 
-<p>We have seen that the relative number of things that are men, or the probability that a thing is a man, is equal to <span class="frac"><span class="num">[m<sup>,</sup>1]</span><span class="den">[1]</span></span>. By &ldquo;thing&rdquo; here is meant any object of our limited universe, as, for example, an animal. But we may wish to consider the relative number of animals that are men when our limited universe is a wider class than animal. In this case, <i>a</i> denoting an animal, we write this probability <span class="frac"><span class="num">[m<sup>,</sup>a]</span><span class="den">[a]</span></span>. Let us suppose that, our universe being &ldquo;day,&rdquo; we wish to know the</p>
+<p>We have seen that the relative number of things that are men, or the probability that a thing is a man, is equal to <span class="frac"><span class="num">[m<span class="inv-comma">,</span>1]</span><span class="den">[1]</span></span>. By &ldquo;thing&rdquo; here is meant any object of our limited universe, as, for example, an animal. But we may wish to consider the relative number of animals that are men when our limited universe is a wider class than animal. In this case, <i>a</i> denoting an animal, we write this probability <span class="frac"><span class="num">[m<span class="inv-comma">,</span>a]</span><span class="den">[a]</span></span>. Let us suppose that, our universe being &ldquo;day,&rdquo; we wish to know the</p>
 
 <!-- p.118 -->
-<p>probability that if it thunders on any day it will rain on that day. To say that if it thunders it will rain on the same day is the same as to say that every day on which it thunders is a day on which it rains. Then let t be a day on which it thunders and r a day on which it rains, and the probability in question is <span class="frac"><span class="num">[t<sup>,</sup>r]</span><span class="den">[t]</span></span>. In general, the probability that if one event happens another will happen is equal to the probability that both will happen, divided by the probability that the first will happen.</p>
+<p>probability that if it thunders on any day it will rain on that day. To say that if it thunders it will rain on the same day is the same as to say that every day on which it thunders is a day on which it rains. Then let t be a day on which it thunders and r a day on which it rains, and the probability in question is <span class="frac"><span class="num">[t<span class="inv-comma">,</span>r]</span><span class="den">[t]</span></span>. In general, the probability that if one event happens another will happen is equal to the probability that both will happen, divided by the probability that the first will happen.</p>
 
-<p>Let us now see how to express the probability that a certain quantity will have a certain value. It is clearly implied that the quantity is defined in some other way than by its value. It might be, for instance, the length of time a bird will be on wing. Let x be this quantity, and let n be any definite value. Then <span class="frac"><span class="num">[x<sup>,</sup>n]</span><span class="den">[x]</span></span>, or the number of cases in which the time a bird is flying has that value, divided by the whole number of cases of a bird&rsquo;s flying, is the probability that a bird will fly for that length of time. But since time is continuous, the length of time a bird may be up may have an infinite number of different values. Consequently, the probability of any one is <i>zero</i>. We, therefore, seek the probability that the time lies between n and n + &Delta;n; and if &Delta;n is infinitesimal, (say d<i>n</i>,) then the probability is proportional to d<i>n</i>. We may, therefore, write this probability thus, [n<sub>x</sub>] d<i>n</i>. Here n<sub>x</sub> denotes the case of the value of x being about n.</p>
+<p>Let us now see how to express the probability that a certain quantity will have a certain value. It is clearly implied that the quantity is defined in some other way than by its value. It might be, for instance, the length of time a bird will be on wing. Let x be this quantity, and let n be any definite value. Then <span class="frac"><span class="num">[x<span class="inv-comma">,</span>n]</span><span class="den">[x]</span></span>, or the number of cases in which the time a bird is flying has that value, divided by the whole number of cases of a bird&rsquo;s flying, is the probability that a bird will fly for that length of time. But since time is continuous, the length of time a bird may be up may have an infinite number of different values. Consequently, the probability of any one is <i>zero</i>. We, therefore, seek the probability that the time lies between n and n + &Delta;n; and if &Delta;n is infinitesimal, (say d<i>n</i>,) then the probability is proportional to d<i>n</i>. We may, therefore, write this probability thus, [n<sub>x</sub>] d<i>n</i>. Here n<sub>x</sub> denotes the case of the value of x being about n.</p>
 
-<p>The probability that if one quantity, <i>x</i>, has a value lying between <i>m</i> and <i>m</i> + d<i>m</i>, then another quantity, <i>y</i>, has a value lying between <i>n</i> and <i>n</i> + d<i>n</i>, will, according to what has been said, be equal to the probability that both <i>x</i> and <i>y</i> will have the supposed values, divided by the probability that <i>x</i> will have the supposed value, or will be <span class="frac"><span class="num">[m<sub>x</sub><sup>,</sup>n<sub>y</sub>] d<i>m</i>.d<i>n</i></span><span class="den">[m<sub>x</sub>] d<i>m</i></span></span>, or, since the d<i>m</i> disappeared by cancellation, <span class="frac"><span class="num">[m<sub>x</sub><sup>,</sup>n<sub>y</sub>]</span><span class="den">[m<sub>x</sub>]</span></span> d<i>n</i>.</p>
+<p>The probability that if one quantity, <i>x</i>, has a value lying between <i>m</i> and <i>m</i> + d<i>m</i>, then another quantity, <i>y</i>, has a value lying between <i>n</i> and <i>n</i> + d<i>n</i>, will, according to what has been said, be equal to the probability that both <i>x</i> and <i>y</i> will have the supposed values, divided by the probability that <i>x</i> will have the supposed value, or will be <span class="frac"><span class="num">[m<sub>x</sub><span class="inv-comma">,</span>n<sub>y</sub>] d<i>m</i>.d<i>n</i></span><span class="den">[m<sub>x</sub>] d<i>m</i></span></span>, or, since the d<i>m</i> disappeared by cancellation, <span class="frac"><span class="num">[m<sub>x</sub><span class="inv-comma">,</span>n<sub>y</sub>]</span><span class="den">[m<sub>x</sub>]</span></span> d<i>n</i>.</p>
 
 <p>Given, the probability of A, the probability of B, and the probability that if A happens, B happens. Required, the probability that if B happens, A happens.</p>
 
-<p>The probability of A is [A]. The probability of B is [B]. The probability that if A then B is <span class="frac"><span class="num">[A<sup>,</sup>B]</span><span class="den">[A]</span></span>.</p>
+<p>The probability of A is [A]. The probability of B is [B]. The probability that if A then B is <span class="frac"><span class="num">[A<span class="inv-comma">,</span>B]</span><span class="den">[A]</span></span>.</p>
 
 <!-- p.119 -->
-<p>The probability that if B then A is <span class="frac"><span class="num">[A<sup>,</sup>B]</span><span class="den">[B]</span></span>. Then we have&mdash;</p>
+<p>The probability that if B then A is <span class="frac"><span class="num">[A<span class="inv-comma">,</span>B]</span><span class="den">[B]</span></span>. Then we have&mdash;</p>
 
 <div class="formula">
-  <span class="frac"><span class="num">[A<sup>,</sup>B]</span><span class="den">[B]</span></span>
-  = <span class="frac"><span class="num">[A<sup>,</sup>B]</span><span class="den">[A]</span></span> &times; [A] &divide; [B]
+  <span class="frac"><span class="num">[A<span class="inv-comma">,</span>B]</span><span class="den">[B]</span></span>
+  = <span class="frac"><span class="num">[A<span class="inv-comma">,</span>B]</span><span class="den">[A]</span></span> &times; [A] &divide; [B]
 </div>
 
 <p>or the probability, if B happens that A happens, is equal to the probability if A happens that B happens, multiplied by the probability of A and divided by the probability of B.</p>
 
-<p>We now pass to the theory of observations. An observation gives us the value of a certain quantity which is connected with an unknown quantity in such a way as to be partly dependent on the latter value, and partly on accidental circumstances, not capable of being separately taken account of.</p>
+<p><span class="example-trigger" data-toggle="example-ex1">We now pass to the theory of observations. An observation gives us <span class="hl-text c" data-hl-for="example-ex1">the value of a certain quantity</span> which is connected with <span class="hl-text q" data-hl-for="example-ex1">an unknown quantity</span> in such a way as to be partly dependent on the latter value, and partly on <span class="hl-text e" data-hl-for="example-ex1">accidental circumstances, not capable of being separately taken account of</span>.</span></p>
+
+<div id="example-ex1" class="example-container"></div>
 
 <p>These accidental variations are, however, in all cases subject to a statistical law, so that (observations of a certain kind forming the limited universe, X being the unknown quantity, &Xi; the quantity observed) the quantity,</p>
 
 <div class="formula">
-  <span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><sup>,</sup> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> d&xi;
+  <span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><span class="inv-comma">,</span> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> d&xi;
 </div>
 
 <p>or the probability that if the unknown quantity X has a certain value x, then the observed quantity &Xi; will have a value between &xi; and &xi; + d&xi;, is a certain arithmetical function of the values &xi; and x. If we write &epsilon; for &xi; &minus; x, or the error of observation, then we may put &phi; for such a function that&mdash;</p>
 
 <div class="formula">
-  <span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><sup>,</sup> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> = &phi; (&epsilon;, x)
+  <span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><span class="inv-comma">,</span> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> = &phi; (&epsilon;, x)
 </div>
 
-<p>The special form of the function &phi; is called the <b>law of the facility of the errors</b>. Except so far as this law is known, an observation can afford us no information whatever. The following conditions are invariably fulfilled by this function. (It must be understood that only <i>real</i> quantities are considered.)</p>
+<p><span class="example-trigger" data-toggle="example-ex2">The special form of the function &phi; is called the <b>law of the facility of the errors</b>.</span> Except so far as this law is known, an observation can afford us no information whatever. The following conditions are invariably fulfilled by this function. (It must be understood that only <i>real</i> quantities are considered.)</p>
 
 <ol>
 <li>It has but one value for each set of values of its variables.</li>
 <li>Its value is always positive and less than unity.</li>
 <li>It vanishes when &epsilon; is infinite.</li>
 </ol>
+
+<div id="example-ex2" class="example-container"></div>
 
 <!-- p.120 -->
 <ol start="4">
@@ -166,7 +929,7 @@
 <p>The probability that if the observed quantity &Xi; has the value &xi;, then the unknown quantity X has the value <i>x</i> is&mdash;</p>
 
 <div class="formula">
-  <span class="frac"><span class="num">[x<sub>x</sub><sup>,</sup> &xi;<sub>&Xi;</sub>]</span><span class="den">[&xi;<sub>&Xi;</sub>]</span></span> dx
+  <span class="frac"><span class="num">[x<sub>x</sub><span class="inv-comma">,</span> &xi;<sub>&Xi;</sub>]</span><span class="den">[&xi;<sub>&Xi;</sub>]</span></span> dx
 </div>
 
 <p>The value of this probability is for any particular kind of observations an arithmetical function of &epsilon; and &xi;, which we may write &psi; (&epsilon;, &xi;) d&epsilon;.</p>
@@ -204,7 +967,7 @@
 <p>or&mdash;</p>
 
 <div class="formula">
-  &Psi;<sup>x</sup> . <sup>n</sup>&Pi;<sub>i=1</sub> <span class="frac"><span class="num">&phi;<sub>i</sub>(&epsilon;<sub>i</sub>, x)</span><span class="den">&Phi;<sub>i</sub>&xi;<sub>i</sub></span></span>
+  &Psi;<sup>x</sup> . <span class="bigprod"><span class="lim">n</span><span class="sym">&Pi;<sub>i</sub></span><span class="lim">1</span></span> <span class="frac"><span class="num">&phi;<sub>i</sub>(&epsilon;<sub>i</sub>, x)</span><span class="den">&Phi;<sub>i</sub>&xi;<sub>i</sub></span></span>
 </div>
 
 <!-- p.121 -->
@@ -231,7 +994,7 @@
 <p>If in place of two we have <i>n</i> observations, the probability that the sum of all will be [&xi;] is&mdash;</p>
 
 <div class="formula">
-  <sup>n&minus;1</sup>&Pi;<sub>1</sub><sup>i</sup> (1 &minus; &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>i</sub>&phi;<sub>i</sub>(&epsilon;<sub>i</sub>, x) . D<sub>i</sub>
+  <span class="bigprod"><span class="lim">n&minus;1</span><span class="sym">&Pi;<sub>i</sub></span><span class="lim">1</span></span> (1 &minus; &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>i</sub>&phi;<sub>i</sub>(&epsilon;<sub>i</sub>, x) . D<sub>i</sub>
   <br><br>
   + <span class="frac"><span class="num">1</span><span class="den">2</span></span> &int;<sub>&minus;&infin;</sub><sup>+&infin;</sup> &epsilon;<sub>i</sub>&sup2;&phi;<sub>i</sub> (&epsilon;<sub>i</sub>, x) . D&sup2;&epsilon;<sub>i</sub> &minus; &amp;c.) &phi;<sub>n</sub>([&epsilon;], x)
 </div>
@@ -273,7 +1036,7 @@
 <p>Whenever these quantities disappear it can be proved by an analytical process which need not be reproduced here that&mdash;</p>
 
 <div class="formula">
-  &phi;(&epsilon;, x) = <span class="frac"><span class="num">h</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;" title="Peirce&rsquo;s typeset uses this glyph where the modern symbol would be &pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e" title="Peirce&rsquo;s typeset uses this glyph where the modern symbol would be e (base of natural logarithms)">G</span><sup>&minus;h&sup2;(&epsilon;&minus;E)&sup2;</sup>
+  &phi;(&epsilon;, x) = <span class="frac"><span class="num">h</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;" title="Peirce&rsquo;s typeset uses this glyph where the modern symbol would be &pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e" title="Peirce&rsquo;s typeset uses this glyph where the modern symbol would be e (base of natural logarithms)"><svg class="swirl" viewBox="0 0 20 20" aria-hidden="true"><use href="#peirce-swirl"/></svg></span><sup>&minus;h&sup2;(&epsilon;&minus;E)&sup2;</sup>
 </div>
 
 <p>where h and E are quantities which depend upon x. <b>We thus reach the fundamental formula of the method of least squares.</b></p>
@@ -285,9 +1048,9 @@
 <p>If the probability of error does not follow that law which the method of least squares supposes, that is to say, if the probability of</p>
 
 <!-- p.124 -->
-<p>the error x in the mean of a large number of observations is not equal to <span class="frac"><span class="num">h</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e">G</span><sup>&minus;h&sup2;x&sup2;</sup>, where h is a constant independent of x, then it must at least be of this form if h be considered to be a function of x. Now, h&sup2; is the weight which has to be assigned to an observation in the application of the method of least squares; and therefore when this method does not apply in its unmodified form, it is only necessary to find what function of x, h must be in order to give the required law of facility of errors, and then proceed according to the method of least squares, after having weighted each observation by h&sup2;. Let the equation which represents the facility of error be plotted, the error being taken as absciss&aelig;, and the probability of that error as ordinate;</p>
+<p>the error x in the mean of a large number of observations is not equal to <span class="frac"><span class="num">h</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e"><svg class="swirl" viewBox="0 0 20 20" aria-hidden="true"><use href="#peirce-swirl"/></svg></span><sup>&minus;h&sup2;x&sup2;</sup>, where h is a constant independent of x, then it must at least be of this form if h be considered to be a function of x. Now, h&sup2; is the weight which has to be assigned to an observation in the application of the method of least squares; and therefore when this method does not apply in its unmodified form, it is only necessary to find what function of x, h must be in order to give the required law of facility of errors, and then proceed according to the method of least squares, after having weighted each observation by h&sup2;. Let the equation which represents the facility of error be plotted, the error being taken as absciss&aelig;, and the probability of that error as ordinate;</p>
 
-<p>then plot on the same diagram the curve y = <span class="frac"><span class="num">1</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e">G</span><sup>&minus;x&sup2;</sup>. Let us suppose, then, that a certain value of x, y, is A times as great for the actual curve of errors as it is for the normal least-squares curve. Now, if h be increased in the ratio A, the ordinates will be increased in this same ratio, and the absciss&aelig; will be diminished in the inverse ratio so that the area of the curve is preserved. But if the ordinates at any one point are to be increased in the ratio A, then the abscissae at that point must be contracted in the inverse ratio, so as to preserve the area; so that if we had a function f<i>x</i> such that D<sub>x</sub> f<i>x</i> = <span class="frac"><span class="num">1</span><span class="den">a</span></span>, then the probability of this function of the error would follow the law y = <span class="frac"><span class="num">1</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e">G</span><sup>&minus;(f<i>x</i>)&sup2;</sup>, and consequently <span class="frac"><span class="num">1</span><span class="den">(D<sub>x</sub> f<i>x</i>)&sup2;</span></span> is the weight which has to be assigned to any such observation in applying the method of least squares. It will be observed that since the weight depends on the value of the error, it will be necessary first to make an approximate solution of the problem in order to get an approximate value of the error from which to determine the weight, so that when the method of least squares is not applicable in its unmodified form, an approximate method must necessarily be resorted to.</p>
+<p>then plot on the same diagram the curve y = <span class="frac"><span class="num">1</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e"><svg class="swirl" viewBox="0 0 20 20" aria-hidden="true"><use href="#peirce-swirl"/></svg></span><sup>&minus;x&sup2;</sup>. Let us suppose, then, that a certain value of x, y, is A times as great for the actual curve of errors as it is for the normal least-squares curve. Now, if h be increased in the ratio A, the ordinates will be increased in this same ratio, and the absciss&aelig; will be diminished in the inverse ratio so that the area of the curve is preserved. But if the ordinates at any one point are to be increased in the ratio A, then the abscissae at that point must be contracted in the inverse ratio, so as to preserve the area; so that if we had a function f<i>x</i> such that D<sub>x</sub> f<i>x</i> = <span class="frac"><span class="num">1</span><span class="den">a</span></span>, then the probability of this function of the error would follow the law y = <span class="frac"><span class="num">1</span><span class="den">&radic;<span class="peirce-pi" data-modern="&pi;">&part;</span></span></span> <span class="peirce-e" data-modern="e"><svg class="swirl" viewBox="0 0 20 20" aria-hidden="true"><use href="#peirce-swirl"/></svg></span><sup>&minus;(f<i>x</i>)&sup2;</sup>, and consequently <span class="frac"><span class="num">1</span><span class="den">(D<sub>x</sub> f<i>x</i>)&sup2;</span></span> is the weight which has to be assigned to any such observation in applying the method of least squares. It will be observed that since the weight depends on the value of the error, it will be necessary first to make an approximate solution of the problem in order to get an approximate value of the error from which to determine the weight, so that when the method of least squares is not applicable in its unmodified form, an approximate method must necessarily be resorted to.</p>
 
 <p>Let us now proceed to consider the method of ascertaining the law of facility of error. In any case, if the error is compounded of an infinite number of infinitely small errors, or approximates to being so, then the law of facility of errors is of that general form which the method of least squares prescribes, and nothing remains indeterminate excepting the value of h. Observation has sufficiently shown that</p>
 
@@ -799,6 +1562,1360 @@ creasing after the twelfth day. There was some variation in the per-</p>
 <!-- p.137 -->
 <p>sonal equation, but not much, but the range of errors continually decreased as long as the observations lasted, and so remarkably that for the twenty-fourth day the probable error does not exceed one-eightieth of a second. I think that this clearly demonstrates the value of such practice in training the nerves for observation, for it can hardly be supposed that the best observer has so small a range of error as this, and I would therefore recommend that transit-observers be kept in constant training by means of some observations of an artificial event which can be repeated with rapidity, so that several hundred can be taken daily without great labor, and I do not think that it is essential that these observations should very closely imitate the transit of a star over wires, inasmuch as it is the general condition of the nerves which it is important to keep in training more than anything peculiar to this or that kind of observation.</p>
 
+<script>
+/* ============================================================================
+   Peirce, "The Probability of Induction" — interactive edition
+   Port of the R/Shiny app (app.R) to a self-contained HTML page.
+
+   Part 1: statistical primitives (replacing R's stats package)
+   Part 2: a small canvas renderer that mimics R base graphics
+   ==========================================================================*/
+
+/* ---------------------------------------------------------------- MATH --- */
+
+const LG_C = [676.5203681218851, -1259.1392167224028, 771.32342877765313,
+  -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+  9.9843695780195716e-6, 1.5056327351493116e-7];
+
+function lgamma(z) {
+  if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lgamma(1 - z);
+  z -= 1;
+  let x = 0.99999999999980993;
+  for (let i = 0; i < 8; i++) x += LG_C[i] / (z + i + 1);
+  const t = z + 7.5;
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+}
+
+function lchoose(n, k) {
+  if (k < 0 || k > n) return -Infinity;
+  return lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
+}
+
+// exact for the small n used here; falls back to lgamma for large n
+function choose(n, k) {
+  if (k < 0 || k > n) return 0;
+  k = Math.min(k, n - k);
+  if (n <= 60) {
+    let r = 1;
+    for (let i = 1; i <= k; i++) r = r * (n - k + i) / i;
+    return Math.round(r);
+  }
+  return Math.exp(lchoose(n, k));
+}
+
+function dbinom(k, n, p) {
+  if (k < 0 || k > n) return 0;
+  if (p === 0) return k === 0 ? 1 : 0;
+  if (p === 1) return k === n ? 1 : 0;
+  return Math.exp(lchoose(n, k) + k * Math.log(p) + (n - k) * Math.log1p(-p));
+}
+
+function dnorm(x, mean, sd) {
+  const z = (x - mean) / sd;
+  return Math.exp(-0.5 * z * z) / (sd * Math.sqrt(2 * Math.PI));
+}
+
+// Abramowitz & Stegun 7.1.26-style erf, refined; |err| < 1.2e-7 is not enough
+// for the tail probabilities used in ex16, so use a Chebyshev erfc instead.
+function erfc(x) {
+  const z = Math.abs(x), t = 2 / (2 + z);
+  const ty = 4 * t - 2;
+  const cof = [-1.3026537197817094, 6.4196979235649026e-1, 1.9476473204185836e-2,
+    -9.561514786808631e-3, -9.46595344482036e-4, 3.66839497852761e-4,
+    4.2523324806907e-5, -2.0278578112534e-5, -1.624290004647e-6,
+    1.303655835580e-6, 1.5626441722e-8, -8.5238095915e-8,
+    6.529054439e-9, 5.059343495e-9, -9.91364156e-10,
+    -2.27365122e-10, 9.6467911e-11, 2.394038e-12,
+    -6.886027e-12, 8.94487e-13, 3.13092e-13,
+    -1.12708e-13, 3.81e-16, 7.106e-15];
+  let d = 0, dd = 0, tmp;
+  for (let j = cof.length - 1; j > 0; j--) { tmp = d; d = ty * d - dd + cof[j]; dd = tmp; }
+  const ans = t * Math.exp(-z * z + 0.5 * (cof[0] + ty * d) - dd);
+  return x >= 0 ? ans : 2 - ans;
+}
+
+function pnorm(x, mean = 0, sd = 1) { return 0.5 * erfc(-((x - mean) / sd) / Math.SQRT2); }
+
+// Wichura AS241-quality inverse normal (Acklam + one Halley refinement)
+function qnorm(p, mean = 0, sd = 1) {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
+    1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+    6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+    -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+    3.754408661907416e+00];
+  const pl = 0.02425, ph = 1 - pl;
+  let q, r, x;
+  if (p < pl) {
+    q = Math.sqrt(-2 * Math.log(p));
+    x = (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  } else if (p <= ph) {
+    q = p - 0.5; r = q * q;
+    x = (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+        (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+  } else {
+    q = Math.sqrt(-2 * Math.log(1 - p));
+    x = -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+  const e = pnorm(x) - p, u = e * Math.sqrt(2 * Math.PI) * Math.exp(x * x / 2);
+  x = x - u / (1 + x * u / 2);
+  return mean + sd * x;
+}
+
+// regularized incomplete beta, via Lentz continued fraction (NR 6.4)
+function betacf(a, b, x) {
+  const FPMIN = 1e-300, EPS = 3e-16;
+  const qab = a + b, qap = a + 1, qam = a - 1;
+  let c = 1, d = 1 - qab * x / qap;
+  if (Math.abs(d) < FPMIN) d = FPMIN;
+  d = 1 / d;
+  let h = d;
+  for (let m = 1; m <= 300; m++) {
+    const m2 = 2 * m;
+    let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+    c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+    d = 1 / d; h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+    c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+    d = 1 / d;
+    const del = d * c; h *= del;
+    if (Math.abs(del - 1) < EPS) break;
+  }
+  return h;
+}
+
+function pbeta(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) +
+                      a * Math.log(x) + b * Math.log1p(-x));
+  return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a
+                                   : 1 - bt * betacf(b, a, 1 - x) / b;
+}
+
+function qbeta(p, a, b) {
+  if (p <= 0) return 0;
+  if (p >= 1) return 1;
+  let lo = 0, hi = 1, mid;
+  for (let i = 0; i < 200; i++) {
+    mid = (lo + hi) / 2;
+    if (pbeta(mid, a, b) < p) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+// Clopper-Pearson interval, i.e. R's binom.test(x, n, conf.level)$conf.int
+function binomTestCI(x, n, conf) {
+  const alpha = 1 - conf;
+  const lower = x === 0 ? 0 : qbeta(alpha / 2, x, n - x + 1);
+  const upper = x === n ? 1 : qbeta(1 - alpha / 2, x + 1, n - x);
+  return [lower, upper];
+}
+
+/* -- random numbers -------------------------------------------------------
+   R's Mersenne-Twister stream cannot be reproduced here, so seeded routines
+   use mulberry32. Anything that R seeded with set.seed(42) is seeded with 42
+   here: results are stable across reloads, but are not R's exact draws.      */
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const runif = () => Math.random();
+const sampleInt = (n) => Math.floor(Math.random() * n);      // 1..n -> 0..n-1
+function rbinom(n, p) { let k = 0; for (let i = 0; i < n; i++) if (Math.random() < p) k++; return k; }
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = sampleInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+/* ---------------------------------------------------------- FORMATTING --- */
+
+const fmt = (x, d) => (Number.isFinite(x) ? x.toFixed(d) : String(x));
+// R's round(x, d) then default printing: 0.5 -> "0.5", not "0.5000"
+function rround(x, d) {
+  if (!Number.isFinite(x)) return String(x);
+  const r = Number(x.toFixed(d));
+  return String(r);
+}
+const bigmark = (x) => Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const pluralBall = (n) => (n === 1 ? "ball" : "balls");
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six",
+  "seven", "eight", "nine", "ten"];
+const numberWord = (n) => (n >= 0 && n <= 10 ? NUMBER_WORDS[n] : String(n));
+
+/* Peirce writes his figures out in words ("Ninety-nine Cretans in a hundred"),
+   so a number standing in for one of those has to be spelled as well. */
+const TEENS = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+  "sixteen", "seventeen", "eighteen", "nineteen"];
+const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+  "eighty", "ninety"];
+function spellNumber(n) {
+  n = Math.round(n);
+  if (n < 0 || n > 99) return String(n);
+  if (n <= 9) return NUMBER_WORDS[n];
+  if (n <= 19) return TEENS[n - 10];
+  const t = TENS[Math.floor(n / 10)], u = n % 10;
+  return u ? `${t}-${NUMBER_WORDS[u]}` : t;
+}
+const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* "one-third", "two-thirds", "one-half" — Peirce writes his fractions out in
+   the granary paragraphs, so a fraction standing in for one of his has to be
+   spelled the same way. */
+const FRAC_ORDINALS = ["", "", "half", "third", "fourth", "fifth", "sixth",
+  "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth"];
+function fracWord(n, d) {
+  const ord = FRAC_ORDINALS[d];
+  if (!ord) return `${n}&frasl;${d}`;
+  return `${spellNumber(n)}-${ord}${n === 1 ? "" : "s"}`;
+}
+
+function decimalToFraction(x) {
+  const common = { "1/2": 0.5, "1/3": 1/3, "2/3": 2/3, "1/4": 0.25, "3/4": 0.75,
+    "1/5": 0.2, "2/5": 0.4, "3/5": 0.6, "4/5": 0.8,
+    "1/10": 0.1, "1/100": 0.01, "1/1000": 0.001 };
+  for (const key in common) {
+    if (Math.abs(x - common[key]) < 0.001) {
+      const parts = key.split("/");
+      return { num: +parts[0], den: +parts[1] };
+    }
+  }
+  const num1000 = Math.round(x * 1000);
+  if (Math.abs(x - num1000 / 1000) < 0.001) return { num: num1000, den: 1000 };
+  for (const den of [100, 500, 200, 250]) {
+    const num = Math.round(x * den);
+    if (Math.abs(x - num / den) < 0.001) return { num: num, den: den };
+  }
+  return { num: num1000, den: 1000 };
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// tiny fraction markup used in place of MathJax
+const frac = (n, d) => `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
+
+/* ------------------------------------------------------------ PLOTTING --- */
+/* A minimal re-implementation of the parts of R base graphics the app uses:
+   plot(NULL)/rect/text/lines/points/segments/polygon/abline/axis/legend.
+   Coordinates passed to these methods are USER (data) coordinates.          */
+
+/* The plots share the page's palette and its typeface. Canvases paint their
+   own background, which is the same white as the article, so with the frames
+   off the plot sits on the page rather than in a panel on it. Names match the
+   CSS custom properties in the head. */
+const PAL = {
+  paper:    "#ffffff",
+  ink:      "#1f2328",
+  inkSoft:  "#575d66",
+  inkFaint: "#8a9099",
+  rule:     "#dbd6cb",
+  ruleSoft: "#ece8df",
+  accent:   "#2f6f9f",
+  accent2:  "#b0563f",
+  accent3:  "#4a7c59",
+  accent4:  "#9a7b3f"
+};
+
+const BASE_FONT = 12;
+const PLOT_FACE = 'Georgia, "Times New Roman", serif';
+
+class RPlot {
+  constructor(ctx, cssW, cssH) {
+    this.ctx = ctx; this.W = cssW; this.H = cssH;
+    this.mar = [40, 45, 32, 16];   // bottom, left, top, right, in px
+    this.xlim = [0, 1]; this.ylim = [0, 1];
+    this.xpd = false;
+  }
+  /* mar is given in R "lines"; ~13px per line at this font size.
+     Reproduces R's default xaxs/yaxs = "r" (4% padding) and, when asp is set,
+     R's behaviour of EXPANDING the user limits of the roomier axis rather
+     than shrinking the plot region — several plots in the original app draw
+     legends outside the nominal limits and rely on that. */
+  setup(opts) {
+    const o = opts || {};
+    if (o.mar) this.mar = o.mar.map((m) => m * 13);
+    let xlim = (o.xlim || [0, 1]).slice(), ylim = (o.ylim || [0, 1]).slice();
+    if (o.ext !== false) {
+      const dx = (xlim[1] - xlim[0]) * 0.04, dy = (ylim[1] - ylim[0]) * 0.04;
+      xlim = [xlim[0] - dx, xlim[1] + dx];
+      ylim = [ylim[0] - dy, ylim[1] + dy];
+    }
+    const [mb, ml, mt, mr] = this.mar;
+    const px0 = ml, px1 = this.W - mr, py0 = this.H - mb, py1 = mt;
+    if (o.asp) {
+      const availW = px1 - px0, availH = py0 - py1;
+      const uw = xlim[1] - xlim[0], uh = ylim[1] - ylim[0];
+      const scale = Math.min(availW / uw, availH / (uh * o.asp));
+      const newUw = availW / scale, newUh = availH / (scale * o.asp);
+      const cx = (xlim[0] + xlim[1]) / 2, cy = (ylim[0] + ylim[1]) / 2;
+      xlim = [cx - newUw / 2, cx + newUw / 2];
+      ylim = [cy - newUh / 2, cy + newUh / 2];
+    }
+    this.xlim = xlim; this.ylim = ylim;
+    this.px0 = px0; this.px1 = px1; this.py0 = py0; this.py1 = py1;
+    return this;
+  }
+  X(x) { return this.px0 + (x - this.xlim[0]) / (this.xlim[1] - this.xlim[0]) * (this.px1 - this.px0); }
+  Y(y) { return this.py0 + (y - this.ylim[0]) / (this.ylim[1] - this.ylim[0]) * (this.py1 - this.py0); }
+  invX(px) { return this.xlim[0] + (px - this.px0) / (this.px1 - this.px0) * (this.xlim[1] - this.xlim[0]); }
+  invY(py) { return this.ylim[0] + (py - this.py0) / (this.py1 - this.py0) * (this.ylim[1] - this.ylim[0]); }
+
+  _font(cex, font) {
+    const size = BASE_FONT * (cex || 1);
+    const weight = (font === 2) ? "bold " : "";
+    const style = (font === 3) ? "italic " : "";
+    this.ctx.font = `${style}${weight}${size}px ${PLOT_FACE}`;
+    return size;
+  }
+  _lty(lty) {
+    const c = this.ctx;
+    if (lty === 2) c.setLineDash([7, 5]);
+    else if (lty === 3) c.setLineDash([2, 3]);
+    else if (lty === 4) c.setLineDash([2, 3, 7, 3]);
+    else c.setLineDash([]);
+  }
+  clip(on) {
+    const c = this.ctx;
+    if (on) {
+      c.save(); c.beginPath();
+      c.rect(Math.min(this.px0, this.px1), Math.min(this.py0, this.py1),
+             Math.abs(this.px1 - this.px0), Math.abs(this.py0 - this.py1));
+      c.clip();
+    } else c.restore();
+  }
+  rect(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    const X0 = this.X(x0), X1 = this.X(x1), Y0 = this.Y(y0), Y1 = this.Y(y1);
+    if (o.col && o.col !== "transparent") { c.fillStyle = o.col; c.fillRect(X0, Y1, X1 - X0, Y0 - Y1); }
+    if (o.border !== null && o.border !== undefined && o.border !== "NA") {
+      c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+      c.strokeRect(X0, Y1, X1 - X0, Y0 - Y1); c.setLineDash([]);
+    }
+  }
+  text(x, y, str, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex, o.font);
+    c.fillStyle = o.col || "black";
+    c.textBaseline = "middle";
+    c.textAlign = o.adj === 0 ? "left" : (o.adj === 1 ? "right" : "center");
+    const lines = String(str).split("\n");
+    const lh = BASE_FONT * (o.cex || 1) * 1.25;
+    const y0 = this.Y(y) - lh * (lines.length - 1) / 2;
+    lines.forEach((ln, i) => c.fillText(ln, this.X(x), y0 + i * lh));
+  }
+  lines(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+    c.beginPath();
+    let started = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (!Number.isFinite(ys[i])) { started = false; continue; }
+      const px = this.X(xs[i]), py = this.Y(ys[i]);
+      if (!started) { c.moveTo(px, py); started = true; } else c.lineTo(px, py);
+    }
+    c.stroke(); c.setLineDash([]);
+  }
+  points(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.fillStyle = o.col || "black"; c.strokeStyle = o.col || "black";
+    const r = 2.2 * (o.cex || 1);
+    for (let i = 0; i < xs.length; i++) {
+      c.beginPath(); c.arc(this.X(xs[i]), this.Y(ys[i]), r, 0, 2 * Math.PI);
+      if (o.pch === 21) { c.fillStyle = "white"; c.fill(); c.stroke(); } else c.fill();
+    }
+  }
+  segments(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+    c.beginPath(); c.moveTo(this.X(x0), this.Y(y0)); c.lineTo(this.X(x1), this.Y(y1));
+    c.stroke(); c.setLineDash([]);
+  }
+  abline(o = {}) {
+    if (o.h !== undefined) this.segments(this.xlim[0], o.h, this.xlim[1], o.h, o);
+    if (o.v !== undefined) this.segments(o.v, this.ylim[0], o.v, this.ylim[1], o);
+  }
+  polygon(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.beginPath();
+    c.moveTo(this.X(xs[0]), this.Y(ys[0]));
+    for (let i = 1; i < xs.length; i++) c.lineTo(this.X(xs[i]), this.Y(ys[i]));
+    c.closePath();
+    if (o.col) { c.fillStyle = o.col; c.fill(); }
+    if (o.border) { c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; c.stroke(); }
+  }
+  arrows(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    this.segments(x0, y0, x1, y1, o);
+    const P0 = [this.X(x0), this.Y(y0)], P1 = [this.X(x1), this.Y(y1)];
+    const len = o.length || 8;
+    const ang = Math.atan2(P1[1] - P0[1], P1[0] - P0[0]);
+    const spread = (o.angle || 20) * Math.PI / 180;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1;
+    const head = (P, a) => {
+      c.beginPath();
+      c.moveTo(P[0], P[1]); c.lineTo(P[0] - len * Math.cos(a - spread), P[1] - len * Math.sin(a - spread));
+      c.moveTo(P[0], P[1]); c.lineTo(P[0] - len * Math.cos(a + spread), P[1] - len * Math.sin(a + spread));
+      c.stroke();
+    };
+    head(P1, ang);
+    if (o.code === 3) head(P0, ang + Math.PI);
+  }
+  title(main, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex || 1.1, 2);
+    c.fillStyle = PAL.ink; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillText(main, (this.px0 + this.px1) / 2, Math.max(12, this.py1 - 14));
+  }
+  axisLabels(xlab, ylab) {
+    const c = this.ctx;
+    if (xlab) {
+      this._font(0.95, 1); c.fillStyle = PAL.inkSoft; c.textAlign = "center"; c.textBaseline = "alphabetic";
+      c.fillText(xlab, (this.px0 + this.px1) / 2, this.H - 6);
+    }
+    if (ylab) {
+      c.save(); this._font(0.95, 1); c.fillStyle = PAL.inkSoft;
+      c.translate(11, (this.py0 + this.py1) / 2); c.rotate(-Math.PI / 2);
+      c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(ylab, 0, 0); c.restore();
+    }
+  }
+  /* full numeric axes with automatic ticks (side 1 = bottom, 2 = left) */
+  box() {
+    const c = this.ctx;
+    c.strokeStyle = PAL.rule; c.lineWidth = 1; c.setLineDash([]);
+    c.strokeRect(this.px0, this.py1, this.px1 - this.px0, this.py0 - this.py1);
+  }
+  static ticks(lo, hi, n = 5) {
+    const span = hi - lo;
+    if (!(span > 0)) return [lo];
+    const raw = span / n;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw / mag;
+    const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+    const out = [];
+    for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+  axes(o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = PAL.inkFaint; c.fillStyle = PAL.inkSoft; c.lineWidth = 1; c.setLineDash([]);
+    this._font(0.85, 1);
+    const xt = o.xat || RPlot.ticks(this.xlim[0], this.xlim[1], o.nx || 5);
+    const yt = o.yat || RPlot.ticks(this.ylim[0], this.ylim[1], o.ny || 5);
+    c.beginPath(); c.moveTo(this.px0, this.py0); c.lineTo(this.px1, this.py0); c.stroke();
+    c.textAlign = "center"; c.textBaseline = "top";
+    xt.forEach((v, i) => {
+      const px = this.X(v);
+      if (px < this.px0 - 0.5 || px > this.px1 + 0.5) return;
+      c.beginPath(); c.moveTo(px, this.py0); c.lineTo(px, this.py0 + 5); c.stroke();
+      c.fillText(o.xlabels ? o.xlabels[i] : String(v), px, this.py0 + 7);
+    });
+    c.beginPath(); c.moveTo(this.px0, this.py0); c.lineTo(this.px0, this.py1); c.stroke();
+    c.textAlign = "right"; c.textBaseline = "middle";
+    yt.forEach((v, i) => {
+      const py = this.Y(v);
+      if (py > this.py0 + 0.5 || py < this.py1 - 0.5) return;
+      c.beginPath(); c.moveTo(this.px0, py); c.lineTo(this.px0 - 5, py); c.stroke();
+      c.fillText(o.ylabels ? o.ylabels[i] : String(v), this.px0 - 7, py);
+    });
+  }
+  /* bare label rows, like R's axis(side, at, labels, tick = FALSE) */
+  axisPlain(side, at, labels, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex || 0.8, 1); c.fillStyle = PAL.inkSoft;
+    at.forEach((v, i) => {
+      const lab = String(labels[i]);
+      if (side === 1) { c.textAlign = "center"; c.textBaseline = "top"; c.fillText(lab, this.X(v), this.py0 + 4); }
+      else if (side === 3) { c.textAlign = "center"; c.textBaseline = "bottom"; c.fillText(lab, this.X(v), this.py1 - 3); }
+      else if (side === 2) { c.textAlign = "right"; c.textBaseline = "middle"; c.fillText(lab, this.px0 - 5, this.Y(v)); }
+    });
+  }
+  grid(o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "#cfcabf"; c.lineWidth = 1; this._lty(3);
+    if (o.ny !== null) RPlot.ticks(this.ylim[0], this.ylim[1], 5).forEach((v) => {
+      const py = this.Y(v);
+      if (py > this.py0 || py < this.py1) return;
+      c.beginPath(); c.moveTo(this.px0, py); c.lineTo(this.px1, py); c.stroke();
+    });
+    if (o.nx !== null && o.nx !== undefined) RPlot.ticks(this.xlim[0], this.xlim[1], 5).forEach((v) => {
+      const px = this.X(v);
+      c.beginPath(); c.moveTo(px, this.py0); c.lineTo(px, this.py1); c.stroke();
+    });
+    c.setLineDash([]);
+  }
+  legend(pos, o = {}) {
+    const c = this.ctx;
+    const cex = o.cex || 0.85;
+    this._font(cex, 1);
+    const items = o.legend;
+    const pad = 6, sw = 20, gap = 6;
+    const lh = BASE_FONT * cex * 1.5;
+    let boxW, boxH, x, y;
+    if (o.horiz) {
+      const widths = items.map((t) => sw + gap + c.measureText(t).width + 12);
+      boxW = widths.reduce((a, b) => a + b, 0) + 2 * pad;
+      boxH = lh + 2 * pad;
+    } else {
+      boxW = 2 * pad + sw + gap + Math.max(...items.map((t) => c.measureText(t).width));
+      boxH = 2 * pad + items.length * lh;
+    }
+    if (pos === "topright") { x = this.px1 - boxW - 4; y = this.py1 + 4; }
+    else if (pos === "topleft") { x = this.px0 + 4; y = this.py1 + 4; }
+    else if (pos === "right") { x = this.px1 - boxW - 4; y = (this.py0 + this.py1) / 2 - boxH / 2; }
+    else if (pos === "bottomright") { x = this.px1 - boxW - 4; y = this.py0 - boxH - 4; }
+    else { /* bottom */ x = (this.px0 + this.px1) / 2 - boxW / 2; y = this.py0 + (o.inset || 20); }
+    if (o.bg !== "n") { c.fillStyle = o.bg || "rgba(255,255,255,0.88)"; c.fillRect(x, y, boxW, boxH); }
+    if (o.bty !== "n" && o.bg !== "n") { c.strokeStyle = PAL.ruleSoft; c.lineWidth = 1; c.setLineDash([]); c.strokeRect(x, y, boxW, boxH); }
+    let cx = x + pad, cy = y + pad + lh / 2;
+    items.forEach((t, i) => {
+      if (o.horiz) {
+        const w = sw + gap + c.measureText(t).width + 12;
+        this._drawKey(cx, cy, sw, o, i);
+        c.fillStyle = PAL.ink; c.textAlign = "left"; c.textBaseline = "middle";
+        this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
+        cx += w;
+      } else {
+        this._drawKey(cx, cy, sw, o, i);
+        c.fillStyle = PAL.ink; c.textAlign = "left"; c.textBaseline = "middle";
+        this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
+        cy += lh;
+      }
+    });
+  }
+  _drawKey(cx, cy, sw, o, i) {
+    const c = this.ctx;
+    const pick = (v) => Array.isArray(v) ? v[i] : v;
+    if (o.fill) {
+      c.fillStyle = pick(o.fill); c.fillRect(cx, cy - 6, sw - 4, 12);
+      c.strokeStyle = "#3a3f45"; c.lineWidth = 0.8; c.setLineDash([]); c.strokeRect(cx, cy - 6, sw - 4, 12);
+    } else {
+      c.strokeStyle = pick(o.col) || "black";
+      c.lineWidth = pick(o.lwd) || 1;
+      this._lty(pick(o.lty) || 1);
+      c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + sw - 4, cy); c.stroke(); c.setLineDash([]);
+      if (o.pch) { c.fillStyle = pick(o.col) || "black"; c.beginPath(); c.arc(cx + (sw - 4) / 2, cy, 2.5, 0, 2 * Math.PI); c.fill(); }
+    }
+  }
+}
+
+/* ---- canvas plumbing: responsive sizing, redraw registry, click mapping -- */
+
+const CANVASES = [];
+
+function mkCanvas(height, drawFn, opts = {}) {
+  const el = document.createElement("canvas");
+  el.className = "plot";
+  el.style.height = height + "px";
+  el._draw = drawFn;
+  el._h = height;
+  el._nplots = opts.nplots || 1;   // for mfrow-style side-by-side panels
+  CANVASES.push(el);
+  if (opts.onclick) {
+    el.style.cursor = "pointer";
+    el.addEventListener("click", (ev) => {
+      const r = el.getBoundingClientRect();
+      const pl = el._pl;
+      if (!pl) return;
+      opts.onclick(pl.invX(ev.clientX - r.left), pl.invY(ev.clientY - r.top), pl);
+    });
+  }
+  requestAnimationFrame(() => drawCanvas(el));
+  return el;
+}
+
+function drawCanvas(el) {
+  const cssW = el.clientWidth || el.parentElement && el.parentElement.clientWidth || 600;
+  const cssH = el._h;
+  if (!cssW) return;
+  const dpr = window.devicePixelRatio || 1;
+  el.width = Math.round(cssW * dpr);
+  el.height = Math.round(cssH * dpr);
+  const ctx = el.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+  ctx.fillStyle = PAL.paper; ctx.fillRect(0, 0, cssW, cssH);
+  const pl = new RPlot(ctx, cssW, cssH);
+  el._pl = pl;
+  try { el._draw(pl, cssW, cssH); } catch (e) { /* eslint-disable-line */ console.error(e); }
+}
+
+/* A shut example is clipped to zero height rather than display:none, so it
+   still has an offsetParent; skip anything inside one. */
+function redrawAll() {
+  CANVASES.forEach((el) => {
+    if (!el.isConnected || el.offsetParent === null) return;
+    if (el.closest(".example-container:not(.open)")) return;
+    drawCanvas(el);
+  });
+}
+
+let _rzT = null;
+window.addEventListener("resize", () => { clearTimeout(_rzT); _rzT = setTimeout(redrawAll, 120); });
+
+function blankPlot(pl, msg) {
+  pl.setup({ xlim: [0, 1], ylim: [0, 1], mar: [1, 1, 1, 1] });
+  pl.text(0.5, 0.5, msg, { cex: 1.15, col: PAL.inkFaint });
+}
+
+/* ------------------------------------------------- tiny DOM utilities --- */
+
+function h(html) {
+  const t = document.createElement("template");
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+/* `key` is a colour key, k1..k4. A slider given one is drawn in that hue, and
+   so is every figure in the text it moves — see registerLive. */
+/* ---- number lines -------------------------------------------------------
+   A rule with ticks and a travelling marker, laid out by .nl-grid so that
+   several of them share one axis. `ticks` are {pos 0..1, major, label}. Used
+   by ex8, ex9 and ex26; the marker is omitted where a real slider supplies it.
+   -----------------------------------------------------------------------*/
+function nlDraw(el, ticks, withMarker) {
+  if (!el) return;
+  el.innerHTML =
+    (withMarker ? '<div class="nl-rule"></div><div class="nl-dot"></div>' : "") +
+    ticks.map((t) =>
+      `<div class="nl-tick${t.major ? " major" : ""}" style="left:${t.pos * 100}%"></div>` +
+      (t.label == null ? "" : `<div class="nl-ticklab" style="left:${t.pos * 100}%">${t.label}</div>`)
+    ).join("");
+}
+
+/* the next 1, 2 or 5 of a decade at or above v — for a ruler that has to grow
+   to keep its marker on it */
+function niceMax(v, floor) {
+  const lo = floor === undefined ? 2 : floor;
+  if (!(v > 0) || v <= lo) return lo;   // the floor is a floor, not just a minimum
+  const base = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 2, 5, 10]) if (v <= m * base) return Math.max(lo, m * base);
+  return Math.max(lo, 10 * base);
+}
+
+function slider(id, label, min, max, value, step, fmtFn, key) {
+  const d = document.createElement("div");
+  d.className = "ctl" + (key ? " " + key : "");
+  d.innerHTML = `<label for="${id}">${label} <span class="slider-val" id="${id}_val"></span></label>
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">`;
+  const inp = d.querySelector("input"), out = d.querySelector(".slider-val");
+  const show = () => { out.textContent = fmtFn ? fmtFn(+inp.value) : inp.value; };
+  inp.addEventListener("input", show);
+  show();
+  return d;
+}
+function select(id, label, choices, selected) {
+  const opts = choices.map(([v, t]) => `<option value="${esc(v)}"${v === selected ? " selected" : ""}>${esc(t)}</option>`).join("");
+  return h(`<div class="ctl"><label for="${id}">${label}</label><select id="${id}">${opts}</select></div>`);
+}
+function checkbox(id, label, checked) {
+  return h(`<div class="ctl checkbox"><label><input type="checkbox" id="${id}"${checked ? " checked" : ""}> ${label}</label></div>`);
+}
+function radios(name, label, choices, selected, stacked) {
+  const items = choices.map(([v, t]) =>
+    `<label><input type="radio" name="${name}" value="${esc(v)}"${v === selected ? " checked" : ""}> ${esc(t)}</label>`).join("");
+  return h(`<div class="ctl"><label>${label}</label><div class="radio-row${stacked ? " stacked" : ""}">${items}</div></div>`);
+}
+function numberInput(id, label, value, min, max, step) {
+  return h(`<div class="ctl"><label for="${id}">${label}</label>
+    <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}"></div>`);
+}
+const val = (id) => { const e = document.getElementById(id); return e ? e.value : null; };
+const num = (id) => +val(id);
+const chk = (id) => { const e = document.getElementById(id); return e ? e.checked : false; };
+const radioVal = (name) => { const e = document.querySelector(`input[name="${name}"]:checked`); return e ? e.value : null; };
+function setSlider(id, v) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.value = v;
+  e.dispatchEvent(new Event("input", { bubbles: true }));
+}
+</script>
+<script>
+/* ==========================================================================
+   Example scaffolding: click a highlighted passage to open its demonstration.
+   Content is built lazily the first time a container is opened.
+
+   Carried over unchanged in behaviour from the Probability of Induction page,
+   so an example written for one paper drops into the other.
+   ========================================================================*/
+
+const BUILDERS = {};
+const BUILT = {};
+
+function registerExample(id, builder) { BUILDERS[id] = builder; }
+
+/* --------------------------------------------------------------------------
+   Live numbers in Peirce's own text.
+
+   A figure in the prose carries data-live="<driver>:<key>", where <driver> is
+   the id of the example whose controls move it. While that example is shut the
+   span shows exactly what Peirce printed; while it is open the span shows what
+   the sliders say, in the colour of the slider saying it. Closing the example
+   restores his text — the document is his unless you are actively driving it.
+   ------------------------------------------------------------------------*/
+const LIVE = {};
+const LIVE_OPEN = new Set();
+
+function registerLive(driverId, bindings, opts) {
+  LIVE[driverId] = { get: bindings, opts: opts || {} };
+  refreshLive(driverId);
+}
+
+function liveEngaged(driverId) {
+  const rec = LIVE[driverId];
+  if (!rec) return false;
+  return rec.opts.engaged ? !!rec.opts.engaged() : LIVE_OPEN.has(driverId);
+}
+
+const REFRESHING = new Set();
+
+function refreshLive(driverId) {
+  const rec = LIVE[driverId];
+  if (!rec || REFRESHING.has(driverId)) return;
+  REFRESHING.add(driverId);
+  try { refreshLiveInner(driverId, rec); (rec.opts.also || []).forEach(refreshLive); }
+  finally { REFRESHING.delete(driverId); }
+}
+
+function refreshLiveInner(driverId, rec) {
+  const on = liveEngaged(driverId);
+  const prefix = driverId + ":";
+  $$(`[data-live^="${prefix}"]`).forEach((el) => {
+    if (el.dataset.peirce === undefined) el.dataset.peirce = el.innerHTML;
+    const key = el.getAttribute("data-live").slice(prefix.length);
+    let out = null;
+    if (on && rec.get[key]) {
+      try { out = rec.get[key](); } catch (e) { out = null; }
+    }
+    if (out === null || out === undefined) {
+      if (el.innerHTML !== el.dataset.peirce) el.innerHTML = el.dataset.peirce;
+      el.classList.remove("is-live");
+      return;
+    }
+    const s = String(out);
+    if (el.innerHTML !== s) el.innerHTML = s;
+    el.classList.add("is-live");
+  });
+  if (rec.opts.onRefresh) rec.opts.onRefresh(on);
+}
+
+/* Any control touched inside a driver's container re-reads that driver's
+   getters. Bubble phase, so the example's own handlers have already run. */
+["input", "change", "click"].forEach((type) => {
+  document.addEventListener(type, (ev) => {
+    const t = ev.target;
+    if (!t || !t.closest) return;
+    const host = t.closest(".example-container[id]");
+    if (host && LIVE[host.id]) refreshLive(host.id);
+  });
+});
+
+/* --------------------------------------------------------------------------
+   Opening an example. The container is a one-row grid whose row goes 0fr ->
+   1fr, which animates to the content's own height without measuring anything;
+   .ex-inner does the clipping.
+   ------------------------------------------------------------------------*/
+function exInner(box) {
+  let inner = box.querySelector(":scope > .ex-inner");
+  if (!inner) {
+    inner = document.createElement("div");
+    inner.className = "ex-inner";
+    box.appendChild(inner);
+  }
+  return inner;
+}
+
+document.addEventListener("click", (ev) => {
+  const trg = ev.target.closest("[data-toggle]");
+  if (!trg) return;
+  const id = trg.getAttribute("data-toggle");
+  const box = document.getElementById(id);
+  if (!box) return;
+
+  const inner = exInner(box);
+  if (!BUILT[id] && BUILDERS[id]) { BUILDERS[id](inner); BUILT[id] = true; }
+
+  const opening = !box.classList.contains("open");
+  box.classList.toggle("open", opening);
+  if (opening) box.removeAttribute("inert"); else box.setAttribute("inert", "");
+  $$(`[data-toggle="${id}"]`).forEach((t) => t.classList.toggle("is-open", opening));
+
+  $$(`[data-hl-for="${id}"]`).forEach((el) => el.classList.toggle("hl-on", opening));
+
+  if (opening) { LIVE_OPEN.add(id); requestAnimationFrame(redrawAll); }
+  else LIVE_OPEN.delete(id);
+  refreshLive(id);
+});
+
+/* Plots are sized from clientWidth, so they want a redraw once the row has
+   finished growing; and the example is nudged into view only if the growth
+   left it hanging off the bottom. */
+document.addEventListener("transitionend", (ev) => {
+  if (ev.propertyName !== "grid-template-rows") return;
+  const box = ev.target;
+  if (!box.classList || !box.classList.contains("example-container")) return;
+  if (!box.classList.contains("open")) return;
+  redrawAll();
+  const r = box.getBoundingClientRect();
+  if (r.top < 0 || r.top > window.innerHeight * 0.75) {
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+});
+
+$$(".example-container").forEach((box) => box.setAttribute("inert", ""));
+
+/* Each example's number in the gutter beside the passage that opens it, taken
+   from its own id so it matches the part files in src/. */
+$$("[data-toggle]").forEach((trg) => {
+  const m = /(\d+)$/.exec(trg.getAttribute("data-toggle") || "");
+  if (!m || $(".ex-num", trg)) return;
+  trg.insertBefore(h(`<span class="ex-num" aria-hidden="true">${m[1]}</span>`), trg.firstChild);
+});
+
+/* collapsible inner header */
+function exHeader(title, contentId) {
+  const el = h(`<div class="example-header">${esc(title)}</div>`);
+  el.addEventListener("click", () => {
+    el.classList.toggle("collapsed");
+    const c = document.getElementById(contentId);
+    c.style.display = c.style.display === "none" ? "block" : "none";
+    redrawAll();
+  });
+  return el;
+}
+
+/* --------------------------------------------------------------------------
+   Shared through the paper: one draw of an error from a named law of facility.
+   The kinds are the ones Peirce himself names — transit observations, the
+   chronograph key on an occultation, a coarse instrument, two observers whose
+   series have been run together — and every later example that needs a law of
+   error takes it from here, so the same four shapes recur throughout.
+   ------------------------------------------------------------------------*/
+function rnorm1(mean = 0, sd = 1) {
+  let u = 0, v = 0;
+  while (u === 0) u = Math.random();
+  while (v === 0) v = Math.random();
+  return mean + sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v);
+}
+
+const ERROR_LAWS = {
+  transit: {
+    name: "Transit observations",
+    gloss: "the error is compounded of a great many small independent ones",
+    draw: (s) => rnorm1(0, s),
+    dens: (e, s) => dnorm(e, 0, s),
+  },
+  occultation: {
+    name: "A star out from behind the moon",
+    gloss: "impossible to strike the key too early, possible to strike it indefinitely too late",
+    // a shifted gamma: no mass to the left of the shift, a long right tail
+    draw: (s) => {
+      let g = 0;
+      for (let i = 0; i < 3; i++) g += -Math.log(Math.random());
+      return (g - 3) * s * 0.62;
+    },
+    dens: (e, s) => {
+      const b = s * 0.62, x = e / b + 3;
+      if (x <= 0) return 0;
+      return (x * x * Math.exp(-x) / 2) / b;
+    },
+  },
+  coarse: {
+    name: "A coarse instrument",
+    gloss: "the reading is carried to the nearest division and no further",
+    draw: (s) => (Math.random() * 2 - 1) * s * 1.732,
+    dens: (e, s) => (Math.abs(e) <= s * 1.732 ? 1 / (2 * s * 1.732) : 0),
+  },
+  twoObservers: {
+    name: "Two observers run together",
+    gloss: "one series, but taken under two sets of circumstances",
+    draw: (s) => rnorm1(Math.random() < 0.5 ? -1.15 * s : 1.15 * s, s * 0.42),
+    dens: (e, s) => 0.5 * dnorm(e, -1.15 * s, s * 0.42) + 0.5 * dnorm(e, 1.15 * s, s * 0.42),
+  },
+};
+</script>
+<script>
+/* ==========================================================================
+   EXAMPLE 1 — An observation is the unknown quantity plus an error
+
+   Peirce's sentence is the model itself: what is recorded depends partly on
+   the quantity wanted and partly on circumstances that cannot be separately
+   accounted for, so the record is the sum of the two. Written out that is
+   O = T + e, and the rest of the paper is about the second term.
+
+   The switch that matters here is "show the unknown quantity". With it on you
+   can see each observation split into its parts. With it off you have what the
+   observer actually has: a row of dots and nothing else. Nothing in the data
+   changes when it is turned off, which is the point — T and e are never
+   observed apart, only their sum.
+   ========================================================================*/
+registerExample("example-ex1", (box) => {
+  box.appendChild(exHeader("Interactive Example: The Quantity Observed and the Quantity Wanted", "ex1-content"));
+  const content = h(`<div id="ex1-content" class="example-content">
+    <p>A star crosses the wire of a transit instrument at some definite moment. That moment is the
+      <span class="k-T">unknown quantity</span>. What gets written down is the moment the observer
+      pressed the key, which depends on when the star really crossed and also on the state of his
+      nerves, the seeing, the instrument &mdash; the <span class="k-e">accidental circumstances</span>.
+      The number written down is the <span class="k-O">quantity observed</span>.</p>
+    <div class="row">
+      <div class="col col-4">
+        <div id="ex1-controls"></div>
+        <div class="ex-buttonbar">
+          <button class="btn btn-primary" data-act="one">Observe once</button>
+          <button class="btn btn-primary" data-act="fifty">Observe fifty</button>
+          <button class="btn btn-warning btn-sm" data-act="clear">Clear</button>
+        </div>
+        <div id="ex1-readout"></div>
+      </div>
+      <div class="col col-8">
+        <div class="plot-container" id="ex1-plot1"></div>
+        <div class="plot-container" id="ex1-plot2"></div>
+      </div>
+    </div>
+    <div id="ex1-ladder"></div>
+    <div id="ex1-note"></div>
+  </div>`);
+  box.appendChild(content);
+
+  const XLO = 4.4, XHI = 5.6;          // the fixed window, so the picture never jumps
+  let obs = [];                         // every quantity observed, in order
+
+  const ctl = $("#ex1-controls", content);
+  ctl.appendChild(slider("ex1_T", "The unknown quantity, T (seconds):", 4.7, 5.3, 5.0, 0.005,
+    (v) => v.toFixed(3), "k3"));
+  ctl.appendChild(slider("ex1_s", "The reach of the accidental circumstances:", 0.005, 0.15, 0.06, 0.005,
+    (v) => "±" + v.toFixed(3) + " s", "k2"));
+  ctl.appendChild(checkbox("ex1_showT", "Show the unknown quantity", true));
+
+  const T = () => num("ex1_T"), S = () => num("ex1_s"), showT = () => chk("ex1_showT");
+
+  function observe(k) {
+    for (let i = 0; i < k; i++) {
+      const e = rnorm1(0, S());
+      obs.push({ e, o: T() + e, T: T() });
+    }
+    if (obs.length > 400) obs = obs.slice(-400);
+  }
+
+  /* ---------------------------------------------------------- the line ---- */
+  const line = mkCanvas(168, (pl) => {
+    pl.setup({ xlim: [XLO, XHI], ylim: [0, 1.12], mar: [2.6, 1.2, 2.2, 1.2], ext: false });
+    pl.abline({ h: 0, col: PAL.inkFaint });
+    const xt = [4.4, 4.6, 4.8, 5.0, 5.2, 5.4, 5.6];
+    xt.forEach((v) => pl.segments(v, 0, v, 0.045, { col: PAL.inkFaint }));
+    pl.axisPlain(1, xt, xt.map((v) => v.toFixed(1)));
+    pl.axisLabels("The quantity, in seconds", "");
+    pl.clip(true);
+
+    if (showT()) {
+      pl.abline({ v: T(), col: PAL.accent3, lwd: 2 });
+      pl.text(T(), 0.94, "T", { col: PAL.accent3, cex: 0.9, font: 2 });
+    }
+
+    // every observation, most recent last and largest
+    const show = obs.slice(-160);
+    show.forEach((r, i) => {
+      const fresh = i === show.length - 1;
+      pl.points([r.o], [0.42 + 0.16 * Math.sin(i * 2.399)], {
+        col: fresh ? PAL.accent : "rgba(47,111,159,0.42)", cex: fresh ? 1.5 : 1.0
+      });
+    });
+
+    // the newest one taken apart, if the truth is on show
+    const last = obs[obs.length - 1];
+    if (last && showT()) {
+      pl.segments(last.T, 0.20, last.o, 0.20, { col: PAL.accent2, lwd: 2 });
+      pl.segments(last.o, 0.16, last.o, 0.24, { col: PAL.accent2, lwd: 2 });
+      pl.segments(last.T, 0.16, last.T, 0.24, { col: PAL.accent2, lwd: 2 });
+      pl.text((last.T + last.o) / 2, 0.09, "ε = " + (last.e >= 0 ? "+" : "") + fmt(last.e, 3),
+        { col: PAL.accent2, cex: 0.78 });
+    }
+    pl.clip(false);
+    pl.title(showT() ? "Each observation is the unknown quantity, displaced"
+                     : "What the observer has: the record, and nothing else", { cex: 0.95 });
+  });
+  $("#ex1-plot1", content).appendChild(line);
+
+  /* ------------------------------------------------------ they pile up ---- */
+  const hist = mkCanvas(210, (pl) => {
+    const NB = 40, w = (XHI - XLO) / NB;
+    const bins = new Array(NB).fill(0);
+    obs.forEach((r) => {
+      const b = Math.floor((r.o - XLO) / w);
+      if (b >= 0 && b < NB) bins[b]++;
+    });
+    const top = Math.max(4, niceMax(Math.max(...bins), 4));
+    pl.setup({ xlim: [XLO, XHI], ylim: [0, top], mar: [3, 3.4, 1.8, 1.2] });
+    pl.axes({ nx: 7 });
+    pl.box();
+    pl.axisLabels("The quantity observed", "How many");
+    pl.clip(true);
+    for (let b = 0; b < NB; b++) {
+      if (!bins[b]) continue;
+      pl.rect(XLO + b * w, 0, XLO + (b + 1) * w, bins[b],
+        { col: "rgba(47,111,159,0.55)", border: "#24587d" });
+    }
+    if (showT()) pl.abline({ v: T(), col: PAL.accent3, lwd: 2 });
+    pl.clip(false);
+    pl.title("The series so far", { cex: 0.95 });
+  });
+  $("#ex1-plot2", content).appendChild(hist);
+
+  /* ------------------------------------------------------- the ladder ---- */
+  function ladder() {
+    const last = obs[obs.length - 1];
+    const seen = showT();
+    const oN = last ? fmt(last.o, 3) : "&mdash;";
+    const tN = last ? (seen ? fmt(last.T, 3) : "?") : "&mdash;";
+    const eN = last ? (seen ? (last.e < 0 ? "−" : "") + fmt(Math.abs(last.e), 3) : "?") : "&mdash;";
+    return `<div class="ex-ladder">
+      <div class="lad-row lad-words">
+        <span class="k-O">the quantity observed</span>
+        <span class="lad-op">=</span>
+        <span class="k-T">the unknown quantity</span>
+        <span class="lad-op">+</span>
+        <span class="k-e">the accidental circumstances</span>
+      </div>
+      <div class="lad-row lad-sym">
+        <span class="k-O">O<sub>i</sub></span>
+        <span class="lad-op">=</span>
+        <span class="k-T">T</span>
+        <span class="lad-op">+</span>
+        <span class="k-e">&epsilon;<sub>i</sub></span>
+      </div>
+      <div class="lad-row lad-num">
+        <span class="k-O">${oN}</span>
+        <span class="lad-op">=</span>
+        <span class="k-T">${tN}</span>
+        <span class="lad-op">+</span>
+        <span class="k-e">${eN}</span>
+      </div>
+    </div>`;
+  }
+
+  function update() {
+    const n = obs.length;
+    const mean = n ? obs.reduce((s, r) => s + r.o, 0) / n : null;
+
+    $("#ex1-readout", content).innerHTML = n
+      ? `<div class="key-insight" style="margin-top:0;">
+           <p style="margin-bottom:6px;"><strong>${bigmark(n)}</strong>
+             observation${n === 1 ? "" : "s"} taken.</p>
+           <p style="margin-bottom:0;">The mean of the series is <strong>${fmt(mean, 4)}</strong>.
+             ${showT() ? `The unknown quantity is ${fmt(T(), 3)}, so the mean is out by
+               ${fmt(Math.abs(mean - T()), 4)}.`
+              : `Whether that is close to the unknown quantity there is, at this point,
+                 no way to say.`}</p></div>`
+      : `<p class="help-text">Nothing observed yet.</p>`;
+
+    $("#ex1-ladder", content).innerHTML = ladder();
+
+    $("#ex1-note", content).innerHTML = showT()
+      ? `<div class="note-block">
+           <p>The sentence is the model. What is recorded depends partly on the quantity wanted and
+           partly on circumstances that cannot be separately accounted for, so the record is the sum
+           of the two, and everything that follows in the paper is about the second term: what
+           distribution it has, when that distribution may be taken as the normal one, and what
+           follows for the mean of a series.</p>
+           <p>Take fifty observations and slide the reach of the accidental circumstances. The
+           unknown quantity does not move; the pile spreads around it. That is the only thing the
+           second term does.</p></div>`
+      : `<div class="note-block">
+           <p>Nothing about the data changed when the unknown quantity was hidden &mdash; the same
+           dots, in the same places. This is the observer's actual position. T and &epsilon; are never
+           observed apart, only added together, and no amount of staring at the dots separates them.</p>
+           <p>So the pile has to be made to speak some other way, and the only thing that can make it
+           speak is knowing what sort of errors this kind of observation produces. That is the law of
+           the facility of errors, which is what Peirce turns to next.</p></div>`;
+
+    drawCanvas(line);
+    drawCanvas(hist);
+  }
+
+  content.addEventListener("input", update);
+  content.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-act]");
+    if (!b) return;
+    const a = b.getAttribute("data-act");
+    if (a === "one") observe(1);
+    else if (a === "fifty") observe(50);
+    else if (a === "clear") obs = [];
+    else return;
+    update();
+  });
+
+  observe(1);
+  update();
+});
+</script>
+<script>
+/* ==========================================================================
+   EXAMPLE 2 — The law of the facility of the errors
+
+   φ is a function, and the special form it takes is a fact about the kind of
+   observation, not about any one observation. So the example is built around
+   choosing a kind: transit observations, the chronograph key on an
+   occultation, a coarse instrument, two observers whose series have been run
+   together. The marks on the target and the curve beside them are the same
+   fact drawn twice.
+
+   The strip is what makes φ mean anything: the height of the curve at ε times
+   the width of the strip is the proportion of shots that should land in it,
+   and the tally says how many did.
+   ========================================================================*/
+registerExample("example-ex2", (box) => {
+  box.appendChild(exHeader("Interactive Example: The Law of the Facility of Errors", "ex2-content"));
+  const content = h(`<div id="ex2-content" class="example-content">
+    <p>Take a marksman firing at a target. He is aiming at the middle every time, so the middle is the
+      <span class="k-T">unknown quantity</span> and each shot is an <span class="k-O">observation</span>
+      of it; how far the shot fell from the middle is the <span class="k-e">error</span>. Fire enough
+      shots and the scatter settles into a shape. That shape is the law.</p>
+    <div id="ex2-kind"></div>
+    <div class="row">
+      <div class="col col-5">
+        <div class="plot-container" id="ex2-target"></div>
+      </div>
+      <div class="col col-7">
+        <div class="plot-container" id="ex2-curve"></div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col col-5">
+        <div id="ex2-controls"></div>
+        <div class="ex-buttonbar">
+          <button class="btn btn-primary" data-act="one">Fire once</button>
+          <button class="btn btn-primary" data-act="many">Fire two hundred</button>
+          <button class="btn btn-warning btn-sm" data-act="clear">Clear</button>
+        </div>
+      </div>
+      <div class="col col-7">
+        <div id="ex2-readout"></div>
+      </div>
+    </div>
+    <div id="ex2-ladder"></div>
+    <div id="ex2-note"></div>
+  </div>`);
+  box.appendChild(content);
+
+  const DE = 0.10;                  // the width of the strip, standing for dε
+  const XLO = -1.5, XHI = 1.5;
+  let shots = [];                   // {e, y} — the error, and where it fell vertically
+
+  $("#ex2-kind", content).appendChild(radios("ex2_kind", "The kind of observation:",
+    Object.entries(ERROR_LAWS).map(([k, v]) => [k, v.name]), "transit", true));
+
+  const ctl = $("#ex2-controls", content);
+  ctl.appendChild(slider("ex2_s", "How wide the errors run:", 0.12, 0.6, 0.3, 0.01,
+    (v) => v.toFixed(2), "k2"));
+  ctl.appendChild(slider("ex2_e", "Read the law at ε =", -1.4, 1.4, 0.3, 0.05,
+    (v) => (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(2), "k1"));
+
+  const law = () => ERROR_LAWS[radioVal("ex2_kind") || "transit"];
+  const S = () => num("ex2_s");
+  const E = () => num("ex2_e");
+
+  function fire(k) {
+    const L = law(), s = S();
+    for (let i = 0; i < k; i++) shots.push({ e: L.draw(s), y: rnorm1(0, s) });
+    if (shots.length > 2000) shots = shots.slice(-2000);
+  }
+
+  /* --------------------------------------------------------- the target --- */
+  const target = mkCanvas(280, (pl) => {
+    const R = 1.5;
+    pl.setup({ xlim: [-R, R], ylim: [-R, R], mar: [1.4, 1.4, 2.0, 1.4], asp: 1, ext: false });
+    const cx = 0, cy = 0;
+    // the rings
+    for (let i = 4; i >= 1; i--) {
+      const r = R * i / 4.6, n = 64, xs = [], ys = [];
+      for (let a = 0; a <= n; a++) {
+        xs.push(cx + r * Math.cos(2 * Math.PI * a / n));
+        ys.push(cy + r * Math.sin(2 * Math.PI * a / n));
+      }
+      pl.polygon(xs, ys, { col: i % 2 ? "#faf8f3" : "#ffffff", border: PAL.rule });
+    }
+    pl.points([0], [0], { col: PAL.accent3, cex: 1.1 });
+    pl.clip(true);
+    const show = shots.slice(-500);
+    show.forEach((s, i) => {
+      const fresh = i === show.length - 1;
+      pl.points([s.e], [s.y], {
+        col: fresh ? PAL.accent2 : "rgba(47,111,159,0.45)", cex: fresh ? 1.6 : 0.95
+      });
+    });
+    // the strip, drawn across the target so the two panels read as one picture
+    const e = E();
+    pl.rect(e - DE / 2, -R, e + DE / 2, R, { col: "rgba(154,123,63,0.16)", border: null });
+    pl.clip(false);
+    pl.title("Where the shots fell", { cex: 0.95 });
+  });
+  $("#ex2-target", content).appendChild(target);
+
+  /* ---------------------------------------------------------- the curve --- */
+  const curve = mkCanvas(280, (pl) => {
+    const L = law(), s = S(), e = E();
+    const xs = [], ys = [];
+    for (let i = 0; i <= 300; i++) {
+      const x = XLO + (XHI - XLO) * i / 300;
+      xs.push(x); ys.push(L.dens(x, s));
+    }
+    const top = Math.max(0.6, niceMax(Math.max(...ys) * 1.15, 0.6));
+
+    // the shots' own errors, as a histogram under the curve
+    const NB = 45, w = (XHI - XLO) / NB, bins = new Array(NB).fill(0);
+    shots.forEach((r) => {
+      const b = Math.floor((r.e - XLO) / w);
+      if (b >= 0 && b < NB) bins[b]++;
+    });
+    const n = shots.length;
+
+    pl.setup({ xlim: [XLO, XHI], ylim: [0, top], mar: [3.2, 3.6, 2.0, 1.2] });
+    pl.axes({ nx: 7 });
+    pl.box();
+    pl.axisLabels("The error, ε", "φ(ε, x)");
+    pl.clip(true);
+
+    if (n) {
+      for (let b = 0; b < NB; b++) {
+        if (!bins[b]) continue;
+        pl.rect(XLO + b * w, 0, XLO + (b + 1) * w, bins[b] / (n * w),
+          { col: "rgba(47,111,159,0.30)", border: "rgba(36,88,125,0.45)" });
+      }
+    }
+    // the strip: φ(ε, x) · dε
+    pl.rect(e - DE / 2, 0, e + DE / 2, L.dens(e, s), { col: "rgba(154,123,63,0.35)", border: PAL.accent4 });
+    pl.lines(xs, ys, { col: PAL.accent2, lwd: 2.4 });
+    pl.abline({ v: 0, col: PAL.accent3, lwd: 1.6, lty: 2 });
+    pl.points([e], [L.dens(e, s)], { col: PAL.accent4, cex: 1.3 });
+    pl.clip(false);
+    pl.title("The law of the facility of the errors", { cex: 0.95 });
+    pl.legend("topright", {
+      legend: n ? ["The law, φ", "The shots so far", "No error"] : ["The law, φ", "No error"],
+      fill: n ? [PAL.accent2, "rgba(47,111,159,0.30)", PAL.accent3]
+              : [PAL.accent2, PAL.accent3],
+      cex: 0.7
+    });
+  });
+  $("#ex2-curve", content).appendChild(curve);
+
+  /* --------------------------------------------------------- the ladder --- */
+  function ladder() {
+    const L = law(), s = S(), e = E();
+    const phi = L.dens(e, s);
+    const p = phi * DE;
+    return `<div class="ex-ladder">
+      <div class="lad-row lad-words">
+        <span>the height of the law at that error</span>
+        <span class="lad-op">×</span>
+        <span>the width of the strip</span>
+        <span class="lad-op">=</span>
+        <span>how often an error falls in it</span>
+      </div>
+      <div class="lad-row lad-sym">
+        <span class="k-e">φ(ε, x)</span>
+        <span class="lad-op">·</span>
+        <span>dε</span>
+        <span class="lad-op">=</span>
+        <span>P</span>
+      </div>
+      <div class="lad-row lad-num">
+        <span class="k-e">${fmt(phi, 3)}</span>
+        <span class="lad-op">×</span>
+        <span>${fmt(DE, 2)}</span>
+        <span class="lad-op">=</span>
+        <span>${fmt(p, 4)}</span>
+      </div>
+      <div class="lad-note">In modern notation the same line is
+        <i>p</i>(ε) d<i>ε</i> &mdash; φ is a probability density, and Peirce's ε
+        is the error, ξ &minus; x.</div>
+    </div>`;
+  }
+
+  function update() {
+    const L = law(), s = S(), e = E();
+    const phi = L.dens(e, s), p = phi * DE;
+    const n = shots.length;
+    const inStrip = shots.filter((r) => Math.abs(r.e - e) <= DE / 2).length;
+
+    $("#ex2-readout", content).innerHTML = `<div class="key-insight" style="margin-top:0;">
+      <p style="margin-bottom:6px;"><em>${esc(L.name)}</em> &mdash; ${esc(L.gloss)}.</p>
+      ${n ? `<p style="margin-bottom:0;">The law says <strong>${fmt(p, 4)}</strong> of the shots
+              should fall in the shaded strip. Of the ${bigmark(n)} fired,
+              <strong>${bigmark(inStrip)}</strong> did &mdash; ${fmt(inStrip / n, 4)} of them.</p>`
+          : `<p style="margin-bottom:0;">The law says ${fmt(p, 4)} of the shots should fall in the
+              shaded strip. Fire some and see.</p>`}
+    </div>`;
+
+    $("#ex2-ladder", content).innerHTML = ladder();
+
+    const kind = radioVal("ex2_kind");
+    $("#ex2-note", content).innerHTML = `<div class="note-block">
+      <p>φ is a function, and the special form it takes is a fact about <em>the kind of observation</em>,
+      not about any one observation. Change the kind and the target and the curve change together;
+      they are the same fact drawn twice.</p>
+      ${kind === "transit"
+        ? `<p>This is the case Peirce says the transit observations actually show: the error is
+           compounded of a great many small independent ones, and the curve that results is the one
+           the method of least squares assumes. He reaches it by argument later in the paper, and
+           checks it against Bradley's observations of Sirius and Procyon.</p>`
+        : kind === "occultation"
+        ? `<p>Here the law is lopsided, and Peirce says why: it is impossible to strike the key too
+           early, while it may be struck indefinitely too late. Least squares assumes a law
+           symmetrical about zero, so on the face of it it should not apply. He made the experiment,
+           and reports at the end of the paper that the divergence proved insignificant.</p>`
+        : kind === "coarse"
+        ? `<p>Every error inside the range is exactly as likely as every other, and outside it none
+           is possible &mdash; the reading was carried to the nearest division and no further. Peirce
+           puts the chemist's balance and the computer's dropped decimal places in this class, and
+           sends the reader to Bremiker for how to handle them.</p>`
+        : `<p>Two humps, because two sets of circumstances have been run together as one series. Peirce
+           returns to exactly this at the end of the paper: if the series can be divided on some
+           principle, and the two parts turn out to have different laws, it is an advantage to divide
+           it. Nothing here is a defect in the observations &mdash; only in calling them one universe.</p>`}
+    </div>`;
+
+    drawCanvas(target);
+    drawCanvas(curve);
+  }
+
+  content.addEventListener("input", (ev) => {
+    // a new kind of observation means a new series; the old shots were not fired under this law
+    if (ev.target && ev.target.name === "ex2_kind") shots = [];
+    update();
+  });
+  content.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-act]");
+    if (!b) return;
+    const a = b.getAttribute("data-act");
+    if (a === "one") fire(1);
+    else if (a === "many") fire(200);
+    else if (a === "clear") shots = [];
+    else return;
+    update();
+  });
+
+  fire(200);
+  update();
+});
+</script>
 </div>
 </body>
 </html>

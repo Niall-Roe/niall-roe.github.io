@@ -12,7 +12,6 @@ As much as possible, the points should be made visually and understood through i
 
 Assuming this is being read on a normal computer screen, we should endeavour to have the meat of the interactive visible while still in view of the text that inspires it. (This is another way in which making the example explicitly involve the text is helpful.
 
-
 to the extent possible, we should strive for continuity, using similar examples and graphics to illustrate similar points. this should help with the rhetorical continuity of the paper. especially the first few sections really do build on one another. 
 
 when i put something in [square brackets] i mean for that thing to have a slider or other user input. 
@@ -26,608 +25,182 @@ when i put something in [square brackets] i mean for that thing to have a slider
 
 ##1 - 5
 
-these are very important because they are (a) the first examples the user will interact with and (b) set out some crucial concepts. 
-
-some of the examples later on are truly awesome, and so we want the user to get hooked here. 
-
-we also need them to understand:
-
-probability applies to arguments
-arguments are assertions of facts and ways of relating those facts such that one is taken to. indicate another. 
-the antecedent facts (including methodological things, the way the die is rolled or whatever) constitute the event space. without that space there is no probability. 
-
-i think the example now shows that stuff well enough... but is not super fun to play with or as visually demonstrative as it could be. i will think on it. if you have any examples or ideas, please leave them here:
-
-[]
-
-
-##1
-
-one idea is to use something like Bertrand's paradox, with the cords and the circle and the triangle. it shows explicitly that the method used is part of the probability. P(You Choose a random cord [by ...] then it will be longer than the side of the triange) = =[1/3, 1/2, 1/4)
-
-its too in your face for the first example though. we have to build up to it. though it is nicely visual... 
-
-anything like that that makes the simple point in a visual way...? hmm. 
-
-
-##2
-##3
-##4
-##5
-
-This one is great, let's just make it more compact. Move the preamble to the bottom, make the buttons less spread out, and so make the graphic the star of the show. 
-
-would be nice to somehow also show the dice chart in the empirical testing view. maybe we just have one view (the dice chart view) but compact it a bit, leaving room for a second graph to appear when we hit a run simulation button (with the slider also moved to that one view). It woudl be even cooler if that run simulation chart could sort of illuminate the individual dice rolls as it goes (this would be almost like a strobe light, given the number of trials, but we could make it work over a second or so for 100 trials, and then just show that many frames for any n selected, so if they did 5000 trials we would just show every mth roll. 
-
-the rule and formula are nice. maybe the could take the whole page width, appear under the chart. When we click run trials, maybe they disappear? when you click a new example, it defaults to the theoretical screen, until run trials is clicked again. 
 
 
 
 ##13 - saturn. 
 
-i am not sure this one is working. no thoughts on it now. 
+FOr now lets make it a coming soon. 
 
 
+##"can be used to determine any probability"
+
+This one needs some work... for now let's hide it. 
+
+
+
+##15
+highlight the bit that asks the user to click on the chart. 
+
+##17
+
+this is great, but lets do a few things. 
+
+First, fix the slider, it is okay if it just goes from 50 to 99. 
+
+Second, for the binomal chart, would it be possible to heatmap the vertical lines according to how many times they have been drawn?
+
+Third, lets have a button that sets it to peirce's example (true proprting is a third and sample size is 4. can add a little text that says something like, while we can never draw a sample that reflects the true proportion, we can be confident that our error bounds will never the less contain it [percent] of the time.
+
+Fourth, have rescale the charts on by default. 
+
+fifth... would it make sense to show the empirical distribution too? not sure, but curious to hear your thoughts. 
+
+##16 - hypothesis test. 
+
+we can cut the analysis results bit. as i think that should all be covered in the text already? maybe could there be another line along the difference line that is perferated in probable error sum sized perferations, showing that the difference is nx the sum of the probable errors? This could be indicated with colour, as we already have colours for the probable error bounds. (so each unit line could be x% blue and y% red, and equal in length to the sum of the PEs.) 
+
+that might mess with stuff a bit when we shift the Con. Lvl. but how should we handle that? it could become the sum of the blank% CL rather than PE, and have the text update as well. 
+
+(Also, what is the reasoning behind using the sum of the PEs? is that like any modern technique?
+
+
+##18
+
+need to make the tolerably certain bit clearer. 
+
+Please:
+
+Cut the explainer paragraph at the bottom (as it just mimics the text)
+
+have this bit of the text update live: "Thus we should be tolerably certain of not being in error by more than one ball in 100."
+
+it should update as you change the sample size and proportion. 
+
+Part of the point of this example is that when the true proprtion is near the extreme, the same PE value is more useful than if the dist is in the middle. 
+
+We could have a button that sets it to the same sample size but puts the proportion to .50. it shoudl show that the X in 100 updates. 
+
+shoudl it also show the PE around the bar you have clicked? is that the relevant PE?
+
+when chart is scaled to the 0-1 number line, could have vertical lines under the graph showing the size of the PE at each point. this would show the point that they are different for the extremes. 
+
+
+
+##20 - cretan induction
+
+this one needs to be slightly tweaked to reflect pierce's reasoning. 
+
+Have it go over this text:
+
+"But when I reason in the opposite direction: Minos, Sarpedon, Rhadamanthus, Deucalion, and Epimenides, are all the Cretans I can think of; But these were all atrocious liars, Therefore, pretty much all Cretans must have been liars;I do not in the least know how often such reasoning would carry me right. On the other hand, 20what I do know is that some definite proportion of Cretans must have been liars, and that this proportion can be probably approximated to by an induction from five or six instances. Even in the worst case for the probability of such an inference, that in which about half the Cretans are liars, the ratio so obtained would probably not be in error by more than 1/6. "
+
+The sample size is tied to the number of names. "Minos, Sarpedon, Rhadamanthus, Deucalion, and Epimenides," The slider that currently does sample size is actually the number of samples. 
+
+As the sample size changes, change the names. Have a set of 100 greek names (make and female, ancient if possible). When a sample is drawn, pick n creteans, and update the names to be those names in the list. Colour coordinate them. In the background, it should be decided which ones are liars and which tell the truth, so that if the boxes show this many liars and those many truth tellers, the names reflect the same. as you change the proportion, it changes who is a liar or not. 
+
+have a button for take five samples. 
+
+i think this should fix the weird numbers we were getting when you hit reveal the proportion. please double check all that. 
 
 
 ##22
 
-Shhould be combined with 23. see below. 
+Should be combined with 23. see below. 
 
 ##23 - 
 
 link it to this text:
+"Now, if there be any way of enumerating the possibilities of Nature so as to make them equally probable, it is clearly one which should make one arrangement or combination of the elements of Nature as probable as another, that is, a distribution like that we have supposed, and it, therefore, appears that the assumption that any such thing can be done, leads simply to the conclusion that reasoning from past to future experience is absolutely worthless. In fact, the moment that you assume that the chances in favor of that of which we are totally ignorant are even, the problem about the tides does not differ, in any arithmetical particular, from the case in which a penny (known to be equally likely to come up heads and tails) should turn up heads m times successively. In short, it would be to assume that Nature is a pure chaos, or chance combination of independent elements, in which reasoning from one fact to another would be impossible; and since, as we shall hereafter see, there is no judgment of pure observation without reasoning, it would be to suppose all human cognition illusory and no real knowledge possible. It would be to suppose that if we have found the order of Nature more or less regular in the past, this has been by a pure run of luck which we may expect is now at an end. Now, it may be we have no scintilla of proof to the contrary, but reason is unnecessary in reference to that belief which is of all the most settled, which nobody doubts or can doubt, and which he who should deny would stultify himself in so doing."
 
-leads simply to the conclusion that reasoning from past to future experience is absolutely worthless. In fact, the moment that you assume that the chances in favor of that of which we are totally ignorant are even, the problem about the tides does not differ, in any arithmetical particular, from the case in which a penny (known to be equally likely to come up heads and tails) should turn up heads m times successively. In short, it would be to assume that Nature is a pure chaos, or chance combination of independent elements, in which reasoning from one fact to another would be impossible; and since, as we shall hereafter see, there is no judgment of pure observation without reasoning, it would be to suppose all human cognition illusory and no real knowledge possible. It would be to suppose that if we have found the order of Nature more or less regular in the past, this has been by a pure run of luck which we may expect is now at an end."
+i have forgotten the idea for this, so will hold off for now. 
 
-the point is that in assuming there are even odds, we are making a factual assumption. we are assuming that the world is like a fair coin, but they making the mistake of treating any run of heads or tails as evidence of bias / regularity. 
+## Blackberries
 
-really, the conceptualist should be treating this as asking which urn the coin came from, and hoping that it lines up over the urn for "fair coin"
+"The relative probability of this or that arrangement of Nature is something which we should have a right to talk about if universes were as plenty as blackberries, if we could put a quantity of them in a bag, shake them well up, draw out a sample, and examine them to see what proportion of them had one arrangement and what proportion another. "
 
-but the next bit shows that this "is something which we should have a right to talk about if universes were as plenty as blackberries, if we could put a quantity of them in a bag, shake them well up, draw out a sample, and examine them to see what proportion of them had one arrangement and what proportion another. "
-
+not sure yet. 
 
 ## new example
 
-for this text " The relative probability of this or that arrangement of Nature is something which we should have a right to talk about if universes were as plenty as blackberries, if we could put a quantity of them in a bag, shake them well up, draw out a sample, and examine them to see what proportion of them had one arrangement and what proportion another." 
+"All our reasonings are of two kinds: 1. Explicative, analytic, or deductive; 2. Amplifiative, synthetic, or (loosely speaking) inductive. In explicative reasoning, certain facts are first laid down in the premises. These facts are, in every case, an inexhaustible multitude, but they may often be summed up in one simple proposition by means of some regularity which runs through them all. Thus, take the proposition that Socrates was a man; this implies (to go no further) that during every fraction of a second of his whole life (or, if you please, during the greater part of them) he was a man. He did not at one instant appear as a tree and at another as a dog; he did not flow into water, or appear in two places at once; you could not put your finger through him as if he were an optical image, etc. Now, the facts being thus laid down, some order among some of them, not particularly made use of for the purpose of stating them, may perhaps be discovered; and this will enable us to throw part or all of them into a new statement, the possibility of which might have escaped attention. Such a statement will be the conclusion of an analytic inference. Of this sort are all mathematical demonstrations. But synthetic reasoning is of another kind. In this case the facts summed up in the conclusion are not among those stated in the premises. They are different facts, as when one sees that the tide rises m times and concludes that it will rise the next time. These are the only inferences which increase our real knowledge, however useful the others may be."
 
+Have a deductive view where the premises are this is socrates and socrates is a man. have a third sort of greyed out premise that is all men are _____
+
+the conclusion can be therefore socrates is _____
+
+have a button that sort of moves a list through the blank spot in the premises, kind of like setting a date on an old iphone or going through a rolodex. just have a list of like 100 things that all men are and have it woosh through them for 2 seconds, and when it lands on one, have it also appear in the conclusion. 
+the point is that the informatino oin the conclusion is not in the premises. 
+
+Show how a problem in probabilities is set up the same way (have a tab under the deduction view to switch it between probabilities and socrates. highlighting this when in probability view "In any problem in probabilities, we have given the relative frequency of certain events, and we perceive that in these facts the relative frequency of another event is given in a hidden way. This being stated makes the solution."
+
+it could be like i am rolling this dice in my dice box
+Die like this rolled that way come up six ___ percent of the time. 
+THerefore, i shoudl expect this one to come up six ___ percent of the time. 
+
+	
+
+then on the induction view, we want to show that we have different facts. 
+
+we could maybe use bean bags. premise one would be that we drew these beans  (could have a slider for like 1-10, and as you move it it randomly generates some beans. 
+and the beans came from that bag. 
+and the conclusion could be like, the beans in the bag are of the same proportion. 
+
+we need a way to show that no fact about any particular bean in your hand has anything to do with a bean in the bag. 
+
+
+
+## PUrple beans.
+
+this text:
+"When we draw a deductive or analytic conclusion, our rule of inference is that facts of a certain general character are either invariably or in a certain proportion of cases accompanied by facts of another general character. Then our premise being a fact of the former class, we infer with certainty or with the appropriate degree of probability the existence of a fact of the second class. But the rule for synthetic inference is of a different kind. When we sample a bag of beans we do not in the least assume that the fact of some beans being purple involves the necessity or even the probability of other beans being so. On the contrary, the conceptualistic method of treating probabilities, which really amounts simply to the deductive treatment of them, when rightly carried out leads to the result that a synthetic inference has just an even chance in its favor, or in other words is absolutely worthless. The color of one bean is entirely independent of that of another.
+
+But synthetic inference is founded upon a classification of facts, not according to their characters, but according to the manner of obtaining them. Its rule is, that a number of facts obtained in a given way will in general more or less resemble other facts obtained in the same way; or, experiences whose conditions are the same will have the same general characters.
+
+In the former case, we know that premises precisely similar in form to those of the given ones will yield true conclusions, just once in a calculable number of times. In the latter case, we only know that premises obtained under circumstances similar to the given ones (though perhaps themselves very different) will yield true conclusions, at least once in a calculable number of times. 25We may express this by saying that in the case of analytic inference we know the probability of our conclusion (if the premises are true), but in the case of synthetic inferences we only know the degree of trustworthiness of our proceeding. As all knowledge comes from synthetic inference, we must equally infer that all human certainty consists merely in our knowing that the processes by which our knowledge has been derived are such as must generally have led to true conclusions."
+
+
+Modes for analytic and synthetic. synthetic will then split into conceptualist and materialist. 
+
+###Analytic
+
+
+[slider] % of beans in this bag are purple
+These [n] beans were drawn [randomly / selectively] from that bag
+:  In the long run, [n] / total beans will approach [the correct percentage]. 
+
+start the slider at 100% and have it real "all" (when it goes to 0 have it read none). and have the conclusion just follow, these beans will be purple.  as the slider goes into not certainty, modify the conclusion to what is above. note there is no probability about this example, there are however many purple beans there are in the sample. (we could do like the black bean hidden thing above, but have it hide the sample. if the beans are draw selectively, have a note saying that this changes the probability, its like the ace of spades deck abouve, or a magician drawing your card. 
+
+if your sample size is the total number of beans, then that becomes also a kind of certainty. 
+
+###Synthetic Conceptualist
+
+needs to make this point: "On the contrary, the conceptualistic method of treating probabilities, which really amounts simply to the deductive treatment of them, when rightly carried out leads to the result that a synthetic inference has just an even chance in its favor, or in other words is absolutely worthless. The color of one bean is entirely independent of that of another."
+
+not sure how to best do this... 
+
+###Synthetic (Materialist)
+
+
+
+
+## new example 
+
+
+"Most treatises on probability contain a very different doctrine. They state, for example, that if one of the ancient denizens of the shores of the Mediterranean, who had never heard of tides, had gone to the bay of Biscay, and had there seen the tide rise, say m times, he could know that there was a probability equal to (m + 1) / (m + 2) that it would rise the next time. In a well-known work by Quetelet, much stress is laid on this, and it is made the foundation of a theory of inductive reasoning."
+
+could have bayes theorem pop up and show how you need values for the porbability of events?
 
 ##24
 
-we should set this one up maybe as a bayesian vs frequentist thing?
+##32
 
+this one is cool...  for now lets hide the "Weighted by" view. 
 
-##25
+##33
 
-will need to fix this one. 
+the "take one more drawing" button does not work on the probable error view. either it should or it sohuld only appear in the drawings view. 
 
-
-# All prose in the examples, in order of appearance
-
-Claude: Pulled straight off the page with every example open, so this is what is
-actually on screen and not what the source says it should be. Each is in its
-opening state — nothing drawn, nothing sampled — so lines that change with the
-controls appear here in their starting form only. Slider labels and button
-labels are included, since they are prose the reader sees.
-
-NRR: I am going to change these now. please update the prose to what is below.
-
-Claude: done — every edit below is now in the page. Where an example was marked
-to be held back the code is untouched; only what its trigger opens has changed,
-so nothing has to be unpicked to put it back.
-
-## 1 — Antecedent, Consequent, Consequence
-
-P(If I were to draw the top card from a well shuffled deck of standard playing
-cards, then that card would be exactly A of any suit)
-Rank:
-P(A → C) = 4/52 = 0.0769
-Probabilities do not apply to events. There is no probability of C. They apply
-to arguments, and so always depend on how some set of antecedent facts relate to
-the consequent fact.
-ANTECEDENT   drawing the top card from a well shuffled deck of standard playing cards
-CONSEQUENT   the card is exactly A of any suit
-CONSEQUENCE  if the first, then the second
-P(A -> C) = 4 / 52 = 0.0769
-The number is a property of the consequence — of arguments of this form — and
-not of any card. There is no P(this card is an ace).
-
-## 2 — The Rule for the Addition of Probabilities
-
-P(If I were to draw the top card from a well shuffled deck of standard playing
-cards, then that card would be exactly A of hearts)
-P(the same, then that card would be exactly A of spades)
-P(A → C1) 1/52 + P(A → C2) 1/52 = P(A → C1 or C2) 2/52
-Nothing answers to both consequents, so the sum is the answer: 0.0385. That is
-the rule.
-Two consequences from the same antecedent. The rule adds them, and adding them
-is right only while they cannot both come true — while nothing counts towards
-both. Set them so that something does, and the sum counts it twice.
-
-## 3 — Multiplication Rule for Consequences
-
-The Rule: Given two consequences where the antecedent of the second includes the
-consequent of the first:
-P(A → B) × P(A∧B → C) = P(A → [B ∧ C])
-A → B (prob P1)
-A ∧ B → C (prob P2)
-Therefore: A → B ∧ C (prob P1 × P2)
-Antecedent A - Draw top card from: / Consequent B - First condition: /
-Consequent C - Second condition (given B): / Number of trials (n):
-ANTECEDENT A: Draw from SHUFFLED STANDARD deck
-CONSEQUENCE 1: "IF A, THEN B" where B = Card is RED
-- B occurs: 252 / 520 times
-- P(A → B) = 0.4846
-CONSEQUENCE 2: "IF (A AND B), THEN C" where C = Card is FACE CARD (J,Q,K)
-- Among 252 cases where B holds, C also holds: 65 times
-- P(A∧B → C) = 65 / 252 = 0.2579
-COMBINED CONSEQUENCE: "IF A, THEN (B AND C)"
-- Both B and C: 65 / 520 times
-- P(A → [B∧C]) = 0.125
-MULTIPLICATION RULE:
-P(A → B) × P(A∧B → C) = 0.4846 × 0.2579 = 0.125
-P(A → [B∧C]) = 0.125
-The consequences CHAIN: first A leads to B, then among cases where we have both
-A and B, we check if C follows.
-
-## 4 — Independent Probabilities
-
-The Special Rule: When B and C are independent (meaning P(A→C) = P(A∧B→C)), we
-can multiply:
-P(A → B) × P(A → C) = P(A → [B ∧ C])
-Independence means: Knowing B doesn't change the probability of C
-Antecedent A - Draw top card from: / Consequent B - Operator: Rank: Property:
-Suit: / Consequent C - Operator: Rank: Property: Suit:
-ANTECEDENT A: Draw from SHUFFLED STANDARD deck
-CONSEQUENCE 1: "IF A, THEN B" where B = Card is exactly A
-- P(A → B) = 4/52 = 0.0769
-CONSEQUENCE 2: "IF A, THEN C" where C = Card is exactly A
-- P(A → C) = 4/52 = 0.0769
-INDEPENDENCE TEST:
-- P(A → C) = 0.0769
-- P(A∧B → C) = 4/4 = 1
-- NOT INDEPENDENT
-SPECIAL RULE (only works if independent):
-P(A → B) × P(A → C) = 0.0769 × 0.0769 = 0.0059
-P(A → [B∧C]) = 4/52 = 0.0769
-Rule doesn't work here. B and C are NOT independent. Knowing B changes the
-probability of C.
-Difference: |0.0059 - 0.0769| = 0.071
-
-## 5 — Peirce's Dice Problems
-
-Explore classic dice probability problems using the rules we've learned. Select
-a preset or run a simulation.
-Important Note: These are theoretical problems. The answers give expectations
-about empirical long-run frequencies—but we solve them with mathematics, not by
-rolling 10,000 times, just as we solve geometry with trigonometry rather than a
-protractor.
-Peirce's: a six / both sixes / deuce-ace
-others: sum of 7 / at least one 6 / both even / any doubles
-Single die shows 6
-Rule: Basic Probability
-One outcome (6) out of six equally likely outcomes.
-General Formula: P(A → B) = (# times A and B occur) / (# times A occurs)
-Calculation: Favorable outcomes: 1 / Total outcomes: 6 / Probability: 1/6 = 0.1667
-P(die = 6) = 1/6
-
-## 21 — Sciential and Ignorantical probability (a note, not a demonstration)
-
-Peirce once dubbed his frequentist, materialist notion of probability "Sciential
-Probability", while deeming a brand of conceptualist probability "pure
-Ignorantical Probability" (R 647, 18). This makes it clear which he preferred,
-and why. Sciential Probability is based on known frequencies. Ignorantial is
-based on assumptions about those frequencies (we will see some of these
-assumptions later in this paper). Some might suggest you could mix these two
-notions, taking a Bayesian approach so long as you intermingle it with some
-frequentism in the right ways. Peirce comments on this approach as well, noting
-that: "The result of a calculation that mingles these two kinds of probability,
-indiscriminately, may be called, out of justice to the great mathematician whose
-worship keeps up its prevalent employment, Laplacian Probability" (MS 647, 19).
-Similar examples could be multiplied endlessly. It is worth noting that his
-apparent reverence for Laplace in the above passage is mocking at best. In 1909,
-the previous year, Peirce stated that the inverse view of probability was first
-"set forth by a certain Rev. Mr. Bayes, otherwise unknown to science. It was
-taken up by Laplace in his work on the subject, which is as weak on the logical
-side as it is strong on the mathematical side" (MS 625:5).
-
-## 6 — two arguments, three grids
-
-A1 → C  Right in this proportion of cases:
-A2 → C  Right in this proportion of cases:
-Sort the cells / Reset to Peirce's 81 and 93
-Both right 75 · one right, one wrong 24 · both wrong 1
-They agree in 76 cases, and of those 75 are right: 0.9868
-P(A1→C) × P(A2→C) = 0.81 × 0.93 = 0.7533
-Expected in the long run: 0.7533 / (0.7533 + 0.0133) = 0.9827
-
-## 7 — When Both Rules Give the Same Answer
-
-Two independent rules, applied to the same question, either agree or disagree.
-They agree in just two circumstances: both are right, or both are wrong.
-Peirce's formula asks what proportion of the agreements are the first kind.
-A1 → C  Right in this proportion of cases:
-A2 → C  Right in this proportion of cases:
-Reset to Peirce's 81 and 93
-93 × 81 / ((93 × 81) + (7 × 19)) = 7,533 / 7,666 = 0.982651
-
-## 8 — The Same Combination, as a Probability and as a Chance
-
-Peirce's 81 and 93 / both even chances / both 3 to 2 / both very strong
-probability — P(A→C)
-chance — Ch(A→C)
-A1 → C  81 : 19 = 4.263
-A2 → C  93 : 7 = 13.286
-both, when they agree
-as a probability  0 ½ 1  0.9827
-the same as a chance  0 50 100  56.639 : 1
-Peirce's chance is what we now call the odds. A chance of 81/19 is odds of 81:19 on; an even chance, 1:1, is evens.
-
-## 26 — The Logarithm of the Chance
-
-probability (p/n)  0 ½ 1  0.500
-chance (p/(n−p))  0 50 100 →  1 : 1 = 1.000
-log(chance)  -3 -2 -1 0 evens 1 2 3  0.000
-even chance / 2 to 1 / 9 to 1 / 99 to 1 / 999 to 1 / 1 to 9 against
-
-## 9 — Balancing Reasons
-
-Add an argument for / Add an argument against / Add an even chance / Peirce's
-two rules
-Units of belief:
-A1 → C  tells for  P ½ 0.810  Ch 0 10 20  81 : 19  log Ch -3.0 adds nothing +3.0  +1.450
-A2 → C  tells for  P ½ 0.930  Ch 0 10 20  93 : 7   log Ch -3.0 adds nothing +3.0  +2.587
-Sum of the arguments for: 4.0367
-Sum of the arguments against: 0.0000 (subtracted)
-Remainder — the belief we ought to have on the whole: +4.0367
-Combined chance C = e^4.0367 = 56.6391
-Combined probability C/(1 + C) = 0.982651
-Cross-check. Multiplying the chances directly gives 133 : 7,533, i.e. a
-probability of 133/(133 + 7,533) = 0.017349 — the same number the sum of
-logarithms produced above. 
-
-## 27 — Which Way the Connection Runs
-
-But note the nature of this intimate connection. When the probabilities of
-several independent arguments pertaining to C are known, they can be combined to
-produce the proper (though unit-less) intensity of belief one ought to have in
-C. However, one's current degree of belief never acts as an input to this
-method, and cannot be used to determine any probability. Further, someone who is
-stubborn, sceptical, over enthusiastic, or otherwise biased, may not adjust
-their belief to that "proper" level.
-Move the probability sliders to see how they impact the proper intensity of
-belief. Move the Your Belief slider to see how much it impacts any worldly
-probability.
-A1 → C  ½  0.81  81 : 19
-A2 → C  ½  0.93  93 : 7
-Proper Intensity of Belief  -6 0 even chance +6  +4.037
-Your Intensity of Belief  -6 0 +6  +4.04
-Update your belief: to its proper state / stubbornly / enthusiastically
-The arguments give a proper intensity of +4.037. Yours stands at +4.04, which is
-just what you ought to believe.
-
-## 34 — A Proportion of What?
-
-Note: Work in Progress
-
-Peirce's two rules, as counts. Each probability is the shaded part of its own grid.
-Peirce's two rules / Fever and rash / Steel and engineer / Two drug trials
-A1 → C — 100 cases where A1 held, 81 with C.  0.81
-A2 → C — 100 cases where A2 held, 93 with C.  0.93
-The ringed cases are the 20 where both antecedents held. They are drawn twice
-here, once in each grid, because nothing yet says what is in them.
-Balancing the two gives 0.9827. Neither argument has that as its shaded part.
-The only cases it could be the shaded part of are those where A1 and A2 both
-held. There are 20 of them and nobody has counted them.
-Cases where both antecedents hold:
-Of those, how many have C:
-Go and count them / Leave them uncounted
-Putting the overlap above zero says there is a wider space — A0, in which both
-antecedents are defined and sometimes both hold. This makes the question possible to answer, but doesn't give that answer.  The two arguments leave the proportion anywhere
-between 0.650 and 1.000, and every value in that band is consistent with 81 in
-100 and 93 in 100. Count them and see.
-Pooling the two grids does give a countable figure, 174 in 200, or 0.87. But
-observe A2 twice as often and it moves even though  neither argument has changed.
-
-## 10 — Sampling the Bag of Beans
-
-Draw one bean / Draw ten / Draw a hundred / Draw a thousand / New bag /
-Peirce's bag (even) / Look inside the bag
-Under the thimble: ?
-0 white and 0 black in 0 drawings.
-Proportion white: —
-The drawings are a record of what came out of the bag. How can we determine the
-colour of the bean under the thimble?
-
-## 11 — Two Numbers, Not One
-
-On these drawings we calculate two numbers. The first is the
-proportion white among the drawings. The second is the probable error: the
-amount by which the first is as likely as not to be wrong. Initially, drawing more beans
-moves the first number very little and the second a great deal.
-Draw one bean / Draw ten / Draw a hundred / Draw a thousand / New bag
-First number — the proportion  —  ·  Second number — the probable error  —
-0 white in 0 drawings. Nothing has been drawn, and neither number has a value.
-[tabs] The drawings / The distribution
-
-## 33 — When the Second Number Overwhelms the First
-
-[tabs] Set the probable error / Set the drawings
-The probable error:
-Beans drawn from the bag:
-Take one more sample / New bag
-First number — the proportion 0.3125 · Second number — the probable error ±0.0600
-An error of that size is what you have after 32 drawings. One more would move
-the first number by +0.0208 if it came up white, −0.0095 if black, and the
-second by 0.000927.
-The two numbers are of a size. The proportion says something and the probable
-error says how far to trust it, and neither can be dropped in favour of the
-other.
-[at the other settings: "The bag is as good as counted…", nothing at all in the
-"very slight" band, and "The error is wider than a single drawing could ever
-leave it…" at the far end]
-
-## 12 — Twenty Black Beans, Whatever the Total
-
-Each black bean drawn is an independent argument that the hidden bean is black;
-each white one is an argument against. Balancing reasons adds up the black
-arguments and subtracts the white ones — so the net belief depends only on the
-excess, never on how many beans were drawn. The materialist reads the same
-drawings as an estimate of a proportion, and gets a different answer.
-The first twenty beans, all black / 1,010 black and 990 white
-Beans drawn: / Proportion of them black:
-Balancing reasons says…
-20 arguments for, 0 against, each worth 0.3010 of belief.
-Net belief = (20 − 0) × 0.3010 = 6.021
-P(hidden bean is black) = > 0.999999 — depends only on the excess of 20
-The proportion drawn says…
-20 black out of 20 drawings.
-Observed proportion black = 20/20 = 1.0000, probable error ±0.0000
-P(hidden bean is black) = 1.0000 — depends on the whole record
-Every bean an argument / 20 arguments, none cancelled / 20 for, 0 against
-[tabs] The drawings / The distribution
-Chance each single bean contributes: / Take the chance from the drawings
-In both cases, the black beans exceed the white beans by twenty. The method of
-balancing reasons is blind to the weight of the evidence, and so assigns each
-case the same intensity of belief. The method Peirce endorses recognizes that
-the second case provides a near-certain report that the bag is half black. The
-second number, the probable error, recognizes the weight of the evidence
-reflecting this near-certainty. (In one sense of weight of evidence, see Kasser
-(2016).)
-
-## 32 — Which Arguments Are Worth Balancing?
-
-[tabs] The rule as stated / Weighted by how well each is known
-Run the tests / New arguments
-Arguments: / Testing effort: / Tolerable certainty — largest probable error admitted:
-What each argument is worth and how well we know it
-The balance, on what was admitted
-3 of 5 arguments are known well enough to admit at ±0.080, and the balance of
-those puts the conclusion at 0.7769. Admit all 5, however badly established, and
-it is 0.9543.
-As we have seen, each argument is determined by two numbers, a determination of
-its probability and its probable error. The method of balancing reasons only
-considers the determination of probability. We have let you set a threshold for
-how good an argument must be for you to consider its value. Click weighted by
-how well each is known to see why we can't simply weigh each argument according
-to its probable error.
-[weighted tab: "This mode is just for fun. Here, no arguments are disqualified,
-but each is weighted such that it contributes only the share of its own
-log-chance that is real rather than noise… Here is why this is just for fun. The
-method of balancing reasons adds independent arguments; you cannot shrink a term
-in a sum and still claim to be summing the evidence…"]
-
-## 13 — The Color-Chart and the Inhabitants of Saturn
-
-
-{Remove this example for now}
-
-
-## 29 — Is the Next Letter a Consonant?
-
-Read one letter / Read ten / Read a hundred / Read up to the paragraph in view /
-Read nothing yet
-the rule says 0.500
-the paper is 0.619 consonant
-0  ½  1
-You have read no letters, so the rule of succession says: ½ — (0 + 1) / (0 + 2).
-It would answer the same of any question whatever. The paper is in fact 0.619 consonant.
-
-
-## 28 — One Urn for Each Proportion
-
-Show: Peirce's urns, one for each proportion / Which urn was this paper drawn from?
-Balls in each urn:
-4 : 0  3 : 1  2 : 2  1 : 3  0 : 4
-5 urns for 4 balls — one for every proportion of white to black, from all white
-to all black.
-Imagine there are A hundred and one urns, the kth holding letters of which k in a hundred are
-consonants. Pretend that his paper is written in just consonants and vowels, without worrying about the specific consonant or vowel. We will proceed like the conceptualist. Read some of the paper and try to determine the probability that it was drawn from a given urn. 
-
-Read ten letters / Read a hundred / Read a thousand / Read up to the paragraph
-in view / Read nothing yet
-Before a letter has been read / The urns say urn N / The paper's own proportion
-Urn — consonants in a hundred / all vowel / all consonant
-Nothing has been read, so by the principle of indifference (or rule of succession) every urn is as likely as every other and the distribution
-is flat. This reflects an assumption and is the result of ignorance. Later findings built on this flat distribution are only as good as their foundation. 
-
-
-## 30 — Filling the Urns from the Granary
-
-White to black in the granary: / Balls in each urn:
-The granary: one-third of the balls white, two-thirds black, and no end of them.
-Put one ball in each urn / Fill the urns / Sort them, whitest first / Empty them
-/ Peirce's own case
-0 of 4 balls put in each of 81 urns.
-
-## 31 — What the First Two Balls Tell You
-
-Draw two at random / or set them: white, white / white, black / black, white /
-black, black
-first drawn  second drawn  third drawn
-Every third ball still in play: 3 white of 9 — 0.3333
-
-## 22 — Which Bag Did This Coin Come From?
-
-{Hide this for now (dont delete the code, just hide it). user side, replace it with a  coming soon note} 
-
-## 23 — Insisting on the Shuffle
-
-{Hide this for now (dont delete the code, just hide it). user side, replace it with a  coming soon note} 
-
-## 24 — Which Way Round?
-
-{Hide this for now (dont delete the code, just hide it). user side, replace it with a  coming soon note} 
-
-An urn holds some proportion of white balls. We draw a sample, observe the
-proportion in it, and conclude that the urn's proportion lies within a tolerance
-of what we saw. Whether that conclusion is any good can be asked in two
-ways
-The urn's true proportion: / Balls in a sample: / Tolerance of the conclusion (±):
-The probability that our conclusion will accord with the fact
-The urn is what it is. Range over the samples we might have drawn from it, and
-count how often the procedure's conclusion is true.
-Draw a thousand samples / Reset
-No samples drawn yet.
-The rate is 0.3456, fixed by the urn, the sample size and the tolerance. Nothing
-was assumed to get it.
-The probability that the fact will accord with our conclusion
-Our one sample is what it is. Range over the urns the world might have been, and
-ask what proportion of them our conclusion fits.
-Draw a fresh sample
-Our sample: 4 white in 5, so the conclusion is that the urn lies within 0.70 to 0.90.
-Weighting the urns / Answer
-Every urn alike 0.4759 / Favouring the extremes 0.4506 / Favouring the middle 0.2245
-Three answers, spread 0.251. Each is as defensible as the others.
-The same inequality stands behind both columns: the urn's proportion within 0.10
-of the sample's. On the left it is conditioned on the urn and counted over
-samples; on the right it is conditioned on the sample and counted over urns.
-The left number is a fact about our procedure in the world we are in. Draw more
-samples and it settles on 0.3456, and it would settle there whatever anyone
-believed. The right number cannot be had without saying how the urns are
-distributed, and the three weightings give 0.476, 0.451, 0.225. There is no
-further fact to appeal to, because we have not got a population of urns to count
-— only the one in front of us.
-Raise the sample size and the three answers close on each other, which is the
-whole of their credibility: they agree only when the data is doing the work and
-the weighting has stopped mattering. It is the small-sample case that the
-question was asked about.
-
-## 15 — Sampling from an Urn
-
-Interactive Demonstration: Sampling from an Urn
-Explore the binomial distribution for sampling with replacement.
-True proportion (p): / Sample size (s): / Rescale chart (zoom) / X-axis: Number
-of balls / Reset to Peirce's example
-Click on any bar to see the exact probability.
-Suppose one ball out of 3 is white and the rest black, and that four balls are
-drawn.
-
-## 17 — Peirce's formula for probable error
-
-True proportion (p): / Number of balls drawn (s): / Rescale charts / Select
-confidence level: / Custom confidence level (%):
-Test with Simulation:
-Draw Single Sample / Draw 100 Samples / Reset History
-Sampling Distribution of p-hat
-History of Last 100 Samples:
-[the table of levels it fills in is printed in the article, not in the panel]
-
-## 16 — Real Difference, or Chance?
-
-Comparison of Both Groups
-Rescale chart (zoom) / Show probable error bounds
-The 1870 census / Same sample size / A difference due to chance
-Males among white children: / White children counted: / Males among colored
-children: / Colored children counted: / p, assumed true proportion: /
-Confidence level (%):
-Analysis Results
-Step 1: Calculate Probable Errors
-For Group 1 (n = 1,000,000): e1 = 0.00034
-For Group 2 (n = 150,000): e2 = 0.00087
-Step 2: Test Against Error Intervals
-Observed difference: 0.0105
-Sum of probable errors: 0.0012
-Multiple of error: 8.7 x (e1 + e2)
-Conclusion
-
-[it also fills two rows into the printed table above the paragraph: "probable
-error, white children  0.477 root(2 × 0.50 × 0.50 / 1,000,000) = 0.00034" and
-the same for the colored children]
-
-## 18 — Extreme probabilities are more secure
-
-True proportion (p): / Sample size (s): / Rescale chart (zoom) / X-axis: Number
-of balls / Show prediction interval / Prediction confidence level: / Reset to
-Peirce's example
-Click on any bar to see the exact probability.
-We should be tolerably certain of not being in error by more than 1.7 balls in 100.
-Thus, suppose there were in reality one white ball in 100 in a certain urn, and
-we were to judge of the number by 100 drawings.
-The probability of drawing no white ball would be 366/1000; that of drawing one
-white ball would be 370/1000; that of drawing two would be 185/1000; that of
-drawing three would be 61/1000; that of drawing four would be 15/1000; that of
-drawing five would be 3/1000, etc.
-Thus we should be tolerably certain of not being in error by more than one ball
-in 100 (0.921).
-
-## 19 — Epimenides the Cretan
-
-Liars in a hundred Cretans:
-Find Epimenides / Sample 100 times / Reset
-A hundred Cretans — liars and truth-tellers:
-The proportion of liars is given in the premise. Picking a Cretan and calling
-him a liar is the same kind of calculation as throwing a die: the rule is right
-as often as the proportion says, and no argument about Epimenides in particular
-is needed. Nothing is known of him beyond his being a Cretan, so finding
-Epimenides is drawing a Cretan at random, and the rate at which the rule carries
-truth is his rate too.
-The rule "call any Cretan a liar" carries truth 99/100 = 0.99 of the time. That
-number is known before any Cretan is picked, and picking more of them only
-brings the tally towards it.
-
-## 20 — Five or Six Cretans
-
-Take a sample / Take a hundred samples / Take a thousand / Clear the samples /
-New Cretans / Reveal the proportion
-Cretans in each sample: / Confidence level: / Mixing before the draw:
-The hundred Cretans — liars, truth-tellers, and those not looked at:
-Nothing uncovered yet.
-[once sampling has begun, its report goes into Peirce's own paragraph rather
-than into the panel: "Our last induction from five gave 0.600 ± 0.1508, and the
-real proportion is 0.57 — out by 0.031, inside the bound…"]
-
-## 25 — The Conclusion, or the Proceeding
-
-{Hide this for now (dont delete the code, just hide it). user side, replace it with a  coming soon note} 
-
-Analytic — the rate belongs to the conclusion
-Premises of one form: so many in a hundred are liars, this is one of them,
-therefore this is a liar. Every argument of that form is alike, so the rate at
-which the form carries truth is the rate for any conclusion drawn by it.
-Liars in a hundred: / Run a thousand / Reset
-Nothing run yet.
-The form carries truth 0.99 of the time, and that is the probability of any
-conclusion it yields.
-Synthetic — the rate belongs to the proceeding
-Five inquiries with nothing in common but the way the premises were got: draw a
-sample, and conclude that the truth lies within the probable error of what was
-drawn. The subjects differ, the proportions differ, the procedure does not.
-Instances drawn in each inquiry: / Run a thousand each / Reset
-Run the inquiries to fill the last column.
-On the left, every argument shares a form, so the rate at which the form carries
-truth is the rate for the conclusion. Say 99 in a hundred and the conclusion
-drawn about any particular Cretan is right 0.99 of the time. The number is the
-probability of the conclusion.
-On the right, the second column shows how little the five have to do with each
-other, and the last shows how little that matters. The tide, the beans and the
-tornado sign are not alike, and no probability has been assigned to any of them.
-What is calculable is how often this way of getting at a proportion comes off,
-and it comes off at about a half whichever inquiry it is turned on — because a
-half is what the probable error was defined to deliver.
-So the synthetic case yields no probability for its conclusion. It yields the
-degree of trustworthiness of the proceeding, and that is a different thing, got
-by classing the inferences not by what they say but by how they were come by.
 
 
 
