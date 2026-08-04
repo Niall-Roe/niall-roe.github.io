@@ -166,8 +166,12 @@ registerExample("example-ex13", (box) => {
    The examples themselves are untouched, above and in their own files; this
    only replaces what their triggers open, so that nothing has to be unpicked
    to put them back. Delete this block and they return as they were.
+
+   13 is here too, the colour chart being complete but waiting on where it
+   stands now that 21's demonstration has gone; take it out of the list and it
+   is back exactly as it was, the whole of it being still above.
    ========================================================================*/
-["example-ex22", "example-ex23", "example-ex24", "example-ex25"].forEach((id) => {
+["example-ex13", "example-ex22", "example-ex23", "example-ex24", "example-ex25"].forEach((id) => {
   registerExample(id, (box) => {
     box.appendChild(h(`<div class="example-content" style="padding-top:2px;">
       <p class="ed-note" style="margin-bottom:0;">Coming soon.</p></div>`));

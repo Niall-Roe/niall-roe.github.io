@@ -408,6 +408,16 @@ registerExample("example-ex33", (box) => {
 
   let truth = 0.5, cum = new Int32Array(0), extra = 0;
 
+  /* The error held as a real number rather than read back off its own slider.
+     A drawing added to a long run changes the error by less than the slider's
+     0.002 step, so rounding to the step and reading that back meant the button
+     did nothing at all over most of the range — the count never moved, and the
+     button looked broken because it was. The slider is still written to, so the
+     thumb goes where it can; this is what the example is actually working on.
+     Any hand movement of the slider drops it and the slider is the handle
+     again. */
+  let peReal = null;
+
   function newBag() {
     truth = 0.12 + Math.random() * 0.76;
     cum = new Int32Array(MAXN + 1);
@@ -423,7 +433,7 @@ registerExample("example-ex33", (box) => {
   function state() {
     let raw, pe;
     if (mode === "pe") {
-      pe = num("ex33_pe");
+      pe = peReal === null ? num("ex33_pe") : peReal;
       raw = nFromPE(pe);
     } else {
       raw = STOPS[Math.round(num("ex33_i"))] + extra;
@@ -527,8 +537,15 @@ registerExample("example-ex33", (box) => {
     const st = state();
     light(st);
 
-    $("[data-act='one']", content).textContent =
-      mode === "pe" ? "Take one more sample" : "Draw one more bean";
+    const oneBtn = $("[data-act='one']", content);
+    oneBtn.textContent = mode === "pe" ? "Take one more sample" : "Draw one more bean";
+    /* with the bag counted exactly there is no drawing left to take, so the
+       button goes rather than sitting there doing nothing */
+    oneBtn.style.display = (mode === "pe" && st.exact) ? "none" : "";
+    /* the slider can only show its own step; while an exact error is being held
+       the readout gives that instead, so the two do not disagree */
+    const peVal = document.getElementById("ex33_pe_val");
+    if (peVal && mode === "pe" && peReal !== null) peVal.textContent = `±${peReal.toFixed(3)}`;
 
     const implied = st.exact ? "the whole bag counted"
       : st.none ? "fewer than one drawing — nothing has been drawn"
@@ -567,7 +584,11 @@ registerExample("example-ex33", (box) => {
     drawCanvas(canvas);
   }
 
-  content.addEventListener("input", () => { if (mode === "beans") extra = 0; update(); });
+  content.addEventListener("input", (ev) => {
+    if (mode === "beans") extra = 0;
+    if (ev.target && ev.target.id === "ex33_pe") peReal = null;
+    update();
+  });
   content.addEventListener("click", (ev) => {
     const tab = ev.target.closest(".mode-tab");
     if (tab) {
@@ -575,7 +596,7 @@ registerExample("example-ex33", (box) => {
       $$(".mode-tab", content).forEach((x) => x.classList.toggle("active", x === tab));
       $("#ex33-ctl-pe", content).style.display = mode === "pe" ? "" : "none";
       $("#ex33-ctl-beans", content).style.display = mode === "beans" ? "" : "none";
-      extra = 0;
+      extra = 0; peReal = null;
       update();
       return;
     }
@@ -586,12 +607,17 @@ registerExample("example-ex33", (box) => {
       if (mode === "beans") extra++;
       else {
         /* one more sample, expressed as what it does to the error one is
-           holding: the slider steps down by exactly that much */
+           holding. The slider is moved to the nearest step it can show, and the
+           exact value is kept beside it — setSlider fires an input event, which
+           clears peReal, so the exact figure is assigned after it. */
         const st = state();
-        if (!st.exact) setSlider("ex33_pe",
-          Math.max(0, Math.round(peFromN(Math.max(1, st.raw) + 1) / 0.002) * 0.002));
+        if (!st.exact) {
+          const next = peFromN(Math.max(1, st.raw) + 1);
+          setSlider("ex33_pe", Math.max(0, Math.round(next / 0.002) * 0.002));
+          peReal = next;
+        }
       }
-    } else if (a === "newbag") { newBag(); extra = 0; }
+    } else if (a === "newbag") { newBag(); extra = 0; peReal = null; }
     else return;
     update();
   });

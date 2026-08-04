@@ -70,83 +70,119 @@ Interactive Diagram
 
 can say that this is the Gaussian Theory of Errors  and now we put this in terms like this: Oi = T + \epsilon_i 
 
---- BUILT: EXAMPLE 1 --------------------------------------------------------
+## 1 — The quantity observed and the quantity wanted
+Status: awaiting approval
 
-Margin number: 1.  Trigger: the whole sentence "We now pass to the theory of
-observations..."  Source: src/05_ex1.js.
+### Text
+"We now pass to the theory of observations. An observation gives us the value
+of a certain quantity which is connected with an unknown quantity in such a way
+as to be partly dependent on the latter value, and partly on accidental
+circumstances, not capable of being separately taken account of."
 
-What it does. Three colour-coded phrases in Peirce's own sentence (the quantity
-observed, blue; the unknown quantity, green; the accidental circumstances, red)
-light up when the example opens. Sliders set T and the reach of the accidental
-circumstances; buttons observe once or fifty times. A number line shows T as a
-green rule and each observation as a dot, with the newest one bracketed back to
-T and the bracket labelled with its own epsilon. Under it the series piles up
-into a histogram. Then the three-row ladder, aligned in columns and colour
-coded:
-
-    the quantity observed = the unknown quantity + the accidental circumstances
-             O_i          =          T           +           e_i
-            4.911         =        5.000         +         -0.089
-
-A checkbox hides the unknown quantity. Nothing in the data changes when it goes
-— same dots, same places — which is the observer's actual position, and the
-argument for why a law of error is needed at all. The closing note changes with
-the checkbox and hands off to the next section.
-
-Open questions for you:
+### Suggestions
 - Is the transit-instrument framing right this early, or should the first
   example be neutral about what is being measured?
-- The ladder is the pattern I propose to reuse for every formula in the paper:
-  words, then Peirce's symbols, then the numbers. Say if you want it the other
-  way up, or the modern line added as a fourth row rather than a footnote.
+- [from the build] The three-row statement — words, then Peirce's symbols, then
+  the numbers — is the pattern I propose to reuse for every formula in the
+  paper. Say if you want it the other way up, or the modern line added as a
+  fourth row rather than as a footnote.
+- TO EDIT: the opening paragraph of the example is a placeholder of mine and is
+  yours to rewrite. It is the only prose left in the example, and it carries the
+  colour key for the whole paper — unknown quantity green, accidental
+  circumstances red, quantity observed blue — so whatever replaces it should
+  still name those three things; the three coloured spans are in the markup and
+  want keeping. The transit instrument as the running example is open too. It is
+  marked with a TO EDIT comment at the top of src/06_ex1.js.
 
+### Awaiting approval
+#### the statement at the top, the cumulative cloud, the residual
+Three colour-coded phrases in Peirce's own sentence light when the example
+opens. Sliders set T and the reach of the accidental circumstances; buttons
+observe once or fifty times. A number line shows T as a green rule and each
+observation as a dot, the newest bracketed back to T and labelled with its own
+epsilon; underneath, the series piles into a histogram. The statement sits at
+the top, above the controls:
 
-## Law of the Facility of Errors
+    the quantity observed = the unknown quantity + the accidental circumstances
+             O_i                     T                        e_i
+            4.911                  5.000                    -0.089
 
-"The special form of the function φ is called the law of the facility of the errors."
+The = and + are set once, in the top row only. The cloud is cumulative: every
+observation is kept and drawn faint at a vertical position fixed when it was
+made, so the pile darkens where the observations fall thickest — measured on the
+built page, the dense middle reads about 30% darker than the sparse edges.
 
-This should let Peirce's symbols become live and colour coded, so that the formula = a copy of the formula with numbers filled in = the modern version. 
+A checkbox hides the unknown quantity; nothing in the data changes when it does,
+which is the observer's actual position. A second checkbox shows the mean as a
+gold dashed rule, and with the unknown quantity hidden the third term becomes
+the residual — the bracket is measured from the mean, labelled r, and the
+statement reads O_i = x-bar + r_i in gold rather than green and red. With both
+shown, both brackets draw, and the gap between them is the difference between an
+error and a residual.
 
-Then there should be a graphical display. the universe is observations of a certain kind. these observations lead to a certain distribution. we could have observations of different "kinds" leading to different distributions.
+All closing prose cut, at your instruction. The example ends at the plots.
 
-could simultaneously have a marksman analogy. have a target with bullseye and hit marks scattered around the target in the appropriate ways to match the "type" of observation.  
+### Completed
+None yet.
 
---- BUILT: EXAMPLE 2 --------------------------------------------------------
+## 2 — The law of the facility of errors
+Status: awaiting approval
 
-Margin number: 2.  Trigger: "The special form of the function phi is called the
-law of the facility of the errors."  Source: src/06_ex2.js.
+### Text
+"These accidental variations are, however, in all cases subject to a statistical
+law, so that (observations of a certain kind forming the limited universe, X
+being the unknown quantity, Xi the quantity observed) the quantity,"
+... "The special form of the function phi is called the law of the facility of
+the errors."
 
-What it does. Four kinds of observation to choose between, all of them ones
-Peirce himself names: transit observations (normal), a star out from behind the
-moon (skewed right, no mass to the left — his occultation case), a coarse
-instrument (uniform, the chemist's balance and the dropped decimal places), and
-two observers run together (bimodal, the case he returns to at the end of the
-paper). Choosing a kind clears the shots, since the old ones were not fired
-under this law.
-
-The marksman is on the left and the law on the right, and they are the same
-fact drawn twice: the horizontal scatter of the shots is what the curve
-describes. A strip of width d-epsilon runs across both. The ladder reads
-
-    the height of the law at that error x the width of the strip = how often
-    phi(e, x) . de = P
-    0.807 x 0.10 = 0.0807
-
-and the readout says how many shots actually fell in the strip — the point
-being that phi is only worth anything because it predicts frequencies. The
-closing note is different for each of the four kinds, tying each to where in
-the paper Peirce discusses it.
-
-The four laws are defined once, in src/04_scaffold.js as ERROR_LAWS, so every
-later example that needs a law of error draws on the same four shapes and the
-reader keeps meeting the same curves.
-
-Open questions for you:
+### Suggestions
 - The strip is fixed at 0.10 wide. Should it be a slider, so that d-epsilon
-  getting small is something you can watch?
+  getting small is something you can watch? This matters more now that the strip
+  is carrying Peirce's d-xi.
 - "Two observers run together" anticipates the splitting-the-universe section a
   long way ahead. Keep it here, or hold it back?
+- [from the build] The limited universe is only implied — it is whatever kind of
+  observation is selected, and changing the kind clears the shots. Worth making
+  explicit in the graphic, or does the radio button carry it?
 
+### Awaiting approval
+#### phi as a relative number, folded in from the passage above
+Four kinds of observation, all named by Peirce: transit observations (normal), a
+star out from behind the moon (skewed right, no mass to the left), a coarse
+instrument (uniform), and two observers run together (bimodal). The marksman is
+on the left and the law on the right — the same fact drawn twice, since the
+horizontal scatter of the shots is what the curve describes. A strip of width
+d-epsilon runs across both.
+
+The passage between examples 1 and 2 is where phi comes from, so it now opens
+this example too. Peirce defines it as a relative number, and the example was
+already computing that ratio without naming it, so the statement is two-sided —
+a tally on the left, a law on the right:
+
+    the shots in the strip, out of      =     the height of the law there,
+    every shot fired                          times the width of the strip
+
+    [xi_Xi , x_x] / [x_x] . d-xi              phi(e, x) . de
+
+    24 / 400 = 0.0600                         0.807 x 0.10 = 0.0807
+
+The bracket notation uses the same mirrored inverted comma as the article text.
+The readout gives both numbers and says they close on each other as more shots
+are fired, which is the whole content of the claim. A line underneath notes that
+the left side is a tally and nothing else, that the limited universe here is
+every shot this marksman fired, and that since e = xi - x the two differentials
+are the same width.
+
+Example 2 now opens from three passages; only the first takes the margin
+number, which needed a change to the shared scaffolding.
+
+Two layout bugs fixed on the way: a note spanning every column of the statement
+grid was dumping its whole width into the operator column (337px), and the
+three-column variant outranked the narrow-screen rule so it never collapsed on
+mobile.
+
+### Completed
+None yet.
 
 ## Need for a law of error
 
@@ -435,6 +471,125 @@ the hands will be carried forward by the fraction of a thousandth of a second mo
 ##Experiment
 
 Copy the occultation simulation from above. let the user try it. have. button to simulate 500 and give a graph like those Peirce found. 
+
+## 3 — The twenty-four days: the tables and the plate
+Status: awaiting approval
+
+### Text
+"Five hundred observations were made on every week-day during a month,
+twenty-four days' observations in all. The results are given in the accompanying
+table, and are also shown upon plate No. 27."
+
+### Suggestions
+- The pencil ("Draw it myself") draws left to right only and does not yet let
+  you go back over a stretch. Enough, or should it be a proper freehand tool?
+- The plate is drawn at one scale per panel, each centred on its own day. Peirce
+  drew them on a common horizontal scale, which is what makes the drift across
+  the month visible down the column. Say which you want. Easier to judge now
+  that his own plate is a button away.
+- Nothing yet uses the tables to make the paper's own point — that the range of
+  errors narrowed after the twelfth day. That wants its own example, on the
+  sentence that says so.
+- [from the build] Should the discrepancy note live in the example, or only in
+  these notes? At the moment the tables tab says when a day does not sum to 500.
+
+### Awaiting approval
+#### REVISION 3 (your notes): the plate's two buttons, the legend cut
+- The plate carries both buttons at all times — "The redrawing" and "Peirce's
+  own plate" — with the current one marked, instead of one button that swapped
+  its own label. It opens on the redrawing. The mean-curve and reset controls,
+  and the two sliders, still appear only on the redrawing, there being nothing
+  for them to drive on his.
+- The line under the calendar is cut. The question I had raised with it — why
+  the 2nd to 4th and 11th to 13th of July are missing — goes with it.
+
+#### REVISION 2 (your notes): the plate's scales, the day's table, the pencil out
+- Every panel of the plate now carries its own scale: the four verticals are
+  labelled with the millisecond they stand at, set under the baseline. The
+  canvas is taller to make room. They are in milliseconds, to agree with the
+  tables and the one-day tab; Peirce labelled his in seconds (0.15, 0.20 ...)
+  and only on the top panel of each column, since his panels share a scale.
+  Say if you would rather have it his way.
+- On the one-day tab the table has moved up beside the buttons — it is now in
+  the same column as the plot, directly under it, so the calendar, the sliders
+  and the buttons sit alongside both. It scrolls within 300px.
+- "Draw it myself" is gone, and the pencil machinery with it.
+- The Plate 27 figure that sat in the article above this block is removed. The
+  plate is a button away inside the block now, so it was there twice.
+- The mean curve has a slider of its own, from 4 (bouncy) to 48 (very smooth),
+  default 22. It sits beside the smoothing slider on both the plate and the
+  one-day tab, so on the plate it redraws all twenty-four mean curves at once.
+  "Reset to Peirce's" restores both sliders.
+
+#### REVISION 1 (your notes): at the foot of the page, and a calendar
+- The whole thing now sits open at the foot of the page and is not behind a
+  trigger at all. It is no longer an example container: it is a plain block set
+  off by a rule, with the numeral 3 still in the margin, built at load. The
+  "Five hundred observations" sentence is plain text again.
+- The day is chosen from a calendar of July 1872 with August 1-3 beside it,
+  instead of a dropdown. July 1872 began on a Monday. Days with observations are
+  clickable and carry their roman numeral and total in the tooltip; days without
+  are dimmed, which puts the shape of the month on view — every Sunday absent,
+  and the 2nd to 4th and 11th to 13th of July.
+- The plate has a button that swaps between the redrawing and Peirce's own
+  engraved Plate 27. On the redrawing the smoothing slider sits above it, so
+  moving it redraws all twenty-four panels at once and the month tightens
+  together; the mean curves toggle with it. The slider is hidden on his plate,
+  there being nothing to drive.
+- "Reset to Peirce's" on both the plate and the one-day tab: eight passes, mean
+  curve on, everything else off.
+- The chosen day carries between the tabs.
+
+#### three tabs: the tables, the plate, one day
+Data from Koenker's transcription (Koenker's data/MiM/data), parsed exactly as
+his ReadPeirceData does, and held in the shape Peirce printed it: nine
+column-pairs per day, each read downwards, with a value smaller than the one
+above it treated as an abbreviation for the hundreds carried down. 13 KB
+embedded in the page, so nothing is fetched at run time.
+
+THE TABLES. Peirce's own layout, reproduced to the digit. His abbreviation rule
+turned out to be readable off the printed page: the time is set in full at the
+head and the foot of each column, wherever the run of milliseconds breaks, and
+at every multiple of ten; elsewhere the last digit alone. Checked cell by cell
+against pp. 138-139 — the first row reads 158 1, 348 0, 389 1, 430 0, 471 1,
+512 1, 553 0, 593 1, 633 2, and the first column reads 158, 240, 261, 277, 296,
+312, 3, 4, 5, 6, 7, 8, 9, 320, 1, 2, 3, 4, 5, 6, 7, both exactly as printed.
+
+THE PLATE. All twenty-four panels, two columns of twelve, roman numeral and date
+at the left of each, baseline and four verticals as on Plate 27. Each panel
+carries the figures smoothed eight times over and a mean curve.
+
+ONE DAY. The smoothing is put in your hands. Peirce says the curve was "smoothed
+off by the addition of adjacent numbers in the table eight times over", which is
+convolution with [1,1] eight times, so the slider runs 0 to 16 passes and is
+labelled at 8 as his. At 0 the raw figures show as spikes. The sums are divided
+back by 2^passes so the vertical scale stays comparable. Then the four overlays:
+a mean curve by eye, a pencil so you can draw your own — his smoother curve is
+"a mean curve for every day drawn by eye", not a fit of any kind — a Gaussian of
+the same mean and spread, and clear.
+
+#### discrepancies found in the data, as asked
+1. Peirce says five hundred observations were made on every week-day. The
+   printed tables sum to 500 on only two of the twenty-four days (the 14th and
+   the 19th). The whole month comes to 11,803, not 12,000 — 197 short.
+
+2. The twelfth day, July 20, sums to 396: 104 short, where no other day is out
+   by more than 11. This is not a transcription slip. I summed the printed table
+   on p. 149 by hand and it comes to 396 as well, and that day's table is
+   visibly shorter than the others — 18 rows where the eleventh day has 20, and
+   it shares a page with the thirteenth. Whatever happened, happened before the
+   tables were set.
+
+3. Two days run over: the seventeenth by 7 and the twenty-first by 2.
+
+4. Koenker's Day01.txt has two stray periods, "1." on line 9 and ".0" on line
+   15. R's scan() reads them as 1 and 0, so his analysis is unaffected, and the
+   parser here does the same; they are transcription noise, not data.
+
+### Completed
+#### the mean curve's default width
+22 is right. [22 seems good.] The slider stays, defaulting there, and "Reset to
+Peirce's" returns to it.
 
 #Graphs and table
 

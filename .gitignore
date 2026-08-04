@@ -1,1 +1,4 @@
 .DS_Store
+_status/index.html
+_status/notes-*.html
+__pycache__/

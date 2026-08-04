@@ -1,0 +1,77 @@
+
+<h2>Try the three methods on yourself</h2>
+<p class="standfirst">The same three procedures, run on your own eyes with grey patches.</p>
+
+<p class="lead">Everything so far used a simulated subject whose answer was known in advance. Here you are the subject. Two grey squares stand side by side and the task is to compare them, exactly as the weights were compared. Each method takes a minute or two. Your results stay on this page as you go, and are gathered at the bottom.</p>
+
+<p class="help-text">Best in a dim room at ordinary screen brightness. Screens differ, so your numbers are in grey levels out of 255 and are not comparable with anyone else's.</p>
+
+<div class="note-block"><b>One difference from the earlier pages</b> These test the difference threshold only. An absolute threshold needs a stimulus that can be turned down to nothing, and a screen in a lit room cannot be trusted that far.</div>
+
+<hr class="div">
+<h3>One · right and wrong cases</h3>
+<p>Four fixed differences, shuffled, eight trials each. Say whether the two squares differ. Guess when you cannot tell.</p>
+<div class="ex-buttonbar" id="t1-intro"><button class="btn btn-primary btn-lg" id="t1-start">Begin</button></div>
+<div id="t1-run" class="hidden">
+  <div class="stage"><div class="patch" id="t1-l"></div><div class="patch" id="t1-r"></div></div>
+  <div class="keys">
+    <button class="btn btn-lg" id="t1-yes">Different</button>
+    <button class="btn btn-lg" id="t1-no">The same</button>
+  </div>
+  <div class="prog"><i id="t1-bar"></i></div>
+  <p class="help-text" id="t1-count"></p>
+</div>
+<div id="t1-done" class="hidden">
+  <div id="t1-sheet"></div>
+  <div class="plot-container" id="t1-plot"></div>
+  <p class="plot-cap">Your proportions, with an ogive fitted through them.</p>
+  <div id="t1-calc"></div>
+  <div class="ex-buttonbar"><button class="btn" id="t1-again">Run it again</button></div>
+</div>
+
+<hr class="div">
+<h3>Two · just noticeable differences</h3>
+<p>The difference grows or shrinks on its own. Press the button, or the space bar, the moment your answer changes. Six series, alternating.</p>
+<div class="ex-buttonbar" id="t2-intro"><button class="btn btn-primary btn-lg" id="t2-start">Begin</button></div>
+<div id="t2-run" class="hidden">
+  <p id="t2-instr"></p>
+  <div class="stage"><div class="patch" id="t2-l"></div><div class="patch" id="t2-r"></div></div>
+  <div class="keys"><button class="btn btn-lg" id="t2-resp">I see it now</button></div>
+  <p class="help-text" id="t2-count"></p>
+</div>
+<div id="t2-done" class="hidden">
+  <div id="t2-sheet"></div>
+  <div class="plot-container" id="t2-plot"></div>
+  <p class="plot-cap">Your crossings, by direction.</p>
+  <div id="t2-calc"></div>
+  <div class="ex-buttonbar"><button class="btn" id="t2-again">Run it again</button></div>
+</div>
+
+<hr class="div">
+<h3>Three · average error</h3>
+<p>Drag the slider until the two squares look identical, then set it. Seven settings, each starting somewhere new.</p>
+<div class="ex-buttonbar" id="t3-intro"><button class="btn btn-primary btn-lg" id="t3-start">Begin</button></div>
+<div id="t3-run" class="hidden">
+  <div class="stage"><div class="patch" id="t3-l"></div><div class="patch" id="t3-r"></div></div>
+  <div class="ctl">
+    <label for="t3-slider">Right square <span class="slider-val" id="t3-sv">—</span></label>
+    <input type="range" id="t3-slider" min="-25" max="25" step=".5" value="12">
+  </div>
+  <div class="ex-buttonbar"><button class="btn btn-primary btn-lg" id="t3-set">They match — set it</button></div>
+  <p class="help-text" id="t3-count"></p>
+</div>
+<div id="t3-done" class="hidden">
+  <div id="t3-sheet"></div>
+  <div class="plot-container" id="t3-plot"></div>
+  <p class="plot-cap">Your settings, their mean, and the band holding the middle half.</p>
+  <div id="t3-calc"></div>
+  <div class="ex-buttonbar"><button class="btn" id="t3-again">Run it again</button></div>
+</div>
+
+<hr class="div">
+<h3>Your three numbers</h3>
+<div id="you-out"></div>
+
+<div class="colophon">
+  Kept in this browser only. <button class="btn" id="you-clear">Clear your results</button>
+</div>

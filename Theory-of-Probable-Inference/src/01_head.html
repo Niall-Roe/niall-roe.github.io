@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Peirce — A Theory of Probable Inference (1883)</title>
+<style>
+  /* ==========================================================================
+     The same page as the companion edition of "The Probability of Induction":
+     one palette for prose, controls and plots alike, a paper card on a warm
+     ground, one serif throughout, and hairlines instead of boxes wherever a
+     boundary has to be shown at all. The example scaffolding below is carried
+     over unchanged from that page, so an interactive example written for it
+     will drop into this one without restyling.
+     ========================================================================*/
+  :root {
+    --page:      #f4f1ea;
+    --paper:     #ffffff;
+    --ink:       #1f2328;
+    --ink-soft:  #575d66;
+    --ink-faint: #8a9099;
+    --rule:      #dbd6cb;
+    --rule-soft: #ece8df;
+    --wash:      #faf8f3;
+    --accent:    #2f6f9f;   /* the first quantity, wherever a pair is shown */
+    --accent-2:  #b0563f;   /* the second */
+    --accent-3:  #4a7c59;   /* truth, or the thing being approached */
+    --accent-4:  #9a7b3f;   /* remarks and asides */
+    --tint:      rgba(47, 111, 159, .10);
+    --tint-2:    rgba(176, 86, 63, .10);
+    --tint-3:    rgba(74, 124, 89, .12);
+    --tint-4:    rgba(154, 123, 63, .12);
+  }
+
+  body {
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 16px;
+    background-color: var(--page);
+    color: var(--ink);
+  }
+
+  .article-container {
+    background-color: var(--paper);
+    padding: 52px 56px;
+    box-shadow: 0 1px 3px rgba(60, 50, 30, .10);
+    border-radius: 2px;
+  }
+
+  h3 {
+    text-align: center;
+    font-variant: small-caps;
+    margin-top: 40px;
+    margin-bottom: 30px;
+    letter-spacing: 1px;
+  }
+
+  h4 {
+    text-align: center;
+    font-weight: normal;
+    margin-bottom: 10px;
+  }
+
+  h5 {
+    font-size: .82em;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .09em;
+    color: var(--ink-faint);
+    margin: 22px 0 8px 0;
+  }
+
+  .section-number {
+    text-align: center;
+    font-size: 1.2em;
+    margin: 40px 0 20px 0;
+    font-weight: bold;
+  }
+
+  p {
+    text-align: justify;
+    margin-bottom: 15px;
+    position: relative;      /* positioning context for .ex-num */
+  }
+
+  /* ------------------------------------------------------------------------
+     Example numbers in the gutter, for referring to them elsewhere. The marker
+     is inserted at the head of its trigger and positioned with `left` only, so
+     its vertical place is the static one — the trigger's own first line, which
+     is what makes two examples in one paragraph land separately.
+     ----------------------------------------------------------------------*/
+  .ex-num {
+    position: absolute;
+    left: -46px;
+    width: 34px;
+    text-align: right;
+    font-size: .78em;
+    line-height: 1.85;
+    letter-spacing: .03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+    user-select: none;
+    pointer-events: none;
+  }
+  /* the gutter is the container's own 56px of padding, which narrows to 20 at
+     the same breakpoint the rest of the layout stacks — no room for it there */
+  @media (max-width: 720px) { .ex-num { display: none; } }
+
+  html { scroll-behavior: smooth; }
+
+  /* ------------------------------------------------------------------------
+     The trigger. A whole paragraph is often the anchor, so a fill would tint
+     half the page; a hairline under the run of text marks its extent without
+     competing with the prose. The fill appears only on hover, to show how far
+     the passage reaches.
+     ----------------------------------------------------------------------*/
+  .example-trigger, .example-trigger-yellow {
+    cursor: pointer;
+    padding: 0;
+    border-radius: 1px;
+    background-color: transparent;
+    transition: background-color .22s ease, border-color .22s ease;
+  }
+  .example-trigger        { border-bottom: 1px solid rgba(47, 111, 159, .28); }
+  .example-trigger-yellow { border-bottom: 1px solid rgba(154, 123, 63, .32); }
+  .example-trigger:hover        { background-color: var(--tint);   border-bottom-color: var(--accent); }
+  .example-trigger-yellow:hover { background-color: var(--tint-4); border-bottom-color: var(--accent-4); }
+  .example-trigger.is-open, .example-trigger-yellow.is-open {
+    border-bottom-style: solid;
+    border-bottom-color: var(--rule);
+    background-color: transparent;
+  }
+
+  /* ------------------------------------------------------------------------
+     The example itself. grid-template-rows 0fr -> 1fr animates to the content's
+     own height with nothing measured in script; the inner div does the
+     clipping. Margin travels with it so the space closes up too.
+     ----------------------------------------------------------------------*/
+  .example-container {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    margin: 0;
+    transition: grid-template-rows .55s cubic-bezier(.22, .61, .36, 1),
+                margin .55s cubic-bezier(.22, .61, .36, 1),
+                opacity .3s ease;
+  }
+  .example-container.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    margin: 34px 0 38px 0;
+  }
+  .example-container > .ex-inner { overflow: hidden; min-height: 0; }
+
+  .example-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: .8em;
+    font-variant: small-caps;
+    letter-spacing: .1em;
+    font-weight: 400;
+    color: var(--ink-faint);
+    cursor: pointer;
+    user-select: none;
+    margin-bottom: 22px;
+  }
+  .example-header:before {
+    content: '\25BE';
+    font-size: .9em;
+    line-height: 1;
+    transition: transform .25s ease;
+  }
+  .example-header.collapsed:before { transform: rotate(-90deg); }
+  .example-header:after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background-color: var(--rule-soft);
+  }
+  .example-header:hover { color: var(--ink-soft); }
+
+  .example-content { margin-top: 0; }
+
+  /* ------------------------------------------------------------------------
+     Numbers in Peirce's own text, driven by the controls below them. Dormant
+     they are indistinguishable from the prose; live they take the colour of
+     the control moving them.
+     ----------------------------------------------------------------------*/
+  .live { transition: color .25s ease, background-color .4s ease; }
+  .live.is-live {
+    font-variant-numeric: tabular-nums;
+    background-color: var(--tint);
+    border-radius: 2px;
+    padding: 0 1px;
+  }
+  .frac .live.is-live, .peirce-table .live.is-live, .live.is-live.phrase {
+    background-color: transparent;
+    padding: 0;
+  }
+  .live.is-live.k1 { color: var(--accent);   background-color: var(--tint); }
+  .live.is-live.k2 { color: var(--accent-2); background-color: var(--tint-2); }
+  .live.is-live.k3 { color: var(--accent-3); background-color: var(--tint-3); }
+  .live.is-live.k4 { color: var(--accent-4); background-color: var(--tint-4); }
+
+  /* the driving slider wears the colour of the numbers it moves */
+  .ctl.k1 input[type=range] { accent-color: var(--accent); }
+  .ctl.k2 input[type=range] { accent-color: var(--accent-2); }
+  .ctl.k3 input[type=range] { accent-color: var(--accent-3); }
+  .ctl.k4 input[type=range] { accent-color: var(--accent-4); }
+  .ctl.k1 .slider-val { color: var(--accent); }
+  .ctl.k2 .slider-val { color: var(--accent-2); }
+  .ctl.k3 .slider-val { color: var(--accent-3); }
+  .ctl.k4 .slider-val { color: var(--accent-4); }
+
+  /* shown beside a control group that has left Peirce's figures behind */
+  .restore-peirce {
+    font-size: .8em;
+    font-variant: small-caps;
+    letter-spacing: .07em;
+    color: var(--ink-faint);
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: inherit;
+    padding: 0;
+    margin: 2px 0 10px 0;
+    border-bottom: 1px dotted var(--rule);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .3s ease;
+  }
+  .restore-peirce.on { opacity: 1; pointer-events: auto; }
+  .mode-tabs .restore-peirce { margin: 0 0 8px 22px; align-self: center; }
+  .restore-peirce:hover { color: var(--ink-soft); }
+
+  /* ------------------------------------------------------------------------
+     Terms of Peirce's coloured in his own sentence rather than only in the
+     legend below it. Dormant they are ordinary text; the colour arrives with
+     the example, on the same rule as the live numbers.
+     ----------------------------------------------------------------------*/
+  .hl-text {
+    border-radius: 2px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+    background-color: transparent;
+    transition: background-color .35s ease;
+  }
+  .hl-text.hl-on.a { background-color: rgba(154, 123, 63, .16); }
+  .hl-text.hl-on.c { background-color: rgba(47, 111, 159, .14); }
+  .hl-text.hl-on.q { background-color: rgba(74, 124, 89, .16); }
+
+  /* A clause that owns a stretch of a slider's travel: it lights as the slider
+     enters its range and fades as it leaves. */
+  .hl-band {
+    border-radius: 2px;
+    padding: 1px 3px;
+    margin: 0 -3px;
+    background-color: transparent;
+    transition: background-color .45s ease;
+  }
+  .hl-band.band-on { background-color: rgba(47, 111, 159, .26); }
+  @media (prefers-reduced-motion: reduce) { .hl-band { transition: none; } }
+
+  /* --------------------------------------------- highlighting in the prose */
+  .hl-antecedent  { background-color: rgba(154, 123, 63, .14); padding: 1px 3px; border-radius: 2px; }
+  .hl-consequent  { background-color: rgba(47, 111, 159, .12); padding: 1px 3px; border-radius: 2px; }
+  .hl-consequence { background-color: rgba(74, 124, 89, .14);  padding: 1px 3px; border-radius: 2px; }
+  .hl-rule   { background-color: rgba(154, 123, 63, .14); padding: 1px 3px; border-radius: 2px; }
+  .hl-case   { background-color: rgba(47, 111, 159, .12); padding: 1px 3px; border-radius: 2px; }
+  .hl-result { background-color: rgba(74, 124, 89, .14);  padding: 1px 3px; border-radius: 2px; }
+
+  /* ------------------------------------------------- displayed expressions */
+  .formula, p.formula, .formula-box, .arrow-diagram {
+    text-align: center;
+    margin: 24px 0;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: 1.16em;
+    font-weight: 400;
+  }
+  .arrow-diagram { font-size: 1.14em; }
+
+  .calc-output {
+    background: none;
+    border: none;
+    border-left: 2px solid var(--rule);
+    border-radius: 0;
+    padding: 2px 0 2px 18px;
+    font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+    margin-top: 16px;
+    white-space: pre-wrap;
+    font-size: .78em;
+    line-height: 1.65;
+    color: var(--ink-soft);
+    overflow-x: auto;
+  }
+
+  .key-insight {
+    background: none;
+    border: none;
+    border-left: 2px solid var(--accent-4);
+    border-radius: 0;
+    padding: 1px 0 1px 18px;
+    margin: 20px 0;
+    font-style: italic;
+  }
+  .key-insight strong { font-style: normal; }
+
+  .note-block {
+    font-size: .9em;
+    color: var(--ink-soft);
+    background: none;
+    border: none;
+    border-left: 2px solid var(--rule);
+    padding: 1px 0 1px 18px;
+    margin: 16px 0;
+    font-family: inherit;
+  }
+
+  .click-info {
+    padding: 1px 0 1px 18px;
+    background: none;
+    border: none;
+    border-left: 2px solid var(--accent-4);
+    border-radius: 0;
+    margin-top: 16px;
+    font-size: .95em;
+  }
+
+  .help-text { color: var(--ink-faint); font-style: italic; text-align: left; }
+
+  .control-panel, .plot-container, .group-box {
+    background: none;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    margin: 0 0 18px 0;
+  }
+  .plot-container { margin: 18px 0; }
+
+  .result-box {
+    padding: 16px 0 0 0;
+    margin-top: 22px;
+    background: none;
+    border: none;
+    border-top: 1px solid var(--rule-soft);
+    border-radius: 0;
+  }
+
+  /* --------------------------------------------------------- mode switches */
+  .mode-tabs {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 22px;
+    flex-wrap: wrap;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  .mode-tab {
+    padding: 3px 0 8px 0;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: .95em;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    color: var(--ink-faint);
+    transition: color .2s, border-color .2s;
+  }
+  .mode-tab:hover { color: var(--ink-soft); }
+  .mode-tab.active {
+    background: none;
+    color: var(--ink);
+    border-bottom-color: var(--accent);
+  }
+
+  /* -------------------------------------------------------------- controls */
+  .ctl { margin-bottom: 16px; }
+  .ctl > label {
+    display: block;
+    font-family: inherit;
+    font-size: .92em;
+    font-weight: 400;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+    line-height: 1.5;
+  }
+  .ctl select, .ctl input[type=number] {
+    width: 100%;
+    padding: 4px 2px;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 1em;
+    color: var(--ink);
+    background: transparent;
+  }
+  .ctl select:focus, .ctl input[type=number]:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+  .ctl input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    margin: 2px 0;
+  }
+  .ctl .slider-val {
+    font-family: inherit;
+    font-size: .95em;
+    color: var(--accent);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .ctl.checkbox label { display: flex; align-items: center; gap: 8px; font-weight: 400; }
+  .ctl.checkbox input { width: auto; accent-color: var(--accent); }
+  .ctl .radio-row { display: flex; gap: 18px; flex-wrap: wrap; }
+  .ctl .radio-row.stacked { flex-direction: column; gap: 4px; }
+  .ctl .radio-row label {
+    display: flex; align-items: center; gap: 6px;
+    font-family: inherit;
+    font-size: .95em; font-weight: 400; cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .ctl .radio-row input { accent-color: var(--accent); }
+
+  /* Buttons set as small caps in the text face, outlined rather than filled —
+     they sit in the column beside the prose and should not shout across it. */
+  button.btn {
+    font-family: inherit;
+    font-size: .88em;
+    font-variant: small-caps;
+    letter-spacing: .05em;
+    padding: 5px 13px;
+    margin: 3px 4px 3px 0;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    cursor: pointer;
+    background: none;
+    color: var(--ink-soft);
+    transition: color .18s, border-color .18s, background-color .18s;
+  }
+  button.btn:hover { background-color: var(--wash); color: var(--ink); border-color: var(--ink-faint); }
+  button.btn.is-active {
+    background-color: var(--tint-4);
+    border-color: var(--accent-4);
+    color: var(--accent-4);
+  }
+  button.btn-primary   { color: var(--accent);   border-color: rgba(47, 111, 159, .45); }
+  button.btn-success   { color: var(--accent-3); border-color: rgba(74, 124, 89, .45); }
+  button.btn-warning   { color: var(--accent-4); border-color: rgba(154, 123, 63, .50); }
+  button.btn-danger    { color: var(--accent-2); border-color: rgba(176, 86, 63, .45); }
+  button.btn-secondary { color: var(--ink-soft); border-color: var(--rule); }
+  button.btn-primary:hover   { background-color: var(--tint);   color: var(--accent); }
+  button.btn-success:hover   { background-color: var(--tint-3); color: var(--accent-3); }
+  button.btn-warning:hover   { background-color: var(--tint-4); color: var(--accent-4); }
+  button.btn-danger:hover    { background-color: var(--tint-2); color: var(--accent-2); }
+  button.btn-block { display: block; width: 100%; margin: 4px 0; }
+  button.btn-sm    { font-size: .8em; padding: 3px 9px; }
+
+  /* A row of actions laid out across the column rather than stacked down the
+     side of it, so the graphic they drive stays in view with the prose. */
+  .ex-buttonbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+    margin-bottom: 16px;
+  }
+  .ex-buttonbar .btn { margin: 0; }
+
+  /* ------------------------------------------------------------------------
+     An argument set out inside an example, its three lines aligned and its
+     terms coloured to the controls that move them. Same shape as .scheme in
+     the article, so the reader sees the same object in both places.
+     ----------------------------------------------------------------------*/
+  .arg {
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 16px 0;
+    margin: 0 0 18px 0;
+  }
+  .arg .arg-name {
+    font-size: .8em; font-variant: small-caps; letter-spacing: .1em;
+    color: var(--ink-faint); margin-bottom: 10px;
+  }
+  .arg p { text-align: left; margin: 0 0 7px 0; line-height: 1.65; }
+  .arg p:last-child { margin-bottom: 0; }
+  .arg .concl { padding-top: 7px; border-top: 1px solid var(--rule-soft); }
+  .arg.is-necessary { border-color: rgba(74, 124, 89, .4); }
+  .arg + .arg { border-top: none; margin-top: -18px; }
+
+  /* ---------------------------------------------------------------- cards */
+  .card {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 34px; height: 46px; margin: 2px;
+    border: 1px solid var(--rule); border-radius: 3px;
+    background-color: var(--paper);
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: .95em; line-height: 1.05;
+    color: var(--ink);
+    transition: opacity .2s, border-color .2s, background-color .2s;
+  }
+  .card .pip { font-size: 1.05em; }
+  .card.red { color: var(--accent-2); }
+  .card.back {
+    background-color: var(--wash);
+    border-color: var(--rule);
+    color: var(--ink-faint);
+    background-image: repeating-linear-gradient(45deg,
+      rgba(47,111,159,.10) 0 4px, transparent 4px 8px);
+  }
+  .card.dim { opacity: .28; }
+  .card.ace { border-color: var(--accent); box-shadow: inset 0 0 0 1px rgba(47,111,159,.35); }
+  .card.big { width: 52px; height: 72px; font-size: 1.25em; }
+  .card-row { display: flex; flex-wrap: wrap; align-items: center; margin: 2px 0 10px 0; }
+  .card-row .hand-lbl {
+    flex: 0 0 108px; font-size: .82em; font-variant: small-caps; letter-spacing: .07em;
+    color: var(--ink-faint);
+  }
+  .pack-grid { display: flex; flex-wrap: wrap; gap: 0; max-width: 100%; }
+
+  /* the 100 figures of ex1 */
+  .pop-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; max-width: 260px; margin: 6px 0 14px 0; }
+  .pop-cell { aspect-ratio: 1; border-radius: 2px; background-color: var(--rule-soft); transition: background-color .18s; }
+  .pop-cell.on { background-color: var(--accent); }
+  .pop-cell.pick { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+  /* a bar showing a set of admitted ratios rather than one ratio (ex2) */
+  .ratio-bar {
+    position: relative; height: 40px; margin: 10px 0 2px;
+    border: 1px solid var(--rule); border-radius: 3px;
+    background-color: var(--rule-soft); overflow: hidden;
+  }
+  .ratio-bar .band { position: absolute; top: 0; bottom: 0; background-color: rgba(47,111,159,.42); }
+  .ratio-scale { position: relative; height: 16px; font-size: .7em; color: var(--ink-faint); }
+  .ratio-scale span { position: absolute; transform: translateX(-50%); }
+
+  /* A remark of the editor's rather than a sentence of Peirce's: set in from
+     the margin behind a rule, so the page never has to be read twice to see
+     whose voice it is in. */
+  .ed-note {
+    border-left: 3px solid var(--accent);
+    padding-left: 16px;
+    margin-left: 2px;
+    color: var(--ink-soft);
+  }
+
+  /* Where an example reports back inside Peirce's own paragraph, the report is
+     tinted so it cannot be mistaken for his sentence carrying on. */
+  .ex-reading {
+    background-color: rgba(47, 111, 159, .11);
+    color: var(--accent);
+    border-radius: 2px;
+    padding: 1px 3px;
+    box-decoration-break: clone;
+    -webkit-box-decoration-break: clone;
+  }
+
+  /* ------------------------------------------------------------------------
+     Peirce's numbered "Forms". No card, just a hairline top and bottom, the
+     way the granary table and the mode-tab rows are set on the companion page.
+     ----------------------------------------------------------------------*/
+  div.form {
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 20px 0;
+    margin: 30px 0;
+    position: relative;      /* positioning context for .ex-num */
+  }
+  div.form h3 { margin: 0 0 4px 0; font-size: 1em; }
+  div.form h3 .bis { font-variant: normal; font-style: italic; letter-spacing: normal; }
+  div.form p.title {
+    text-align: center;
+    font-style: italic;
+    font-variant: small-caps;
+    letter-spacing: .04em;
+    margin: 0 0 16px 0;
+  }
+  div.form p { text-align: left; margin: 0 0 8px 0; }
+
+  /* An argument set out line by line inside the prose — a syllogism, a scheme,
+     an explanatory deduction. Same voice as a .form but without the heading. */
+  .scheme {
+    margin: 22px 0 22px 34px;
+    line-height: 1.65;
+  }
+  .scheme p { text-align: left; margin: 0 0 10px 0; }
+  .scheme p:last-child { margin-bottom: 0; }
+  .scheme .lbl, .scheme-pair .lbl {
+    font-variant: small-caps;
+    letter-spacing: .05em;
+    color: var(--ink-faint);
+  }
+  .scheme-pair p.title { margin-bottom: 6px; }
+  .scheme-pair {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 44px;
+    margin: 22px 0 22px 34px;
+  }
+  .scheme-pair > div { flex: 1 1 240px; line-height: 1.65; }
+  .scheme-pair p { text-align: left; margin: 0 0 10px 0; }
+
+  /* ---------------------------------------------------------------- layout */
+  .row { display: flex; flex-wrap: wrap; margin: 0 -14px; }
+  .row > .col { padding: 0 14px; box-sizing: border-box; }
+  .col-3  { flex: 0 0 25%;      max-width: 25%; }
+  .col-4  { flex: 0 0 33.3333%; max-width: 33.3333%; }
+  .col-5  { flex: 0 0 41.6667%; max-width: 41.6667%; }
+  .col-6  { flex: 0 0 50%;      max-width: 50%; }
+  .col-7  { flex: 0 0 58.3333%; max-width: 58.3333%; }
+  .col-8  { flex: 0 0 66.6667%; max-width: 66.6667%; }
+  .col-12 { flex: 0 0 100%;     max-width: 100%; }
+  @media (max-width: 720px) {
+    .row > .col { flex: 0 0 100%; max-width: 100%; }
+    .article-container { padding: 22px 20px; }
+    body { padding: 8px; }
+  }
+
+  canvas.plot { width: 100%; display: block; }
+
+  hr { border: none; border-top: 1px solid var(--rule-soft); margin: 20px 0; }
+
+  /* ---------------------------------------------------------- inline maths */
+  .frac {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    text-align: center;
+    font-size: .85em;
+    line-height: 1.25;
+    margin: 0 3px;
+  }
+  .frac > .num { border-bottom: 1px solid currentColor; padding: 0 4px; }
+  .frac > .den { padding: 0 4px; }
+  .math { font-family: 'Times New Roman', Georgia, serif; font-style: italic; }
+  .math .op, .math .num-lit { font-style: normal; }
+  .rad {
+    border-top: 1px solid currentColor;
+    padding: 2px 3px 0 3px;
+    display: inline-block;
+  }
+
+  /* ------------------------------------- tables carried over from the print */
+  table.tbl {
+    width: 100%;
+    border-collapse: collapse;
+    font-family: inherit;
+    font-size: .92em;
+    margin-top: 16px;
+    background: none;
+  }
+  table.tbl th, table.tbl td {
+    border: none;
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 5px 8px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+  }
+  table.tbl th {
+    background: none;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    color: var(--ink-faint);
+    border-bottom: 1px solid var(--rule);
+  }
+  .table-scroll { overflow-x: auto; }
+
+  .peirce-table {
+    margin: 22px auto;
+    border-collapse: collapse;
+    font-size: .95em;
+    max-width: 560px;
+  }
+  .peirce-table td { padding: 4px 10px; vertical-align: middle; }
+  .peirce-table td.lbl { text-align: right; color: var(--ink-soft); }
+  .peirce-table td:last-child { text-align: left; white-space: nowrap; }
+  @media (max-width: 720px) {
+    .peirce-table { font-size: .82em; }
+    .peirce-table td { padding: 4px 5px; }
+  }
+
+  table.datatable { border-collapse: collapse; margin: 22px auto; font-size: .92em; }
+  table.datatable caption { font-style: italic; margin-bottom: 8px; font-size: .88em; color: var(--ink-faint); }
+  table.datatable th, table.datatable td { padding: 5px 14px; text-align: center; font-variant-numeric: tabular-nums; }
+  table.datatable th { font-weight: 400; font-variant: small-caps; letter-spacing: .06em; color: var(--ink-faint); border-bottom: 1px solid var(--rule); }
+  table.datatable td { border-bottom: 1px solid var(--rule-soft); }
+  table.datatable.rainfall td:first-child { text-align: left; }
+  table.datatable.atomic td, table.datatable.playfair td, table.datatable.poets td { text-align: left; }
+  table.datatable.constitutions td, table.datatable.constitutions th { font-family: ui-monospace, 'SF Mono', Menlo, monospace; font-size: .88em; }
+  table.syllogism-pair { border-collapse: collapse; width: 100%; margin: 20px 0; font-size: .95em; }
+  table.syllogism-pair td { vertical-align: top; padding: 0 24px 0 0; width: 50%; }
+  .table-row { display: flex; flex-wrap: wrap; gap: 30px; justify-content: center; }
+
+  figure { margin: 40px 0; text-align: center; }
+  figure img { max-width: 100%; border: 1px solid var(--rule); }
+  figcaption { font-size: .85em; color: var(--ink-faint); font-style: italic; margin-top: 10px; }
+
+  /* ------------------------------------------------- table of contents */
+  nav.toc {
+    background-color: var(--wash);
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 18px 0 22px 0;
+    margin-bottom: 44px;
+  }
+  nav.toc h5 { text-align: center; margin: 0 0 14px 0; }
+  nav.toc ol {
+    columns: 2; column-gap: 40px; margin: 0; padding-left: 0;
+    list-style: none; counter-reset: toc;
+  }
+  nav.toc li { break-inside: avoid; margin-bottom: 8px; padding-left: 1.6em; text-indent: -1.6em; }
+  nav.toc a { color: var(--ink-soft); text-decoration: none; font-size: .95em; }
+  nav.toc a:hover { color: var(--accent); text-decoration: underline; }
+  @media (max-width: 720px) { nav.toc ol { columns: 1; } }
+
+  /* ------------------------------------------------------------- footnotes */
+  sup { line-height: 0; }
+  sup.fn { font-size: .7em; line-height: 0; }
+  sup.fn a { text-decoration: none; color: var(--accent); }
+  .footnotes {
+    margin-top: 40px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-soft);
+    font-size: .9em;
+    color: var(--ink-soft);
+  }
+  .footnotes p { text-align: left; margin-bottom: 8px; }
+  .footnotes a { text-decoration: none; color: var(--accent); }
+  .footnotes .formula { font-size: 1em; margin: 12px 0; text-align: center; }
+
+  .footer {
+    margin-top: 44px;
+    padding-top: 20px;
+    border-top: 1px solid var(--rule-soft);
+    font-size: .9em;
+    color: var(--ink-soft);
+    font-family: inherit;
+    text-align: justify;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .example-container, .example-header:before, .live, .restore-peirce { transition: none; }
+  }
+</style>
+</head>
+<body>
+<div class="article-container">

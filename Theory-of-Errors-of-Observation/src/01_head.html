@@ -752,6 +752,7 @@ sup.fn a { text-decoration: none; color: var(--accent); }
   .k-O { color: var(--accent);   }
   .k-T { color: var(--accent-3); }
   .k-e { color: var(--accent-2); }
+  .k-est { color: var(--accent-4); }   /* the estimate, and the residual measured from it */
   .hl-text.hl-on.e { background-color: rgba(176, 86, 63, .16); }
 
   /* Peirce's expression, the modern one, and the same thing with the numbers
@@ -767,12 +768,13 @@ sup.fn a { text-decoration: none; color: var(--accent); }
     text-align: center;
   }
   .ex-ladder .lad-row { display: contents; }
-  .ex-ladder .lad-op { color: var(--ink-faint); }
+  .ex-ladder .lad-op { color: var(--ink-faint); min-width: 1ch; }
   .lad-words > span { font-size: .88em; line-height: 1.35; color: var(--ink-soft); }
   .lad-words > .k-O, .lad-words > .k-T, .lad-words > .k-e { color: inherit; }
   .lad-words > .k-O { color: var(--accent); }
   .lad-words > .k-T { color: var(--accent-3); }
   .lad-words > .k-e { color: var(--accent-2); }
+  .lad-words > .k-est { color: var(--accent-4); }
   .lad-sym > span {
     font-family: 'Times New Roman', Georgia, serif;
     font-size: 1.32em; font-style: italic;
@@ -781,11 +783,111 @@ sup.fn a { text-decoration: none; color: var(--accent); }
     font-family: 'Times New Roman', Georgia, serif;
     font-size: 1.16em; font-variant-numeric: tabular-nums;
   }
-  .lad-note { grid-column: 1 / -1; font-size: .85em; color: var(--ink-faint); margin-top: 6px; }
+  /* a two-sided statement: the relative number on the left, the law on the
+     right, with one operator between them */
+  .ex-ladder.cols-3 {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+  .ex-ladder .frac { font-size: .95em; }
+  /* Kept OUT of the grid. A grid item spanning every column contributes its
+     whole intrinsic width to the one track that is not flexible — the operator
+     column — which blows that column out to the width of the sentence. */
+  .lad-note {
+    font-size: .85em; color: var(--ink-faint);
+    text-align: center; max-width: 46em; margin: 2px auto 20px auto;
+  }
   @media (max-width: 720px) {
-    .ex-ladder { grid-template-columns: 1fr; gap: 2px; }
+    /* .cols-3 is more specific than .ex-ladder, so it has to be named here or
+       the narrow layout never reaches it */
+    .ex-ladder, .ex-ladder.cols-3 { grid-template-columns: 1fr; gap: 2px; }
     .ex-ladder .lad-op { display: none; }
   }
+
+
+  /* ------------------------------------------------------------------------
+     Peirce's data tables, pp. 138-158: nine column-pairs read downwards, the
+     leading digits printed only where they change. Set tight and small, as
+     they are on the page.
+     ----------------------------------------------------------------------*/
+  .table-scroll { overflow-x: auto; margin: 14px 0 6px 0; }
+  .peirce-data-table {
+    border-collapse: collapse; margin: 0 auto;
+    font-size: .68em; font-variant-numeric: tabular-nums;
+  }
+  .peirce-data-table caption {
+    caption-side: top; font-size: 1.25em; font-variant: small-caps;
+    letter-spacing: .08em; color: var(--ink-soft); padding-bottom: 8px;
+  }
+  .peirce-data-table th {
+    font-weight: 400; font-style: italic; font-size: .92em;
+    color: var(--ink-faint); padding: 2px 5px;
+    border-bottom: 1px solid var(--rule); line-height: 1.15;
+  }
+  .peirce-data-table td { padding: 0 5px; text-align: right; line-height: 1.35; }
+  .peirce-data-table td.pv { color: var(--ink); }
+  .peirce-data-table td.pc { color: var(--ink-soft); border-right: 1px solid var(--rule-soft); }
+  .peirce-data-table td:last-child { border-right: none; }
+
+
+  /* ------------------------------------------------------------------------
+     The twenty-four days, at the foot of the page. Not an example container:
+     it is always open, so it is set off by a rule rather than by a trigger.
+     ----------------------------------------------------------------------*/
+  .ex3-block {
+    position: relative;
+    margin: 46px 0 10px 0;
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
+  }
+  .ex3-head {
+    font-size: 1em; font-variant: small-caps; letter-spacing: .07em;
+    color: var(--ink-soft); margin: 0 0 8px 0;
+  }
+  .ex3-lead { font-size: .95em; color: var(--ink-soft); margin-bottom: 18px; }
+
+  /* --------------------------------------------------- the month, as a month */
+  .cal-wrap { display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 16px; }
+  .cal-name {
+    font-size: .78em; font-variant: small-caps; letter-spacing: .08em;
+    color: var(--ink-faint); margin-bottom: 5px; text-align: center;
+  }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1.85em); gap: 2px; }
+  .cal-dow {
+    font-size: .68em; color: var(--ink-faint); text-align: center;
+    padding-bottom: 2px;
+  }
+  .cal-day {
+    font-family: inherit; font-size: .8em;
+    height: 1.85em; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid transparent; border-radius: 2px;
+    background: none; padding: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .cal-day.off { color: var(--ink-faint); opacity: .45; }
+  .cal-day.blank { border: none; }
+  .cal-day.has {
+    cursor: pointer; color: var(--accent);
+    border-color: rgba(47, 111, 159, .35);
+    transition: background-color .15s, color .15s, border-color .15s;
+  }
+  .cal-day.has:hover { background-color: var(--tint); }
+  .cal-day.has.is-on {
+    background-color: var(--accent); border-color: var(--accent);
+    color: #fff; font-weight: 700;
+  }
+  /* a hairline between a pair of view buttons and the controls they govern */
+  .bar-sep {
+    display: inline-block; width: 1px; height: 1.4em;
+    background: var(--rule); margin: 0 6px;
+  }
+
+  /* the day's table sits under its plot, in the same column as it, so the
+     controls on the left stay beside both */
+  .ex3-day-table { max-height: 300px; overflow-y: auto; margin-top: 10px; }
+
+  .plate-orig { margin: 8px 0 0 0; }
+  .plate-orig img { max-width: 100%; border: 1px solid var(--rule-soft); }
 
   .footnotes { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: .9em; color: var(--ink-soft); }
   .footnotes li { margin-bottom: 10px; }

@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__TITLE__</title>
+<style>
+  /* ==========================================================================
+     Shared by every page. Same palette and setting as the other papers here.
+     Nothing is fetched at run time: no fonts, no scripts, no data. Plots draw
+     with PAL in _lib.js, in the same serif as the prose.
+     ========================================================================*/
+  :root {
+    --page:      #f4f1ea;
+    --paper:     #ffffff;
+    --ink:       #1f2328;
+    --ink-soft:  #575d66;
+    --ink-faint: #8a9099;
+    --rule:      #dbd6cb;
+    --rule-soft: #ece8df;
+    --wash:      #faf8f3;
+    --accent:    #2f6f9f;
+    --accent-2:  #b0563f;
+    --accent-3:  #4a7c59;
+    --accent-4:  #9a7b3f;
+    --tint:      rgba(47, 111, 159, .10);
+    --tint-2:    rgba(176, 86, 63, .10);
+    --tint-3:    rgba(74, 124, 89, .12);
+    --tint-4:    rgba(154, 123, 63, .12);
+  }
+
+  body {
+    font-family: 'Georgia', serif;
+    line-height: 1.8;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 16px;
+    background-color: var(--page);
+    color: var(--ink);
+  }
+
+  .article-container {
+    background-color: var(--paper);
+    padding: 44px 56px 52px 56px;
+    box-shadow: 0 1px 3px rgba(60, 50, 30, .10);
+    border-radius: 2px;
+  }
+  @media (max-width: 720px) { .article-container { padding: 26px 20px 34px 20px; } }
+
+  /* ------------------------------------------------------------------ nav */
+  nav.top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 22px;
+    padding-bottom: 14px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  nav.top a {
+    font-size: .82em;
+    font-variant: small-caps;
+    letter-spacing: .07em;
+    color: var(--ink-faint);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 3px;
+  }
+  nav.top a:hover { color: var(--ink-soft); }
+  nav.top a.here { color: var(--ink); border-bottom-color: var(--accent); }
+  nav.top .n { color: var(--rule); margin-right: 5px; }
+
+  nav.foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 44px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-soft);
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    font-size: .92em;
+  }
+  nav.foot a { color: var(--accent); text-decoration: none; }
+  nav.foot a:hover { color: var(--ink); }
+  nav.foot .sp { color: var(--ink-faint); }
+
+  /* -------------------------------------------------------------- headings */
+  h2 {
+    text-align: center;
+    font-weight: normal;
+    font-size: 1.7em;
+    margin: 0 0 6px 0;
+    letter-spacing: .01em;
+  }
+  h3 {
+    text-align: center;
+    font-variant: small-caps;
+    margin-top: 46px;
+    margin-bottom: 26px;
+    letter-spacing: 1px;
+  }
+  h4 {
+    font-weight: normal;
+    font-size: 1.06em;
+    margin: 34px 0 4px 0;
+    color: var(--ink);
+  }
+  h5 {
+    font-size: .82em;
+    font-weight: 400;
+    font-variant: small-caps;
+    letter-spacing: .09em;
+    color: var(--ink-faint);
+    margin: 30px 0 8px 0;
+  }
+  .standfirst {
+    text-align: center;
+    color: var(--ink-soft);
+    font-style: italic;
+    margin: 0 auto 30px auto;
+    max-width: 34em;
+  }
+  .step-of {
+    font-size: .78em;
+    font-variant: small-caps;
+    letter-spacing: .1em;
+    color: var(--accent-4);
+    margin: 30px 0 -2px 0;
+  }
+
+  p { text-align: justify; margin-bottom: 15px; }
+  .lead { font-size: 1.04em; }
+  hr.div { border: none; border-top: 1px solid var(--rule-soft); margin: 44px 0; }
+
+  /* -------------------------------------------------------------- controls */
+  .ctl { margin-bottom: 16px; }
+  .ctl > label {
+    display: block; font-size: .92em; color: var(--ink-soft);
+    margin-bottom: 2px; line-height: 1.5;
+  }
+  .ctl input[type=range] { width: 100%; accent-color: var(--accent); margin: 2px 0; }
+  .ctl .slider-val {
+    font-size: .95em; color: var(--accent);
+    font-weight: 700; font-variant-numeric: tabular-nums;
+  }
+
+  button.btn {
+    font-family: inherit;
+    font-size: .88em;
+    font-variant: small-caps;
+    letter-spacing: .05em;
+    padding: 5px 13px;
+    margin: 3px 4px 3px 0;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    cursor: pointer;
+    background: none;
+    color: var(--ink-soft);
+    transition: color .18s, border-color .18s, background-color .18s;
+  }
+  button.btn:hover:not(:disabled) { background-color: var(--wash); color: var(--ink); border-color: var(--ink-faint); }
+  button.btn:disabled { opacity: .35; cursor: default; }
+  button.btn-primary { color: var(--accent);   border-color: rgba(47, 111, 159, .45); }
+  button.btn-success { color: var(--accent-3); border-color: rgba(74, 124, 89, .45); }
+  button.btn-danger  { color: var(--accent-2); border-color: rgba(176, 86, 63, .45); }
+  button.btn-primary:hover:not(:disabled) { background-color: var(--tint);   color: var(--accent); }
+  button.btn-success:hover:not(:disabled) { background-color: var(--tint-3); color: var(--accent-3); }
+  button.btn-danger:hover:not(:disabled)  { background-color: var(--tint-2); color: var(--accent-2); }
+  button.btn-lg { font-size: 1em; padding: 8px 18px; }
+
+  .ex-buttonbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-bottom: 16px; }
+  .ex-buttonbar .btn { margin: 0; }
+  .ex-buttonbar .sep { flex-basis: 100%; height: 0; }
+
+  /* ---------------------------------------------------------------- asides */
+  .note-block {
+    font-size: .9em; color: var(--ink-soft);
+    border-left: 2px solid var(--rule);
+    padding: 1px 0 1px 18px; margin: 18px 0;
+  }
+  .note-block b { color: var(--ink); font-weight: 400; font-variant: small-caps; letter-spacing: .05em; }
+  .help-text { color: var(--ink-faint); font-style: italic; font-size: .93em; }
+  .plot-container { margin: 16px 0 6px 0; }
+  .plot-cap {
+    font-size: .82em; color: var(--ink-faint);
+    text-align: center; margin: 0 0 22px 0; line-height: 1.5;
+  }
+  canvas.plot { width: 100%; display: block; }
+
+  /* -------------------------------------------------------- protocol sheet */
+  .sheet-wrap { overflow-x: auto; margin: 16px 0 6px 0; }
+  table.sheet {
+    border-collapse: collapse;
+    font-size: .78em;
+    font-variant-numeric: tabular-nums;
+    margin: 0 auto;
+  }
+  table.sheet th {
+    font-weight: 400; font-variant: small-caps; letter-spacing: .06em;
+    color: var(--ink-faint); padding: 2px 6px 5px 6px;
+    border-bottom: 1px solid var(--rule); white-space: nowrap;
+  }
+  table.sheet th.rot { font-size: .92em; }
+  table.sheet td {
+    text-align: center; padding: 3px 7px;
+    border-left: 1px solid var(--rule-soft);
+    white-space: nowrap;
+  }
+  table.sheet td:first-child { border-left: none; }
+  table.sheet td.rowhead {
+    text-align: right; color: var(--ink-soft);
+    padding-right: 10px; border-left: none;
+  }
+  table.sheet td.yes  { color: var(--accent);   font-weight: 700; }
+  table.sheet td.no   { color: var(--ink-faint); }
+  table.sheet td.gt   { color: var(--accent-2); font-weight: 700; }
+  table.sheet td.eq   { color: var(--accent-3); font-weight: 700; }
+  table.sheet td.lt   { color: var(--accent);   font-weight: 700; }
+  table.sheet td.blank { color: var(--rule); }
+  table.sheet td.brack { background: var(--tint-4); }
+  table.sheet tr.rule td { border-top: 1px solid var(--rule); }
+  table.sheet tr.derived td { color: var(--accent-3); font-weight: 700; padding-top: 5px; }
+  table.sheet tr.derived td.rowhead { color: var(--ink-faint); font-weight: 400; }
+  table.sheet caption {
+    caption-side: bottom; font-size: .95em; color: var(--ink-faint);
+    padding-top: 9px; text-align: center; line-height: 1.5;
+  }
+  .sheet-empty {
+    color: var(--ink-faint); font-style: italic; font-size: .9em;
+    text-align: center; padding: 22px 0;
+    border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft);
+    margin: 16px 0;
+  }
+
+  /* ---------------------------------------------------- worked calculation */
+  .calc {
+    font-variant-numeric: tabular-nums;
+    margin: 20px 0 22px 0;
+    border-left: 2px solid var(--rule-soft);
+    padding: 6px 0 6px 20px;
+  }
+  .calc .line {
+    display: grid;
+    grid-template-columns: minmax(90px, 200px) minmax(0, 1fr) max-content;
+    gap: 6px 16px; align-items: baseline;
+    padding: 2px 0; line-height: 1.7;
+  }
+  .calc .line.sum { border-top: 1px solid var(--rule-soft); margin-top: 6px; padding-top: 7px; }
+  .calc .lbl { color: var(--ink-soft); font-size: .9em; text-align: right; }
+  .calc .expr { color: var(--ink-faint); font-size: .92em; }
+  .calc .res { font-weight: 700; text-align: right; white-space: nowrap; }
+  .calc .res.k1 { color: var(--accent); }
+  .calc .res.k2 { color: var(--accent-2); }
+  .calc .res.k3 { color: var(--accent-3); }
+  @media (max-width: 600px) {
+    .calc .line { grid-template-columns: 1fr max-content; }
+    .calc .expr { grid-column: 1 / -1; text-align: right; }
+  }
+
+  /* ---------------------------------------------------------------- trials */
+  .trial-log {
+    font-size: .82em; line-height: 1.7; color: var(--ink-soft);
+    max-height: 108px; overflow-y: auto;
+    border-left: 2px solid var(--rule-soft);
+    padding: 4px 0 4px 16px; margin: 14px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .trial-log .r { color: var(--accent-3); }
+  .trial-log .w { color: var(--accent-2); }
+
+  .apparatus {
+    display: flex; align-items: baseline; justify-content: center;
+    gap: 8px 26px; flex-wrap: wrap;
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 16px 10px; margin: 18px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .apparatus .slot { text-align: center; min-width: 116px; }
+  .apparatus .slot span {
+    display: block; font-size: .76em; font-variant: small-caps;
+    letter-spacing: .07em; color: var(--ink-faint);
+  }
+  .apparatus .slot b { font-weight: 400; font-size: 1.5em; }
+  .apparatus .slot b.k1 { color: var(--accent); }
+  .apparatus .slot b.k2 { color: var(--accent-2); }
+  .apparatus .slot b.k3 { color: var(--accent-3); }
+  .apparatus .says { font-size: 1.15em; font-style: italic; min-width: 130px; text-align: center; }
+
+  /* --------------------------------------------------------- self-test bits */
+  .stage {
+    background: #7a7a7a; padding: 40px 26px;
+    display: flex; gap: 40px; justify-content: center; align-items: center;
+    margin: 20px 0; border-radius: 2px;
+  }
+  .patch { width: 140px; height: 140px; border-radius: 2px; }
+  @media (max-width: 600px) { .patch { width: 104px; height: 104px; } .stage { gap: 20px; padding: 28px 16px; } }
+  .keys { display: flex; gap: 12px; justify-content: center; margin-top: 14px; flex-wrap: wrap; }
+  .prog { height: 2px; background: var(--rule-soft); margin: 18px 0 6px 0; }
+  .prog i { display: block; height: 100%; background: var(--accent); width: 0; }
+  .hidden { display: none; }
+
+  .colophon {
+    margin-top: 40px; padding-top: 18px;
+    border-top: 1px solid var(--rule-soft);
+    font-size: .84em; color: var(--ink-faint); text-align: left;
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body data-page="__PAGE__">
+<div class="article-container">
+
+<nav class="top">
+  <a href="index.html"                data-p="intro"><span class="n">0</span>Introduction</a>
+  <a href="right-and-wrong-cases.html" data-p="rw"><span class="n">1</span>Right and wrong cases</a>
+  <a href="just-noticeable-differences.html" data-p="jnd"><span class="n">2</span>Just noticeable differences</a>
+  <a href="average-error.html"         data-p="ae"><span class="n">3</span>Average error</a>
+  <a href="results.html"               data-p="res"><span class="n">4</span>The three together</a>
+  <a href="try-it-yourself.html"       data-p="try"><span class="n">5</span>Try it yourself</a>
+</nav>

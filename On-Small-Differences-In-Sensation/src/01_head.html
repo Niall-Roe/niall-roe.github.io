@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Peirce &amp; Jastrow — On Small Differences of Sensation (interactive)</title>
+<title>Peirce &amp; Jastrow — On Small Differences of Sensation</title>
 <style>
   /* ==========================================================================
      One palette for prose, controls and plots alike. The examples are meant to
@@ -1092,6 +1092,118 @@
     font-family: inherit;
     text-align: justify;
   }
+
+  /* ------------------------------------------------------------------------
+     This memoir carries no interactive examples, only the text and its
+     tables. What follows is the apparatus that differs from the Probability
+     of Induction edition: the printed pagination in the gutter, the
+     four-degree confidence scale, and the rebuilt tables.
+     ----------------------------------------------------------------------*/
+
+  h4.read {
+    font-size: .82em;
+    font-variant: small-caps;
+    letter-spacing: .09em;
+    color: var(--ink-faint);
+    margin-bottom: 18px;
+  }
+
+  /* The pagination of the Writings, kept so the edition stays citable. Same
+     gutter the example numbers use in the other paper, and it goes the same
+     way at the same breakpoint. */
+  .pg-num {
+    position: absolute;
+    left: -46px;
+    width: 34px;
+    text-align: right;
+    font-size: .78em;
+    line-height: 1.85;
+    letter-spacing: .03em;
+    font-variant-numeric: tabular-nums;
+    color: var(--ink-faint);
+    user-select: none;
+    pointer-events: none;
+  }
+  @media (max-width: 720px) { .pg-num { display: none; } }
+
+  /* The four degrees of confidence. Set as the paper sets them: the mark in
+     the margin, the gloss hanging beside it, no bullet. */
+  ul.scale {
+    list-style: none;
+    margin: 20px 0 20px 0;
+    padding: 0 0 0 34px;
+  }
+  ul.scale li {
+    position: relative;
+    margin-bottom: 7px;
+    text-align: justify;
+  }
+  .scale-mark {
+    position: absolute;
+    left: -34px;
+    width: 22px;
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    color: var(--accent);
+  }
+
+  /* ----------------------------------------------------------- the tables */
+  .tbl-block { margin: 26px 0 30px 0; }
+
+  .tbl-caption {
+    text-align: center;
+    font-style: italic;
+    font-size: .95em;
+    margin: 22px 0 6px 0;
+  }
+  .tbl-idx {
+    font-style: normal;
+    font-size: .88em;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .tbl-note {
+    font-size: .85em;
+    color: var(--ink-faint);
+    text-align: center;
+    margin: 2px 0 8px 0;
+  }
+  /* A column that does not reproduce its own printed mean. Said plainly on
+     the page rather than left for the reader to discover. */
+  .tbl-warn {
+    font-size: .85em;
+    color: var(--accent-2);
+    text-align: left;
+    margin: 4px 0 10px 0;
+    padding-left: 14px;
+    border-left: 2px solid var(--accent-2);
+  }
+
+  table.tbl td.lbl {
+    text-align: left;
+    color: var(--ink-soft);
+    white-space: nowrap;
+  }
+  table.tbl tr.tbl-group td {
+    text-align: left;
+    font-variant: small-caps;
+    letter-spacing: .05em;
+    color: var(--ink-soft);
+    border-bottom: 1px solid var(--rule);
+    padding-top: 14px;
+  }
+  table.tbl tr.tbl-rule td { border-top: 1px solid var(--rule); }
+
+  /* "110 right / 66 wrong" reads as two facts about one cell, so they are
+     stacked rather than run together on one line. */
+  .rw { display: block; line-height: 1.45; }
+  .rw + .rw { color: var(--ink-soft); }
+
+  /* the daily tables are wide; they scroll inside their own box rather than
+     pushing the page sideways */
+  table.tbl-daily { font-size: .85em; }
+  table.tbl-daily td, table.tbl-daily th { padding: 4px 7px; }
+  .series { font-variant-numeric: tabular-nums; text-align: left; }
 
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }

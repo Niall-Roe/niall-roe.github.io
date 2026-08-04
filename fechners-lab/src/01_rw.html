@@ -1,0 +1,81 @@
+
+<h2>The method of right and wrong cases</h2>
+<p class="standfirst">Fixed weights, presented over and over in random order. Count the answers.</p>
+
+<p class="lead">Choose a few weights in advance and keep them fixed. Present them many times, in random order so the subject cannot anticipate. Record his answer each time. Nothing is adjusted during the experiment and the subject is never asked how much — only which, or whether.</p>
+
+<hr class="div">
+<h3>Part one · the absolute threshold</h3>
+
+<p class="step-of">Step 1 · the trials</p>
+<h4>Watch the answers come in</h4>
+<p>A weight is laid on his palm. He says whether he feels it. Each press runs trials at one weight, chosen at random from the fixed set.</p>
+<div class="ex-buttonbar">
+  <button class="btn btn-primary" id="rl-1">One trial</button>
+  <button class="btn" id="rl-20">Twenty</button>
+  <button class="btn" id="rl-200">Two hundred</button>
+  <button class="btn" id="rl-clear">Clear</button>
+</div>
+<div class="apparatus">
+  <div class="slot"><span>weight</span><b class="k1" id="rl-w">—</b></div>
+  <div class="says" id="rl-says">—</div>
+  <div class="slot"><span>trials so far</span><b id="rl-n">0</b></div>
+</div>
+<div class="trial-log" id="rl-log">No trials yet.</div>
+
+<p class="step-of">Step 2 · the record</p>
+<h4>The tally</h4>
+<p>The trials collect into one row per weight: how many times it was presented, and how often he felt it. This table is the whole of the raw data.</p>
+<div id="rl-sheet"></div>
+
+<p class="step-of">Step 3 · the picture</p>
+<h4>Plot the proportions</h4>
+<p>Each row gives one point. They rise, and they do not rise in a step.</p>
+<div class="plot-container" id="rl-props"></div>
+<p class="plot-cap">The proportion of trials he felt the weight, at each weight tested.</p>
+
+<p class="step-of">Step 4 · the threshold</p>
+<h4>Fit a curve and read it off</h4>
+<p>There is no weight in the table at which he changes from never to always, so no row is the threshold. Instead a normal ogive is fitted to the points, and the threshold is taken as the weight it crosses at one half.</p>
+<div class="plot-container" id="rl-fit"></div>
+<p class="plot-cap">The fitted curve, with the half-way crossing dropped to the axis.</p>
+<div id="rl-calc"></div>
+<div class="note-block"><b>What was assumed</b> The shape of the curve, and that one half is the right place to read. Neither comes from the subject. Fit a different curve, or read at a different proportion, and the threshold moves.</div>
+
+<hr class="div">
+<h3>Part two · the difference threshold</h3>
+
+<p class="step-of">Step 1 · the trials</p>
+<h4>Watch the answers come in</h4>
+<p>Now a 100&nbsp;g standard sits in one hand and a comparison in the other. He says which is heavier. He must answer even when he cannot tell.</p>
+<div class="ex-buttonbar">
+  <button class="btn btn-primary" id="dl-1">One trial</button>
+  <button class="btn" id="dl-20">Twenty</button>
+  <button class="btn" id="dl-200">Two hundred</button>
+  <button class="btn" id="dl-clear">Clear</button>
+</div>
+<div class="apparatus">
+  <div class="slot"><span>standard</span><b>100.0 g</b></div>
+  <div class="slot"><span>comparison</span><b class="k1" id="dl-c">—</b></div>
+  <div class="says" id="dl-says">—</div>
+  <div class="slot"><span>trials so far</span><b id="dl-n">0</b></div>
+</div>
+<div class="trial-log" id="dl-log">No trials yet.</div>
+
+<p class="step-of">Step 2 · the record</p>
+<h4>The tally</h4>
+<div id="dl-sheet"></div>
+
+<p class="step-of">Step 3 · the picture</p>
+<h4>Plot the proportions</h4>
+<div class="plot-container" id="dl-props"></div>
+<p class="plot-cap">How often he called the comparison heavier, at each comparison weight.</p>
+
+<p class="step-of">Step 4 · the thresholds</p>
+<h4>Three readings off one curve</h4>
+<p>Fit the ogive again. This time three quantities are read from it, at different heights.</p>
+<div class="plot-container" id="dl-fit"></div>
+<p class="plot-cap">The half-way crossing gives the point of subjective equality; the three-quarter crossing is one difference threshold above it.</p>
+<div id="dl-calc"></div>
+<div class="note-block"><b>Why three quarters</b> The distance from the half-way point to the three-quarter point is the <i>probable error</i> of the fitted curve: the amount either side of the middle that holds half of his judgements. It is a convention for summarising the spread, adopted from astronomy. It is not something the subject did.</div>
+

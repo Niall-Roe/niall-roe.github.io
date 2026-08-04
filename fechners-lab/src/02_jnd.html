@@ -1,0 +1,87 @@
+
+<h2>The method of just noticeable differences</h2>
+<p class="standfirst">The weight moved in small steps, up or down, until his answer changes.</p>
+
+<p class="lead">Here the experimenter moves the weight himself, in a fixed order. A series starts well away from the threshold and steps toward it, one small step at a time, with the subject answering after each. The series ends the moment his answer changes. Later writers call this the method of limits.</p>
+
+<hr class="div">
+<h3>Part one · the absolute threshold</h3>
+
+<p class="step-of">Step 1 · one series</p>
+<h4>Walk down a single series</h4>
+<p>A descending series starts at a weight he can clearly feel and takes 0.25&nbsp;g off at a time. Present the steps one by one and watch for the answer to change.</p>
+<div class="ex-buttonbar">
+  <button class="btn btn-primary" id="a-step">Present the next step</button>
+  <button class="btn" id="a-finish">Run to the end of this series</button>
+  <button class="btn" id="a-new">Start a new series</button>
+</div>
+<div class="apparatus">
+  <div class="slot"><span>direction</span><b id="a-dir">—</b></div>
+  <div class="slot"><span>weight</span><b class="k1" id="a-w">—</b></div>
+  <div class="says" id="a-says">—</div>
+  <div class="slot"><span>crossing</span><b class="k3" id="a-cross">—</b></div>
+</div>
+<div class="plot-container" id="a-ladder"></div>
+<p class="plot-cap">Each column is one series. Filled circles are trials where he felt the weight, open circles where he did not. The green mark is where his answer changed.</p>
+
+<p class="step-of">Step 2 · the record</p>
+<h4>The protocol sheet</h4>
+<p>Written out, a series is a column of pluses and minuses. The crossing is taken as the midpoint of the last two steps, since the change happened somewhere between them.</p>
+<div id="a-sheet"></div>
+
+<p class="step-of">Step 3 · many series</p>
+<h4>Both directions, alternating</h4>
+<p>One series is one number. Run more, alternating direction: ascending series start below anything he can feel and step up.</p>
+<div class="ex-buttonbar">
+  <button class="btn btn-primary" id="a-run10">Run ten more series</button>
+  <button class="btn" id="a-clear">Clear all</button>
+</div>
+<div class="plot-container" id="a-cross-plot"></div>
+<p class="plot-cap">Every crossing so far, sorted by the direction of its series.</p>
+<div class="note-block"><b>Why both directions</b> Descending series cross low and ascending series cross high, because he carries his previous answer forward a step or two before switching. The two errors run opposite ways, so the pair are run in equal numbers and averaged together.</div>
+
+<p class="step-of">Step 4 · the threshold</p>
+<h4>Average the crossings</h4>
+<div id="a-calc"></div>
+
+<hr class="div">
+<h3>Part two · the difference threshold</h3>
+
+<p class="step-of">Step 1 · a third answer</p>
+<h4>Less, equal, or greater</h4>
+<p>Against the 100&nbsp;g standard the subject is allowed to say the comparison is lighter, heavier, or the same. A sweep now runs the whole way past the standard, so his answer changes twice: once out of “lighter”, once into “heavier”.</p>
+<div class="ex-buttonbar">
+  <button class="btn btn-primary" id="b-step">Present the next step</button>
+  <button class="btn" id="b-finish">Run to the end of this sweep</button>
+  <button class="btn" id="b-run10">Run ten more sweeps</button>
+  <button class="btn" id="b-clear">Clear all</button>
+</div>
+<div class="apparatus">
+  <div class="slot"><span>direction</span><b id="b-dir">—</b></div>
+  <div class="slot"><span>comparison</span><b class="k1" id="b-w">—</b></div>
+  <div class="says" id="b-says">—</div>
+  <div class="slot"><span>changes so far</span><b id="b-flips">—</b></div>
+</div>
+<div class="plot-container" id="b-ladder"></div>
+<p class="plot-cap">One column per sweep. Blue is “lighter”, green “the same”, red “heavier”. The two marks are where his answer changed.</p>
+
+<p class="step-of">Step 2 · the record</p>
+<h4>Two crossings per sweep</h4>
+<div id="b-sheet"></div>
+
+<p class="step-of">Step 3 · the band</p>
+<h4>Where he cannot tell</h4>
+<p>Between the two crossings lies the range of comparison weights he calls the same as the standard.</p>
+<div class="plot-container" id="b-band"></div>
+<p class="plot-cap">Each sweep's band of “the same”, and the averaged limits across all of them.</p>
+
+<p class="step-of">Step 4 · four quantities</p>
+<h4>What the two crossings give</h4>
+<div id="b-calc"></div>
+<div class="note-block"><b>What this threshold depends on</b> The width of the band is not fixed by his senses alone. It also depends on how sure he insists on being before he will commit to “heavier” rather than “the same”. Tell him to say “the same” only when he really cannot tell and the band narrows; let him use it freely and it widens. The slider below changes nothing about his senses.</div>
+<div class="ctl">
+  <label for="b-caution">How readily he says “the same” <span class="slider-val" id="b-cautionv"></span></label>
+  <input type="range" id="b-caution" min="0.3" max="1.8" step=".05" value="0.95">
+</div>
+<div class="ex-buttonbar"><button class="btn" id="b-redo">Run twenty sweeps at this setting</button></div>
+<div id="b-caution-out"></div>

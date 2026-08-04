@@ -341,6 +341,18 @@
 
   .help-text { color: var(--ink-faint); font-style: italic; text-align: left; }
 
+  /* The one instruction an example gives the reader is worth seeing. Tinted in
+     the colour the clicked bar takes, so the cue and what it produces are the
+     same colour; it is gone as soon as it has been obeyed. */
+  .click-cue {
+    display: inline-block;
+    background-color: rgba(138, 122, 168, .18);
+    color: #5f5279;
+    border-radius: 2px;
+    padding: 2px 7px;
+    font-style: italic;
+  }
+
   .control-panel, .plot-container, .group-box {
     background: none;
     border: none;

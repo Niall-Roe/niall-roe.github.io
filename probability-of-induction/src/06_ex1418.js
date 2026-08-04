@@ -329,9 +329,42 @@ function samplingDistPlot(pl, opts) {
     xlim = rescale ? [Math.max(0, mu - 5 * sigma), Math.min(1, mu + 5 * sigma)] : [0, 1];
     xlab = "p̂";
   }
-  pl.setup({ xlim: xlim, ylim: [0, maxP * 1.3], mar: [4, 5, 3, 2] });
-  pl.axes({});
+  /* The probable error at every proportion, hung under the number line: a comb
+     whose teeth are 0.477 root(2p(1-p)/s) to scale, tallest in the middle and
+     shortest at the two ends. That is the whole of Peirce's remark about
+     extreme values in one picture — the same formula, the same s, and a
+     tolerance worth twice as much out here as it is at a half. Only on the
+     proportion axis, where the teeth stand at the proportions they belong to. */
+  /* Only on the whole number line. Zoomed to five standard errors round an
+     extreme proportion the teeth are all of a length and say nothing, and the
+     band they need would be a third of the plot given over to nothing. */
+  const comb = !!opts.peComb && !useBalls && !rescale;
+  const top = maxP * 1.3;
+  const combH = comb ? top * 0.42 : 0;
+  pl.setup({ xlim: xlim, ylim: [-combH, top], mar: [4, 5, 3, 2] });
+  pl.axes(comb ? { yat: RPlot.ticks(0, top, 5).filter((v) => v >= 0) } : {});
   pl.box();
+  if (comb) {
+    const peAt = (q) => 0.477 * Math.sqrt(2 * q * (1 - q) / s);
+    const peMax = peAt(0.5);                     // the worst case, so the scale means one thing
+    pl.clip(true);
+    pl.segments(xlim[0], 0, xlim[1], 0, { col: PAL.rule, lwd: 1 });
+    const tooth = (q) => (peAt(q) / peMax) * combH * 0.62;
+    for (let i = 0; i <= 100; i++) {
+      const q = i / 100;
+      if (q < xlim[0] || q > xlim[1]) continue;
+      pl.segments(q, -combH * 0.06, q, -combH * 0.06 - tooth(q),
+        { col: i % 10 === 0 ? "#b8bcc2" : "#dcdee2", lwd: i % 10 === 0 ? 1.6 : 1 });
+    }
+    pl.segments(p, -combH * 0.06, p, -combH * 0.06 - tooth(p), { col: PAL.accent2, lwd: 2.5 });
+    pl.clip(false);
+    /* under the teeth, not through them */
+    const middling = Math.abs(p - 0.5) < 0.02;
+    pl.text(xlim[0] + (xlim[1] - xlim[0]) * 0.5, -combH * 0.93,
+      `the probable error at each proportion — ±${fmt(peAt(p), 4)} here`
+      + (middling ? ", which is as wide as it ever gets" : `, ±${fmt(peMax, 4)} at a half`),
+      { cex: 0.7, col: PAL.inkSoft });
+  }
   pl.axisLabels(xlab, "Probability mass");
   pl.title("Sampling distribution", { cex: 1.1 });
   pl.clip(true);
@@ -369,6 +402,20 @@ function samplingDistPlot(pl, opts) {
     const cp = dbinom(clicked, s, p);
     pl.segments(cx, 0, cx, cp, { lwd: 5, col: "#8a7aa8" });
     pl.points([cx], [cp], { cex: 1.5, col: "#8a7aa8" });
+    /* The probable error that goes with the estimate, drawn where the estimate
+       is: worked at the proportion the sample came out at, which is the only
+       one an inquirer holding that sample would have. It is not the height of
+       the bar — the height is how often that sample turns up, and the bar is a
+       probability where the band is an error. */
+    if (opts.clickedPE) {
+      const ph = clicked / s;
+      const e = 0.477 * Math.sqrt(2 * ph * (1 - ph) / s);
+      const half = useBalls ? e * s : e;
+      const y = cp + maxP * 0.09;
+      pl.segments(cx - half, y, cx + half, y, { col: "#8a7aa8", lwd: 2 });
+      [-half, half].forEach((d) => pl.segments(cx + d, y - maxP * 0.03, cx + d, y + maxP * 0.03,
+        { col: "#8a7aa8", lwd: 2 }));
+    }
   }
   pl.clip(false);
   pl.legend("topright", {
@@ -484,7 +531,7 @@ registerExample("example-ex15", (box) => {
     const useApprox = total > 1000;
     if (clicked === null) {
       $("#ex15_click_text", content).innerHTML = `<div class="click-info">
-        <p><em>Click on any bar to see the exact probability.</em></p>
+        <p><span class="click-cue">Click on any bar of the chart to see the exact probability.</span></p>
         <p>Suppose <strong>${numberWord(pf.num)}</strong> ${pluralBall(pf.num)} out of <strong>${pf.den}</strong>
           is white and the rest black, and that <strong>${numberWord(s)}</strong> balls are drawn.</p></div>`;
     } else {
@@ -531,7 +578,11 @@ registerExample("example-ex17", (box) => {
           <button class="btn btn-primary btn-sm" id="ex17_simulate_100">Draw a hundred</button>
           <button class="btn btn-warning btn-sm" id="ex17_reset">Clear</button>
         </div>
+        <div class="ex-buttonbar">
+          <button class="btn btn-sm" id="ex17_peirce">Peirce's example: one in three, four drawn</button>
+        </div>
         <div id="ex17-rescale"></div>
+        <div id="ex17_unreachable"></div>
         <div id="ex17_current_result"></div>
       </div>
       <div class="col col-8"><div class="plot-container" id="ex17-combined-plot"></div></div>
@@ -544,22 +595,24 @@ registerExample("example-ex17", (box) => {
 
   $("#ex17-ctl-p", content).appendChild(
     slider("ex17_p", "True proportion (p):", 0.001, 0.999, 0.5, 0.001, (v) => v.toFixed(3), "k1"));
+  /* Down to four, and one ball at a time. Peirce's own case is four drawn, and
+     it is the case the sentence beside the chart is about; a slider that began
+     at ten in tens could not be put there. */
   $("#ex17-ctl-s", content).appendChild(
-    slider("ex17_s", "Balls drawn (s):", 10, 1000, 100, 10, null, "k2"));
-  /* One plain slider rather than a menu with a custom row hanging off it. It
-     runs in nines rather than in percent — k of them means 100(1 - 10^-k) — so
-     that every row of Peirce's printed table is a position on it, from a half
-     at k = 0.301 to his ten-billionth at k = 10. Clicking a row sets it there. */
-  const NINES = (c) => -Math.log10(1 - c / 100);
-  const CONF = () => 100 * (1 - Math.pow(10, -num("ex17_k")));
+    slider("ex17_s", "Balls drawn (s):", 2, 1000, 100, 1, null, "k2"));
+  /* A plain percentage from a half to 99. It ran in nines before — k of them
+     meaning 100(1 - 10^-k) — so that every row of Peirce's printed table was a
+     position on it, out to his ten-billionth. That put almost the whole travel
+     of the thumb in country no reader has any use for, and made the levels
+     anyone does want unhittable. The far rows are still printed above with
+     their own bounds worked out; they are simply not places the slider goes. */
   $("#ex17-ctl-c", content).appendChild(
-    slider("ex17_k", "How often the bound is to hold:", 0.301, 10, 1, 0.001, (v) => {
-      /* as many decimals as the level has nines, so 90, 99.9 and 99.99999999
-         all read as themselves rather than as rounding */
-      const c = 100 * (1 - Math.pow(10, -v));
-      return `${c.toFixed(Math.max(0, Math.ceil(v) - 2))}%`;
-    }, "k3"));
-  $("#ex17-rescale", content).appendChild(checkbox("ex17_rescale", "Rescale charts", false));
+    slider("ex17_conf", "How often the bound is to hold:", 50, 99, 50, 1,
+      (v) => (v <= 50 ? "50% — the probable error"
+        : v === 95 ? "95% — standard today" : `${Math.round(v)}%`), "k3"));
+  const CONF = () => num("ex17_conf");
+  const CONF_MIN = 50, CONF_MAX = 99;
+  $("#ex17-rescale", content).appendChild(checkbox("ex17_rescale", "Rescale charts", true));
 
   content.addEventListener("input", () => update());
   content.addEventListener("change", () => update());
@@ -588,13 +641,17 @@ registerExample("example-ex17", (box) => {
   const ex17Row = (i) => () => ex17Bound(CONSTANTS[i]);
   const ex17Table = document.getElementById("ex17-table");
   if (ex17Table) {
-    /* clicking a printed row moves the slider to that row's level */
+    /* clicking a printed row moves the slider to that row's level, for the rows
+       the slider can reach. The three beyond 99 keep their own worked bound —
+       that is what the row is for — but there is nowhere to put the thumb, and
+       clamping it silently to 99 would be a lie about which level was being
+       drawn. */
     ex17Table.addEventListener("click", (ev) => {
       const tr = ev.target.closest("tr[data-conf]");
-      if (!tr || !document.getElementById("ex17_k")) return;
+      if (!tr || !document.getElementById("ex17_conf")) return;
       const c = parseFloat(tr.getAttribute("data-conf"));
-      if (!Number.isFinite(c)) return;
-      setSlider("ex17_k", Math.min(10, Math.max(0.301, NINES(c))));
+      if (!Number.isFinite(c) || c < CONF_MIN || c > CONF_MAX) return;
+      setSlider("ex17_conf", Math.round(c));
       refreshLive("example-ex17");
     });
   }
@@ -606,10 +663,7 @@ registerExample("example-ex17", (box) => {
     e3: ex17Row(3), e4: ex17Row(4), e5: ex17Row(5),
     /* the seventh row is wherever the slider is standing, so a level between
        two of Peirce's printed ones still has its bound written out */
-    customLabel: () => {
-      const c = CONF();
-      return `${c >= 99.99 ? fmt(c, 6) : fmt(c, 2)} times out of 100 within`;
-    },
+    customLabel: () => `${Math.round(CONF())} times out of 100 within`,
     customConst: () => fmt(getConstant(), 3),
     eCustom: () => ex17Bound(getConstant())
   }, {
@@ -620,7 +674,7 @@ registerExample("example-ex17", (box) => {
       $$("tr[data-conf]", ex17Table).forEach((tr) => {
         const v = parseFloat(tr.getAttribute("data-conf"));
         tr.classList.toggle("conf-active", c !== null && Number.isFinite(v)
-          && Math.abs(NINES(v) - NINES(c)) < 0.005);
+          && Math.abs(v - c) < 0.005);
       });
     }
   });
@@ -641,6 +695,24 @@ registerExample("example-ex17", (box) => {
     const df = history.slice(-ROWS).reverse();   // newest first, just under the curve
     const nContain = history.filter((d) => d.containsP).length;
 
+    /* How often each result has actually come up, counted on the lattice the
+       chart already draws. The stems keep their theoretical heights and take
+       the count as their colour, so the empirical distribution is shown on the
+       exact same marks as the distribution it is meant to approach rather than
+       in a second chart beside it. Only samples of the current size are
+       counted: an old record's proportion does not sit on this lattice. */
+    const heat = new Map();
+    history.forEach((d) => { if (d.s === s2) heat.set(d.k, (heat.get(d.k) || 0) + 1); });
+    const heatMax = Math.max(1, ...heat.values());
+    const HEAT_COLD = [201, 204, 209], HEAT_LO = [193, 186, 209], HEAT_HI = [79, 66, 104];
+    const heatCol = (k) => {
+      const c = heat.get(k) || 0;
+      if (!c) return `rgb(${HEAT_COLD.join(",")})`;
+      /* square root, so that one draw among a thousand still shows */
+      const t = Math.sqrt(c / heatMax);
+      return `rgb(${HEAT_LO.map((v, i) => Math.round(v + (HEAT_HI[i] - v) * t)).join(",")})`;
+    };
+
     /* one coordinate system: x is the proportion for both halves, y runs from
        the top of the curve down through the rows */
     pl.setup({ xlim: xlim, ylim: [-ROWS - 1.5, 10], mar: [4, 4, 3, 2] });
@@ -660,7 +732,8 @@ registerExample("example-ex17", (box) => {
     const H = 9;
     ks.forEach((k, i) => {
       if (probs[i] <= 0) return;
-      pl.segments(k / s2, 0, k / s2, (probs[i] / maxP) * H, { lwd: 2, col: "#c9ccd1" });
+      pl.segments(k / s2, 0, k / s2, (probs[i] / maxP) * H,
+        { lwd: s2 <= 40 ? 4 : 2, col: heatCol(k) });
     });
     const xs = [], ys = [];
     for (let i = 0; i < 500; i++) {
@@ -690,8 +763,10 @@ registerExample("example-ex17", (box) => {
     }
     pl.clip(false);
     pl.legend("topleft", {
-      legend: ["The truth", "Covers it", "Misses it"],
-      col: ["#c79a45", "#4a7c59", "#b0563f"], lwd: [2.5, 2, 2], cex: 0.7
+      legend: history.length ? ["The truth", "Covers it", "Misses it", "Shade: how often drawn"]
+        : ["The truth", "Covers it", "Misses it"],
+      col: ["#c79a45", "#4a7c59", "#b0563f", `rgb(${HEAT_HI.join(",")})`],
+      lwd: [2.5, 2, 2, 4], cex: 0.7
     });
   });
   $("#ex17-combined-plot", content).appendChild(combinedCanvas);
@@ -704,10 +779,28 @@ registerExample("example-ex17", (box) => {
     const whiteBalls = rbinom(s, p);
     const pHat = whiteBalls / s;
     const rec = { pHat: pHat, ciLower: pHat - margin, ciUpper: pHat + margin,
-      containsP: (p >= pHat - margin && p <= pHat + margin), p: p };
+      containsP: (p >= pHat - margin && p <= pHat + margin), p: p,
+      k: whiteBalls, s: s };      // where on the lattice it landed, for the shading
     return { rec: rec, whiteBalls: whiteBalls, s: s };
   }
   function confLevel() { return CONF(); }
+
+  /* Peirce's own case: one ball in three, four drawn. No sample of four can
+     come out at a third, so the induction is wrong every single time — and the
+     bound around it still does its work at the rate claimed. The exact figure
+     is worth having rather than the counted one, since it is a claim about the
+     construction and not about any particular run. */
+  const exactCover = () => {
+    const p = num("ex17_p"), s = Math.round(num("ex17_s"));
+    const margin = getConstant() * Math.sqrt(2 * p * (1 - p) / s);
+    let tot = 0;
+    for (let k = 0; k <= s; k++) if (Math.abs(k / s - p) <= margin + 1e-12) tot += dbinom(k, s, p);
+    return tot;
+  };
+  const unreachable = () => {
+    const p = num("ex17_p"), s = Math.round(num("ex17_s"));
+    return Math.abs(p * s - Math.round(p * s)) > 1e-9;
+  };
 
   $("#ex17_simulate_single", content).addEventListener("click", () => {
     const d = drawSample();
@@ -725,10 +818,35 @@ registerExample("example-ex17", (box) => {
     update();
   });
   $("#ex17_reset", content).addEventListener("click", () => { history = []; current = null; update(); });
+  $("#ex17_peirce", content).addEventListener("click", () => {
+    history = []; current = null;
+    setSlider("ex17_p", 1 / 3); setSlider("ex17_s", 4); setSlider("ex17_conf", 50);
+    update();
+  });
 
   function update() {
     /* The table of levels and bounds is Peirce's own, printed above; it fills
        in there rather than being repeated here. */
+
+    /* Why the two rates can differ: the estimate has only s + 1 places to land,
+       so the window round the truth catches one of them at some proportions and
+       two at others. The claimed level is the smooth curve through that; at any
+       one proportion the lattice puts the realised rate above or below it. Both
+       figures are given rather than the claim alone, as in 20. */
+    if (unreachable()) {
+      const s17 = Math.round(num("ex17_s")), got = exactCover() * 100, want = CONF();
+      const green = (t) => `<span style="color:#4a7c59;font-weight:700;">${t}</span>`;
+      const close = Math.abs(got - want) < 1.5;
+      $("#ex17_unreachable", content).innerHTML = `<div class="note-block" style="margin:10px 0 14px;">
+        While we can never draw a sample that reflects the true proportion of
+        <span style="color:#9a7b3f;font-weight:700;">${fmt(num("ex17_p"), 3)}</span> &mdash;
+        <span style="color:#b0563f;font-weight:700;">${spellNumber(s17)}</span> drawings can come out at only
+        ${spellNumber(s17 + 1)} values, and it is not among them &mdash; we can be confident that our error
+        bounds will nevertheless contain it ${green(fmt(got, 1) + "%")} of the time${close ? "" :
+          `, against the ${green(fmt(want, 0) + "%")} claimed: an induction from ${spellNumber(s17)} can land
+           on only ${spellNumber(s17 + 1)} values, and the window round the truth catches one of them at this
+           proportion and two at others`}.</div>`;
+    } else $("#ex17_unreachable", content).innerHTML = "";
 
     if (current) {
       const col = current.containsP ? "#4a7c59" : "#b0563f";
@@ -771,7 +889,6 @@ registerExample("example-ex16", (box) => {
       <div class="col col-6"><div id="ex16-p-slider"></div></div>
       <div class="col col-6"><div id="ex16-conf-slider"></div></div>
     </div>
-    <div id="ex16_results"></div>
   </div>`);
   box.appendChild(content);
 
@@ -945,25 +1062,58 @@ registerExample("example-ex16", (box) => {
     const ya = maxY * 0.5;
     pl.arrows(c.p2, ya, c.p1, ya, { code: 3, angle: 20, length: 8, lwd: 2, col: "#8a4331" });
     pl.text((c.p1 + c.p2) / 2, ya * 1.1, `Difference: ${fmt(c.diffObs, 4)}`, { col: "#8a4331", cex: 0.9, font: 2 });
+
+    /* --------------------------------------------------------------------
+       The difference measured in probable errors, laid along it.
+
+       A second rule under the arrow, perforated into lengths of e1 + e2 — each
+       perforation the two errors end to end, in the two groups' own colours,
+       so what the multiple is a multiple OF is visible rather than stated. Ten
+       and a bit of them span the census difference, which is Peirce's sentence
+       drawn.
+
+       They stay probable errors whatever the confidence slider says. That
+       slider widens the shaded bands, which is what a level is for; the count
+       in his sentence is in probable errors, and his table is then consulted
+       for what such a multiple comes to. Perforating in the selected bound as
+       well would count the level twice over, and the picture would stop
+       agreeing with the sentence it illustrates.
+       ------------------------------------------------------------------- */
+    if (c.sumErr > 0 && c.diffObs > 0) {
+      const yb = ya * 0.74;
+      const lo = Math.min(c.p1, c.p2), unit = c.sumErr;
+      const whole = Math.floor(c.ratio + 1e-9);
+      const gap = unit * 0.10;               // the perforation, so the units count
+      const drawUnit = (u0, frac) => {
+        const b = Math.min(c.q1, unit * frac);            // group 1's share first
+        if (b > 0) pl.segments(u0, yb, u0 + b, yb, { col: "#2f6f9f", lwd: 4 });
+        const r = unit * frac - b;
+        if (r > 0) pl.segments(u0 + b, yb, u0 + b + r, yb, { col: "#b8703a", lwd: 4 });
+      };
+      for (let i = 0; i < Math.min(whole, 60); i++) drawUnit(lo + i * unit, 1 - gap / unit);
+      const rest = c.ratio - whole;
+      if (rest > 0.01 && whole < 60) drawUnit(lo + whole * unit, Math.max(0, rest - gap / unit));
+      pl.text((c.p1 + c.p2) / 2, yb * 0.72,
+        `${fmt(c.ratio, 1)} × (e₁ + e₂) — every dash is the two probable errors end to end`,
+        { col: "#575d66", cex: 0.78 });
+      /* the question the confidence slider raises, answered where it arises */
+      if (c.confidence > 50.5 && chk("ex16_show_errors")) {
+        pl.text((c.p1 + c.p2) / 2, yb * 0.5,
+          `the bands follow the ${fmt(c.confidence, 0)}% level; the dashes stay probable errors`,
+          { col: PAL.inkFaint, cex: 0.7 });
+      }
+    }
     pl.clip(false);
     pl.legend("topright", { legend: ["Group 1", "Group 2"], col: ["#2f6f9f", "#b8703a"], lwd: [2, 2], cex: 0.9 });
   });
   $("#ex16-plot", content).appendChild(canvas);
 
+  /* The analysis box is gone. Every figure that was in it — both probable
+     errors, the difference, their sum and the multiple — is in Peirce's own
+     paragraph above and in the perforated rule under the difference, so the box
+     was the same arithmetic printed a third time. */
   function update() {
     confSlider.style.display = chk("ex16_show_errors") ? "" : "none";
-    const c = calc();
-    $("#ex16_results", content).innerHTML = `<div class="result-box">
-      <h4>Analysis Results</h4>
-      <h5>Step 1: Calculate Probable Errors</h5>
-      <p>For Group 1 (n = ${bigmark(c.n1)}): e1 = ${fmt(c.q1, 5)}</p>
-      <p>For Group 2 (n = ${bigmark(c.n2)}): e2 = ${fmt(c.q2, 5)}</p>
-      <hr>
-      <h5>Step 2: Test Against Error Intervals</h5>
-      <p><strong>Observed difference: </strong>${fmt(c.diffObs, 4)}</p>
-      <p><strong>Sum of probable errors: </strong>${fmt(c.sumErr, 4)}</p>
-      <p><strong>Multiple of error: </strong>${fmt(c.ratio, 1)} x (e1 + e2)</p>
-      </div>`;
     drawCanvas(canvas);
   }
   update();
@@ -979,14 +1129,16 @@ registerExample("example-ex18", (box) => {
       <div class="col col-4">
         <div id="ex18-controls"></div>
         <div id="ex18-pred"></div>
-        <button class="btn btn-primary btn-sm" id="ex18_reset">Reset to Peirce's example</button>
+        <div class="ex-buttonbar">
+          <button class="btn btn-primary btn-sm" id="ex18_reset">Reset to Peirce's example</button>
+          <button class="btn btn-sm" id="ex18_even">Same sample, an even proportion</button>
+        </div>
       </div>
       <div class="col col-8">
         <div id="ex18-plot"></div>
         <div id="ex18_click_text"></div>
       </div>
     </div>
-    <div id="ex18_peirce"></div>
   </div>`);
   box.appendChild(content);
 
@@ -1018,6 +1170,40 @@ registerExample("example-ex18", (box) => {
     return spellOut ? `${n} white balls` : n;
   };
 
+  /* --------------------------------------------------------------------------
+     What "tolerably certain" comes to.
+
+     Peirce's claim is a tolerance and a certainty together: an error of no more
+     than one ball in a hundred, and being tolerably certain of it. Only one of
+     the two can be the handle. The certainty is the handle here, because it is
+     the vaguer of the two words and the one worth pinning down, and the
+     tolerance is then read off — the smallest whole ball in a hundred that the
+     drawings cover that often.
+
+     Counted on the exact binomial, not on the normal curve, so the figure is
+     the same arithmetic he does in the paragraph: at one in a hundred with a
+     hundred drawings, no ball, one, or two covers 0.921 of the cases, and his
+     sentence comes back word for word. Push the proportion to a half and the
+     same certainty needs nine balls in a hundred, which is the whole of his
+     remark about extreme values.
+     ------------------------------------------------------------------------*/
+  function tolerance() {
+    const p = num("ex18_p"), s = Math.round(num("ex18_s")), want = num("ex18_pred_cl");
+    const cover = (m) => {
+      const d = m / 100;
+      let tot = 0;
+      for (let k = 0; k <= s; k++) if (Math.abs(k / s - p) <= d + 1e-12) tot += dbinom(k, s, p);
+      return tot;
+    };
+    for (let m = 0; m <= 100; m++) {
+      const c = cover(m);
+      if (c >= want - 1e-12) return { m: m, delta: m / 100, cover: c };
+    }
+    return { m: 100, delta: 1, cover: 1 };
+  }
+  const ballsPhrase = (m) => (m === 0 ? "not one ball"
+    : m === 1 ? "one ball" : `${spellNumber(m)} balls`);
+
   registerLive("example-ex18", {
     rate: () => {
       const p = num("ex18_p");
@@ -1025,6 +1211,9 @@ registerExample("example-ex18", (box) => {
                       : `${bigmark(p * 100)} white balls in 100`;
     },
     s: () => bigmark(num("ex18_s")),
+    /* his own two words, with the figure they come to */
+    certainty: () => ` &mdash; ${fmt(tolerance().cover * 100, 1)} times in 100 &mdash;`,
+    margin: () => ballsPhrase(tolerance().m),
     list: () => {
       const p = num("ex18_p"), s = Math.round(num("ex18_s"));
       const ks = ex18Window();
@@ -1043,8 +1232,13 @@ registerExample("example-ex18", (box) => {
   ctl.appendChild(checkbox("ex18_rescale", "Rescale chart (zoom)", true));
   ctl.appendChild(checkbox("ex18_xaxis_balls", "X-axis: Number of balls", false));
   const pred = $("#ex18-pred", content);
-  pred.appendChild(checkbox("ex18_show_prediction", "Show prediction interval", true));
-  const predSlider = slider("ex18_pred_cl", "Prediction confidence level:", 0.50, 0.99, 0.50, 0.01, (v) => v.toFixed(2));
+  pred.appendChild(checkbox("ex18_show_prediction", "Show the error allowed", true));
+  /* The slider is what "tolerably certain" means, so it says so and reads as a
+     rate rather than as a decimal. It opens at nine times in ten, which is a
+     fair reading of the words and the one at which his own sentence comes out
+     as he printed it. */
+  const predSlider = slider("ex18_pred_cl", "Tolerably certain means:", 0.50, 0.99, 0.90, 0.01,
+    (v) => `${Math.round(v * 100)} times in 100`, "k3");
   pred.appendChild(predSlider);
 
   content.addEventListener("input", (ev) => { if (ev.target.id === "ex18_p") stickySnap("ex18_p"); update(); });
@@ -1054,20 +1248,34 @@ registerExample("example-ex18", (box) => {
     document.getElementById("ex18_rescale").checked = true;
     document.getElementById("ex18_xaxis_balls").checked = false;
     document.getElementById("ex18_show_prediction").checked = true;
-    setSlider("ex18_pred_cl", 0.50);
+    setSlider("ex18_pred_cl", 0.90);
+    update();
+  });
+  /* The same drawings and the same certainty, moved to the middle of the range:
+     the tolerance is the only thing that gives, and it is the sentence in the
+     text that shows it. Unzoomed, so the comb underneath is on the whole number
+     line where the two ends can be compared. */
+  $("#ex18_even", content).addEventListener("click", () => {
+    setSlider("ex18_p", 0.5);
+    document.getElementById("ex18_rescale").checked = false;
+    document.getElementById("ex18_xaxis_balls").checked = false;
+    clicked = null;
     update();
   });
 
+  /* The band drawn on the chart is the tolerance in the sentence, not a second
+     interval of its own: p either side by the balls the sentence allows. */
   const predInterval = () => {
     if (!chk("ex18_show_prediction")) return null;
-    const p = num("ex18_p"), s = num("ex18_s");
-    return binomTestCI(Math.round(p * s), s, num("ex18_pred_cl"));
+    const p = num("ex18_p"), d = tolerance().delta;
+    return [Math.max(0, p - d), Math.min(1, p + d)];
   };
 
   const canvas = mkCanvas(450, (pl) => {
     samplingDistPlot(pl, {
       p: num("ex18_p"), s: num("ex18_s"), rescale: chk("ex18_rescale"),
-      useBalls: chk("ex18_xaxis_balls"), clicked: clicked, predCI: predInterval()
+      useBalls: chk("ex18_xaxis_balls"), clicked: clicked, predCI: predInterval(),
+      peComb: true, clickedPE: true
     });
   }, {
     onclick: (x) => {
@@ -1078,68 +1286,38 @@ registerExample("example-ex18", (box) => {
   });
   $("#ex18-plot", content).appendChild(canvas);
 
-  /* Peirce's own paragraph with the figures filled in from the sliders.
-     "Not in error by more than one ball in den" is a tolerance on the
-     proportion, |k/s - p| <= 1/den, which at his own settings (p = 1/100,
-     s = 100) is |k - 1| <= 1, so k of 0, 1 or 2 — the three probabilities he
-     lists that carry most of the weight. */
-  function peirceParagraph(p, s) {
-    const pf = decimalToFraction(p);
-    // Peirce names the ball for the first two and then only the number
-    const balls = (k) => (k === 0 ? "no white ball" : k === 1 ? "one white ball" : numberWord(k));
-    /* He enumerates from none upward because his proportion is tiny. Follow the
-       likely counts instead, which lands on his 0 to 5 at his own settings and
-       stays informative when the proportion is not extreme. */
-    const start = Math.max(0, Math.round(p * s) - 2);
-    const terms = [];
-    for (let k = start; k < start + 6 && k <= s; k++) {
-      terms.push(`that of drawing ${balls(k)} would be ${Math.round(dbinom(k, s, p) * 1000)}/1000`);
-    }
-    const first = terms.shift().replace("that of drawing", "The probability of drawing");
-
-    /* The tolerance is Peirce's own concrete claim, one ball in a hundred, so
-       it stays fixed at 0.01 of the proportion however p is set. That is what
-       makes the figure worth watching: at his 1 in 100 it comes to 0.921, and
-       at an even proportion it collapses, which is the security he is pointing
-       to in extreme values. */
-    const tol = 0.01 * s;
-    let certain = 0;
-    for (let k = Math.max(0, Math.ceil(p * s - tol)); k <= Math.min(s, Math.floor(p * s + tol)); k++) {
-      certain += dbinom(k, s, p);
-    }
-    const subject = pf.num === 1 ? "one white ball" : `${pf.num} white balls`;
-    return `<div class="note-block">
-      Thus, suppose there were in reality ${subject} in <strong>${bigmark(pf.den)}</strong> in a certain urn,
-      and we were to judge of the number by <strong>${bigmark(s)}</strong> drawings.
-      ${first}; ${terms.join("; ")}, etc.
-      Thus we should be tolerably certain of not being in error by more than one ball in 100
-      (<strong>${fmt(certain, 3)}</strong>).</div>`;
-  }
-
   function update() {
     predSlider.style.display = chk("ex18_show_prediction") ? "" : "none";
     const p = num("ex18_p"), s = num("ex18_s");
     if (clicked !== null && clicked > s) clicked = null;
-    const pf = decimalToFraction(p);
-    $("#ex18_peirce", content).innerHTML = peirceParagraph(p, s);
+    /* Peirce's sentence in the text above is the readout now — the enumerated
+       list, the certainty and the tolerance are all in it — so the panel says
+       only what the text cannot: which bar has been clicked. */
     if (clicked === null) {
-      let predText = "";
-      const ci = predInterval();
-      if (ci) {
-        const margin = Math.max(Math.abs(p - ci[0]), Math.abs(ci[1] - p)) * s;
-        predText = `<p>We should be tolerably certain of not being in error by more than
-          <strong>${fmt(margin, 1)}</strong> ${pluralBall(Math.round(margin))} in <strong>${pf.den}</strong>.</p>`;
-      }
-      $("#ex18_click_text", content).innerHTML =
-        `<div class="click-info"><p><em>Click on any bar to see the exact probability.</em></p>${predText}</div>`;
+      /* the comb only exists on the whole number line, so say where it is */
+      const combNote = (chk("ex18_rescale") && !chk("ex18_xaxis_balls"))
+        ? `<p class="help-text" style="margin-bottom:0;">Untick <em>Rescale</em> to see the probable error at
+           every proportion, drawn under the chart.</p>` : "";
+      $("#ex18_click_text", content).innerHTML = `<div class="click-info">
+        <p><span class="click-cue">Click on any bar of the chart to see the exact probability.</span></p>
+        ${combNote}</div>`;
     } else {
       const prob = dbinom(clicked, s, p);
       const probNum = Math.round(prob * 1000);
       const numText = clicked === 1 ? `${numberWord(clicked)} ${pluralBall(clicked)}` : `${clicked} ${pluralBall(clicked)}`;
+      const ph = clicked / s;
+      const e = 0.477 * Math.sqrt(2 * ph * (1 - ph) / s);
+      const covers = Math.abs(ph - p) <= e + 1e-12;
       $("#ex18_click_text", content).innerHTML = `<div class="click-info">
         <p><strong>Clicked outcome: </strong>${clicked} white balls out of ${s} drawings</p>
         <p>The probability of drawing <strong>${numText}</strong> would be
-          <strong>${probNum}/1000</strong> = <strong>${fmt(prob, 3)}</strong>.</p></div>`;
+          <strong>${probNum}/1000</strong> = <strong>${fmt(prob, 3)}</strong>.</p>
+        <p style="margin-bottom:0;">An induction from that sample gives
+          <strong style="color:#6b5c86;">${fmt(ph, 3)} &plusmn; ${fmt(e, 4)}</strong>, drawn as the bar across
+          the top of the stem &mdash; ${covers ? "which covers" : "which does not cover"} the real proportion of
+          ${fmt(p, 3)}. That is the probable error worked at the proportion the sample came out at, which is
+          the only one an inquirer holding it would have. It belongs to the estimate, not to the height of the
+          bar: the height says how often that sample turns up.</p></div>`;
     }
     drawCanvas(canvas);
   }

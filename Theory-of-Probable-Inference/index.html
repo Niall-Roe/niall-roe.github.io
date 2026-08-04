@@ -383,6 +383,168 @@
     border-bottom-color: var(--accent);
   }
 
+  /* -------------------------------------------------------------- controls */
+  .ctl { margin-bottom: 16px; }
+  .ctl > label {
+    display: block;
+    font-family: inherit;
+    font-size: .92em;
+    font-weight: 400;
+    color: var(--ink-soft);
+    margin-bottom: 2px;
+    line-height: 1.5;
+  }
+  .ctl select, .ctl input[type=number] {
+    width: 100%;
+    padding: 4px 2px;
+    border: none;
+    border-bottom: 1px solid var(--rule);
+    border-radius: 0;
+    font-family: inherit;
+    font-size: 1em;
+    color: var(--ink);
+    background: transparent;
+  }
+  .ctl select:focus, .ctl input[type=number]:focus {
+    outline: none;
+    border-bottom-color: var(--accent);
+  }
+  .ctl input[type=range] {
+    width: 100%;
+    accent-color: var(--accent);
+    margin: 2px 0;
+  }
+  .ctl .slider-val {
+    font-family: inherit;
+    font-size: .95em;
+    color: var(--accent);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+  }
+  .ctl.checkbox label { display: flex; align-items: center; gap: 8px; font-weight: 400; }
+  .ctl.checkbox input { width: auto; accent-color: var(--accent); }
+  .ctl .radio-row { display: flex; gap: 18px; flex-wrap: wrap; }
+  .ctl .radio-row.stacked { flex-direction: column; gap: 4px; }
+  .ctl .radio-row label {
+    display: flex; align-items: center; gap: 6px;
+    font-family: inherit;
+    font-size: .95em; font-weight: 400; cursor: pointer;
+    color: var(--ink-soft);
+  }
+  .ctl .radio-row input { accent-color: var(--accent); }
+
+  /* Buttons set as small caps in the text face, outlined rather than filled —
+     they sit in the column beside the prose and should not shout across it. */
+  button.btn {
+    font-family: inherit;
+    font-size: .88em;
+    font-variant: small-caps;
+    letter-spacing: .05em;
+    padding: 5px 13px;
+    margin: 3px 4px 3px 0;
+    border: 1px solid var(--rule);
+    border-radius: 3px;
+    cursor: pointer;
+    background: none;
+    color: var(--ink-soft);
+    transition: color .18s, border-color .18s, background-color .18s;
+  }
+  button.btn:hover { background-color: var(--wash); color: var(--ink); border-color: var(--ink-faint); }
+  button.btn.is-active {
+    background-color: var(--tint-4);
+    border-color: var(--accent-4);
+    color: var(--accent-4);
+  }
+  button.btn-primary   { color: var(--accent);   border-color: rgba(47, 111, 159, .45); }
+  button.btn-success   { color: var(--accent-3); border-color: rgba(74, 124, 89, .45); }
+  button.btn-warning   { color: var(--accent-4); border-color: rgba(154, 123, 63, .50); }
+  button.btn-danger    { color: var(--accent-2); border-color: rgba(176, 86, 63, .45); }
+  button.btn-secondary { color: var(--ink-soft); border-color: var(--rule); }
+  button.btn-primary:hover   { background-color: var(--tint);   color: var(--accent); }
+  button.btn-success:hover   { background-color: var(--tint-3); color: var(--accent-3); }
+  button.btn-warning:hover   { background-color: var(--tint-4); color: var(--accent-4); }
+  button.btn-danger:hover    { background-color: var(--tint-2); color: var(--accent-2); }
+  button.btn-block { display: block; width: 100%; margin: 4px 0; }
+  button.btn-sm    { font-size: .8em; padding: 3px 9px; }
+
+  /* A row of actions laid out across the column rather than stacked down the
+     side of it, so the graphic they drive stays in view with the prose. */
+  .ex-buttonbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 6px;
+    margin-bottom: 16px;
+  }
+  .ex-buttonbar .btn { margin: 0; }
+
+  /* ------------------------------------------------------------------------
+     An argument set out inside an example, its three lines aligned and its
+     terms coloured to the controls that move them. Same shape as .scheme in
+     the article, so the reader sees the same object in both places.
+     ----------------------------------------------------------------------*/
+  .arg {
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 16px 0;
+    margin: 0 0 18px 0;
+  }
+  .arg .arg-name {
+    font-size: .8em; font-variant: small-caps; letter-spacing: .1em;
+    color: var(--ink-faint); margin-bottom: 10px;
+  }
+  .arg p { text-align: left; margin: 0 0 7px 0; line-height: 1.65; }
+  .arg p:last-child { margin-bottom: 0; }
+  .arg .concl { padding-top: 7px; border-top: 1px solid var(--rule-soft); }
+  .arg.is-necessary { border-color: rgba(74, 124, 89, .4); }
+  .arg + .arg { border-top: none; margin-top: -18px; }
+
+  /* ---------------------------------------------------------------- cards */
+  .card {
+    display: inline-flex; flex-direction: column; align-items: center; justify-content: center;
+    width: 34px; height: 46px; margin: 2px;
+    border: 1px solid var(--rule); border-radius: 3px;
+    background-color: var(--paper);
+    font-family: 'Times New Roman', Georgia, serif;
+    font-size: .95em; line-height: 1.05;
+    color: var(--ink);
+    transition: opacity .2s, border-color .2s, background-color .2s;
+  }
+  .card .pip { font-size: 1.05em; }
+  .card.red { color: var(--accent-2); }
+  .card.back {
+    background-color: var(--wash);
+    border-color: var(--rule);
+    color: var(--ink-faint);
+    background-image: repeating-linear-gradient(45deg,
+      rgba(47,111,159,.10) 0 4px, transparent 4px 8px);
+  }
+  .card.dim { opacity: .28; }
+  .card.ace { border-color: var(--accent); box-shadow: inset 0 0 0 1px rgba(47,111,159,.35); }
+  .card.big { width: 52px; height: 72px; font-size: 1.25em; }
+  .card-row { display: flex; flex-wrap: wrap; align-items: center; margin: 2px 0 10px 0; }
+  .card-row .hand-lbl {
+    flex: 0 0 108px; font-size: .82em; font-variant: small-caps; letter-spacing: .07em;
+    color: var(--ink-faint);
+  }
+  .pack-grid { display: flex; flex-wrap: wrap; gap: 0; max-width: 100%; }
+
+  /* the 100 figures of ex1 */
+  .pop-grid { display: grid; grid-template-columns: repeat(10, 1fr); gap: 3px; max-width: 260px; margin: 6px 0 14px 0; }
+  .pop-cell { aspect-ratio: 1; border-radius: 2px; background-color: var(--rule-soft); transition: background-color .18s; }
+  .pop-cell.on { background-color: var(--accent); }
+  .pop-cell.pick { outline: 2px solid var(--ink); outline-offset: 1px; }
+
+  /* a bar showing a set of admitted ratios rather than one ratio (ex2) */
+  .ratio-bar {
+    position: relative; height: 40px; margin: 10px 0 2px;
+    border: 1px solid var(--rule); border-radius: 3px;
+    background-color: var(--rule-soft); overflow: hidden;
+  }
+  .ratio-bar .band { position: absolute; top: 0; bottom: 0; background-color: rgba(47,111,159,.42); }
+  .ratio-scale { position: relative; height: 16px; font-size: .7em; color: var(--ink-faint); }
+  .ratio-scale span { position: absolute; transform: translateX(-50%); }
+
   /* A remark of the editor's rather than a sentence of Peirce's: set in from
      the margin behind a rule, so the page never has to be read twice to see
      whose voice it is in. */
@@ -576,7 +738,7 @@
   }
   .footnotes p { text-align: left; margin-bottom: 8px; }
   .footnotes a { text-decoration: none; color: var(--accent); }
-  .footnotes .formula { font-size: 1em; margin: 12px 0; }
+  .footnotes .formula { font-size: 1em; margin: 12px 0; text-align: center; }
 
   .footer {
     margin-top: 44px;
@@ -622,9 +784,9 @@
 
   <div class="section-number" id="sec-I">I.</div>
 
-  <p>THE following is an example of the simplest kind of probable inference:&mdash;</p>
+  <p><span class="example-trigger" data-toggle="example-ex1">THE following is an example of the simplest kind of probable inference:&mdash;</span></p>
 
-  <div class="scheme"><p>About two per cent of persons wounded in the liver recover;<br>This man has been wounded in the liver;<br>Therefore, there are two chances out of a hundred that he will recover.</p></div>
+  <div class="scheme"><p>About <span class="live k1" data-live="example-ex1:pct">two per cent</span> of persons wounded in the liver recover;<br>This man has been wounded in the liver;<br>Therefore, there are <span class="live k1" data-live="example-ex1:chances">two chances out of a hundred</span> that he will recover.</p></div>
 
   <p>Compare this with the simplest of syllogisms, say the following:&mdash;</p>
 
@@ -633,18 +795,24 @@
   <p>The latter argument consists in the application of a general rule to a particular case. The former applies to a particular case a rule not absolutely universal, but subject to a known proportion of exceptions. Both may alike be termed deductions, because they bring information about the uniform or usual course of things to bear upon the solution of special questions; and the probable argument may approximate indefinitely to demonstration as the ratio named in the first premise approaches to unity or to zero. </p>
   <p>Let us set forth the general formulas of the two kinds of inference in the manner of formal logic. </p>
   <div class="form"><h3>FORM I.</h3><p class="title">Singular Syllogism in Barbara.</p><p>Every M is a P;<br>S is an M:<br>Hence, S is a P.</p></div>
-  <div class="form"><h3>FORM II.</h3><p class="title">Simple Probable Deduction.</p><p>The proportion &rho; of the M&rsquo;s are P&rsquo;s;<br>S is an M:<br>It follows, with probability &rho;, that S is a P.</p></div>
-  <p>It is to be observed that the ratio ρ need not be exactly specified. We may reason from the premise that not more than two per cent of persons wounded in the liver recover, or from “not less than a certain proportion of the M’s are P’s,” or from “no very large nor very small proportion, etc.” In short, ρ is subject to every kind of indeterminacy; it simply excludes some ratios and admits the possibility of the rest. The analogy between syllogism and what is here called probable deduction is certainly genuine and important; yet how wide the differences between the two modes of inference are, will appear from the following considerations:&mdash; </p>
+  <div class="form"><h3>FORM II.</h3><p class="title">Simple Probable Deduction.</p><p>The proportion <span class="live k1" data-live="example-ex1:rho">&rho;</span> of the M&rsquo;s are P&rsquo;s;<br>S is an M:<br>It follows, with probability <span class="live k1" data-live="example-ex1:rho">&rho;</span>, that S is a P.</p></div>
+
+  <div id="example-ex1" class="example-container"></div>
+  <p><span class="example-trigger" data-toggle="example-ex2">It is to be observed that the ratio ρ need not be exactly specified. We may reason from the premise that <span class="hl-text a" id="ex2-cl-notmore">not more than two per cent of persons wounded in the liver recover</span>, or from <span class="hl-text c" id="ex2-cl-notless">“not less than a certain proportion of the M’s are P’s,”</span> or from <span class="hl-text q" id="ex2-cl-novery">“no very large nor very small proportion, etc.”</span> In short, ρ is subject to every kind of indeterminacy; it simply excludes some ratios and admits the possibility of the rest.</span> The analogy between syllogism and what is here called probable deduction is certainly genuine and important; yet how wide the differences between the two modes of inference are, will appear from the following considerations:&mdash;</p>
+
+  <div id="example-ex2" class="example-container"></div>
 
   <p>1. The logic of probability is related to ordinary syllogistic as the quantitative to the qualitative branch of the same science. Necessary syllogism recognizes only the inclusion or non-inclusion of one class under another; but probable inference takes account of the proportion of one class which is contained under a second. It is like the distinction between projective geometry, which asks whether points coincide or not, and metric geometry, which determines their distances. </p>
 
   <p>2. For the existence of ordinary syllogism, all that is requisite is that we should be able to say, in some sense, that one term is contained in another, or that one object stands to a second in one of those relations: “better than,” “equivalent to,” etc., which are termed transitive because if A is in any such relation to B, and B is in the same relation to C, then A is in that relation to C. The universe might be all so fluid and variable that nothing should preserve its individual identity, and that no measurement should be conceivable; and still one portion might remain inclosed within a second, itself inclosed within a third, so that a syllogism would be possible. But probable inference could not be made in such a universe, because no signification would attach to the words “quantitative ratio.” For that there must be counting; and consequently units must exist, preserving their identity and variously grouped together. </p>
 
-  <p>3. A cardinal distinction between the two kinds of inference is, that in demonstrative reasoning the conclusion follows from the existence of the objective facts laid down in the premises; while in probable reasoning these facts in themselves do not even render the conclusion probable, but account has to be taken of various subjective circumstances,—of the manner in which the premises have been obtained, of there being no countervailing considerations, etc.; in short, good faith and honesty are essential to good logic in probable reasoning. When the partial rule that the proposition ρ of the M’s are P’s is applied to show with probability ρ that S is a P, it is requisite, not merely that S should be an M, but also that it should be an instance drawn at random from among the M’s. Thus, there being four aces in a picquet pack of thirty-two cards, the chance is one eighth that a given card not looked at is an ace; but this is only on the supposition that the card has been drawn at random from the whole pack. If, for instance, it had been drawn from the cards discarded by the players at piquet or euchre, the probability would be quite different. The instance must be drawn at random. </p>
+  <p>3. A cardinal distinction between the two kinds of inference is, that in demonstrative reasoning the conclusion follows from the existence of the objective facts laid down in the premises; while in probable reasoning these facts in themselves do not even render the conclusion probable, but account has to be taken of various subjective circumstances,—of the manner in which the premises have been obtained, of there being no countervailing considerations, etc.; in short, good faith and honesty are essential to good logic in probable reasoning. When the partial rule that the proposition ρ of the M’s are P’s is applied to show with probability ρ that S is a P, it is requisite, not merely that S should be an M, but also that it should be an instance drawn at random from among the M’s. <span class="example-trigger" data-toggle="example-ex3">Thus, there being four aces in a picquet pack of thirty-two cards, the chance is <span class="live k1" data-live="example-ex3:chance">one eighth</span> that a given card not looked at is an ace; but this is only on the supposition that the card has been drawn at random from the whole pack. If, for instance, it had been drawn from the cards discarded by the players at piquet or euchre, the probability would be quite different.</span> The instance must be drawn at random.</p>
+
+  <div id="example-ex3" class="example-container"></div>
 
   <p>Here is a maxim of conduct. The volition of the reasoner (using what machinery it may) has to choose S so that it shall be an M; but he ought to restrain himself from all further preference, and not allow his will to act in any way that might tend to settle what particular M is taken, but should leave that to the operation of chance. Willing and wishing, like other operations of the mind, are general and imperfectly determinate. I wish for a horse,—for some particular kind of horse perhaps, but not usually for any individual one. I will to act in a way of which I have a general conception; but so long as my action conforms to that general description, how it is further determined I do not care. Now in choosing the instance S, the general intention (including the whole plan of action) should be to select an M, but beyond that there should be no preference; and the act of choice should be such that if it were repeated many enough times with the same intention, the result would be that among the totality of selections the different sorts of M’s would occur with the same relative frequencies as in experiences in which volition does not intermeddle at all. In cases in which it is found difficult thus to restrain the will by a direct effort, the apparatus of games of chance,—a lottery-wheel, a roulette, cards, or dice,—may be called to our aid. </p>
 
-  <p>Usually, however, in making a simple probable deduction, we take that instance in which we happen at the time to be interested. In such a case, it is our interest that fulfils the function of an apparatus for random selection; and no better need be desired, so long as we have reason to deem the premise “the proportion ρ of the M’s are P’s” to be equally true in regard to that part of the M’s which are alone likely ever to excite our interest. Nor is it a matter of indifference in what manner the other premise has been obtained. A card being drawn at random from a picquet pack, the chance is one-eighth that it is an ace, if we have no other knowledge of it. But after we have looked at the card, we can no longer reason in that way. That the conclusion must be drawn in advance of any other knowledge on the subject is a rule that, however elementary, will be found in the sequel to have great importance. </p>
+  <p>Usually, however, in making a simple probable deduction, we take that instance in which we happen at the time to be interested. In such a case, it is our interest that fulfils the function of an apparatus for random selection; and no better need be desired, so long as we have reason to deem the premise “the proportion ρ of the M’s are P’s” to be equally true in regard to that part of the M’s which are alone likely ever to excite our interest. Nor is it a matter of indifference in what manner the other premise has been obtained. A card being drawn at random from a picquet pack, the chance is one-eighth that it is an ace, if we have no other knowledge of it. <span class="example-trigger" data-toggle="example-ex3">But after we have looked at the card, we can no longer reason in that way.</span> That the conclusion must be drawn in advance of any other knowledge on the subject is a rule that, however elementary, will be found in the sequel to have great importance. </p>
 
   <p>4. The conclusions of the two modes of inference likewise differ. One is necessary; the other only probable. Locke, in the “Essay concerning Human Understanding,” hints at the correct analysis of the nature of probability. After remarking that the mathematician positively knows that the sum of the three angles of a triangle is equal to two right angles because he apprehends the geometrical proof, he then continues: “But another man who never took the pains to observe the demonstration, hearing a mathematician, a man of credit, affirm the three angles of a triangle to be equal to two right ones, assents to it; that is, receives it for true. In which case, the foundation of his assent is the probability of the thing, the proof being such as, for the most part, carries truth with it; the man on whose testimony he receives it not being wont to affirm anything contrary to or besides his knowledge, especially in matters of this kind.”</p>
 
@@ -1069,5 +1237,1362 @@
   </div>
 
 </div>
+<script>
+/* ============================================================================
+   Peirce, "The Probability of Induction" — interactive edition
+   Port of the R/Shiny app (app.R) to a self-contained HTML page.
+
+   Part 1: statistical primitives (replacing R's stats package)
+   Part 2: a small canvas renderer that mimics R base graphics
+   ==========================================================================*/
+
+/* ---------------------------------------------------------------- MATH --- */
+
+const LG_C = [676.5203681218851, -1259.1392167224028, 771.32342877765313,
+  -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+  9.9843695780195716e-6, 1.5056327351493116e-7];
+
+function lgamma(z) {
+  if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lgamma(1 - z);
+  z -= 1;
+  let x = 0.99999999999980993;
+  for (let i = 0; i < 8; i++) x += LG_C[i] / (z + i + 1);
+  const t = z + 7.5;
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
+}
+
+function lchoose(n, k) {
+  if (k < 0 || k > n) return -Infinity;
+  return lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
+}
+
+// exact for the small n used here; falls back to lgamma for large n
+function choose(n, k) {
+  if (k < 0 || k > n) return 0;
+  k = Math.min(k, n - k);
+  if (n <= 60) {
+    let r = 1;
+    for (let i = 1; i <= k; i++) r = r * (n - k + i) / i;
+    return Math.round(r);
+  }
+  return Math.exp(lchoose(n, k));
+}
+
+function dbinom(k, n, p) {
+  if (k < 0 || k > n) return 0;
+  if (p === 0) return k === 0 ? 1 : 0;
+  if (p === 1) return k === n ? 1 : 0;
+  return Math.exp(lchoose(n, k) + k * Math.log(p) + (n - k) * Math.log1p(-p));
+}
+
+function dnorm(x, mean, sd) {
+  const z = (x - mean) / sd;
+  return Math.exp(-0.5 * z * z) / (sd * Math.sqrt(2 * Math.PI));
+}
+
+// Abramowitz & Stegun 7.1.26-style erf, refined; |err| < 1.2e-7 is not enough
+// for the tail probabilities used in ex16, so use a Chebyshev erfc instead.
+function erfc(x) {
+  const z = Math.abs(x), t = 2 / (2 + z);
+  const ty = 4 * t - 2;
+  const cof = [-1.3026537197817094, 6.4196979235649026e-1, 1.9476473204185836e-2,
+    -9.561514786808631e-3, -9.46595344482036e-4, 3.66839497852761e-4,
+    4.2523324806907e-5, -2.0278578112534e-5, -1.624290004647e-6,
+    1.303655835580e-6, 1.5626441722e-8, -8.5238095915e-8,
+    6.529054439e-9, 5.059343495e-9, -9.91364156e-10,
+    -2.27365122e-10, 9.6467911e-11, 2.394038e-12,
+    -6.886027e-12, 8.94487e-13, 3.13092e-13,
+    -1.12708e-13, 3.81e-16, 7.106e-15];
+  let d = 0, dd = 0, tmp;
+  for (let j = cof.length - 1; j > 0; j--) { tmp = d; d = ty * d - dd + cof[j]; dd = tmp; }
+  const ans = t * Math.exp(-z * z + 0.5 * (cof[0] + ty * d) - dd);
+  return x >= 0 ? ans : 2 - ans;
+}
+
+function pnorm(x, mean = 0, sd = 1) { return 0.5 * erfc(-((x - mean) / sd) / Math.SQRT2); }
+
+// Wichura AS241-quality inverse normal (Acklam + one Halley refinement)
+function qnorm(p, mean = 0, sd = 1) {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
+    1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+    6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+    -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+    3.754408661907416e+00];
+  const pl = 0.02425, ph = 1 - pl;
+  let q, r, x;
+  if (p < pl) {
+    q = Math.sqrt(-2 * Math.log(p));
+    x = (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  } else if (p <= ph) {
+    q = p - 0.5; r = q * q;
+    x = (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+        (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+  } else {
+    q = Math.sqrt(-2 * Math.log(1 - p));
+    x = -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+  const e = pnorm(x) - p, u = e * Math.sqrt(2 * Math.PI) * Math.exp(x * x / 2);
+  x = x - u / (1 + x * u / 2);
+  return mean + sd * x;
+}
+
+// regularized incomplete beta, via Lentz continued fraction (NR 6.4)
+function betacf(a, b, x) {
+  const FPMIN = 1e-300, EPS = 3e-16;
+  const qab = a + b, qap = a + 1, qam = a - 1;
+  let c = 1, d = 1 - qab * x / qap;
+  if (Math.abs(d) < FPMIN) d = FPMIN;
+  d = 1 / d;
+  let h = d;
+  for (let m = 1; m <= 300; m++) {
+    const m2 = 2 * m;
+    let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+    c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+    d = 1 / d; h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+    c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+    d = 1 / d;
+    const del = d * c; h *= del;
+    if (Math.abs(del - 1) < EPS) break;
+  }
+  return h;
+}
+
+function pbeta(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) +
+                      a * Math.log(x) + b * Math.log1p(-x));
+  return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a
+                                   : 1 - bt * betacf(b, a, 1 - x) / b;
+}
+
+function qbeta(p, a, b) {
+  if (p <= 0) return 0;
+  if (p >= 1) return 1;
+  let lo = 0, hi = 1, mid;
+  for (let i = 0; i < 200; i++) {
+    mid = (lo + hi) / 2;
+    if (pbeta(mid, a, b) < p) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+// Clopper-Pearson interval, i.e. R's binom.test(x, n, conf.level)$conf.int
+function binomTestCI(x, n, conf) {
+  const alpha = 1 - conf;
+  const lower = x === 0 ? 0 : qbeta(alpha / 2, x, n - x + 1);
+  const upper = x === n ? 1 : qbeta(1 - alpha / 2, x + 1, n - x);
+  return [lower, upper];
+}
+
+/* -- random numbers -------------------------------------------------------
+   R's Mersenne-Twister stream cannot be reproduced here, so seeded routines
+   use mulberry32. Anything that R seeded with set.seed(42) is seeded with 42
+   here: results are stable across reloads, but are not R's exact draws.      */
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const runif = () => Math.random();
+const sampleInt = (n) => Math.floor(Math.random() * n);      // 1..n -> 0..n-1
+function rbinom(n, p) { let k = 0; for (let i = 0; i < n; i++) if (Math.random() < p) k++; return k; }
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = sampleInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
+
+/* ---------------------------------------------------------- FORMATTING --- */
+
+const fmt = (x, d) => (Number.isFinite(x) ? x.toFixed(d) : String(x));
+// R's round(x, d) then default printing: 0.5 -> "0.5", not "0.5000"
+function rround(x, d) {
+  if (!Number.isFinite(x)) return String(x);
+  const r = Number(x.toFixed(d));
+  return String(r);
+}
+const bigmark = (x) => Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const pluralBall = (n) => (n === 1 ? "ball" : "balls");
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six",
+  "seven", "eight", "nine", "ten"];
+const numberWord = (n) => (n >= 0 && n <= 10 ? NUMBER_WORDS[n] : String(n));
+
+/* Peirce writes his figures out in words ("Ninety-nine Cretans in a hundred"),
+   so a number standing in for one of those has to be spelled as well. */
+const TEENS = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+  "sixteen", "seventeen", "eighteen", "nineteen"];
+const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+  "eighty", "ninety"];
+function spellNumber(n) {
+  n = Math.round(n);
+  if (n < 0 || n > 99) return String(n);
+  if (n <= 9) return NUMBER_WORDS[n];
+  if (n <= 19) return TEENS[n - 10];
+  const t = TENS[Math.floor(n / 10)], u = n % 10;
+  return u ? `${t}-${NUMBER_WORDS[u]}` : t;
+}
+const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+/* "one-third", "two-thirds", "one-half" — Peirce writes his fractions out in
+   the granary paragraphs, so a fraction standing in for one of his has to be
+   spelled the same way. */
+const FRAC_ORDINALS = ["", "", "half", "third", "fourth", "fifth", "sixth",
+  "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth"];
+function fracWord(n, d) {
+  const ord = FRAC_ORDINALS[d];
+  if (!ord) return `${n}&frasl;${d}`;
+  return `${spellNumber(n)}-${ord}${n === 1 ? "" : "s"}`;
+}
+
+function decimalToFraction(x) {
+  const common = { "1/2": 0.5, "1/3": 1/3, "2/3": 2/3, "1/4": 0.25, "3/4": 0.75,
+    "1/5": 0.2, "2/5": 0.4, "3/5": 0.6, "4/5": 0.8,
+    "1/10": 0.1, "1/100": 0.01, "1/1000": 0.001 };
+  for (const key in common) {
+    if (Math.abs(x - common[key]) < 0.001) {
+      const parts = key.split("/");
+      return { num: +parts[0], den: +parts[1] };
+    }
+  }
+  const num1000 = Math.round(x * 1000);
+  if (Math.abs(x - num1000 / 1000) < 0.001) return { num: num1000, den: 1000 };
+  for (const den of [100, 500, 200, 250]) {
+    const num = Math.round(x * den);
+    if (Math.abs(x - num / den) < 0.001) return { num: num, den: den };
+  }
+  return { num: num1000, den: 1000 };
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// tiny fraction markup used in place of MathJax
+const frac = (n, d) => `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
+
+/* ------------------------------------------------------------ PLOTTING --- */
+/* A minimal re-implementation of the parts of R base graphics the app uses:
+   plot(NULL)/rect/text/lines/points/segments/polygon/abline/axis/legend.
+   Coordinates passed to these methods are USER (data) coordinates.          */
+
+/* The plots share the page's palette and its typeface. Canvases paint their
+   own background, which is the same white as the article, so with the frames
+   off the plot sits on the page rather than in a panel on it. Names match the
+   CSS custom properties in the head. */
+const PAL = {
+  paper:    "#ffffff",
+  ink:      "#1f2328",
+  inkSoft:  "#575d66",
+  inkFaint: "#8a9099",
+  rule:     "#dbd6cb",
+  ruleSoft: "#ece8df",
+  accent:   "#2f6f9f",
+  accent2:  "#b0563f",
+  accent3:  "#4a7c59",
+  accent4:  "#9a7b3f"
+};
+
+const BASE_FONT = 12;
+const PLOT_FACE = 'Georgia, "Times New Roman", serif';
+
+class RPlot {
+  constructor(ctx, cssW, cssH) {
+    this.ctx = ctx; this.W = cssW; this.H = cssH;
+    this.mar = [40, 45, 32, 16];   // bottom, left, top, right, in px
+    this.xlim = [0, 1]; this.ylim = [0, 1];
+    this.xpd = false;
+  }
+  /* mar is given in R "lines"; ~13px per line at this font size.
+     Reproduces R's default xaxs/yaxs = "r" (4% padding) and, when asp is set,
+     R's behaviour of EXPANDING the user limits of the roomier axis rather
+     than shrinking the plot region — several plots in the original app draw
+     legends outside the nominal limits and rely on that. */
+  setup(opts) {
+    const o = opts || {};
+    if (o.mar) this.mar = o.mar.map((m) => m * 13);
+    let xlim = (o.xlim || [0, 1]).slice(), ylim = (o.ylim || [0, 1]).slice();
+    if (o.ext !== false) {
+      const dx = (xlim[1] - xlim[0]) * 0.04, dy = (ylim[1] - ylim[0]) * 0.04;
+      xlim = [xlim[0] - dx, xlim[1] + dx];
+      ylim = [ylim[0] - dy, ylim[1] + dy];
+    }
+    const [mb, ml, mt, mr] = this.mar;
+    const px0 = ml, px1 = this.W - mr, py0 = this.H - mb, py1 = mt;
+    if (o.asp) {
+      const availW = px1 - px0, availH = py0 - py1;
+      const uw = xlim[1] - xlim[0], uh = ylim[1] - ylim[0];
+      const scale = Math.min(availW / uw, availH / (uh * o.asp));
+      const newUw = availW / scale, newUh = availH / (scale * o.asp);
+      const cx = (xlim[0] + xlim[1]) / 2, cy = (ylim[0] + ylim[1]) / 2;
+      xlim = [cx - newUw / 2, cx + newUw / 2];
+      ylim = [cy - newUh / 2, cy + newUh / 2];
+    }
+    this.xlim = xlim; this.ylim = ylim;
+    this.px0 = px0; this.px1 = px1; this.py0 = py0; this.py1 = py1;
+    return this;
+  }
+  X(x) { return this.px0 + (x - this.xlim[0]) / (this.xlim[1] - this.xlim[0]) * (this.px1 - this.px0); }
+  Y(y) { return this.py0 + (y - this.ylim[0]) / (this.ylim[1] - this.ylim[0]) * (this.py1 - this.py0); }
+  invX(px) { return this.xlim[0] + (px - this.px0) / (this.px1 - this.px0) * (this.xlim[1] - this.xlim[0]); }
+  invY(py) { return this.ylim[0] + (py - this.py0) / (this.py1 - this.py0) * (this.ylim[1] - this.ylim[0]); }
+
+  _font(cex, font) {
+    const size = BASE_FONT * (cex || 1);
+    const weight = (font === 2) ? "bold " : "";
+    const style = (font === 3) ? "italic " : "";
+    this.ctx.font = `${style}${weight}${size}px ${PLOT_FACE}`;
+    return size;
+  }
+  _lty(lty) {
+    const c = this.ctx;
+    if (lty === 2) c.setLineDash([7, 5]);
+    else if (lty === 3) c.setLineDash([2, 3]);
+    else if (lty === 4) c.setLineDash([2, 3, 7, 3]);
+    else c.setLineDash([]);
+  }
+  clip(on) {
+    const c = this.ctx;
+    if (on) {
+      c.save(); c.beginPath();
+      c.rect(Math.min(this.px0, this.px1), Math.min(this.py0, this.py1),
+             Math.abs(this.px1 - this.px0), Math.abs(this.py0 - this.py1));
+      c.clip();
+    } else c.restore();
+  }
+  rect(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    const X0 = this.X(x0), X1 = this.X(x1), Y0 = this.Y(y0), Y1 = this.Y(y1);
+    if (o.col && o.col !== "transparent") { c.fillStyle = o.col; c.fillRect(X0, Y1, X1 - X0, Y0 - Y1); }
+    if (o.border !== null && o.border !== undefined && o.border !== "NA") {
+      c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+      c.strokeRect(X0, Y1, X1 - X0, Y0 - Y1); c.setLineDash([]);
+    }
+  }
+  text(x, y, str, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex, o.font);
+    c.fillStyle = o.col || "black";
+    c.textBaseline = "middle";
+    c.textAlign = o.adj === 0 ? "left" : (o.adj === 1 ? "right" : "center");
+    const lines = String(str).split("\n");
+    const lh = BASE_FONT * (o.cex || 1) * 1.25;
+    const y0 = this.Y(y) - lh * (lines.length - 1) / 2;
+    lines.forEach((ln, i) => c.fillText(ln, this.X(x), y0 + i * lh));
+  }
+  lines(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+    c.beginPath();
+    let started = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (!Number.isFinite(ys[i])) { started = false; continue; }
+      const px = this.X(xs[i]), py = this.Y(ys[i]);
+      if (!started) { c.moveTo(px, py); started = true; } else c.lineTo(px, py);
+    }
+    c.stroke(); c.setLineDash([]);
+  }
+  points(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.fillStyle = o.col || "black"; c.strokeStyle = o.col || "black";
+    const r = 2.2 * (o.cex || 1);
+    for (let i = 0; i < xs.length; i++) {
+      c.beginPath(); c.arc(this.X(xs[i]), this.Y(ys[i]), r, 0, 2 * Math.PI);
+      if (o.pch === 21) { c.fillStyle = "white"; c.fill(); c.stroke(); } else c.fill();
+    }
+  }
+  segments(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+    c.beginPath(); c.moveTo(this.X(x0), this.Y(y0)); c.lineTo(this.X(x1), this.Y(y1));
+    c.stroke(); c.setLineDash([]);
+  }
+  abline(o = {}) {
+    if (o.h !== undefined) this.segments(this.xlim[0], o.h, this.xlim[1], o.h, o);
+    if (o.v !== undefined) this.segments(o.v, this.ylim[0], o.v, this.ylim[1], o);
+  }
+  polygon(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.beginPath();
+    c.moveTo(this.X(xs[0]), this.Y(ys[0]));
+    for (let i = 1; i < xs.length; i++) c.lineTo(this.X(xs[i]), this.Y(ys[i]));
+    c.closePath();
+    if (o.col) { c.fillStyle = o.col; c.fill(); }
+    if (o.border) { c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; c.stroke(); }
+  }
+  arrows(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    this.segments(x0, y0, x1, y1, o);
+    const P0 = [this.X(x0), this.Y(y0)], P1 = [this.X(x1), this.Y(y1)];
+    const len = o.length || 8;
+    const ang = Math.atan2(P1[1] - P0[1], P1[0] - P0[0]);
+    const spread = (o.angle || 20) * Math.PI / 180;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1;
+    const head = (P, a) => {
+      c.beginPath();
+      c.moveTo(P[0], P[1]); c.lineTo(P[0] - len * Math.cos(a - spread), P[1] - len * Math.sin(a - spread));
+      c.moveTo(P[0], P[1]); c.lineTo(P[0] - len * Math.cos(a + spread), P[1] - len * Math.sin(a + spread));
+      c.stroke();
+    };
+    head(P1, ang);
+    if (o.code === 3) head(P0, ang + Math.PI);
+  }
+  title(main, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex || 1.1, 2);
+    c.fillStyle = PAL.ink; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillText(main, (this.px0 + this.px1) / 2, Math.max(12, this.py1 - 14));
+  }
+  axisLabels(xlab, ylab) {
+    const c = this.ctx;
+    if (xlab) {
+      this._font(0.95, 1); c.fillStyle = PAL.inkSoft; c.textAlign = "center"; c.textBaseline = "alphabetic";
+      c.fillText(xlab, (this.px0 + this.px1) / 2, this.H - 6);
+    }
+    if (ylab) {
+      c.save(); this._font(0.95, 1); c.fillStyle = PAL.inkSoft;
+      c.translate(11, (this.py0 + this.py1) / 2); c.rotate(-Math.PI / 2);
+      c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(ylab, 0, 0); c.restore();
+    }
+  }
+  /* full numeric axes with automatic ticks (side 1 = bottom, 2 = left) */
+  box() {
+    const c = this.ctx;
+    c.strokeStyle = PAL.rule; c.lineWidth = 1; c.setLineDash([]);
+    c.strokeRect(this.px0, this.py1, this.px1 - this.px0, this.py0 - this.py1);
+  }
+  static ticks(lo, hi, n = 5) {
+    const span = hi - lo;
+    if (!(span > 0)) return [lo];
+    const raw = span / n;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw / mag;
+    const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+    const out = [];
+    for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+  axes(o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = PAL.inkFaint; c.fillStyle = PAL.inkSoft; c.lineWidth = 1; c.setLineDash([]);
+    this._font(0.85, 1);
+    const xt = o.xat || RPlot.ticks(this.xlim[0], this.xlim[1], o.nx || 5);
+    const yt = o.yat || RPlot.ticks(this.ylim[0], this.ylim[1], o.ny || 5);
+    c.beginPath(); c.moveTo(this.px0, this.py0); c.lineTo(this.px1, this.py0); c.stroke();
+    c.textAlign = "center"; c.textBaseline = "top";
+    xt.forEach((v, i) => {
+      const px = this.X(v);
+      if (px < this.px0 - 0.5 || px > this.px1 + 0.5) return;
+      c.beginPath(); c.moveTo(px, this.py0); c.lineTo(px, this.py0 + 5); c.stroke();
+      c.fillText(o.xlabels ? o.xlabels[i] : String(v), px, this.py0 + 7);
+    });
+    c.beginPath(); c.moveTo(this.px0, this.py0); c.lineTo(this.px0, this.py1); c.stroke();
+    c.textAlign = "right"; c.textBaseline = "middle";
+    yt.forEach((v, i) => {
+      const py = this.Y(v);
+      if (py > this.py0 + 0.5 || py < this.py1 - 0.5) return;
+      c.beginPath(); c.moveTo(this.px0, py); c.lineTo(this.px0 - 5, py); c.stroke();
+      c.fillText(o.ylabels ? o.ylabels[i] : String(v), this.px0 - 7, py);
+    });
+  }
+  /* bare label rows, like R's axis(side, at, labels, tick = FALSE) */
+  axisPlain(side, at, labels, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex || 0.8, 1); c.fillStyle = PAL.inkSoft;
+    at.forEach((v, i) => {
+      const lab = String(labels[i]);
+      if (side === 1) { c.textAlign = "center"; c.textBaseline = "top"; c.fillText(lab, this.X(v), this.py0 + 4); }
+      else if (side === 3) { c.textAlign = "center"; c.textBaseline = "bottom"; c.fillText(lab, this.X(v), this.py1 - 3); }
+      else if (side === 2) { c.textAlign = "right"; c.textBaseline = "middle"; c.fillText(lab, this.px0 - 5, this.Y(v)); }
+    });
+  }
+  grid(o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "#cfcabf"; c.lineWidth = 1; this._lty(3);
+    if (o.ny !== null) RPlot.ticks(this.ylim[0], this.ylim[1], 5).forEach((v) => {
+      const py = this.Y(v);
+      if (py > this.py0 || py < this.py1) return;
+      c.beginPath(); c.moveTo(this.px0, py); c.lineTo(this.px1, py); c.stroke();
+    });
+    if (o.nx !== null && o.nx !== undefined) RPlot.ticks(this.xlim[0], this.xlim[1], 5).forEach((v) => {
+      const px = this.X(v);
+      c.beginPath(); c.moveTo(px, this.py0); c.lineTo(px, this.py1); c.stroke();
+    });
+    c.setLineDash([]);
+  }
+  legend(pos, o = {}) {
+    const c = this.ctx;
+    const cex = o.cex || 0.85;
+    this._font(cex, 1);
+    const items = o.legend;
+    const pad = 6, sw = 20, gap = 6;
+    const lh = BASE_FONT * cex * 1.5;
+    let boxW, boxH, x, y;
+    if (o.horiz) {
+      const widths = items.map((t) => sw + gap + c.measureText(t).width + 12);
+      boxW = widths.reduce((a, b) => a + b, 0) + 2 * pad;
+      boxH = lh + 2 * pad;
+    } else {
+      boxW = 2 * pad + sw + gap + Math.max(...items.map((t) => c.measureText(t).width));
+      boxH = 2 * pad + items.length * lh;
+    }
+    if (pos === "topright") { x = this.px1 - boxW - 4; y = this.py1 + 4; }
+    else if (pos === "topleft") { x = this.px0 + 4; y = this.py1 + 4; }
+    else if (pos === "right") { x = this.px1 - boxW - 4; y = (this.py0 + this.py1) / 2 - boxH / 2; }
+    else if (pos === "bottomright") { x = this.px1 - boxW - 4; y = this.py0 - boxH - 4; }
+    else { /* bottom */ x = (this.px0 + this.px1) / 2 - boxW / 2; y = this.py0 + (o.inset || 20); }
+    if (o.bg !== "n") { c.fillStyle = o.bg || "rgba(255,255,255,0.88)"; c.fillRect(x, y, boxW, boxH); }
+    if (o.bty !== "n" && o.bg !== "n") { c.strokeStyle = PAL.ruleSoft; c.lineWidth = 1; c.setLineDash([]); c.strokeRect(x, y, boxW, boxH); }
+    let cx = x + pad, cy = y + pad + lh / 2;
+    items.forEach((t, i) => {
+      if (o.horiz) {
+        const w = sw + gap + c.measureText(t).width + 12;
+        this._drawKey(cx, cy, sw, o, i);
+        c.fillStyle = PAL.ink; c.textAlign = "left"; c.textBaseline = "middle";
+        this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
+        cx += w;
+      } else {
+        this._drawKey(cx, cy, sw, o, i);
+        c.fillStyle = PAL.ink; c.textAlign = "left"; c.textBaseline = "middle";
+        this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
+        cy += lh;
+      }
+    });
+  }
+  _drawKey(cx, cy, sw, o, i) {
+    const c = this.ctx;
+    const pick = (v) => Array.isArray(v) ? v[i] : v;
+    if (o.fill) {
+      c.fillStyle = pick(o.fill); c.fillRect(cx, cy - 6, sw - 4, 12);
+      c.strokeStyle = "#3a3f45"; c.lineWidth = 0.8; c.setLineDash([]); c.strokeRect(cx, cy - 6, sw - 4, 12);
+    } else {
+      c.strokeStyle = pick(o.col) || "black";
+      c.lineWidth = pick(o.lwd) || 1;
+      this._lty(pick(o.lty) || 1);
+      c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + sw - 4, cy); c.stroke(); c.setLineDash([]);
+      if (o.pch) { c.fillStyle = pick(o.col) || "black"; c.beginPath(); c.arc(cx + (sw - 4) / 2, cy, 2.5, 0, 2 * Math.PI); c.fill(); }
+    }
+  }
+}
+
+/* ---- canvas plumbing: responsive sizing, redraw registry, click mapping -- */
+
+const CANVASES = [];
+
+function mkCanvas(height, drawFn, opts = {}) {
+  const el = document.createElement("canvas");
+  el.className = "plot";
+  el.style.height = height + "px";
+  el._draw = drawFn;
+  el._h = height;
+  el._nplots = opts.nplots || 1;   // for mfrow-style side-by-side panels
+  CANVASES.push(el);
+  if (opts.onclick) {
+    el.style.cursor = "pointer";
+    el.addEventListener("click", (ev) => {
+      const r = el.getBoundingClientRect();
+      const pl = el._pl;
+      if (!pl) return;
+      opts.onclick(pl.invX(ev.clientX - r.left), pl.invY(ev.clientY - r.top), pl);
+    });
+  }
+  requestAnimationFrame(() => drawCanvas(el));
+  return el;
+}
+
+function drawCanvas(el) {
+  const cssW = el.clientWidth || el.parentElement && el.parentElement.clientWidth || 600;
+  const cssH = el._h;
+  if (!cssW) return;
+  const dpr = window.devicePixelRatio || 1;
+  el.width = Math.round(cssW * dpr);
+  el.height = Math.round(cssH * dpr);
+  const ctx = el.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+  ctx.fillStyle = PAL.paper; ctx.fillRect(0, 0, cssW, cssH);
+  const pl = new RPlot(ctx, cssW, cssH);
+  el._pl = pl;
+  try { el._draw(pl, cssW, cssH); } catch (e) { /* eslint-disable-line */ console.error(e); }
+}
+
+/* A shut example is clipped to zero height rather than display:none, so it
+   still has an offsetParent; skip anything inside one. */
+function redrawAll() {
+  CANVASES.forEach((el) => {
+    if (!el.isConnected || el.offsetParent === null) return;
+    if (el.closest(".example-container:not(.open)")) return;
+    drawCanvas(el);
+  });
+}
+
+let _rzT = null;
+window.addEventListener("resize", () => { clearTimeout(_rzT); _rzT = setTimeout(redrawAll, 120); });
+
+function blankPlot(pl, msg) {
+  pl.setup({ xlim: [0, 1], ylim: [0, 1], mar: [1, 1, 1, 1] });
+  pl.text(0.5, 0.5, msg, { cex: 1.15, col: PAL.inkFaint });
+}
+
+/* ------------------------------------------------- tiny DOM utilities --- */
+
+function h(html) {
+  const t = document.createElement("template");
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+/* `key` is a colour key, k1..k4. A slider given one is drawn in that hue, and
+   so is every figure in the text it moves — see registerLive. */
+/* ---- number lines -------------------------------------------------------
+   A rule with ticks and a travelling marker, laid out by .nl-grid so that
+   several of them share one axis. `ticks` are {pos 0..1, major, label}. Used
+   by ex8, ex9 and ex26; the marker is omitted where a real slider supplies it.
+   -----------------------------------------------------------------------*/
+function nlDraw(el, ticks, withMarker) {
+  if (!el) return;
+  el.innerHTML =
+    (withMarker ? '<div class="nl-rule"></div><div class="nl-dot"></div>' : "") +
+    ticks.map((t) =>
+      `<div class="nl-tick${t.major ? " major" : ""}" style="left:${t.pos * 100}%"></div>` +
+      (t.label == null ? "" : `<div class="nl-ticklab" style="left:${t.pos * 100}%">${t.label}</div>`)
+    ).join("");
+}
+
+/* the next 1, 2 or 5 of a decade at or above v — for a ruler that has to grow
+   to keep its marker on it */
+function niceMax(v, floor) {
+  const lo = floor === undefined ? 2 : floor;
+  if (!(v > 0) || v <= lo) return lo;   // the floor is a floor, not just a minimum
+  const base = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 2, 5, 10]) if (v <= m * base) return Math.max(lo, m * base);
+  return Math.max(lo, 10 * base);
+}
+
+function slider(id, label, min, max, value, step, fmtFn, key) {
+  const d = document.createElement("div");
+  d.className = "ctl" + (key ? " " + key : "");
+  d.innerHTML = `<label for="${id}">${label} <span class="slider-val" id="${id}_val"></span></label>
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">`;
+  const inp = d.querySelector("input"), out = d.querySelector(".slider-val");
+  const show = () => { out.textContent = fmtFn ? fmtFn(+inp.value) : inp.value; };
+  inp.addEventListener("input", show);
+  show();
+  return d;
+}
+function select(id, label, choices, selected) {
+  const opts = choices.map(([v, t]) => `<option value="${esc(v)}"${v === selected ? " selected" : ""}>${esc(t)}</option>`).join("");
+  return h(`<div class="ctl"><label for="${id}">${label}</label><select id="${id}">${opts}</select></div>`);
+}
+function checkbox(id, label, checked) {
+  return h(`<div class="ctl checkbox"><label><input type="checkbox" id="${id}"${checked ? " checked" : ""}> ${label}</label></div>`);
+}
+function radios(name, label, choices, selected, stacked) {
+  const items = choices.map(([v, t]) =>
+    `<label><input type="radio" name="${name}" value="${esc(v)}"${v === selected ? " checked" : ""}> ${esc(t)}</label>`).join("");
+  return h(`<div class="ctl"><label>${label}</label><div class="radio-row${stacked ? " stacked" : ""}">${items}</div></div>`);
+}
+function numberInput(id, label, value, min, max, step) {
+  return h(`<div class="ctl"><label for="${id}">${label}</label>
+    <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}"></div>`);
+}
+const val = (id) => { const e = document.getElementById(id); return e ? e.value : null; };
+const num = (id) => +val(id);
+const chk = (id) => { const e = document.getElementById(id); return e ? e.checked : false; };
+const radioVal = (name) => { const e = document.querySelector(`input[name="${name}"]:checked`); return e ? e.value : null; };
+function setSlider(id, v) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.value = v;
+  e.dispatchEvent(new Event("input", { bubbles: true }));
+}
+</script>
+<script>
+/* ==========================================================================
+   Example scaffolding: click a highlighted passage to open its demonstration.
+   Content is built lazily the first time a container is opened.
+
+   Carried over unchanged from the Probability of Induction edition, so that
+   the two papers behave identically: the same trigger, the same growth, the
+   same rule that the text on the page is the authors' unless you are actively
+   driving it.
+   ========================================================================*/
+
+const BUILDERS = {};
+const BUILT = {};
+
+function registerExample(id, builder) { BUILDERS[id] = builder; }
+
+/* --------------------------------------------------------------------------
+   Live numbers in the authors' own text.
+
+   A figure in the prose carries data-live="<driver>:<key>", where <driver> is
+   the id of the example whose controls move it. While that example is shut the
+   span shows exactly what was printed in 1885; while it is open the span shows
+   what the sliders say, in the colour of the slider saying it. Closing the
+   example restores the memoir.
+   ------------------------------------------------------------------------*/
+const LIVE = {};
+const LIVE_OPEN = new Set();
+
+function registerLive(driverId, bindings, opts) {
+  LIVE[driverId] = { get: bindings, opts: opts || {} };
+  refreshLive(driverId);
+}
+
+function liveEngaged(driverId) {
+  const rec = LIVE[driverId];
+  if (!rec) return false;
+  return rec.opts.engaged ? !!rec.opts.engaged() : LIVE_OPEN.has(driverId);
+}
+
+/* `also` lets one driver pull another along, for the case where two adjacent
+   demonstrations are working the same pair of numbers and either may be the
+   one being driven. The guard is because those relations are mutual. */
+const REFRESHING = new Set();
+
+function refreshLive(driverId) {
+  const rec = LIVE[driverId];
+  if (!rec || REFRESHING.has(driverId)) return;
+  REFRESHING.add(driverId);
+  try { refreshLiveInner(driverId, rec); (rec.opts.also || []).forEach(refreshLive); }
+  finally { REFRESHING.delete(driverId); }
+}
+
+function refreshLiveInner(driverId, rec) {
+  const on = liveEngaged(driverId);
+  const prefix = driverId + ":";
+  $$(`[data-live^="${prefix}"]`).forEach((el) => {
+    if (el.dataset.printed === undefined) el.dataset.printed = el.innerHTML;
+    const key = el.getAttribute("data-live").slice(prefix.length);
+    let out = null;
+    if (on && rec.get[key]) {
+      try { out = rec.get[key](); } catch (e) { out = null; }
+    }
+    if (out === null || out === undefined) {
+      if (el.innerHTML !== el.dataset.printed) el.innerHTML = el.dataset.printed;
+      el.classList.remove("is-live");
+      return;
+    }
+    const s = String(out);
+    if (el.innerHTML !== s) el.innerHTML = s;
+    el.classList.add("is-live");
+  });
+  if (rec.opts.onRefresh) rec.opts.onRefresh(on);
+}
+
+/* Any control touched inside a driver's container re-reads that driver's
+   getters. Bubble phase, so the example's own handlers have already run. */
+["input", "change", "click"].forEach((type) => {
+  document.addEventListener(type, (ev) => {
+    const t = ev.target;
+    if (!t || !t.closest) return;
+    const host = t.closest(".example-container[id]");
+    if (host && LIVE[host.id]) refreshLive(host.id);
+  });
+});
+
+/* --------------------------------------------------------------------------
+   Clauses that own a stretch of a slider's travel. A paragraph marked up with
+   data-band-for="<driver>" and data-band="lo,hi" lights while the driver's
+   reported position is inside [lo, hi), so the prose reads as a running
+   commentary on where the control is. The driver reports its position by
+   calling bandPosition(id, x).
+   ------------------------------------------------------------------------*/
+function bandPosition(driverId, x) {
+  $$(`[data-band-for="${driverId}"]`).forEach((el) => {
+    const [lo, hi] = el.getAttribute("data-band").split(",").map(Number);
+    el.classList.toggle("band-on", x >= lo && x < hi);
+  });
+}
+
+function bandsOff(driverId) {
+  $$(`[data-band-for="${driverId}"]`).forEach((el) => el.classList.remove("band-on"));
+}
+
+/* --------------------------------------------------------------------------
+   Opening an example. The container is a one-row grid whose row goes 0fr ->
+   1fr, which animates to the content's own height without measuring anything;
+   .ex-inner does the clipping. The prose below is pushed down by the growth
+   rather than being covered over, so the example takes its place in the column
+   instead of arriving on top of it.
+   ------------------------------------------------------------------------*/
+function exInner(box) {
+  let inner = box.querySelector(":scope > .ex-inner");
+  if (!inner) {
+    inner = document.createElement("div");
+    inner.className = "ex-inner";
+    box.appendChild(inner);
+  }
+  return inner;
+}
+
+document.addEventListener("click", (ev) => {
+  const trg = ev.target.closest("[data-toggle]");
+  if (!trg) return;
+  const id = trg.getAttribute("data-toggle");
+  const box = document.getElementById(id);
+  if (!box) return;
+
+  const inner = exInner(box);
+  if (!BUILT[id] && BUILDERS[id]) { BUILDERS[id](inner); BUILT[id] = true; }
+
+  const opening = !box.classList.contains("open");
+  box.classList.toggle("open", opening);
+  if (opening) box.removeAttribute("inert"); else box.setAttribute("inert", "");
+  $$(`[data-toggle="${id}"]`).forEach((t) => t.classList.toggle("is-open", opening));
+
+  $$(`[data-hl-for="${id}"]`).forEach((el) => el.classList.toggle("hl-on", opening));
+
+  if (opening) { LIVE_OPEN.add(id); requestAnimationFrame(redrawAll); }
+  else { LIVE_OPEN.delete(id); bandsOff(id); }
+  refreshLive(id);
+});
+
+/* Plots are sized from clientWidth, so they want a redraw once the row has
+   finished growing; and the example is nudged into view only if the growth
+   left it hanging off the bottom. */
+document.addEventListener("transitionend", (ev) => {
+  if (ev.propertyName !== "grid-template-rows") return;
+  const box = ev.target;
+  if (!box.classList || !box.classList.contains("example-container")) return;
+  if (!box.classList.contains("open")) return;
+  redrawAll();
+  const r = box.getBoundingClientRect();
+  if (r.top < 0 || r.top > window.innerHeight * 0.75) {
+    box.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+});
+
+$$(".example-container").forEach((box) => box.setAttribute("inert", ""));
+
+/* Each example's number in the gutter beside the passage that opens it, taken
+   from its own id so it matches the part files in src/. */
+const NUMBERED = new Set();
+$$("[data-toggle]").forEach((trg) => {
+  const id = trg.getAttribute("data-toggle") || "";
+  const m = /(\d+)$/.exec(id);
+  // an example may be opened from several passages in a row; only the first of
+  // them takes the number, or the gutter reads as several examples alike
+  if (!m || NUMBERED.has(id) || $(".ex-num", trg)) return;
+  NUMBERED.add(id);
+  trg.insertBefore(h(`<span class="ex-num" aria-hidden="true">${m[1]}</span>`), trg.firstChild);
+});
+
+/* collapsible inner header */
+function exHeader(title, contentId) {
+  const el = h(`<div class="example-header">${esc(title)}</div>`);
+  el.addEventListener("click", () => {
+    el.classList.toggle("collapsed");
+    const c = document.getElementById(contentId);
+    c.style.display = c.style.display === "none" ? "block" : "none";
+    redrawAll();
+  });
+  return el;
+}
+</script>
+<script>
+/* ==========================================================================
+   Section I — examples 1, 2 and 3.
+
+   1: Forms I and II are one argument with one knob turned.
+   2: the ratio need not be a number; it may be a set of numbers.
+   3: the instance must be drawn at random, and drawn before you look.
+   ========================================================================*/
+
+/* ---------------------------------------------------------------- ex 1 ---
+   One argument, one knob. The slider is the proportion rho; the form of the
+   argument never changes as it moves, only the strength, so the argument is
+   printed once and the same three lines are re-lettered in place.
+   -----------------------------------------------------------------------*/
+registerExample("example-ex1", (root) => {
+  const S = { rho: 2, drawn: 0, recovered: 0 };
+
+  /* a fixed scatter, so that "two per cent of persons" reads as two people
+     here and there rather than as a bar filling from the left */
+  const rnd = mulberry32(11);
+  const ORDER = (() => {
+    const a = Array.from({ length: 100 }, (_, i) => i);
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rnd() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  })();
+  const isP = (cell) => ORDER.indexOf(cell) < S.rho;
+
+  root.appendChild(exHeader("The same argument, at every strength", "ex1-content"));
+  const wrap = h('<div id="ex1-content" class="example-content"></div>');
+  root.appendChild(wrap);
+
+  wrap.appendChild(h(`<div class="row">
+    <div class="col col-5">
+      <div id="ex1-ctl"></div>
+      <div id="ex1-presets"></div>
+      <div class="pop-grid" id="ex1-grid"></div>
+      <div class="help-text" id="ex1-legend"></div>
+      <div class="ex-buttonbar" id="ex1-draw"></div>
+      <div class="calc-output" id="ex1-tally"></div>
+    </div>
+    <div class="col col-7">
+      <div class="arg" id="ex1-arg"></div>
+      <div class="arg" id="ex1-arg2"></div>
+      <div class="note-block" id="ex1-note"></div>
+    </div>
+  </div>`));
+
+  $("#ex1-ctl", wrap).appendChild(
+    slider("ex1_rho", "The proportion &rho; of the M&rsquo;s that are P&rsquo;s",
+      0, 100, S.rho, 1, (v) => (v / 100).toFixed(2), "k1"));
+
+  const presets = btnGroup([
+    ["2", "the liver wound (2%)", "btn-primary"],
+    ["50", "an even chance (50%)", "btn-secondary"],
+    ["98", "recovery the rule (98%)", "btn-secondary"],
+    ["100", "every man dies (100%)", "btn-success"]
+  ], "2", (v) => { setSlider("ex1_rho", +v); });
+  $("#ex1-presets", wrap).appendChild(presets);
+
+  const grid = $("#ex1-grid", wrap);
+  const cells = [];
+  for (let i = 0; i < 100; i++) {
+    const c = h('<div class="pop-cell"></div>');
+    grid.appendChild(c); cells.push(c);
+  }
+
+  $("#ex1-draw", wrap).appendChild(h('<button class="btn btn-primary" id="ex1_draw1">draw this man</button>'));
+  $("#ex1-draw", wrap).appendChild(h('<button class="btn btn-secondary" id="ex1_draw50">draw fifty</button>'));
+  $("#ex1-draw", wrap).appendChild(h('<button class="btn btn-secondary" id="ex1_reset">start again</button>'));
+
+  function drawOne(mark) {
+    const cell = sampleInt(100);
+    S.drawn++;
+    if (isP(cell)) S.recovered++;
+    if (mark) {
+      cells.forEach((c) => c.classList.remove("pick"));
+      cells[cell].classList.add("pick");
+    }
+  }
+  $("#ex1_draw1", wrap).addEventListener("click", () => { drawOne(true); render(); });
+  $("#ex1_draw50", wrap).addEventListener("click", () => {
+    for (let i = 0; i < 50; i++) drawOne(i === 49);
+    render();
+  });
+  $("#ex1_reset", wrap).addEventListener("click", () => {
+    S.drawn = 0; S.recovered = 0;
+    cells.forEach((c) => c.classList.remove("pick"));
+    render();
+  });
+  $("#ex1_rho", wrap).addEventListener("input", () => {
+    S.rho = num("ex1_rho");
+    S.drawn = 0; S.recovered = 0;
+    presets._set(String(S.rho));
+    render();
+  });
+
+  function render() {
+    const rho = S.rho, p = rho / 100;
+    cells.forEach((c, i) => c.classList.toggle("on", isP(i)));
+
+    $("#ex1-legend", wrap).innerHTML =
+      `<span style="color:var(--accent)">&#9632;</span> the ${bigmark(rho)} in a hundred who are P&rsquo;s` +
+      `&nbsp;&nbsp;<span style="color:var(--rule)">&#9632;</span> the ${bigmark(100 - rho)} who are not`;
+
+    /* The general form. At the ends of the travel the middle line of the
+       major premise is the only thing that changes, and the argument is
+       Barbara — which is the whole claim of the section. */
+    const necessary = (rho === 100 || rho === 0);
+    const major = rho === 100 ? "Every M is a P;"
+                : rho === 0 ? "No M is a P;"
+                : `The proportion <span class="live is-live k1">${p.toFixed(2)}</span> of the M&rsquo;s are P&rsquo;s;`;
+    const concl = rho === 100 ? "Hence, S is a P."
+                : rho === 0 ? "Hence, S is not a P."
+                : `It follows, with probability <span class="live is-live k1">${p.toFixed(2)}</span>, that S is a P.`;
+    const name = rho === 100 ? "Form I. &nbsp;Singular syllogism in Barbara"
+               : rho === 0 ? "Form I. &nbsp;Barbara, negatively"
+               : "Form II. &nbsp;Simple probable deduction";
+    const arg = $("#ex1-arg", wrap);
+    arg.classList.toggle("is-necessary", necessary);
+    arg.innerHTML = `<div class="arg-name">${name}</div>
+      <p>${major}</p><p>S is an M:</p><p class="concl">${concl}</p>`;
+
+    /* Peirce's own instance, in the same three lines. */
+    const pctWord = spellNumber(rho);
+    const arg2 = $("#ex1-arg2", wrap);
+    arg2.classList.toggle("is-necessary", necessary);
+    arg2.innerHTML = `<div class="arg-name">the same argument, in his words</div>
+      <p>${rho === 100 ? "Every person" : `About <span class="live is-live k1">${pctWord} per cent</span> of persons`} wounded in the liver ${rho === 100 ? "recovers" : "recover"};</p>
+      <p>This man has been wounded in the liver:</p>
+      <p class="concl">${rho === 100
+        ? "Therefore, he will recover."
+        : rho === 0
+          ? "Therefore, he will not recover."
+          : `Therefore, there are <span class="live is-live k1">${pctWord} chances out of a hundred</span> that he will recover.`}</p>`;
+
+    $("#ex1-note", wrap).innerHTML = necessary
+      ? "At the ends of the travel the second premise and the conclusion are exactly what they were in the middle. Only the major premise has stopped naming a proportion, and the argument has become a syllogism &mdash; &ldquo;the probable argument may approximate indefinitely to demonstration as the ratio named in the first premise approaches to unity or to zero.&rdquo;"
+      : "Nothing in the shape of the argument has changed. The premises stand in the same relation, the conclusion follows in the same way. What the slider moves is how often reasoning like this carries truth with it.";
+
+    const t = $("#ex1-tally", wrap);
+    if (!S.drawn) {
+      t.textContent = "Draw a man from the hundred and see whether he is one of the P's.\n"
+        + "The argument is the same whichever he turns out to be; what the drawings\n"
+        + "show is the rate at which arguments of this shape come out true.";
+    } else {
+      const obs = S.recovered / S.drawn;
+      t.textContent =
+        `men drawn      ${S.drawn}\n` +
+        `of them P's    ${S.recovered}\n` +
+        `observed rate  ${(obs * 100).toFixed(1)} per cent\n` +
+        `rho says       ${rho} per cent`;
+    }
+  }
+
+  const rhoWord = () => (S.rho === 100 ? "a hundred" : spellNumber(S.rho));
+  registerLive("example-ex1", {
+    pct: () => `${rhoWord()} per cent`,
+    chances: () => `${rhoWord()} chances out of a hundred`,
+    rho: () => (S.rho / 100).toFixed(2)
+  });
+
+  render();
+});
+
+/* ---------------------------------------------------------------- ex 2 ---
+   The ratio need not be exactly specified. What a premise gives us is a set
+   of admitted ratios; the conclusion it yields is a set too.
+   -----------------------------------------------------------------------*/
+registerExample("example-ex2", (root) => {
+  const S = { lo: 0, hi: 2, invert: false, preset: "notmore" };
+  let SETTING = false;
+
+  const PRESETS = {
+    exact:   { lo: 2,  hi: 2,  invert: false, cl: null,
+               say: "the proportion &rho; of the M&rsquo;s are P&rsquo;s, and &rho; is exactly .02" },
+    notmore: { lo: 0,  hi: 2,  invert: false, cl: "ex2-cl-notmore",
+               say: "not more than two per cent of persons wounded in the liver recover" },
+    notless: { lo: 30, hi: 100, invert: false, cl: "ex2-cl-notless",
+               say: "not less than a certain proportion of the M&rsquo;s are P&rsquo;s" },
+    novery:  { lo: 15, hi: 85, invert: false, cl: "ex2-cl-novery",
+               say: "no very large nor very small proportion of the M&rsquo;s are P&rsquo;s" },
+    excl:    { lo: 40, hi: 60, invert: true,  cl: null,
+               say: "the proportion is anything but a middling one" }
+  };
+
+  root.appendChild(exHeader("A premise that names a set of ratios", "ex2-content"));
+  const wrap = h('<div id="ex2-content" class="example-content"></div>');
+  root.appendChild(wrap);
+
+  wrap.appendChild(h(`<div>
+    <div id="ex2-presets"></div>
+    <div class="row">
+      <div class="col col-6"><div id="ex2-ctl-lo"></div></div>
+      <div class="col col-6"><div id="ex2-ctl-hi"></div></div>
+    </div>
+    <div id="ex2-ctl-inv"></div>
+    <div class="ratio-bar" id="ex2-bar"></div>
+    <div class="ratio-scale" id="ex2-scale"></div>
+    <div class="arg" id="ex2-arg" style="margin-top:18px"></div>
+    <div class="note-block" id="ex2-note"></div>
+    </div>`));
+
+  $("#ex2-presets", wrap).appendChild(btnGroup([
+    ["exact",   "exactly two per cent", "btn-secondary"],
+    ["notmore", "not more than two per cent", "btn-primary"],
+    ["notless", "not less than…", "btn-primary"],
+    ["novery",  "no very large nor very small", "btn-primary"],
+    ["excl",    "anything but middling", "btn-warning"]
+  ], "notmore", (v) => {
+    const p = PRESETS[v];
+    /* setSlider fires input, which the free-hand handler below reads as the
+       reader taking the controls over; the flag keeps the preset named. */
+    SETTING = true;
+    S.invert = p.invert;
+    $("#ex2_inv", wrap).checked = p.invert;
+    setSlider("ex2_lo", p.lo); setSlider("ex2_hi", p.hi);
+    SETTING = false;
+    S.lo = p.lo; S.hi = p.hi; S.preset = v;
+    render();
+  }));
+
+  $("#ex2-ctl-lo", wrap).appendChild(
+    slider("ex2_lo", "from", 0, 100, S.lo, 1, (v) => (v / 100).toFixed(2), "k1"));
+  $("#ex2-ctl-hi", wrap).appendChild(
+    slider("ex2_hi", "to", 0, 100, S.hi, 1, (v) => (v / 100).toFixed(2), "k2"));
+  $("#ex2-ctl-inv", wrap).appendChild(
+    checkbox("ex2_inv", "the band is what the premise <em>excludes</em>", false));
+
+  ["ex2_lo", "ex2_hi", "ex2_inv"].forEach((id) =>
+    $("#" + id, wrap).addEventListener("input", () => {
+      S.lo = num("ex2_lo"); S.hi = num("ex2_hi"); S.invert = chk("ex2_inv");
+      if (!SETTING) S.preset = "free";
+      render();
+    }));
+
+  const bar = $("#ex2-bar", wrap);
+  $("#ex2-scale", wrap).innerHTML = [0, 0.25, 0.5, 0.75, 1]
+    .map((v) => `<span style="left:${v * 100}%">${v.toFixed(2)}</span>`).join("");
+
+  function bands() {
+    const lo = Math.min(S.lo, S.hi), hi = Math.max(S.lo, S.hi);
+    return S.invert
+      ? [[0, lo], [hi, 100]].filter(([a, b]) => b > a)
+      : [[lo, hi]];
+  }
+
+  function render() {
+    const bs = bands();
+    bar.innerHTML = bs.map(([a, b]) =>
+      `<div class="band" style="left:${a}%;width:${Math.max(b - a, 0.6)}%"></div>`).join("");
+
+    const say = bs.map(([a, b]) => a === b
+      ? `exactly ${(a / 100).toFixed(2)}`
+      : `between ${(a / 100).toFixed(2)} and ${(b / 100).toFixed(2)}`).join(", or ");
+    const width = bs.reduce((t, [a, b]) => t + (b - a), 0);
+
+    $("#ex2-arg", wrap).innerHTML =
+      `<div class="arg-name">Form II, with the ratio left indeterminate</div>
+       <p>The proportion <span class="live is-live k1">${say}</span> of the M&rsquo;s are P&rsquo;s;</p>
+       <p>S is an M:</p>
+       <p class="concl">It follows, with probability <span class="live is-live k1">${say}</span>, that S is a P.</p>`;
+
+    $("#ex2-note", wrap).innerHTML = width >= 99.4
+      ? "The premise now excludes nothing, and the conclusion is the whole of the interval &mdash; which is to say there is no conclusion. Every other setting of these handles says something, however loosely."
+      : `The premise admits <strong>${rround(width, 0)}</strong> of the hundred possible ratios and excludes the other <strong>${rround(100 - width, 0)}</strong>. That is all a probable premise ever does: &ldquo;it simply excludes some ratios and admits the possibility of the rest.&rdquo; The conclusion is a region of the same bar, not a point on it.`;
+
+    ["ex2-cl-notmore", "ex2-cl-notless", "ex2-cl-novery"].forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("hl-on", (PRESETS[S.preset] || {}).cl === id);
+    });
+  }
+
+  registerLive("example-ex2", {}, {
+    onRefresh: (on) => {
+      if (!on) ["ex2-cl-notmore", "ex2-cl-notless", "ex2-cl-novery"].forEach((id) => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove("hl-on");
+      });
+      else render();
+    }
+  });
+
+  render();
+});
+
+/* ---------------------------------------------------------------- ex 3 ---
+   "The instance must be drawn at random." Three sources for one card, and
+   then the second condition: the conclusion must be drawn in advance of any
+   other knowledge of the case.
+   -----------------------------------------------------------------------*/
+const SUIT_CH = { S: "♠", H: "♥", D: "♦", C: "♣" };
+const PIQUET_RANKS = ["7", "8", "9", "10", "J", "Q", "K", "A"];
+const FULL_RANKS = ["2", "3", "4", "5", "6", "7", "8", "9", "10", "J", "Q", "K", "A"];
+const RANK_VAL = { "2": 2, "3": 3, "4": 4, "5": 5, "6": 6, "7": 7, "8": 8, "9": 9,
+  "10": 10, J: 11, Q: 12, K: 13, A: 14 };
+
+function cardHTML(c, cls) {
+  if (!c) return '<span class="card back"><span class="pip">?</span></span>';
+  const red = (c.s === "H" || c.s === "D");
+  return `<span class="card${red ? " red" : ""}${c.r === "A" ? " ace" : ""}${cls ? " " + cls : ""}">` +
+    `<span>${c.r}</span><span class="pip">${SUIT_CH[c.s]}</span></span>`;
+}
+const makePack = (ranks) => {
+  const out = [];
+  ["S", "H", "D", "C"].forEach((s) => ranks.forEach((r) => out.push({ r: r, s: s })));
+  return out;
+};
+
+registerExample("example-ex3", (root) => {
+  const S = { src: "pack", card: null, faceUp: false, deal: null, care: 100 };
+
+  root.appendChild(exHeader("Where the card came from, and when you looked", "ex3-content"));
+  const wrap = h('<div id="ex3-content" class="example-content"></div>');
+  root.appendChild(wrap);
+
+  wrap.appendChild(h(`<div>
+    <div id="ex3-src"></div>
+    <div id="ex3-care"></div>
+    <div id="ex3-pile"></div>
+    <div class="row" style="margin-top:6px">
+      <div class="col col-4" style="text-align:center">
+        <div id="ex3-card"></div>
+        <div class="ex-buttonbar" id="ex3-acts" style="justify-content:center"></div>
+      </div>
+      <div class="col col-8">
+        <div class="arg" id="ex3-arg"></div>
+        <div class="calc-output" id="ex3-calc"></div>
+      </div>
+    </div>
+    <div class="note-block" id="ex3-note"></div>
+    </div>`));
+
+  $("#ex3-src", wrap).appendChild(btnGroup([
+    ["pack",   "the whole piquet pack", "btn-primary"],
+    ["piquet", "the cards discarded at piquet", "btn-warning"],
+    ["euchre", "the cards discarded for euchre", "btn-warning"]
+  ], "pack", (v) => { S.src = v; S.card = null; S.faceUp = false; if (v === "piquet") deal(); render(); }));
+
+  $("#ex3-care", wrap).appendChild(
+    slider("ex3_care", "How far the players choose what to throw out &mdash; at 0 they discard at random, at 1 they always throw the five lowest",
+      0, 100, S.care, 1, (v) => (v / 100).toFixed(2), "k2"));
+  $("#ex3_care", wrap).addEventListener("input", () => {
+    S.care = num("ex3_care");
+    if (S.src === "piquet") { deal(); S.card = null; S.faceUp = false; }
+    render();
+  });
+
+  $("#ex3-acts", wrap).appendChild(h('<button class="btn btn-primary btn-sm" id="ex3_draw">draw a card</button>'));
+  $("#ex3-acts", wrap).appendChild(h('<button class="btn btn-danger btn-sm" id="ex3_look">look at it</button>'));
+  $("#ex3-acts", wrap).appendChild(h('<button class="btn btn-secondary btn-sm" id="ex3_again">deal again</button>'));
+
+  /* Two hands of twelve, each player throwing out five — which is why the pile
+     Peirce points at need not be a random part of the pack. `care` is how much
+     of the choosing is judgment and how much is chance: at 0 the five go out at
+     random and the pile is as good as the pack, at 1 the five lowest go every
+     time and no ace ever reaches it. The maxim has a dial, not a switch. */
+  function deal() {
+    const pack = shuffle(makePack(PIQUET_RANKS));
+    const h1 = pack.slice(0, 12), h2 = pack.slice(12, 24), talon = pack.slice(24);
+    const care = S.care / 100;
+    const throwOut = (hand) => {
+      const left = hand.slice(), out = [];
+      while (out.length < 5) {
+        let i;
+        if (Math.random() < care) {
+          i = 0;
+          for (let j = 1; j < left.length; j++) if (RANK_VAL[left[j].r] < RANK_VAL[left[i].r]) i = j;
+        } else i = sampleInt(left.length);
+        out.push(left.splice(i, 1)[0]);
+      }
+      return out;
+    };
+    const d1 = throwOut(h1), d2 = throwOut(h2);
+    S.deal = { h1: h1, h2: h2, d1: d1, d2: d2, talon: talon, pile: d1.concat(d2) };
+  }
+
+  function source() {
+    if (S.src === "pack") return { cards: makePack(PIQUET_RANKS), name: "the whole piquet pack" };
+    if (S.src === "euchre") {
+      return { cards: makePack(FULL_RANKS).filter((c) => RANK_VAL[c.r] < 9),
+        name: "the cards thrown out of a full pack to make a euchre pack" };
+    }
+    if (!S.deal) deal();
+    return { cards: S.deal.pile, name: "the two players&rsquo; discards at piquet" };
+  }
+
+  $("#ex3_draw", wrap).addEventListener("click", () => {
+    const src = source();
+    if (!src.cards.length) return;
+    S.card = src.cards[sampleInt(src.cards.length)];
+    S.faceUp = false;
+    render();
+  });
+  $("#ex3_look", wrap).addEventListener("click", () => { if (S.card) { S.faceUp = true; render(); } });
+  $("#ex3_again", wrap).addEventListener("click", () => {
+    if (S.src === "piquet") deal();
+    S.card = null; S.faceUp = false; render();
+  });
+
+  function render() {
+    const src = source();
+    const n = src.cards.length;
+    const aces = src.cards.filter((c) => c.r === "A").length;
+
+    /* the pack, or the hands it was dealt into */
+    const pile = $("#ex3-pile", wrap);
+    if (S.src === "pack") {
+      pile.innerHTML = '<div class="pack-grid">' +
+        src.cards.map((c) => cardHTML(c)).join("") + "</div>";
+    } else if (S.src === "euchre") {
+      const full = makePack(FULL_RANKS);
+      pile.innerHTML = '<div class="pack-grid">' +
+        full.map((c) => cardHTML(c, RANK_VAL[c.r] < 9 ? "" : "dim")).join("") + "</div>" +
+        '<div class="help-text">The euchre pack is what is left after the twos to eights are thrown out. The pile to draw from is the bright half; every ace is in the other one.</div>';
+    } else {
+      const d = S.deal;
+      const row = (lbl, hand, disc) => `<div class="card-row"><span class="hand-lbl">${lbl}</span>` +
+        hand.map((c) => cardHTML(c, disc.includes(c) ? "" : "dim")).join("") + "</div>";
+      pile.innerHTML =
+        row("elder hand", d.h1, d.d1) +
+        row("younger hand", d.h2, d.d2) +
+        '<div class="card-row"><span class="hand-lbl">the discards</span>' +
+        d.pile.map((c) => cardHTML(c)).join("") + "</div>" +
+        '<div class="help-text">Each player throws out his five worst cards. Bright cards are the ones discarded; dimmed cards are kept.</div>';
+    }
+
+    $("#ex3-card", wrap).innerHTML = S.card
+      ? (S.faceUp ? cardHTML(S.card, "big") : '<span class="card back big"><span class="pip">?</span></span>')
+      : '<span class="card back big" style="opacity:.35"><span class="pip">&nbsp;</span></span>';
+
+    const p = n ? aces / n : 0;
+    const known = S.faceUp;
+    const isAce = S.card && S.card.r === "A";
+
+    $("#ex3-arg", wrap).innerHTML =
+      `<div class="arg-name">${known ? "no longer an argument of this kind" : "Form II"}</div>
+       <p>${aces === 0
+          ? `<span class="live is-live k1">No</span> card in ${src.name} is an ace;`
+          : `The proportion <span class="live is-live k1">${frac(aces, n)}</span> of the cards in ${src.name} are aces;`}</p>
+       <p>This card has been drawn at random from ${src.name}:</p>
+       <p class="concl">${known
+          ? `<span style="color:var(--accent-2)">&mdash; but the card has been looked at. It is ${isAce ? "an ace" : "not an ace"}, so the chance that it is one is ${isAce ? "1" : "0"}, and the premises above have nothing left to do.</span>`
+          : `It follows, with probability <span class="live is-live k1">${rround(p, 4)}</span>, that this card is an ace.`}</p>`;
+
+    $("#ex3-calc", wrap).textContent =
+      `source          ${src.name.replace(/&rsquo;/g, "'")}\n` +
+      `cards in it     ${n}\n` +
+      `aces among them ${aces}\n` +
+      `chance          ${aces}/${n} = ${n ? rround(p, 4) : "—"}` +
+      (S.card ? `\ncard drawn      ${known ? S.card.r + SUIT_CH[S.card.s] : "face down"}` : "");
+
+    $("#ex3-note", wrap).innerHTML = known
+      ? "This is the second half of the maxim, and it costs the argument everything: &ldquo;That the conclusion must be drawn in advance of any other knowledge on the subject is a rule that, however elementary, will be found in the sequel to have great importance.&rdquo; Turn the card back down &mdash; deal again &mdash; and the eighth returns."
+      : S.src === "pack"
+        ? "Four aces in thirty-two cards: the chance is one eighth, and it is one eighth only because the drawing was made from the whole pack, with the will of the drawer taking no part in which card came."
+        : "The same card, the same question, a different precept of selection &mdash; and the answer is not one eighth. Nothing about the card has changed. What has changed is the class it was drawn from, and the fact that a person&rsquo;s judgment did the sorting.";
+  }
+
+  /* Peirce writes the chance as "one eighth", so a chance standing in for his
+     is written the same way where it reduces, and "n in m" where it does not. */
+  function chanceWords(aces, n) {
+    if (!n) return null;
+    if (aces === 0) return "nothing at all";
+    const g = (a, b) => (b ? g(b, a % b) : a);
+    const d = g(aces, n);
+    const num = aces / d, den = n / d;
+    if (num === 1 && den <= 20) return `one ${["", "", "half", "third", "fourth", "fifth", "sixth",
+      "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth", "thirteenth", "fourteenth",
+      "fifteenth", "sixteenth", "seventeenth", "eighteenth", "nineteenth", "twentieth"][den]}`;
+    return `${num} in ${den}`;
+  }
+  registerLive("example-ex3", {
+    chance: () => {
+      const src = source(), n = src.cards.length;
+      const aces = src.cards.filter((c) => c.r === "A").length;
+      if (!n) return null;
+      if (S.faceUp) return S.card && S.card.r === "A" ? "certain" : "nothing at all";
+      return chanceWords(aces, n);
+    }
+  });
+
+  render();
+});
+</script>
 </body>
 </html>

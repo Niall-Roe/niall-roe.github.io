@@ -9,6 +9,35 @@ const CRETAN_LIAR_INK = "#8a4331";
 const CRETAN_TRUE_INK = "#547c62";
 const EST_COL = "#7a6a94";           // our own estimate, distinct from either
 
+/* A hundred Cretans by name, so that the sample in the boxes is the same thing
+   as the list of names in Peirce's sentence. His own five come first, in his
+   own order, because they are the ones the sentence prints when it is shut and
+   the ones a reader will look for; the rest are ancient Greek, women and men
+   alternating through the roll so that neither sex belongs to one end of it.
+   The roll is fixed: which of them lies is decided separately, and moves. */
+const CRETAN_NAMES = [
+  "Minos", "Sarpedon", "Rhadamanthus", "Deucalion", "Epimenides",
+  "Ariadne", "Idomeneus", "Pasiphaë", "Catreus", "Phaedra",
+  "Androgeus", "Europa", "Talos", "Britomartis", "Glaucus",
+  "Acacallis", "Asterion", "Dictynna", "Xenodice", "Meriones",
+  "Aerope", "Lycastus", "Clymene", "Deiphobus", "Eurymedon",
+  "Althaea", "Nauplius", "Kydon", "Melissa", "Iasus",
+  "Amaltheia", "Cleitus", "Arsinoe", "Doreus", "Chryseis",
+  "Ampelos", "Nikaia", "Kleoboulos", "Thessala", "Antiphates",
+  "Erigone", "Kritias", "Praxilla", "Oenopion", "Timandra",
+  "Lykomedes", "Aglaia", "Diomedes", "Kalliste", "Hipparchus",
+  "Theano", "Alkaios", "Melantho", "Pyrrhos", "Iphianassa",
+  "Straton", "Korinna", "Neoptolemus", "Damaris", "Charilaus",
+  "Eupraxia", "Phoinix", "Anthousa", "Kleisthenes", "Myrrhine",
+  "Archelaus", "Zenodora", "Philemon", "Hegesippe", "Menandros",
+  "Alkmene", "Xanthippos", "Berenike", "Polydorus", "Lysandra",
+  "Nikias", "Phanessa", "Gorgias", "Melitta", "Aristarchos",
+  "Isidora", "Kallias", "Sostrate", "Demetrios", "Eirene",
+  "Prokles", "Thaleia", "Timaeus", "Glykera", "Aristides",
+  "Herais", "Leontios", "Kleopatra", "Sosthenes", "Aspasia",
+  "Euthymios", "Danae", "Onesimos", "Rhodanthe", "Theophrastos"
+];
+
 /* ==========================================================================
    EXAMPLE 19 — Epimenides. Deduction from a known proportion.
    "Ninety-nine Cretans in a hundred are liars; But Epimenides is a Cretan;
@@ -165,6 +194,7 @@ registerExample("example-ex20", (box) => {
   const content = h(`<div id="ex20-content" class="example-content">
     <div class="ex-buttonbar">
       <button class="btn btn-primary" data-act="one">Take a sample</button>
+      <button class="btn btn-primary" data-act="five">Take five samples</button>
       <button class="btn btn-primary" data-act="many">Take a hundred samples</button>
       <button class="btn btn-primary" data-act="lots">Take a thousand</button>
       <button class="btn btn-warning btn-sm" data-act="clear">Clear the samples</button>
@@ -187,8 +217,11 @@ registerExample("example-ex20", (box) => {
 
   const N = 100;                       // the roll of Cretans, so a proportion is a count
 
+  /* The names in his sentence are this slider: "five or six instances" is the
+     length of the list above, not the number of times one draws. How many times
+     one draws is what the buttons do. */
   $("#ex20-ctl-s", content).appendChild(
-    slider("ex20_s", "Cretans in each sample:", 2, 20, 5, 1, (v) => v, "k2"));
+    slider("ex20_s", "Cretans named in each sample:", 2, 20, 5, 1, (v) => v, "k2"));
   /* The confidence level is the word "probably" in Peirce's sentence, so the
      slider carrying it is the one his word is coloured for. Its two ends are
      the first and third rows of the table above: 0.477 and 1.821. */
@@ -240,10 +273,79 @@ registerExample("example-ex20", (box) => {
   const tint = (col, s) => `<span style="color:${col};">${s}</span>`;
   const K2 = "#b0563f", K3 = "#4a7c59", GOLD = "#9a7b3f";
 
+  /* --------------------------------------------------------------------------
+     Peirce's five names are the sample.
+
+     His list is the sample size, so the two are one control: move the slider
+     and the list lengthens, take a sample and the list is who was drawn. Which
+     of them lies is settled behind the boxes and nowhere else, so a name is
+     coloured only once its box has been uncovered — the sentence and the
+     hundred boxes can never disagree, being the same fact read twice.
+
+     Unmixed, the draw is the front of the roll, and the front of the roll is
+     Minos, Sarpedon, Rhadamanthus, Deucalion and Epimenides, all of them liars.
+     So at the setting his own paragraph describes the sentence comes out
+     exactly as he printed it, and it is the mixing slider that takes it away
+     from him.
+     ------------------------------------------------------------------------*/
+  function drawn() {
+    const s = Math.round(num("ex20_s"));
+    /* before anything is drawn, the front of the roll — which is what "all the
+       Cretans I can think of" means, and prints his own five at five */
+    return sample.length ? sample.slice(0, s) : Array.from({ length: s }, (_, i) => i);
+  }
+  function nameList() {
+    const idx = drawn(), uncovered = sample.length > 0;
+    const parts = idx.map((i) => {
+      const nm = CRETAN_NAMES[i % CRETAN_NAMES.length];
+      if (!uncovered) return nm;
+      return tint(pop[i] ? CRETAN_LIAR_INK : CRETAN_TRUE_INK, nm);
+    });
+    if (parts.length <= 1) return parts.join("");
+    return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
+  }
+  const liarsDrawn = () => drawn().filter((i) => pop[i]).length;
+
   registerLive("example-ex20", {
     instances: () => {
       const s = Math.round(num("ex20_s"));
       return `${spellNumber(s)} or ${spellNumber(s + 1)}`;
+    },
+    /* What "approximated" comes to, in the units the example is already
+       counting in. His adverb is left alone: "probably" is a modal about how
+       often the bound holds, which the confidence slider governs three clauses
+       later, and the closeness is a different quantity — so it is added rather
+       than swapped for. A hundred Cretans makes whole Cretans the natural unit,
+       and it is his worst case throughout, since that is what his sentence is
+       about and, until the reveal, the only bound there is. */
+    within: () => ` within ${spellNumber(Math.max(1, Math.round(bound() * 100)))} in a hundred`,
+    names: () => nameList(),
+    /* the mixing slider, said in his own clause: at one end they are the ones
+       that come to mind, at the other they are a fair draw */
+    howGot: () => {
+      const st = state();
+      const s = st.s;
+      /* until a sample is taken the list is the front of the roll, which is
+         what his clause says it is; the draw is what can make it something
+         else */
+      if (!sample.length) return null;
+      if (st.fair) return `are ${tint(K2, spellNumber(s))} Cretans drawn at random`;
+      if (st.notRandom) return `are all the Cretans I can think of`;
+      return `are ${tint(K2, spellNumber(s))} Cretans, the roll only partly mixed`;
+    },
+    allLiars: () => {
+      if (!sample.length) return null;             // his sentence, until there is a draw
+      const k = liarsDrawn(), s = drawn().length;
+      if (k === s) return "these were all atrocious liars";
+      if (k === 0) return `not one of these ${spellNumber(s)} was a liar`;
+      return `${spellNumber(k)} of these ${spellNumber(s)} were atrocious liars`;
+    },
+    conclusion: () => {
+      if (!sample.length) return null;
+      const k = liarsDrawn(), s = drawn().length;
+      if (k === s) return "pretty much all Cretans must have been liars";
+      if (k === 0) return "pretty much no Cretan can have been a liar";
+      return `about ${tint(EST_COL, fracWord(k, s))} of the Cretans must have been liars`;
     },
     /* "Probably" is a rate and nothing else, so the slider that sets the rate
        rewrites the word. At the probable error it is his own. */
@@ -301,13 +403,25 @@ registerExample("example-ex20", (box) => {
          either way and is what is left once the first is accounted for. */
       const eFit = boundAtP(st.conf, st.s, truth);
       const slack = st.e > eFit * 1.02;
+      /* "Even in the worst case" cuts the other way too, and this is the half
+         of it his sentence leaves implicit: away from a half the same bound is
+         bought with fewer instances. Setting 0.477 root(2q(1-q)/n) equal to the
+         worst case at s gives n = 4 s q(1-q) — at nine liars in ten, two
+         Cretans do what five do at a half. */
+      const nEquiv = Math.max(1, Math.round(4 * st.s * truth * (1 - truth)));
+      const fewer = nEquiv < st.s
+        ? ` At that proportion ${tint(K2, spellNumber(nEquiv))}
+            ${nEquiv === 1 ? "instance" : "instances"} would buy the bound that
+            ${tint(K2, spellNumber(st.s))} do at a half, which is the other half of
+            &ldquo;even in the worst case&rdquo;.`
+        : "";
       const why = st.fair
         ? `A fair draw of ${from} from a hundred puts that rate at ${tint(K3, fmt(exactRate(st.e), 3))}. `
           + (slack
             ? `Peirce's bound is the worst case, p = &frac12;, so it is wider than this proportion warrants:
                at ${tint(GOLD, fmt(truth, 2))} the probable error is ${tint(K3, "&plusmn;" + fmt(eFit, 4))},
-               and a bound that size would be caught ${tint(K3, fmt(exactRate(eFit) * 100, 1))} in 100. What
-               is left over is the lattice &mdash; `
+               and a bound that size would be caught ${tint(K3, fmt(exactRate(eFit) * 100, 1))} in 100.${fewer}
+               What is left over is the lattice &mdash; `
             : `The bound already fits this proportion, so what moves the rate off the claim is the lattice
                &mdash; `)
           + `an induction from ${from} can land on only ${tint(K2, spellNumber(st.s + 1))} values, and the
@@ -485,7 +599,10 @@ registerExample("example-ex20", (box) => {
       const shown = revealed || inSample.has(i);
       const bg = shown ? (pop[i] ? CRETAN_LIAR : CRETAN_TRUE) : CRETAN_UNSEEN;
       const ring = inSample.has(i) ? "box-shadow:0 0 0 2px #2c3138;" : "";
-      cells += `<span style="display:inline-block;width:20px;height:20px;margin:2px;border-radius:3px;
+      /* every box is somebody, and the five in the sentence above are five of
+         these: the name is on the box so the two can be matched by hand */
+      cells += `<span title="${CRETAN_NAMES[i % CRETAN_NAMES.length]}"
+        style="display:inline-block;width:20px;height:20px;margin:2px;border-radius:3px;
         border:1px solid #a8adb4;${ring}background:${bg};color:#8a9099;font-size:0.72em;line-height:20px;
         text-align:center;vertical-align:top;">${shown ? "" : "?"}</span>`;
     }
@@ -521,6 +638,7 @@ registerExample("example-ex20", (box) => {
     if (!b) return;
     const a = b.getAttribute("data-act");
     if (a === "one") takeSamples(1);
+    else if (a === "five") takeSamples(5);
     else if (a === "many") takeSamples(100);
     else if (a === "lots") takeSamples(1000);
     else if (a === "clear") clearSamples();

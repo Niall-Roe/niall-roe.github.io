@@ -1,219 +1,35 @@
 NRR Comments on the Probability of induction HTML - July 28
+(reorganised by example — every example now has its own entry, with
+"Suggestions" for what is open and "Recently completed" for what is built.)
 
 # Overall:
 
-my goal is for the illustrative examples to appear as seamlessly and to integrate with the text as seamlessly as possible. Where, for example, number change or colour codes are used, those changes and colours can and should appear directly in the text. controls for those variables should be colour coordinated with that bit of text, when possible. 
+my goal is for the illustrative examples to appear as seamlessly and to integrate with the text as seamlessly as possible. Where, for example, number change or colour codes are used, those changes and colours can and should appear directly in the text. controls for those variables should be colour coordinated with that bit of text, when possible.
 
-This should be straightforward when the illustration is just showing one of Peirce's examples. But we will need a different approach when we are using one of my examples to show Peirce's point. I will try to handle that example by example in the comments below. 
+This should be straightforward when the illustration is just showing one of Peirce's examples. But we will need a different approach when we are using one of my examples to show Peirce's point. I will try to handle that example by example in the comments below.
 
-When it makes sense to do so, sliders are preferred to number entry or drop downs. (obviously, if choosing between 5 non-ordered options, its better to use a list. But for things like ratios or the level of certainty required, etc, sliders are best. 
+When it makes sense to do so, sliders are preferred to number entry or drop downs. (obviously, if choosing between 5 non-ordered options, its better to use a list. But for things like ratios or the level of certainty required, etc, sliders are best.
 
-As much as possible, the points should be made visually and understood through interaction. The math and working out should be available too, but is not the point. 
+As much as possible, the points should be made visually and understood through interaction. The math and working out should be available too, but is not the point.
 
 Assuming this is being read on a normal computer screen, we should endeavour to have the meat of the interactive visible while still in view of the text that inspires it. (This is another way in which making the example explicitly involve the text is helpful.
 
-to the extent possible, we should strive for continuity, using similar examples and graphics to illustrate similar points. this should help with the rhetorical continuity of the paper. especially the first few sections really do build on one another. 
+to the extent possible, we should strive for continuity, using similar examples and graphics to illustrate similar points. this should help with the rhetorical continuity of the paper. especially the first few sections really do build on one another.
 
-when i put something in [square brackets] i mean for that thing to have a slider or other user input. 
+when i put something in [square brackets] i mean for that thing to have a slider or other user input.
 
 
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-# By example:
-
-
-
-##1 - 5
-
-
-
-
-##13 - saturn. 
-
-FOr now lets make it a coming soon. 
-
-
-##"can be used to determine any probability"
-
-This one needs some work... for now let's hide it. 
-
-
-
-##15
-highlight the bit that asks the user to click on the chart. 
-
-##17
-
-this is great, but lets do a few things. 
-
-First, fix the slider, it is okay if it just goes from 50 to 99. 
-
-Second, for the binomal chart, would it be possible to heatmap the vertical lines according to how many times they have been drawn?
-
-Third, lets have a button that sets it to peirce's example (true proprting is a third and sample size is 4. can add a little text that says something like, while we can never draw a sample that reflects the true proportion, we can be confident that our error bounds will never the less contain it [percent] of the time.
-
-Fourth, have rescale the charts on by default. 
-
-fifth... would it make sense to show the empirical distribution too? not sure, but curious to hear your thoughts. 
-
-##16 - hypothesis test. 
-
-we can cut the analysis results bit. as i think that should all be covered in the text already? maybe could there be another line along the difference line that is perferated in probable error sum sized perferations, showing that the difference is nx the sum of the probable errors? This could be indicated with colour, as we already have colours for the probable error bounds. (so each unit line could be x% blue and y% red, and equal in length to the sum of the PEs.) 
-
-that might mess with stuff a bit when we shift the Con. Lvl. but how should we handle that? it could become the sum of the blank% CL rather than PE, and have the text update as well. 
-
-(Also, what is the reasoning behind using the sum of the PEs? is that like any modern technique?
-
-
-##18
-
-need to make the tolerably certain bit clearer. 
-
-Please:
-
-Cut the explainer paragraph at the bottom (as it just mimics the text)
-
-have this bit of the text update live: "Thus we should be tolerably certain of not being in error by more than one ball in 100."
-
-it should update as you change the sample size and proportion. 
-
-Part of the point of this example is that when the true proprtion is near the extreme, the same PE value is more useful than if the dist is in the middle. 
-
-We could have a button that sets it to the same sample size but puts the proportion to .50. it shoudl show that the X in 100 updates. 
-
-shoudl it also show the PE around the bar you have clicked? is that the relevant PE?
-
-when chart is scaled to the 0-1 number line, could have vertical lines under the graph showing the size of the PE at each point. this would show the point that they are different for the extremes. 
-
-
-
-##20 - cretan induction
-
-this one needs to be slightly tweaked to reflect pierce's reasoning. 
-
-Have it go over this text:
-
-"But when I reason in the opposite direction: Minos, Sarpedon, Rhadamanthus, Deucalion, and Epimenides, are all the Cretans I can think of; But these were all atrocious liars, Therefore, pretty much all Cretans must have been liars;I do not in the least know how often such reasoning would carry me right. On the other hand, 20what I do know is that some definite proportion of Cretans must have been liars, and that this proportion can be probably approximated to by an induction from five or six instances. Even in the worst case for the probability of such an inference, that in which about half the Cretans are liars, the ratio so obtained would probably not be in error by more than 1/6. "
-
-The sample size is tied to the number of names. "Minos, Sarpedon, Rhadamanthus, Deucalion, and Epimenides," The slider that currently does sample size is actually the number of samples. 
-
-As the sample size changes, change the names. Have a set of 100 greek names (make and female, ancient if possible). When a sample is drawn, pick n creteans, and update the names to be those names in the list. Colour coordinate them. In the background, it should be decided which ones are liars and which tell the truth, so that if the boxes show this many liars and those many truth tellers, the names reflect the same. as you change the proportion, it changes who is a liar or not. 
-
-have a button for take five samples. 
-
-i think this should fix the weird numbers we were getting when you hit reveal the proportion. please double check all that. 
-
-
-##22
-
-Should be combined with 23. see below. 
-
-##23 - 
-
-link it to this text:
-"Now, if there be any way of enumerating the possibilities of Nature so as to make them equally probable, it is clearly one which should make one arrangement or combination of the elements of Nature as probable as another, that is, a distribution like that we have supposed, and it, therefore, appears that the assumption that any such thing can be done, leads simply to the conclusion that reasoning from past to future experience is absolutely worthless. In fact, the moment that you assume that the chances in favor of that of which we are totally ignorant are even, the problem about the tides does not differ, in any arithmetical particular, from the case in which a penny (known to be equally likely to come up heads and tails) should turn up heads m times successively. In short, it would be to assume that Nature is a pure chaos, or chance combination of independent elements, in which reasoning from one fact to another would be impossible; and since, as we shall hereafter see, there is no judgment of pure observation without reasoning, it would be to suppose all human cognition illusory and no real knowledge possible. It would be to suppose that if we have found the order of Nature more or less regular in the past, this has been by a pure run of luck which we may expect is now at an end. Now, it may be we have no scintilla of proof to the contrary, but reason is unnecessary in reference to that belief which is of all the most settled, which nobody doubts or can doubt, and which he who should deny would stultify himself in so doing."
-
-i have forgotten the idea for this, so will hold off for now. 
-
-## Blackberries
-
-"The relative probability of this or that arrangement of Nature is something which we should have a right to talk about if universes were as plenty as blackberries, if we could put a quantity of them in a bag, shake them well up, draw out a sample, and examine them to see what proportion of them had one arrangement and what proportion another. "
-
-not sure yet. 
-
-## new example
-
-"All our reasonings are of two kinds: 1. Explicative, analytic, or deductive; 2. Amplifiative, synthetic, or (loosely speaking) inductive. In explicative reasoning, certain facts are first laid down in the premises. These facts are, in every case, an inexhaustible multitude, but they may often be summed up in one simple proposition by means of some regularity which runs through them all. Thus, take the proposition that Socrates was a man; this implies (to go no further) that during every fraction of a second of his whole life (or, if you please, during the greater part of them) he was a man. He did not at one instant appear as a tree and at another as a dog; he did not flow into water, or appear in two places at once; you could not put your finger through him as if he were an optical image, etc. Now, the facts being thus laid down, some order among some of them, not particularly made use of for the purpose of stating them, may perhaps be discovered; and this will enable us to throw part or all of them into a new statement, the possibility of which might have escaped attention. Such a statement will be the conclusion of an analytic inference. Of this sort are all mathematical demonstrations. But synthetic reasoning is of another kind. In this case the facts summed up in the conclusion are not among those stated in the premises. They are different facts, as when one sees that the tide rises m times and concludes that it will rise the next time. These are the only inferences which increase our real knowledge, however useful the others may be."
-
-Have a deductive view where the premises are this is socrates and socrates is a man. have a third sort of greyed out premise that is all men are _____
-
-the conclusion can be therefore socrates is _____
-
-have a button that sort of moves a list through the blank spot in the premises, kind of like setting a date on an old iphone or going through a rolodex. just have a list of like 100 things that all men are and have it woosh through them for 2 seconds, and when it lands on one, have it also appear in the conclusion. 
-the point is that the informatino oin the conclusion is not in the premises. 
-
-Show how a problem in probabilities is set up the same way (have a tab under the deduction view to switch it between probabilities and socrates. highlighting this when in probability view "In any problem in probabilities, we have given the relative frequency of certain events, and we perceive that in these facts the relative frequency of another event is given in a hidden way. This being stated makes the solution."
-
-it could be like i am rolling this dice in my dice box
-Die like this rolled that way come up six ___ percent of the time. 
-THerefore, i shoudl expect this one to come up six ___ percent of the time. 
-
-	
-
-then on the induction view, we want to show that we have different facts. 
-
-we could maybe use bean bags. premise one would be that we drew these beans  (could have a slider for like 1-10, and as you move it it randomly generates some beans. 
-and the beans came from that bag. 
-and the conclusion could be like, the beans in the bag are of the same proportion. 
-
-we need a way to show that no fact about any particular bean in your hand has anything to do with a bean in the bag. 
-
-
-
-## PUrple beans.
-
-this text:
-"When we draw a deductive or analytic conclusion, our rule of inference is that facts of a certain general character are either invariably or in a certain proportion of cases accompanied by facts of another general character. Then our premise being a fact of the former class, we infer with certainty or with the appropriate degree of probability the existence of a fact of the second class. But the rule for synthetic inference is of a different kind. When we sample a bag of beans we do not in the least assume that the fact of some beans being purple involves the necessity or even the probability of other beans being so. On the contrary, the conceptualistic method of treating probabilities, which really amounts simply to the deductive treatment of them, when rightly carried out leads to the result that a synthetic inference has just an even chance in its favor, or in other words is absolutely worthless. The color of one bean is entirely independent of that of another.
-
-But synthetic inference is founded upon a classification of facts, not according to their characters, but according to the manner of obtaining them. Its rule is, that a number of facts obtained in a given way will in general more or less resemble other facts obtained in the same way; or, experiences whose conditions are the same will have the same general characters.
-
-In the former case, we know that premises precisely similar in form to those of the given ones will yield true conclusions, just once in a calculable number of times. In the latter case, we only know that premises obtained under circumstances similar to the given ones (though perhaps themselves very different) will yield true conclusions, at least once in a calculable number of times. 25We may express this by saying that in the case of analytic inference we know the probability of our conclusion (if the premises are true), but in the case of synthetic inferences we only know the degree of trustworthiness of our proceeding. As all knowledge comes from synthetic inference, we must equally infer that all human certainty consists merely in our knowing that the processes by which our knowledge has been derived are such as must generally have led to true conclusions."
-
-
-Modes for analytic and synthetic. synthetic will then split into conceptualist and materialist. 
-
-###Analytic
-
-
-[slider] % of beans in this bag are purple
-These [n] beans were drawn [randomly / selectively] from that bag
-:  In the long run, [n] / total beans will approach [the correct percentage]. 
-
-start the slider at 100% and have it real "all" (when it goes to 0 have it read none). and have the conclusion just follow, these beans will be purple.  as the slider goes into not certainty, modify the conclusion to what is above. note there is no probability about this example, there are however many purple beans there are in the sample. (we could do like the black bean hidden thing above, but have it hide the sample. if the beans are draw selectively, have a note saying that this changes the probability, its like the ace of spades deck abouve, or a magician drawing your card. 
-
-if your sample size is the total number of beans, then that becomes also a kind of certainty. 
-
-###Synthetic Conceptualist
-
-needs to make this point: "On the contrary, the conceptualistic method of treating probabilities, which really amounts simply to the deductive treatment of them, when rightly carried out leads to the result that a synthetic inference has just an even chance in its favor, or in other words is absolutely worthless. The color of one bean is entirely independent of that of another."
-
-not sure how to best do this... 
-
-###Synthetic (Materialist)
-
-
-
-
-## new example 
-
-
-"Most treatises on probability contain a very different doctrine. They state, for example, that if one of the ancient denizens of the shores of the Mediterranean, who had never heard of tides, had gone to the bay of Biscay, and had there seen the tide rise, say m times, he could know that there was a probability equal to (m + 1) / (m + 2) that it would rise the next time. In a well-known work by Quetelet, much stress is laid on this, and it is made the foundation of a theory of inductive reasoning."
-
-could have bayes theorem pop up and show how you need values for the porbability of events?
-
-##24
-
-##32
-
-this one is cool...  for now lets hide the "Weighted by" view. 
-
-##33
-
-the "take one more drawing" button does not work on the probable error view. either it should or it sohuld only appear in the drawings view. 
-
-
-
-
-
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-# Done
-
-Implemented and checked in the browser. Anything not got to from the original
-note is listed as "still open" under its own entry, so nothing is lost.
-
-Anything finished is taken out of "By example" above and written up here
-instead, so that section stays a list of what is left to do.
+# How to read this file
+
+Each example is one entry, in number order, with the unnumbered new examples
+after them. Under each:
+
+  Suggestions        — what is still to do. Your notes are kept in your own
+                       words. Anything marked [from the build] is an open item
+                       I raised while building, not something you wrote.
+  Recently completed — what is implemented and checked in the browser.
 
 State of play. Built: 1, 6, 7, 8, 9, 10, 11, 12, 14, 15, 17, 18, 19, 20, 28,
 16, 29, plus new examples 26, 27, 30, 31, 32, 33 and 34.
@@ -222,11 +38,593 @@ of the text rather than panels beside it, Peirce's own figures move with the
 sliders and revert when an example is shut, and every example carries its number
 in the margin.
 
-Still to do, and still as you wrote them above: the 1–5 group, 13, 22, 23
-and 25. Of those, 13, 22, 23 and 25 are waiting on your own thinking rather than on
-me.
+Still to do: the 1–5 group, 13, 22, 23 and 25. Of those, 13, 22, 23 and 25 are
+waiting on your own thinking rather than on me.
 
-##16 — leads with the graph, and the census works itself out
+Last pass, 4 August: 13, 32, 15, 33, 17, 18, 20 and 16, in that order. Their
+notes have moved from Suggestions to Recently completed under each example.
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# By example
+
+
+## 1
+
+### Suggestions
+
+From the "1 - 5" group. No note written yet beyond what is already built.
+
+### Recently completed
+
+#### the whole thing set as an argument
+Rebuilt. The "Peirce's Framework" list, the arrow diagram and the panel of
+dropdowns are gone; in their place one sentence, which is the argument itself:
+
+  P(If I were to draw the top card from a well shuffled deck of standard
+  playing cards, then that card would be exactly A of any suit)
+
+Yellow for the antecedent, green for the "then", blue for the consequent. Every
+choice is a word in the sentence rather than a control beside it — click a word
+to change it: top / middle / bottom, well shuffled / brand new, deck of standard
+playing cards / piquet pack / trick pack, exactly / higher than / lower than,
+and the suit. The rank is a slider, since cycling A to K by clicking would be
+thirteen presses.
+
+The two settled cases work as you asked. A brand-new pack determines the card
+before the draw — the top of a new pack is the ace of spades, the middle the
+king of diamonds, the bottom the ace of hearts, which is the order a new pack
+actually comes in — so every card is still shown, being a card in the pack, but
+all of them are faded except the one that can come up. A trick pack makes every
+one of the fifty-two the ace of spades.
+
+Refined after your look. The words that can be changed are bold with a dotted
+rule under them, so they read as clickable, and clicking one opens a short list
+under it rather than cycling — with five suits, cycling is four clicks to get
+back where you started. The "then" is a stronger green than the washes either
+side of it, since it is the part that carries the probability, and the same
+three colours are used in the formula: P(A → C) with A in the antecedent's
+yellow, the arrow in that green, C in the consequent's blue.
+
+The note under it is now yours: "Probabilities do not apply to events. There is
+no probability of C. They apply to arguments, and so always depend on how some
+set of antecedent facts relate to the consequent fact."
+
+#### (earlier) — colour coding moved into the text
+Peirce's own sentence now carries the three colours: antecedent in ochre,
+consequent in blue, consequence in green, on every occurrence including the
+plain-prose ones later in the sentence, not just the italicised first use. They
+are invisible until the example is opened and fade in with it, on the same rule
+as the live numbers — shut, the paragraph is ordinary text.
+
+
+## 2
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### the rule stated over two arguments
+Built to your correction, which was the right one: not one P with two blue
+clauses inside it, but two arguments and the rule between them —
+
+  P(A → C1)  1/52  +  P(A → C2)  1/52  =  P(A → [C1 or C2])  2/52
+
+Two sentences, sharing an antecedent (the second reads "the same"), each with
+its own consequent set by the same chip-and-menu words as example 1. The
+identity underneath carries the live fractions in the same three colours.
+
+The condition is not asserted, it is shown. Set the two consequents so that a
+card answers to both — an ace of hearts, and an ace of any suit — and that card
+is ringed in the grid and the sum visibly counts it twice: 5/52 where the truth
+is 4/52. Peirce's "incompatible consequents" is then something you have broken
+rather than something you have been told.
+
+
+## 3 and 4
+
+### Suggestions
+
+[from the build] Rules 3 and 4 in the same style as 2. The chip-and-menu
+machinery is written to be shared (argChip and argMenu are at file scope, not
+inside example 1), and 2 is now the pattern to copy. 3 is P(A → C1) x
+P(A and C1 → C2) = P(A → [C1 and C2]), which needs the second argument's
+antecedent to be the first antecedent with C1 added to it — the one real
+difference from 2. 4 is the same with independent consequents, P(A → C1) x
+P(A → C2), and wants the same treatment as 2's incompatibility: let the reader
+break independence and watch the identity fail.
+
+### Recently completed
+
+Nothing yet.
+
+
+## 5
+
+### Suggestions
+
+From the "1 - 5" group. No note written yet beyond what is already built.
+
+### Recently completed
+
+#### buttons compacted
+The bordered box with two headed rows of long labels is one flat row of short
+ones, led by "Peirce's:" and "others:". The rest of 5 is untouched.
+
+
+## 6
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### two arguments, three grids
+Moved. The panel sits under the table of the four combinations rather than
+directly under the paragraph, so opening it leaves the statement of the case,
+its breakdown, and the demonstration on one screen with the same numbers moving
+in each.
+
+Cut back hard on the second pass. No preamble, no metal, no box, no gold and
+lead, and the whole "unknown metal" mode with it — the reasoning it carried
+about what follows when the two agree is ex7's job, and ex7 does it. What is
+left is two sliders and three grids directly beneath them.
+
+The two are A_1 → C and A_2 → C. The grids are right and green, wrong and pink,
+with the combined grid in the middle, orange where one is right and the other
+wrong. Cells can be sorted into blocks or scattered; the scatter is a fixed
+shuffle, so toggling back and forth does not deal them again.
+
+Two tabs. The hundred as expected, and a hundred actual cases — where you can
+run them one at a time, and the bulk button then reads "Run the remaining 97"
+until the set is finished and offers another hundred. Watching them arrive one
+by one is, as you say, the thing that makes the point.
+
+The mismatch you noticed was real. The composed grid counted its own cells while
+the decomposed one drew the theoretical figures beside them, and the two grids
+had been built from two independent columns — each with the right margin, but
+paired arbitrarily — so the joint counts had no reason to agree. There is now
+one array of a hundred cases and every grid, count and figure reads from it. The
+expected hundred is built from the four combinations rather than from two
+margins, so the margins and the joints cannot disagree: at 0.81 and 0.93 it is
+75 both right, 6 and 18 mixed, 1 both wrong, and the grids read 81/19 and 93/7
+exactly as they should.
+
+One honest residue: 75 of 76 agreements is 0.9868, while the long-run figure is
+0.9827. That is what rounding to whole cells costs, and both numbers are on
+screen together rather than the difference being papered over.
+
+The paragraph stating the case and the table of the four combinations under it
+are wired to the sliders again — that binding was lost when the panel was
+rewritten. A quiet "Reset to Peirce's 81 and 93" appears beside the other
+buttons once the sliders have left his figures, on the same pattern as 14.
+
+Hovering a cell rings the same cell in all three grids and names the case
+beneath them. That is the thing that shows the middle grid is made of the two
+beside it rather than being a third grid of its own.
+
+Each of the four combinations in the table now carries its value while the panel
+is open — 0.7533, 0.1767, 0.0567, 0.0133, summing to one — set before Peirce's
+semicolon and gone again when the panel is shut. The two displayed formulas
+further down already had theirs.
+
+While doing that I found a transcription slip in the table: the fourth row was
+labelled "and both answer correctly", the same as the first. Its own fraction is
+7/100 of 19/100, so it is the both-wrong case; I have made it "and both answer
+incorrectly". Easily reverted if you would rather keep the edition as it was.
+
+The convergence chart is back, under the grids and only while cases are being
+run: the running proportion right for each argument and, in heavier green, the
+proportion right among the cases where they agree, each against a dotted line
+at what it is set to be. It keeps growing across sets rather than restarting
+with each hundred.
+
+
+## 7
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### the formula in the text evaluates
+Both displayed expressions (the quotient, and the chance 81/19 x 93/7 further
+down) gain "= 0.9827" and "= 56.6" while ex7 is open, in green so they read as
+the result rather than as part of the expression. Peirce prints them
+unevaluated, so shut, the "=" clause disappears entirely.
+
+#### laid out like 8, and wired to it
+The two sliders now sit side by side across the top, in the same position they
+occupy in 8, with the horizontal bars full width beneath them and a good deal
+more room to breathe — the canvas went from 300 to 380 and the chart no longer
+shares its row with a column of controls. Headed A_1 → C and A_2 → C like the
+rest.
+
+The closing note about building the same quantity cell by cell in the previous
+demonstration is cut. It pointed at a mode of 6 that no longer exists.
+
+6, 7 and 8 now drive one another. There is one pair of values held in common and
+each panel's sliders are a view onto it, so moving one physically moves the
+others; all three were given the same range and step (0.02 to 0.98) so it is
+value for value.
+
+The reason it was not working: the mirror only wrote to sliders that already
+existed. Set the pair in one panel before the others had ever been opened and
+they were built at the defaults, which is exactly the case the feature is for.
+Each panel now adopts the common pair as it stands when it is built.
+
+The working under 7's bars is one line, close under them: the bottom margin of
+the figure went from three lines to almost none and the box round the working is
+gone. It is worth having but it is not what the panel is for.
+
+7's reset became the same quiet "Reset to Peirce's 81 and 93" used elsewhere:
+invisible while the sliders are at his figures, and it now resets both panels.
+
+
+## 8
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### nothing under the sliders but the reading
+Everything below the sliders is gone. Neither equation is reproduced: Peirce's
+chance equation is printed immediately below the panel and the probability
+version immediately above it, and both of those now vary with these sliders, so
+the algebra stays where he put it.
+
+Making the printed quotient vary needed a small change to the machinery. That
+equation belongs to ex7 as much as to ex8, and a figure in the text could only
+have one driver. Drivers can now be registered for a container without that
+container being open, and can pull each other along, so the 81 and 93 are
+registered once for both panels: whichever is open supplies the figures, and if
+both are open the one last touched wins. Opening either one animates both
+printed equations and the passage between them.
+
+What is left is the two arguments in A_n→C form with a probability slider and a
+chance each, and then the final reading: two number lines, the combination as a
+probability and the same combination as a chance, both in green because they are
+one quantity and not two.
+
+The chance line has no fixed maximum. It steps up through 1, 2, 5 and their
+decades to keep the marker on it — 2, then 5, then 100, then 5,000 as you push
+the two probabilities up. Watching the ruler itself give way is Peirce's "any
+magnitude, however great" without a word of it being said. Evens is marked while
+it is legible and drops off once the scale grows past it.
+
+Checked that both fit on one screen: with the panel open at his figures, the
+varying quotient sits at the top of the viewport and the second slider at about
+three-quarters down, with the number lines below that.
+
+The two sliders and the two number lines now share one column template and
+gutter, so all four tracks have the same left edge, right edge and midpoint.
+The lines are inset eight pixels each side of the sliders, which is half a
+thumb: it makes the markers travel exactly the thumb's range, so the midpoints
+coincide rather than merely the boxes.
+
+The chance ruler is now held at 25 until the chance outgrows it, and steps by
+decades above that: 25 up to a chance of 25 : 1, then 50, 100, 500 and so on.
+(This needed a small correction to the shared scale helper — its floor was
+behaving as a minimum rather than a floor, so a chance of 22 was still jumping
+the ruler to 50.)
+
+Kept the odds note — it is a gloss rather than a reproduced equation, and you
+had asked for it. Trivial to drop.
+
+
+## 9
+
+### Suggestions
+
+None open. (The belief slider that was outstanding here has moved to 27.)
+
+### Recently completed
+
+#### two stages
+Preamble gone: the opening paragraph, the "quantities involved" box and the
+instruction line above the controls. The buttons say what they do.
+
+Stage one, two arguments. The setup from 26 given twice, side by side — a
+probability slider, the chance it comes to, and the belief that is its
+logarithm — sized to sit in the space the old Argument / Tells table occupied.
+Both columns share one chance ruler and one belief ruler, so the two arguments
+are read against each other rather than each against itself. The belief line is
+the axis the bar chart below is drawn on, so the third row of each column is
+literally the bar that argument contributes; moving a probability slider moves
+its chance, its belief and its bar together.
+
+Stage two, three arguments or more. Columns will not fit side by side at that
+point, so it reformats to a row apiece — the old layout, with the changes from
+your note:
+ - no text inputs. Each argument is named for what it tells, A_n → C for an
+   argument for and A_n → ~C for one against. You were right that ~C is the
+   way to write it: the same argument at 40 in 100 for C is 60 in 100 for ~C,
+   which is exactly what the rewrite on release already did silently.
+ - headings are P(A→C), Ch(A→C), ln Ch(A→C).
+ - a half tick under every probability slider, and the slider itself takes the
+   colour of the way its argument tells — green above the midpoint, terracotta
+   below. Crossing the middle recolours the slider, flips the sign of the
+   belief and turns the bar around, all while dragging.
+ - the even-chance button now says why nothing happened: an even chance is
+   1 : 1, log 1 is 0, it sits at the middle of the belief line marked "adds
+   nothing", and it can be added any number of times to no effect.
+
+Going back down to two arguments returns to the side-by-side view.
+
+The flip you found is fixed, and by removing rather than mending. An argument
+carried a probability and a side, and the two could disagree — so crossing a
+half rewrote both on release, which is why the slider jumped and the chance
+turned over. An argument now carries one number and no side at all. Which way it
+tells is the sign of the logarithm of its chance, and an argument right less
+than half the time is simply an argument for ~C. The slider stays exactly where
+it is put; the name, the words and the colour change under it as it crosses the
+middle, and the chance is stated in the direction the argument actually tells
+(0.40 reads A → ~C, tells against, 60 : 40, −0.405). The for/against dropdown is
+gone, as you say it should be.
+
+While in here I hoisted the number-line drawing and the growing-ruler scale
+into the library — 8, 9 and 26 were about to hold three copies of it.
+
+The even-chance note is trimmed to the clause and the quotation.
+
+
+## 10
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### re-anchored
+The trigger has come off "Suppose we have a large bag of beans" and gone onto
+"Suppose the first drawing is white and the next black ... we have great
+confidence in this result", stopping before "We now feel pretty sure", and the
+panel now opens under that paragraph. No code changed.
+
+
+## 11
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### the two numbers flattened, and the curve
+The two boxes are gone. The numbers now read as one line under the buttons,
+first in the blue of the parenthetical it fills in Peirce's sentence above,
+second in that one's red, with the count and the range on the line below. The
+graph takes the full width. The closing note under the table is cut.
+
+A tab bar over the graph switches between the drawings and the two numbers as a
+curve: a gaussian on the estimate, the probable error shaded as the middle half
+of its area, with an arrow across the band. The x-axis is held at 0 to 1 rather
+than fitted to the curve, so the narrowing is the thing you see — at ten
+drawings the band is a third of the page, at a thousand it is a hairline, and
+the first number has hardly moved. The figure sits in the legend rather than
+inside the band, since the band closes to nothing; the legend takes whichever
+top corner the curve leaves free.
+
+
+## 12
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### a fix found while dumping the prose
+The panel opened saying every bean was worth "-Infinity of belief". Its chance
+slider is not in the document until update() has built the block that holds it,
+and the first update() reads it before that: missing, the read gives nothing,
+and the logarithm of nothing is minus infinity. It corrected itself the moment
+anything was touched, which is why it had not been caught. Now defaulted.
+
+#### the arguments as lanes, and 11's two graphs beside them
+The block of stacked units is gone. The MBR graphic is now laid out as 9's is:
+one lane per argument, black to the right and white to the left, ruled off with
+the sum underneath. Two thousand lanes will not fit and would say nothing if
+they did, since every bean is worth the same, so a run is three lanes, a
+vertical ellipsis carrying "× 1,004", and three more.
+
+The sum bar is on a fixed scale — forty beans across, whatever was drawn — so it
+comes out identical in Peirce's two cases, as it must, since balancing reasons
+returns the same belief for both. Measured at the pixel it is 69 across at
+twenty black and 69 at 1,010 against 990, while the lanes above it go from six
+rows to fourteen. An excess past forty is clipped and marked, with the figure
+printed underneath either way. (An earlier version scaled it against the
+drawings; that made the bar disagree with the very thing it illustrates.)
+
+The right-hand block is now 11's two graphs on a tab, at the same height as the
+lanes. The drawings: a real order of drawing — the blacks and whites of the
+current setting, shuffled and dealt — so the estimate wanders in and lands
+exactly on the observed proportion. The distribution: the same gaussian and
+probable error as 11.
+
+Balancing reasons is marked on the drawings chart but not on the distribution,
+on your point that it does not express a probability. What the distribution
+shows is how an estimate of the bag's proportion is spread, and the rule's
+figure is not an estimate of that proportion, so putting it on the axis would
+make the two look like rival readings of one quantity. That axis is now labelled
+"proportion black in the bag" rather than "P(the hidden bean is black)" for the
+same reason. The horizontal line on the drawings chart is open to the same
+objection if you want it gone — say so and it goes.
+
+Cut: the "holding the excess fixed" heading, its paragraph and the log-scale
+plot under it. The table stays, with your replacement note and the Kasser link.
+
+#### tied into balancing reasons
+Buttons across the top, and the two sliders are the draw itself: how many beans,
+and what proportion of them came up black. Black and white counts follow from
+those, which is how the drawing is described in the paragraph.
+
+The two verdicts sit side by side with a graphic under each. Under balancing
+reasons, every bean drawn as a unit, black to the right and white to the left —
+first as drawn, and then a second row beneath it with the pairs struck out, so
+what the sum actually keeps is a row of its own rather than something to be
+picked out of the first. At Peirce's second case that reads "990 against 990
+cancel; 20 left over", which is the whole complaint in one picture. Blocks stand
+in for beans once there are too many to draw one apiece, and it says so.
+
+Under the proportion, both answers on one probability axis: the proportion the
+drawings came to with its probable error as a band, and where balancing reasons
+puts the same case, dashed. At 1,010 and 990 that is 0.5050 ± 0.0075 against
+> 0.999999, the two of them at opposite ends of the same scale.
+
+On your question about the force each bean contributes — no, there is no way to
+calculate it, and I have said so in the panel rather than inventing one.
+Balancing reasons needs each drawing to be an argument of some fixed force, and
+nothing in the bag or the drawings fixes it, which is exactly why it has to be a
+slider. The standing note is gone; the button that sets the force to the observed odds
+now sits under its slider, and the explanation appears there when it is pressed
+rather than sitting on the page whether or not anyone asked. The point of the
+button is that it fails informatively: the force of a single bean turns out to
+be a fact about all the other beans, so the arguments are not independent after
+all and the adding up is not licensed. That seemed a better answer than a
+formula.
+
+
+## 13 — saturn
+
+### Suggestions
+
+[from the build] 13 was built to land as the refutation of the principle 21
+stated. With 21's demonstration gone it now arrives without the positive
+statement it was answering. Say the word and I will put a sentence into the new
+note to carry that weight, or leave 13 to speak for itself.
+
+### Recently completed
+
+#### coming soon, and back on the page
+It was not on the page at all. The trigger and the container came out of the
+article when 21 was rewritten — the demonstration 13 answers and 13 itself went
+together — so the Saturn paragraph had been sitting there as plain prose with
+nothing to open. The trigger is back, on the paragraph exactly as it was
+(checked byte for byte against the version before it was removed), and it opens
+"Coming soon", the same holding page 22 to 25 use.
+
+The example itself is untouched and still built, above in its own file. It is
+one name in a list of five; take "example-ex13" out of that list and the colour
+chart returns as it was.
+
+
+## 14
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### the table as printed, until it is asked to be more
+The sets are set the way Peirce sets them: letters on the page, no cell round
+each one, and nothing over the groups. The captions are gone — he names what the
+groups contain in the paragraph after the table, so a caption was saying it
+twice and stopping it from looking like a table in a book.
+
+The two sliders are simply there, side by side so they cost as little height as
+possible, with the view tabs beneath them. (They were behind a click for a
+round; you were right that it was a door with nothing behind it.)
+
+The chart has lost its frame and its grid. Both were drawn in a warm grey and
+together they read as a panel laid over the page — the one thing this table is
+not supposed to look like. Axes and bars only now, on white.
+
+The first tab is "List of sets". "Reset to Peirce's figures" has moved out of the
+slider row to sit beside the binomial-expansion tab, and still appears only once
+the sliders have left his figures.
+
+Both paragraphs around it now follow the sliders. The one before — "The relative
+number of white balls in the granary might be anything, say one in three. Then
+in one-third of the urns the first ball would be white, and in two-thirds
+black..." — is spelled out in words as he spells it, so at 1 : 3 it reads one in
+four, one-fourth, three-fourths. The one after was already wired.
+
+The sliders travel. A second pair sits under "In the second group, where there is
+one b...", and takes over the moment the first pair goes off the top; only one of
+the two is ever on screen, and the second writes straight through to the first,
+so they are the same control in effect.
+
+Your worry about the table moving the text around was well founded — at seven
+balls drawn the listing runs to thousands of lines, and every step of the slider
+was throwing the paragraph thousands of pixels down the page. The paragraph is
+now held still: its position is measured before and after each change and the
+page scrolled back by the difference. Measured drift is zero at every step from
+four balls to seven and back. It has to be an instant scroll rather than the
+page's usual smooth one, or the paragraph lurches away and glides back on every
+step of the drag.
+
+
+## 15
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+Built in the earlier pass over all the examples; no separate write-up of that.
+
+#### the instruction made visible
+"Click on any bar of the chart to see the exact probability" is now tinted in
+the purple a clicked bar takes, so the cue and what it produces are the same
+colour. It goes as soon as it has been obeyed, the panel then having the clicked
+outcome to report instead. The style is shared, so 18's identical instruction
+reads the same way.
+
+
+## 16 — hypothesis test
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### the difference measured in probable errors, laid along it
+The analysis results box is gone. Every figure in it — both probable errors, the
+difference, their sum, the multiple — is in Peirce's own paragraph above, so the
+box was the same arithmetic printed a third time.
+
+In its place, under the difference arrow, a second rule perforated into lengths
+of e1 + e2: each perforation the two errors end to end, blue then terracotta in
+the two groups' own colours, so what the multiple is a multiple OF is a thing
+you can see rather than a thing you are told. At the census that is eight whole
+perforations and most of a ninth, and they are countable. The reading under it
+is "8.7 × (e1 + e2) — every dash is the two probable errors end to end". At his
+figures the two errors are 0.00034 and 0.00087, so each dash is about a third
+blue and two thirds terracotta, which is itself the answer to why "same sample
+size" changes the verdict.
+
+On the confidence level, which is the question you raised. The perforations stay
+probable errors whatever the slider says, and the slider goes on widening the
+shaded bands. Peirce counts the discrepancy in probable errors and then consults
+his table for what such a multiple comes to; if the perforations followed the
+level too, the level would be counted twice and the picture would stop agreeing
+with the sentence it illustrates — the same double count that was flipping the
+verdict before. Above 50% the chart says so in a line under the dashes: "the
+bands follow the 90% level; the dashes stay probable errors". Easy to swap if
+you would rather have it the other way, and then the multiple in the text has to
+move with it.
+
+On your other question — the sum of the probable errors is not a modern
+technique. Today two independent errors are combined in quadrature,
+root(e1² + e2²), which here is 0.00093 against the sum's 0.00121. Summing them
+always overstates the combined error, so it is the conservative move: Peirce's
+ten times the sum would be about eleven times the modern quantity. His
+conclusion is if anything understated. I have left his arithmetic as his; say
+the word and both figures can go on the page together.
+
+#### leads with the graph, and the census works itself out
 The graph is first, then the two chart toggles, then the buttons, then the
 sliders. The headings and horizontal rules are gone.
 
@@ -266,12 +664,8 @@ counts it in — he gets his ten, and then consults the table for what such a
 multiple comes to. The bands follow the confidence level; the multiple and the
 verdict do not.
 
-##12 — a fix found while dumping the prose
-The panel opened saying every bean was worth "-Infinity of belief". Its chance
-slider is not in the document until update() has built the block that holds it,
-and the first update() reads it before that: missing, the read gives nothing,
-and the logarithm of nothing is minus infinity. It corrected itself the moment
-anything was touched, which is why it had not been caught. Now defaulted.
+#### the three buttons, and where the live figures depart from his print
+(These paragraphs were filed under 12 in the old note; they belong here.)
 
 Three buttons: the 1870 census, same sample size, and a difference due to
 chance. "Same sample size" is the interesting one — give the colored count the
@@ -285,194 +679,233 @@ ten. The odds come out at 3.0e+13 rather than his 10,000,000,000, which is his
 table's last row rather than a computed figure — his conclusion holds with a
 good deal to spare.
 
-##21 — the example gives way to your text
-The indifference demonstration is gone and your Sciential / Ignorantical /
-Laplacian paragraph stands in its place, behind a blue rule as a remark of yours
-rather than a sentence of Peirce's. It opens on a click of "except that this
-introduces the thoroughly unclear idea of cases equally possible", the same
-sentence that used to open the demonstration, so the page carries only Peirce
-until it is asked to carry more. No collapsing header on this one — there is
-nothing to collapse, and calling it an interactive example would promise
-something it does not do. It keeps 21 in the margin. Quotation marks and the
-citation on the Laplacian Probability passage are set as typography rather than
-as typed; nothing else of your wording is touched.
 
-Worth knowing: 13, the Saturn colour chart, was built to land as the refutation
-of the principle 21 stated. With 21 gone it now arrives without the positive
-statement it was answering. Say the word and I will put a sentence into the new
-note to carry that weight, or leave 13 to speak for itself.
+## 17
 
-##27 — the note marked, the instruction moved
-Your added paragraph is set behind the same blue rule. "Move the probability
-sliders to see how they impact the proper intensity of belief. Move the Your
-Belief slider to see how much it impacts any worldly probability." has come out
-of the readout at the bottom and now sits on its own line at the end of the
-preamble, where it can be read before the sliders rather than after them. The
-readout keeps the two intensities and the gap between them.
+### Suggestions
 
-##10 — re-anchored
-The trigger has come off "Suppose we have a large bag of beans" and gone onto
-"Suppose the first drawing is white and the next black ... we have great
-confidence in this result", stopping before "We now feel pretty sure", and the
-panel now opens under that paragraph. No code changed.
+None open.
 
-##30 — balls per urn capped at six
-Both "balls in each urn" sliders now stop at six: 30's, where the count of urns
-is (r+1)^n and the arithmetic was what slowed down, and 28's alongside it, since
-the two rows are meant to be read against each other and a cap on one only would
-have put them out of step.
+### Recently completed
 
-##34 (new) — a proportion of what?
-The sequel to 27, opening from "cannot be used to determine any probability" in
-27's own text, with its panel underneath 27's.
+Built in the earlier pass over all the examples; no separate write-up of that.
+Its cascade of samples-with-bounds is the graphic 20 now reuses.
 
-Peirce's two rules drawn as counts. A1 has 100 cases with 81 shaded; A2 has 100
-with 93. Each probability is the shaded part of its own grid, countable. The
-balance of the two is 0.9827, which is not the shaded part of either. The only
-grid it could be the shaded part of is a third one, the cases where both
-antecedents held, and nobody has counted it.
+#### the slider, the shading, and Peirce's own four
+The confidence slider is a plain percentage from 50 to 99, stepping by one, with
+its ends named as 20's are: "50% — the probable error" and "95% — standard
+today". It ran in nines before — k of them meaning 100(1 − 10^-k) — so that
+every row of his printed table out to the ten-billionth was a position on it.
+That put nearly the whole travel of the thumb in country no reader has any use
+for and made the levels anyone does want unhittable. The far rows are still
+printed above with their bounds worked out; they are simply not places the
+slider goes, and clicking one of them no longer moves it, since clamping to 99
+would have been a lie about which level was being drawn. The three rows within
+range still set it on a click.
 
-You can then go and count it, and the two arguments barely constrain what you
-find. At an overlap of twenty the proportion can be anything from 0.650 to
-1.000, every value consistent with 81 in 100 and 93 in 100. The rule's 0.9827 is
-one of them, near the top. Nothing in the arguments picked it out; independence
-did.
+Rescale is on by default.
 
-Two ends worth the visit. At an overlap of none the two antecedents never occur
-together, the third grid is empty, and there is nothing to take a proportion of
-at all. At an overlap of 88 — the largest the counts allow — the answer is
-pinned at exactly 81/88 = 0.9205, and 0.9827 is not it. Past 88 the shared cases
-would have to hold more consequents than A1 contains, so the two arguments
-cannot be about more than 88 of the same cases: they provably do not share a
-population.
+The balls-drawn slider goes down to two and steps by one. It began at ten in
+tens, which could not be put at four, and four is the case the passage is about.
 
-The pooled figure is dealt with in passing: 174 in 200, or 0.87, is countable
-but moves when you observe A2 more often, so it is a proportion of how much you
-looked rather than of what you found.
+The heatmap is in, and it is also the answer to your fifth question. The
+vertical lines keep their theoretical heights and take their colour from how
+often that result has actually been drawn — pale where nothing has landed,
+deepening to a dark violet at the commonest. So the empirical distribution is
+shown on the very marks of the distribution it is meant to approach, rather than
+in a second chart beside it: the two agree when the darkest lines are also the
+tallest, and a short run shows as darkness in the wrong place. Only samples of
+the current size are counted, an older record's proportion not sitting on this
+lattice. The lines thicken below forty drawn, so that at Peirce's four the five
+of them are wide enough to read as a shade.
 
-This is the example 32 wanted to link to. Same fact seen twice — no common
-population, so nothing to pool there and nothing to be a proportion of here.
-The placeholder in 32 still says "example to come"; it can be pointed at this
-one whenever you want it wired up.
+"Peirce's example: one in three, four drawn" clears the record and sets the
+three sliders. It comes with the sentence you asked for, which appears whenever
+no sample can hit the truth exactly: "While we can never draw a sample that
+reflects the true proportion of 0.333 — four drawings can come out at only five
+values, and it is not among them — we can be confident that our error bounds
+will nevertheless contain it 39.5% of the time."
 
-Your replacement text is in on 32's first tab, ending by sending the reader to
-the weighted tab. The two now hand off to each other in both directions.
+The figure is the exact one, summed over the lattice rather than counted off a
+run, since it is a claim about the construction. At his own case it comes out
+below the level claimed, and the sentence says why rather than glossing it: an
+induction from four can land on only five values, the window catches one of them
+at this proportion and two at others. That is 20's lattice again, and the same
+wording. Where the two rates agree to within a point and a half the clause drops
+and the sentence is the plain one.
 
-##33 (new) — when the second number overwhelms the first
-Built on your note, between 11 and 12, on the "it is true that when our
-knowledge is very precise" paragraph, which had no example on it. Two modes on a
-tab, since you wanted both.
+Checked over three hundred samples at his settings: 120 covered, 0.400 against
+the exact 0.395.
 
-"Set the probable error" is your spec. The second number is the quantity under
-discussion, so it is the one in your hand, and what follows from it — how much
-drawing it would take to have earned an error that size — is printed beside it.
-±0.010 is 1,138 drawings; ±0.200 is three. At nothing the bag is counted exactly
-and the curve has no width at all. Past ±0.337 the error is wider than a single
-drawing could ever leave it, which is to say nothing has been drawn, and that is
-where the passage lands. "Take one more sample" steps the slider down by exactly
-one drawing's worth: from ±0.340 it goes to ±0.238, a visible lurch, where at
-±0.010 it does not move at all.
 
-"Set the drawings" is the same claim on the bag of 10 and 11, where the error is
-not chosen but earned. The two disagree about nothing; they differ in which
-number is the handle.
+## 18
 
-Peirce's sentences light as you pass through the regimes he names: very precise
-below ±0.02, very slight above ±0.12, and no knowledge at all past ±0.337.
-Between them nothing lights, since he names no case there and the two numbers
-are simply of a size. The highlighting goes out when the example is shut.
+### Suggestions
 
-The end of the range is the point. There is no curve, because there is no fact.
-The flat line is still drawn — but as the conceptualist's answer and labelled as
-his — with "entirely indefinite" underneath, so the disagreement is staged
-rather than asserted. The note beside it: a half here is not a measurement that
-came out at a half, it is the absence of any measurement written in the same
-notation, and the notation is what makes it look like a fact.
+None open.
 
-Two details worth knowing. The regime is decided on the unrounded number of
-drawings — an error of ±0.44 stands for six-tenths of a drawing, and rounding
-first called that one drawing and never reached the case the passage is about.
-And the curve's spread is the one that goes with the probable error being used
-(pe is 0.6745 of it exactly) rather than one read off the observed proportion,
-which collapses to nothing the moment a short run comes out all one way and
-leaves no curve to draw at just the point where there is least to go on.
+### Recently completed
 
-Cut on your instruction: the opening paragraph, and the note that appeared in
-the "very slight" regime. Peirce's own lit sentence carries that one.
+Built in the earlier pass over all the examples; no separate write-up of that.
 
-##32 (new) — which arguments are worth balancing
-The constructive half of 12. Several arguments bear on one conclusion, none of
-them handed to us: each is established by testing it, so each arrives with a
-probable error as well as a probability, and the rule has nowhere to put the
-second number.
+#### what "tolerably certain" comes to
+The explainer at the bottom is cut. It was the enumerated list and the tolerance
+printed a second time under the paragraph they came from.
 
-How well an argument is established is laid on a ladder — three tests at one
-end, a thousand at the other — rather than sampled, because a random spread now
-and then hands out a set that all clears the line at once and there is nothing
-to see. Which rung an argument sits on is shuffled against how strongly it
-tells, so being well established and telling strongly stay independent; that is
-what stops the threshold from working as a proxy for strength. The probabilities
-are not laid out at all, they come out of the testing, which runs in front of
-you over about a second when the button is hit.
+His sentence in the text is the readout now: "Thus we should be tolerably
+certain — 92.1 times in 100 — of not being in error by more than one ball in
+100." Both the figure and the tolerance move with the sliders.
 
-Left: each argument as what the testing left, a centre and a spread, drawn as a
-ridgeline on one P axis. Admitted ones in the colour of the way they tell, ones
-too vague in grey and tagged "left out". Right: the balance itself, laid out as
-9 lays it, on the admitted arguments only, with the excluded lanes named but
-empty. Then the table, with P, probable error, chance and log chance for each.
+Which of the two is the handle had to be settled, and the certainty is the
+better one: it is the vaguer word, it is the one you asked to have made clearer,
+and pinning it lets the tolerance be read off. So the slider that was
+"Prediction confidence level: 0.50" now reads "Tolerably certain means: 90 times
+in 100", and the tolerance is the smallest whole ball in a hundred the drawings
+cover that often.
 
-Two things worth knowing. The probable error is Peirce's worst case, from the
-number of tests alone, as with the Cretans in 20 — taken at the observed p it
-misbehaves badly here, since three tests that all came out the same way give
-p-hat = 0 and so an error of nothing at all, which put the worst established
-argument on the page down as the best known. And p-hat is given half a trial's
-room at each end so an all-one-way run has a chance rather than an infinite one;
-that is a continuity correction rather than a prior, and how extreme a chance
-the record may claim grows with the testing behind it.
+Counted on the exact binomial, so it is the arithmetic he does in the paragraph
+rather than a normal curve laid over it: at one ball in a hundred with a hundred
+drawings, no ball, one, or two covers 0.921 of the cases — and his own sentence
+comes back word for word, with 92.1 as the figure standing behind "tolerably
+certain". That number is his; it is what the six probabilities he prints add to.
 
-The reading it produces: at five arguments and ±0.080, three are admitted and
-the balance puts the conclusion at 0.035, where admitting all five puts it at
-0.005. The rule did not leave the other two out. It would have taken them at
-full weight; the line you drew left them out, and moving the line moves the
-answer.
+"Same sample, an even proportion" is the button. The same hundred drawings and
+the same certainty, the proportion moved to a half: it reads "tolerably certain
+— 91.1 times in 100 — of not being in error by more than eight balls in 100".
+One ball against eight, at the same certainty and the same labour, is the whole
+of his remark about extreme values. It also unzooms the chart, so the comb below
+is on the whole number line.
 
-A second mode on a tab, answering your question about weighting by the probable
-error: yes, and here is the shape of it. Each log-chance is pulled towards zero
-by tau squared over tau squared plus sigma squared — the share of the spread
-among the arguments that is real rather than their own noise. A rule tested a
-thousand times keeps a weight of 1.00; one tested thirteen times gets 0.75; one
-tested three times gets 0.41. The full bar is drawn in outline behind the shaved
-one, so what the weighting took is a gap you can see rather than a number to be
-trusted. On a typical run it moves the balance from 0.976 at face value to
-0.969.
+The shaded band on the chart is now that tolerance rather than an interval of
+its own, so the picture, the sentence and the comb are all about one quantity.
 
-Zero is the right place to shrink towards, and not by accident: zero log-chance
-is an even chance, which is the one thing Peirce says can do nothing towards
-reenforcing others. So a barely tested argument is pulled towards contributing
-nothing, by degrees rather than by the cliff the threshold gives.
+#### the comb, and the probable error of a clicked bar
+Under the number line, and only on the whole number line — zoomed to five
+standard errors round an extreme proportion the teeth are all of a length and
+say nothing, so the band is not reserved at all and the panel says where the
+comb is instead. Unzoomed, the probable error at every proportion: a comb whose teeth are 0.477 root(2p(1-p)/s) to scale, longest in
+the middle and vanishing at the two ends, with the tooth at the current
+proportion picked out in the colour its line takes above. The caption gives both
+figures — at his own settings, "the probable error at each proportion — ±0.0067
+here, ±0.0337 at a half". Five times as much room at the middle for the same
+number of drawings, drawn rather than asserted. At a half it says instead that
+this is as wide as it ever gets.
 
-One correction since first writing this. Tau squared has to be the second
-moment about zero rather than the variance about the mean, because zero is where
-the shrinking goes. Taken about the mean it got the most ordinary case badly
-wrong: five strong arguments that agree with one another have almost no variance
-between them, so tau squared came out at nothing and five well-established rules
-were weighted away to an even chance. About zero it behaves — at high testing
-effort every weight now sits at 0.98 to 1.00, which is what it should be.
+On your question about the clicked bar: yes, and it is the relevant one, but not
+in the way the bar might suggest. Clicking now draws a band across the top of
+the stem — the estimate that sample gives, plus and minus the probable error
+worked at the proportion the sample came out at, which is the only proportion an
+inquirer holding it would have. The panel says whether that band covers the real
+proportion. It also says what the band is not: the height of the bar is how
+often that sample turns up, and the band is an error on the estimate; they are
+different quantities on different axes, which is exactly the confusion the
+question is pointing at.
 
-It is labelled just for fun, in your words, and the example says why. The rule adds
-independent evidence, and you cannot shrink a term in a sum and still claim to
-be summing the evidence — weighting is a different operation, one that treats
-the arguments as noisy readings of a common quantity to be pooled. That is an
-assumption the rule never makes. When it fails outright, which happens when the
-whole spread among the arguments is no more than their own noise, tau squared
-comes out at nothing, every weight is nothing, and the balance says so on the
-chart.
+## 19
 
-Still open: where it hangs. It is provisionally on a note of its own after 12,
-set behind a blue rule as an editorial remark — the same treatment 21 and 27 are
-waiting for. Easy to move once you have picked a home for it.
+### Suggestions
 
-##20 — the hundred Cretans
+None open.
+
+### Recently completed
+
+#### relaid out to match 20
+Slider and buttons share one row, so the hundred Cretans spread the full width
+in four rows as they do in 20. Then the text, then the chart: boxes on top,
+reading in the middle, graph below. The preamble and the running tally are now
+one block in that middle position rather than a paragraph above and a panel to
+the side.
+
+Colours are shared with 20 — liars muted red, truth-tellers muted green — so the
+hundred Cretans read alike across the two.
+
+
+## 20 — cretan induction
+
+### Suggestions
+
+[from the build] The sample is capped at twenty rather than forty. Past that the
+hundred is too small a population for the bound to hold.
+
+### Recently completed
+
+#### what "approximated" comes to, and the other half of the worst case
+"Seventeen or eighteen instances" and "±0.0818" were answering to different
+things — the first read as a number of samples, the second worked from the
+sample size. Instances are the names: his ±1/6 is 0.477 root(2 × ¼ / 5) =
+0.1508 = 1/6.6, which needs five examinations, and he lists five names in the
+sentence before. Five samples of one would give the same figure; the formula
+knows only how many Cretans have been looked at, not how they were grouped. So
+nothing was rewired, and what was missing was said instead.
+
+His sentence now gives the closeness in the units the example counts in:
+"probably approximated to within fifteen in a hundred by an induction from five
+or six instances". At seventeen it is eight in a hundred. That is what "a decent
+approximation" means here, as a number rather than as a word.
+
+His adverb is left alone. "Probably" is a modal about how often the bound holds,
+which the confidence slider already governs three clauses later; the closeness is
+a different quantity, so it is added rather than swapped for. Say the word and it
+becomes an adverb ladder — roughly, fairly, closely — instead.
+
+The figure is his worst case throughout, since that is what the sentence is
+about and, until the reveal, the only bound there is. Which shows its own point
+when the confidence slider moves: five instances at 95 per cent is "within
+forty-four in a hundred", i.e. nothing at all.
+
+And the other half of "even in the worst case", which he leaves implicit and the
+page did not have: away from a half the same bound is bought with fewer
+instances. Setting 0.477 root(2q(1-q)/n) equal to the worst case at s gives
+n = 4sq(1-q), so after the reveal the report adds "At that proportion two
+instances would buy the bound that five do at a half". Checked at 0.14 and at
+0.88: both come to two.
+
+#### the names are the sample
+His list is the sample size, so the two are now one control. The sentence he
+prints — "Minos, Sarpedon, Rhadamanthus, Deucalion, and Epimenides, are all the
+Cretans I can think of; But these were all atrocious liars, Therefore, pretty
+much all Cretans must have been liars" — has four live spans in it: the names,
+the clause saying how they were got, the clause saying how many lied, and the
+conclusion.
+
+A hundred ancient Greek names, women and men through the roll, his own five at
+the front in his own order. Who lies is settled behind the boxes and nowhere
+else, so a name takes its colour — the muted red or green the boxes wear — only
+once its box has been uncovered. The sentence and the hundred boxes are then the
+same fact read twice and cannot disagree. Each box carries its own name on
+hover, so a name in the sentence can be found in the roll by hand.
+
+The mixing slider is what takes the sentence away from him. Unmixed, the draw is
+the front of the roll, the front of the roll is his five, and they are all
+liars — so at the setting his own paragraph describes, his sentence comes out
+word for word, and it is only the mixing that makes it something else: "Kalliste,
+Menandros, Sosthenes, Timandra, and Eurymedon, are five Cretans drawn at random;
+But three of these five were atrocious liars, Therefore, about three-fifths of
+the Cretans must have been liars". Before any sample is taken the clause is his
+own again, the list then being the front of the roll, which is what the clause
+says it is. Shut, the whole sentence is his.
+
+The conclusion follows the draw rather than standing as his caricature over a
+sample that does not support it. All liars gives his "pretty much all"; anything
+else gives the proportion drawn, spelled the way he spells fractions.
+
+"Take five samples" is in, between one and a hundred.
+
+The slider now reads "Cretans named in each sample", since that is what it is:
+how many times one draws is what the buttons do.
+
+On the proportion changing who lies — there is no proportion slider here any
+more. It is hidden and drawn afresh by "New Cretans", which is the point of the
+rebuild: the enquirer does not know it. Say the word if you would rather have it
+settable, but the boxes would then be showing you the answer.
+
+On the reveal numbers: checked again after the names went in. They come from the
+same state the boxes do — one induction reported with its own bound, the average
+reported separately with no ± claimed — and the two rates the sentence gives,
+the worst-case one and the one fitted at the real proportion, still agree with
+the exact hypergeometric figure printed beside them.
+
+#### the hundred Cretans
 Rebuilt to the note. A hundred boxes reading "?", liars and truth-tellers behind
 them in a hidden proportion, as with the bag in 10. A sample uncovers that many
 boxes and gives its estimate and bound. Samples accumulate. "Reveal the
@@ -570,450 +1003,90 @@ about 0.94 against 0.936 exact.
 Colours: liars muted red, truth-tellers muted green, uncovered boxes pale. Same
 pair applied to 19, so the hundred Cretans read alike across the two.
 
-Still open: the sample is capped at twenty rather than forty. Past that the
-hundred is too small a population for the bound to hold.
-
-##12 — the arguments as lanes, and 11's two graphs beside them
-The block of stacked units is gone. The MBR graphic is now laid out as 9's is:
-one lane per argument, black to the right and white to the left, ruled off with
-the sum underneath. Two thousand lanes will not fit and would say nothing if
-they did, since every bean is worth the same, so a run is three lanes, a
-vertical ellipsis carrying "× 1,004", and three more.
-
-The sum bar is on a fixed scale — forty beans across, whatever was drawn — so it
-comes out identical in Peirce's two cases, as it must, since balancing reasons
-returns the same belief for both. Measured at the pixel it is 69 across at
-twenty black and 69 at 1,010 against 990, while the lanes above it go from six
-rows to fourteen. An excess past forty is clipped and marked, with the figure
-printed underneath either way. (An earlier version scaled it against the
-drawings; that made the bar disagree with the very thing it illustrates.)
-
-The right-hand block is now 11's two graphs on a tab, at the same height as the
-lanes. The drawings: a real order of drawing — the blacks and whites of the
-current setting, shuffled and dealt — so the estimate wanders in and lands
-exactly on the observed proportion. The distribution: the same gaussian and
-probable error as 11.
-
-Balancing reasons is marked on the drawings chart but not on the distribution,
-on your point that it does not express a probability. What the distribution
-shows is how an estimate of the bag's proportion is spread, and the rule's
-figure is not an estimate of that proportion, so putting it on the axis would
-make the two look like rival readings of one quantity. That axis is now labelled
-"proportion black in the bag" rather than "P(the hidden bean is black)" for the
-same reason. The horizontal line on the drawings chart is open to the same
-objection if you want it gone — say so and it goes.
-
-Cut: the "holding the excess fixed" heading, its paragraph and the log-scale
-plot under it. The table stays, with your replacement note and the Kasser link.
-
-##11 — the two numbers flattened, and the curve
-The two boxes are gone. The numbers now read as one line under the buttons,
-first in the blue of the parenthetical it fills in Peirce's sentence above,
-second in that one's red, with the count and the range on the line below. The
-graph takes the full width. The closing note under the table is cut.
-
-A tab bar over the graph switches between the drawings and the two numbers as a
-curve: a gaussian on the estimate, the probable error shaded as the middle half
-of its area, with an arrow across the band. The x-axis is held at 0 to 1 rather
-than fitted to the curve, so the narrowing is the thing you see — at ten
-drawings the band is a third of the page, at a thousand it is a hairline, and
-the first number has hardly moved. The figure sits in the legend rather than
-inside the band, since the band closes to nothing; the legend takes whichever
-top corner the curve leaves free.
-
-##28 and 29 — giving the article back
-Fixed. Two holes: the inner header collapses the content without touching the
-container's class, so nothing was watching it, and scrolling away was not
-handled at all. Both are now covered by one test — open, not collapsed, and (for
-v/c) still on screen.
-
-Both modes now drop on scroll-away, as you asked: the v/c replacement and the
-shading alike give the article back the moment their example leaves the screen,
-and take it again when it comes back.
-
-Also from that note: the posterior in 28 carries a dashed line at its mean,
-running down through the urn chart below it, and the urn it lands on is ringed.
-The legend reads "the urns say urn 62" and the text with it: "the weight has a
-mean at 61.9, so the urns say this paper came from urn 62 — ringed below". Since
-the two charts share an x-axis you can look straight down from the peak to what
-that urn holds.
-
-##29 — is the next letter a consonant?
-The tide is gone. The rule of succession is now asked about the next letter of
-this paper, which has a definite proportion of consonants that nobody knows
-before looking. At nothing read it answers a half, and says so: the paper is in
-fact 0.619 consonant, so the answer is not merely unfounded but wrong. Read and
-the same rule walks over to the truth.
-
-Buttons read one, ten, a hundred, or up to the end of whatever paragraph you are
-looking at; "read nothing yet" puts it back to a half, having unlearned
-everything. The bar shows the counted proportion as a fill, the rule's answer
-marked above it in green, the paper's own proportion below in red. Under that,
-the reading itself: the opening as Peirce set it, then an ellipsis, then the
-last stretch, vowels gold and consonants blue.
-
-While it is open the article shows its own letters in those colours — faintly
-where the reading has not got to, strongly where it has, so the reading head is
-a visible boundary running down the page. There are 28,181 letters in the prose
-paragraphs, so they are wrapped a block at a time as blocks come into view
-rather than all at once. Headings, the apparatus inside examples, the granary
-table and the footnotes are not indexed, and neither is anything inside a live
-span, since a driven value would change the letter count and put every later
-index out.
-
-##28 — which urn was this paper drawn from?
-Peirce's urns are still there, on a radio button. The second view is the one
-from your note: 101 urns, the kth holding letters of which k in a hundred are
-consonants, and the paper rewritten in v and c only — every letter in the
-article outside this example, in the vowel and consonant colours. Reading is
-shared with 29, so the same head serves both.
-
-A flat prior over the 101, then the posterior as bars, with the paper's own
-proportion marked. At a thousand letters the weight has gathered on urn 62
-against the paper's 61.9. The closing note is the point: nobody drew this paper
-from an urn, the urns were supposed at the outset with each as likely as the
-next, and the answer is only ever as good as that supposition.
-
-The urns are a second chart directly under the first, sharing its x limits and
-its left and right margins, so bar k of one stands over bar k of the other: the
-weight above, the urn it belongs to below. Each of the 101 is divided at its own
-proportion, consonant blue from the bottom and vowel gold above, so the boundary
-runs as a straight diagonal from all vowel at one end to all consonant at the
-other. Both ends are labelled in place rather than by a legend, the x-axis is on
-the lower chart only, and the paper's own proportion is the same red line
-through both.
-
-##19 — relaid out to match 20
-Slider and buttons share one row, so the hundred Cretans spread the full width
-in four rows as they do in 20. Then the text, then the chart: boxes on top,
-reading in the middle, graph below. The preamble and the running tally are now
-one block in that middle position rather than a paragraph above and a panel to
-the side.
-
-##1 — the whole thing set as an argument
-Rebuilt. The "Peirce's Framework" list, the arrow diagram and the panel of
-dropdowns are gone; in their place one sentence, which is the argument itself:
-
-  P(If I were to draw the top card from a well shuffled deck of standard
-  playing cards, then that card would be exactly A of any suit)
-
-Yellow for the antecedent, green for the "then", blue for the consequent. Every
-choice is a word in the sentence rather than a control beside it — click a word
-to change it: top / middle / bottom, well shuffled / brand new, deck of standard
-playing cards / piquet pack / trick pack, exactly / higher than / lower than,
-and the suit. The rank is a slider, since cycling A to K by clicking would be
-thirteen presses.
-
-The two settled cases work as you asked. A brand-new pack determines the card
-before the draw — the top of a new pack is the ace of spades, the middle the
-king of diamonds, the bottom the ace of hearts, which is the order a new pack
-actually comes in — so every card is still shown, being a card in the pack, but
-all of them are faded except the one that can come up. A trick pack makes every
-one of the fifty-two the ace of spades.
-
-Refined after your look. The words that can be changed are bold with a dotted
-rule under them, so they read as clickable, and clicking one opens a short list
-under it rather than cycling — with five suits, cycling is four clicks to get
-back where you started. The "then" is a stronger green than the washes either
-side of it, since it is the part that carries the probability, and the same
-three colours are used in the formula: P(A → C) with A in the antecedent's
-yellow, the arrow in that green, C in the consequent's blue.
-
-The note under it is now yours: "Probabilities do not apply to events. There is
-no probability of C. They apply to arguments, and so always depend on how some
-set of antecedent facts relate to the consequent fact."
-
-##2 — the rule stated over two arguments
-Built to your correction, which was the right one: not one P with two blue
-clauses inside it, but two arguments and the rule between them —
-
-  P(A → C1)  1/52  +  P(A → C2)  1/52  =  P(A → [C1 or C2])  2/52
-
-Two sentences, sharing an antecedent (the second reads "the same"), each with
-its own consequent set by the same chip-and-menu words as example 1. The
-identity underneath carries the live fractions in the same three colours.
-
-The condition is not asserted, it is shown. Set the two consequents so that a
-card answers to both — an ace of hearts, and an ace of any suit — and that card
-is ringed in the grid and the sum visibly counts it twice: 5/52 where the truth
-is 4/52. Peirce's "incompatible consequents" is then something you have broken
-rather than something you have been told.
-
-STILL TO DO — rules 3 and 4 in the same style. The chip-and-menu machinery is
-written to be shared (argChip and argMenu are at file scope, not inside example
-1), and 2 is now the pattern to copy. 3 is P(A → C1) x P(A and C1 → C2) =
-P(A → [C1 and C2]), which needs the second argument's antecedent to be the first
-antecedent with C1 added to it — the one real difference from 2. 4 is the same
-with independent consequents, P(A → C1) x P(A → C2), and wants the same
-treatment as 2's incompatibility: let the reader break independence and watch
-the identity fail.
-
-##5 — buttons compacted
-The bordered box with two headed rows of long labels is one flat row of short
-ones, led by "Peirce's:" and "others:". The rest of 5 is untouched.
-
-##1 (earlier) — colour coding moved into the text
-Peirce's own sentence now carries the three colours: antecedent in ochre,
-consequent in blue, consequence in green, on every occurrence including the
-plain-prose ones later in the sentence, not just the italicised first use. They
-are invisible until the example is opened and fade in with it, on the same rule
-as the live numbers — shut, the paragraph is ordinary text.
-
-##7 — the formula in the text evaluates
-Both displayed expressions (the quotient, and the chance 81/19 x 93/7 further
-down) gain "= 0.9827" and "= 56.6" while ex7 is open, in green so they read as
-the result rather than as part of the expression. Peirce prints them
-unevaluated, so shut, the "=" clause disappears entirely.
-
-##7 — laid out like 8, and wired to it
-The two sliders now sit side by side across the top, in the same position they
-occupy in 8, with the horizontal bars full width beneath them and a good deal
-more room to breathe — the canvas went from 300 to 380 and the chart no longer
-shares its row with a column of controls. Headed A_1 → C and A_2 → C like the
-rest.
-
-The closing note about building the same quantity cell by cell in the previous
-demonstration is cut. It pointed at a mode of 6 that no longer exists.
-
-6, 7 and 8 now drive one another. There is one pair of values held in common and
-each panel's sliders are a view onto it, so moving one physically moves the
-others; all three were given the same range and step (0.02 to 0.98) so it is
-value for value.
-
-The reason it was not working: the mirror only wrote to sliders that already
-existed. Set the pair in one panel before the others had ever been opened and
-they were built at the defaults, which is exactly the case the feature is for.
-Each panel now adopts the common pair as it stands when it is built.
-
-The working under 7's bars is one line, close under them: the bottom margin of
-the figure went from three lines to almost none and the box round the working is
-gone. It is worth having but it is not what the panel is for.
-
-7's reset became the same quiet "Reset to Peirce's 81 and 93" used elsewhere:
-invisible while the sliders are at his figures, and it now resets both panels.
-
-##8 — nothing under the sliders but the reading
-Everything below the sliders is gone. Neither equation is reproduced: Peirce's
-chance equation is printed immediately below the panel and the probability
-version immediately above it, and both of those now vary with these sliders, so
-the algebra stays where he put it.
-
-Making the printed quotient vary needed a small change to the machinery. That
-equation belongs to ex7 as much as to ex8, and a figure in the text could only
-have one driver. Drivers can now be registered for a container without that
-container being open, and can pull each other along, so the 81 and 93 are
-registered once for both panels: whichever is open supplies the figures, and if
-both are open the one last touched wins. Opening either one animates both
-printed equations and the passage between them.
-
-What is left is the two arguments in A_n→C form with a probability slider and a
-chance each, and then the final reading: two number lines, the combination as a
-probability and the same combination as a chance, both in green because they are
-one quantity and not two.
-
-The chance line has no fixed maximum. It steps up through 1, 2, 5 and their
-decades to keep the marker on it — 2, then 5, then 100, then 5,000 as you push
-the two probabilities up. Watching the ruler itself give way is Peirce's "any
-magnitude, however great" without a word of it being said. Evens is marked while
-it is legible and drops off once the scale grows past it.
-
-Checked that both fit on one screen: with the panel open at his figures, the
-varying quotient sits at the top of the viewport and the second slider at about
-three-quarters down, with the number lines below that.
-
-The two sliders and the two number lines now share one column template and
-gutter, so all four tracks have the same left edge, right edge and midpoint.
-The lines are inset eight pixels each side of the sliders, which is half a
-thumb: it makes the markers travel exactly the thumb's range, so the midpoints
-coincide rather than merely the boxes.
-
-The chance ruler is now held at 25 until the chance outgrows it, and steps by
-decades above that: 25 up to a chance of 25 : 1, then 50, 100, 500 and so on.
-(This needed a small correction to the shared scale helper — its floor was
-behaving as a minimum rather than a floor, so a chance of 22 was still jumping
-the ruler to 50.)
-
-Kept the odds note — it is a gloss rather than a reproduced equation, and you
-had asked for it. Trivial to drop.
-
-##9 — two stages
-Preamble gone: the opening paragraph, the "quantities involved" box and the
-instruction line above the controls. The buttons say what they do.
-
-Stage one, two arguments. The setup from 26 given twice, side by side — a
-probability slider, the chance it comes to, and the belief that is its
-logarithm — sized to sit in the space the old Argument / Tells table occupied.
-Both columns share one chance ruler and one belief ruler, so the two arguments
-are read against each other rather than each against itself. The belief line is
-the axis the bar chart below is drawn on, so the third row of each column is
-literally the bar that argument contributes; moving a probability slider moves
-its chance, its belief and its bar together.
-
-Stage two, three arguments or more. Columns will not fit side by side at that
-point, so it reformats to a row apiece — the old layout, with the changes from
-your note:
- - no text inputs. Each argument is named for what it tells, A_n → C for an
-   argument for and A_n → ~C for one against. You were right that ~C is the
-   way to write it: the same argument at 40 in 100 for C is 60 in 100 for ~C,
-   which is exactly what the rewrite on release already did silently.
- - headings are P(A→C), Ch(A→C), ln Ch(A→C).
- - a half tick under every probability slider, and the slider itself takes the
-   colour of the way its argument tells — green above the midpoint, terracotta
-   below. Crossing the middle recolours the slider, flips the sign of the
-   belief and turns the bar around, all while dragging.
- - the even-chance button now says why nothing happened: an even chance is
-   1 : 1, log 1 is 0, it sits at the middle of the belief line marked "adds
-   nothing", and it can be added any number of times to no effect.
-
-Going back down to two arguments returns to the side-by-side view.
-
-The flip you found is fixed, and by removing rather than mending. An argument
-carried a probability and a side, and the two could disagree — so crossing a
-half rewrote both on release, which is why the slider jumped and the chance
-turned over. An argument now carries one number and no side at all. Which way it
-tells is the sign of the logarithm of its chance, and an argument right less
-than half the time is simply an argument for ~C. The slider stays exactly where
-it is put; the name, the words and the colour change under it as it crosses the
-middle, and the chance is stated in the direction the argument actually tells
-(0.40 reads A → ~C, tells against, 60 : 40, −0.405). The for/against dropdown is
-gone, as you say it should be.
-
-While in here I hoisted the number-line drawing and the growing-ruler scale
-into the library — 8, 9 and 26 were about to hold three copies of it.
-
-The even-chance note is trimmed to the clause and the quotation.
-
-The belief slider that was outstanding here has moved to its own example, 27.
-
-##6 — two arguments, three grids
-Moved. The panel sits under the table of the four combinations rather than
-directly under the paragraph, so opening it leaves the statement of the case,
-its breakdown, and the demonstration on one screen with the same numbers moving
-in each.
-
-Cut back hard on the second pass. No preamble, no metal, no box, no gold and
-lead, and the whole "unknown metal" mode with it — the reasoning it carried
-about what follows when the two agree is ex7's job, and ex7 does it. What is
-left is two sliders and three grids directly beneath them.
-
-The two are A_1 → C and A_2 → C. The grids are right and green, wrong and pink,
-with the combined grid in the middle, orange where one is right and the other
-wrong. Cells can be sorted into blocks or scattered; the scatter is a fixed
-shuffle, so toggling back and forth does not deal them again.
-
-Two tabs. The hundred as expected, and a hundred actual cases — where you can
-run them one at a time, and the bulk button then reads "Run the remaining 97"
-until the set is finished and offers another hundred. Watching them arrive one
-by one is, as you say, the thing that makes the point.
-
-The mismatch you noticed was real. The composed grid counted its own cells while
-the decomposed one drew the theoretical figures beside them, and the two grids
-had been built from two independent columns — each with the right margin, but
-paired arbitrarily — so the joint counts had no reason to agree. There is now
-one array of a hundred cases and every grid, count and figure reads from it. The
-expected hundred is built from the four combinations rather than from two
-margins, so the margins and the joints cannot disagree: at 0.81 and 0.93 it is
-75 both right, 6 and 18 mixed, 1 both wrong, and the grids read 81/19 and 93/7
-exactly as they should.
-
-One honest residue: 75 of 76 agreements is 0.9868, while the long-run figure is
-0.9827. That is what rounding to whole cells costs, and both numbers are on
-screen together rather than the difference being papered over.
-
-The paragraph stating the case and the table of the four combinations under it
-are wired to the sliders again — that binding was lost when the panel was
-rewritten. A quiet "Reset to Peirce's 81 and 93" appears beside the other
-buttons once the sliders have left his figures, on the same pattern as 14.
-
-Hovering a cell rings the same cell in all three grids and names the case
-beneath them. That is the thing that shows the middle grid is made of the two
-beside it rather than being a third grid of its own.
-
-Each of the four combinations in the table now carries its value while the panel
-is open — 0.7533, 0.1767, 0.0567, 0.0133, summing to one — set before Peirce's
-semicolon and gone again when the panel is shut. The two displayed formulas
-further down already had theirs.
-
-While doing that I found a transcription slip in the table: the fourth row was
-labelled "and both answer correctly", the same as the first. Its own fraction is
-7/100 of 19/100, so it is the both-wrong case; I have made it "and both answer
-incorrectly". Easily reverted if you would rather keep the edition as it was.
-
-The convergence chart is back, under the grids and only while cases are being
-run: the running proportion right for each argument and, in heavier green, the
-proportion right among the cases where they agree, each against a dotted line
-at what it is set to be. It keeps growing across sets rather than restarting
-with each hundred.
-
-##12 — tied into balancing reasons
-Buttons across the top, and the two sliders are the draw itself: how many beans,
-and what proportion of them came up black. Black and white counts follow from
-those, which is how the drawing is described in the paragraph.
-
-The two verdicts sit side by side with a graphic under each. Under balancing
-reasons, every bean drawn as a unit, black to the right and white to the left —
-first as drawn, and then a second row beneath it with the pairs struck out, so
-what the sum actually keeps is a row of its own rather than something to be
-picked out of the first. At Peirce's second case that reads "990 against 990
-cancel; 20 left over", which is the whole complaint in one picture. Blocks stand
-in for beans once there are too many to draw one apiece, and it says so.
-
-Under the proportion, both answers on one probability axis: the proportion the
-drawings came to with its probable error as a band, and where balancing reasons
-puts the same case, dashed. At 1,010 and 990 that is 0.5050 ± 0.0075 against
-> 0.999999, the two of them at opposite ends of the same scale.
-
-On your question about the force each bean contributes — no, there is no way to
-calculate it, and I have said so in the panel rather than inventing one.
-Balancing reasons needs each drawing to be an argument of some fixed force, and
-nothing in the bag or the drawings fixes it, which is exactly why it has to be a
-slider. The standing note is gone; the button that sets the force to the observed odds
-now sits under its slider, and the explanation appears there when it is pressed
-rather than sitting on the page whether or not anyone asked. The point of the
-button is that it fails informatively: the force of a single bean turns out to
-be a fact about all the other beans, so the arguments are not independent after
-all and the adding up is not licensed. That seemed a better answer than a
-formula.
-
-##14 — the table as printed, until it is asked to be more
-The sets are set the way Peirce sets them: letters on the page, no cell round
-each one, and nothing over the groups. The captions are gone — he names what the
-groups contain in the paragraph after the table, so a caption was saying it
-twice and stopping it from looking like a table in a book.
-
-The two sliders are simply there, side by side so they cost as little height as
-possible, with the view tabs beneath them. (They were behind a click for a
-round; you were right that it was a door with nothing behind it.)
-
-The chart has lost its frame and its grid. Both were drawn in a warm grey and
-together they read as a panel laid over the page — the one thing this table is
-not supposed to look like. Axes and bars only now, on white.
-
-The first tab is "List of sets". "Reset to Peirce's figures" has moved out of the
-slider row to sit beside the binomial-expansion tab, and still appears only once
-the sliders have left his figures.
-
-Both paragraphs around it now follow the sliders. The one before — "The relative
-number of white balls in the granary might be anything, say one in three. Then
-in one-third of the urns the first ball would be white, and in two-thirds
-black..." — is spelled out in words as he spells it, so at 1 : 3 it reads one in
-four, one-fourth, three-fourths. The one after was already wired.
-
-The sliders travel. A second pair sits under "In the second group, where there is
-one b...", and takes over the moment the first pair goes off the top; only one of
-the two is ever on screen, and the second writes straight through to the first,
-so they are the same control in effect.
-
-Your worry about the table moving the text around was well founded — at seven
-balls drawn the listing runs to thousands of lines, and every step of the slider
-was throwing the paragraph thousands of pixels down the page. The paragraph is
-now held still: its position is measured before and after each change and the
-page scrolled back by the difference. Measured drift is zero at every step from
-four balls to seven and back. It has to be an instant scroll rather than the
-page's usual smooth one, or the paragraph lurches away and glides back on every
-step of the drag.
-
-##26 (new) — the logarithm of the chance
+
+## 21
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### the example gives way to your text
+The indifference demonstration is gone and your Sciential / Ignorantical /
+Laplacian paragraph stands in its place, behind a blue rule as a remark of yours
+rather than a sentence of Peirce's. It opens on a click of "except that this
+introduces the thoroughly unclear idea of cases equally possible", the same
+sentence that used to open the demonstration, so the page carries only Peirce
+until it is asked to carry more. No collapsing header on this one — there is
+nothing to collapse, and calling it an interactive example would promise
+something it does not do. It keeps 21 in the margin. Quotation marks and the
+citation on the Laplacian Probability passage are set as typography rather than
+as typed; nothing else of your wording is touched.
+
+Worth knowing: 13, the Saturn colour chart, was built to land as the refutation
+of the principle 21 stated. With 21 gone it now arrives without the positive
+statement it was answering. Say the word and I will put a sentence into the new
+note to carry that weight, or leave 13 to speak for itself.
+
+
+## 22
+
+### Suggestions
+
+Should be combined with 23. see below.
+
+### Recently completed
+
+Nothing yet.
+
+
+## 23
+
+### Suggestions
+
+link it to this text:
+"Now, if there be any way of enumerating the possibilities of Nature so as to make them equally probable, it is clearly one which should make one arrangement or combination of the elements of Nature as probable as another, that is, a distribution like that we have supposed, and it, therefore, appears that the assumption that any such thing can be done, leads simply to the conclusion that reasoning from past to future experience is absolutely worthless. In fact, the moment that you assume that the chances in favor of that of which we are totally ignorant are even, the problem about the tides does not differ, in any arithmetical particular, from the case in which a penny (known to be equally likely to come up heads and tails) should turn up heads m times successively. In short, it would be to assume that Nature is a pure chaos, or chance combination of independent elements, in which reasoning from one fact to another would be impossible; and since, as we shall hereafter see, there is no judgment of pure observation without reasoning, it would be to suppose all human cognition illusory and no real knowledge possible. It would be to suppose that if we have found the order of Nature more or less regular in the past, this has been by a pure run of luck which we may expect is now at an end. Now, it may be we have no scintilla of proof to the contrary, but reason is unnecessary in reference to that belief which is of all the most settled, which nobody doubts or can doubt, and which he who should deny would stultify himself in so doing."
+
+i have forgotten the idea for this, so will hold off for now.
+
+### Recently completed
+
+Nothing yet.
+
+
+## 24
+
+### Suggestions
+
+No note written yet.
+
+### Recently completed
+
+Nothing yet.
+
+
+## 25
+
+### Suggestions
+
+No note written yet — listed as still to do, waiting on your own thinking.
+
+### Recently completed
+
+Nothing yet.
+
+
+## 26 (new) — the logarithm of the chance
+
+### Suggestions
+
+None open. (The felt-intensity slider that was outstanding here has moved to
+27.)
+
+### Recently completed
+
+#### the logarithm of the chance
 Anchored where you asked, on "Now, there is one quantity which, more simply than
 any other, fulfills these conditions; it is the logarithm of the chance." Three
 number lines of the same length on three scales — probability (p/n), chance
@@ -1051,10 +1124,16 @@ changing length ("1 : 1" to "999 : 1 — off the line") no longer resize the
 column and shunt the tracks sideways mid-drag. Measured stable at 287px across
 the range.
 
-The felt-intensity slider that was outstanding here has moved to its own
-example, 27.
 
-##27 (new) — which way the connection runs
+## 27 (new) — which way the connection runs
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### which way the connection runs
 Anchored on "The kernel of it is that the conjoint probability of all the
 arguments in our possession ... must be intimately connected with the just
 degree of our belief in that fact". Your paragraph opens it, as written (I took
@@ -1117,7 +1196,24 @@ Earlier fixes:
 This closes the outstanding items on both 9 and 26 — it was the same one-way
 street both times, and it belongs here rather than in either of them.
 
-##28 (new) — one urn for each proportion
+#### the note marked, the instruction moved
+Your added paragraph is set behind the same blue rule. "Move the probability
+sliders to see how they impact the proper intensity of belief. Move the Your
+Belief slider to see how much it impacts any worldly probability." has come out
+of the readout at the bottom and now sits on its own line at the end of the
+preamble, where it can be read before the sliders rather than after them. The
+readout keeps the two intensities and the gap between them.
+
+
+## 28
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### one urn for each proportion (new)
 Anchored on "One urn contains all white balls, another one black and the rest
 white ... until an urn is reached containing only black balls."
 
@@ -1128,7 +1224,61 @@ arrangement and the arrangement is worth seeing before anything is said about
 drawing from it. Drawn in the text rather than in a canvas, so it scales with
 the page.
 
-##29 (new) — watching the tide
+#### which urn was this paper drawn from?
+Peirce's urns are still there, on a radio button. The second view is the one
+from your note: 101 urns, the kth holding letters of which k in a hundred are
+consonants, and the paper rewritten in v and c only — every letter in the
+article outside this example, in the vowel and consonant colours. Reading is
+shared with 29, so the same head serves both.
+
+A flat prior over the 101, then the posterior as bars, with the paper's own
+proportion marked. At a thousand letters the weight has gathered on urn 62
+against the paper's 61.9. The closing note is the point: nobody drew this paper
+from an urn, the urns were supposed at the outset with each as likely as the
+next, and the answer is only ever as good as that supposition.
+
+The urns are a second chart directly under the first, sharing its x limits and
+its left and right margins, so bar k of one stands over bar k of the other: the
+weight above, the urn it belongs to below. Each of the 101 is divided at its own
+proportion, consonant blue from the bottom and vowel gold above, so the boundary
+runs as a straight diagonal from all vowel at one end to all consonant at the
+other. Both ends are labelled in place rather than by a legend, the x-axis is on
+the lower chart only, and the paper's own proportion is the same red line
+through both.
+
+#### 28 and 29 — giving the article back
+Fixed. Two holes: the inner header collapses the content without touching the
+container's class, so nothing was watching it, and scrolling away was not
+handled at all. Both are now covered by one test — open, not collapsed, and (for
+v/c) still on screen.
+
+Both modes now drop on scroll-away, as you asked: the v/c replacement and the
+shading alike give the article back the moment their example leaves the screen,
+and take it again when it comes back.
+
+Also from that note: the posterior in 28 carries a dashed line at its mean,
+running down through the urn chart below it, and the urn it lands on is ringed.
+The legend reads "the urns say urn 62" and the text with it: "the weight has a
+mean at 61.9, so the urns say this paper came from urn 62 — ringed below". Since
+the two charts share an x-axis you can look straight down from the peak to what
+that urn holds.
+
+#### balls per urn capped at six
+Both "balls in each urn" sliders now stop at six: 30's, where the count of urns
+is (r+1)^n and the arithmetic was what slowed down, and 28's alongside it, since
+the two rows are meant to be read against each other and a cap on one only would
+have put them out of step.
+
+
+## 29
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### watching the tide (new)
 Anchored on "the solution involves the conceptualistic principle that there is
 an even chance of a totally unknown event."
 
@@ -1144,7 +1294,42 @@ The half was not sitting over its own tick. Two-line tick labels take the width
 of their longer line, and without a text-align the short line sat at its left
 edge. Fixed for every number line on the page, not only this one.
 
-##30 (new) — filling the urns from the granary
+#### is the next letter a consonant?
+The tide is gone. The rule of succession is now asked about the next letter of
+this paper, which has a definite proportion of consonants that nobody knows
+before looking. At nothing read it answers a half, and says so: the paper is in
+fact 0.619 consonant, so the answer is not merely unfounded but wrong. Read and
+the same rule walks over to the truth.
+
+Buttons read one, ten, a hundred, or up to the end of whatever paragraph you are
+looking at; "read nothing yet" puts it back to a half, having unlearned
+everything. The bar shows the counted proportion as a fill, the rule's answer
+marked above it in green, the paper's own proportion below in red. Under that,
+the reading itself: the opening as Peirce set it, then an ellipsis, then the
+last stretch, vowels gold and consonants blue.
+
+While it is open the article shows its own letters in those colours — faintly
+where the reading has not got to, strongly where it has, so the reading head is
+a visible boundary running down the page. There are 28,181 letters in the prose
+paragraphs, so they are wrapped a block at a time as blocks come into view
+rather than all at once. Headings, the apparatus inside examples, the granary
+table and the footnotes are not indexed, and neither is anything inside a live
+span, since a driven value would change the letter count and put every later
+index out.
+
+#### giving the article back
+See the entry of that name under 28 — it covers 28 and 29 together.
+
+
+## 30 (new) — filling the urns from the granary
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### filling the urns from the granary
 Anchored on "Suppose we had an immense granary filled with black and white balls
 well mixed up; and suppose each urn were filled by taking a fixed number of
 balls from this granary quite at random."
@@ -1186,7 +1371,22 @@ granary's own proportion and few at the ends, which is the distribution the
 table below actually counts. The closing paragraph saying so is cut — the row
 says it.
 
-##31 (new) — what the first two balls tell you
+#### balls per urn capped at six
+Both "balls in each urn" sliders now stop at six: 30's, where the count of urns
+is (r+1)^n and the arithmetic was what slowed down, and 28's alongside it, since
+the two rows are meant to be read against each other and a cap on one only would
+have put them out of step.
+
+
+## 31 (new) — what the first two balls tell you
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### what the first two balls tell you
 Anchored on "Now suppose two balls were drawn from one of these urns and were
 found to be both white, what would be the probability of the next one being
 white?"
@@ -1210,3 +1410,324 @@ panel either. It lights up where he wrote it, in the paragraph the panel hangs
 from, on the same mechanism example 1 uses for antecedent and consequent.
 
 
+## 32 (new) — which arguments are worth balancing
+
+### Suggestions
+
+[from the build] Where it hangs. It is provisionally on a note of its own after
+12, set behind a blue rule as an editorial remark — the same treatment 21 and 27
+are waiting for. Easy to move once you have picked a home for it.
+
+[from the build] The placeholder on 32's first tab still says "example to come";
+it can be pointed at 34 whenever you want it wired up.
+
+### Recently completed
+
+#### the weighted view held back
+The tab bar is out, so the panel opens on the rule as stated and there is no
+second view to find. Nothing behind it is unpicked — the shrinkage, its column
+in the table and the whole of its reading are still there and still working;
+the two lines of markup that make the tabs are commented out beside a note
+saying so, and putting them back returns it.
+
+One sentence had to move with it. The reading under the rule ended by sending
+the reader to the weighted tab, which would now be a door with nothing behind
+it. It ends instead on the point that tab was there to sharpen: the rule did not
+leave anything out, the line you drew did.
+
+#### which arguments are worth balancing
+The constructive half of 12. Several arguments bear on one conclusion, none of
+them handed to us: each is established by testing it, so each arrives with a
+probable error as well as a probability, and the rule has nowhere to put the
+second number.
+
+How well an argument is established is laid on a ladder — three tests at one
+end, a thousand at the other — rather than sampled, because a random spread now
+and then hands out a set that all clears the line at once and there is nothing
+to see. Which rung an argument sits on is shuffled against how strongly it
+tells, so being well established and telling strongly stay independent; that is
+what stops the threshold from working as a proxy for strength. The probabilities
+are not laid out at all, they come out of the testing, which runs in front of
+you over about a second when the button is hit.
+
+Left: each argument as what the testing left, a centre and a spread, drawn as a
+ridgeline on one P axis. Admitted ones in the colour of the way they tell, ones
+too vague in grey and tagged "left out". Right: the balance itself, laid out as
+9 lays it, on the admitted arguments only, with the excluded lanes named but
+empty. Then the table, with P, probable error, chance and log chance for each.
+
+Two things worth knowing. The probable error is Peirce's worst case, from the
+number of tests alone, as with the Cretans in 20 — taken at the observed p it
+misbehaves badly here, since three tests that all came out the same way give
+p-hat = 0 and so an error of nothing at all, which put the worst established
+argument on the page down as the best known. And p-hat is given half a trial's
+room at each end so an all-one-way run has a chance rather than an infinite one;
+that is a continuity correction rather than a prior, and how extreme a chance
+the record may claim grows with the testing behind it.
+
+The reading it produces: at five arguments and ±0.080, three are admitted and
+the balance puts the conclusion at 0.035, where admitting all five puts it at
+0.005. The rule did not leave the other two out. It would have taken them at
+full weight; the line you drew left them out, and moving the line moves the
+answer.
+
+A second mode on a tab, answering your question about weighting by the probable
+error: yes, and here is the shape of it. Each log-chance is pulled towards zero
+by tau squared over tau squared plus sigma squared — the share of the spread
+among the arguments that is real rather than their own noise. A rule tested a
+thousand times keeps a weight of 1.00; one tested thirteen times gets 0.75; one
+tested three times gets 0.41. The full bar is drawn in outline behind the shaved
+one, so what the weighting took is a gap you can see rather than a number to be
+trusted. On a typical run it moves the balance from 0.976 at face value to
+0.969.
+
+Zero is the right place to shrink towards, and not by accident: zero log-chance
+is an even chance, which is the one thing Peirce says can do nothing towards
+reenforcing others. So a barely tested argument is pulled towards contributing
+nothing, by degrees rather than by the cliff the threshold gives.
+
+One correction since first writing this. Tau squared has to be the second
+moment about zero rather than the variance about the mean, because zero is where
+the shrinking goes. Taken about the mean it got the most ordinary case badly
+wrong: five strong arguments that agree with one another have almost no variance
+between them, so tau squared came out at nothing and five well-established rules
+were weighted away to an even chance. About zero it behaves — at high testing
+effort every weight now sits at 0.98 to 1.00, which is what it should be.
+
+It is labelled just for fun, in your words, and the example says why. The rule adds
+independent evidence, and you cannot shrink a term in a sum and still claim to
+be summing the evidence — weighting is a different operation, one that treats
+the arguments as noisy readings of a common quantity to be pooled. That is an
+assumption the rule never makes. When it fails outright, which happens when the
+whole spread among the arguments is no more than their own noise, tau squared
+comes out at nothing, every weight is nothing, and the balance says so on the
+chart.
+
+Your replacement text is in on 32's first tab, ending by sending the reader to
+the weighted tab. The two now hand off to each other in both directions.
+
+
+## 33 (new) — when the second number overwhelms the first
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### the button made to work on the probable-error view
+It should, and now does. It was not quite dead: it moved the slider, but the
+slider steps by 0.002 and one more drawing added to a long run changes the error
+by very much less than that, so the step rounded to where it already was and
+nothing happened. Over most of the range that is every press.
+
+The error is now held as a real number and only written to the slider, never
+read back off it — the same fix 27's belief needed, and for the same reason. The
+thumb goes to the nearest step it can show and the reading beside it gives the
+exact figure. Every press is one more drawing, exactly: from ±0.010 the count
+goes 1,138, 1,139, 1,140, 1,141 while the proportion moves under it. Touch the
+slider by hand and it drops the held value; the slider is the handle again.
+
+At the far end the lurch is still the point: at ±0.340, which stands for less
+than a single drawing, one press takes it to two drawings and ±0.2385.
+
+With the bag counted exactly there is no drawing left to take, so at an error of
+nothing the button goes rather than sitting there doing nothing.
+
+#### when the second number overwhelms the first
+Built on your note, between 11 and 12, on the "it is true that when our
+knowledge is very precise" paragraph, which had no example on it. Two modes on a
+tab, since you wanted both.
+
+"Set the probable error" is your spec. The second number is the quantity under
+discussion, so it is the one in your hand, and what follows from it — how much
+drawing it would take to have earned an error that size — is printed beside it.
+±0.010 is 1,138 drawings; ±0.200 is three. At nothing the bag is counted exactly
+and the curve has no width at all. Past ±0.337 the error is wider than a single
+drawing could ever leave it, which is to say nothing has been drawn, and that is
+where the passage lands. "Take one more sample" steps the slider down by exactly
+one drawing's worth: from ±0.340 it goes to ±0.238, a visible lurch, where at
+±0.010 it does not move at all.
+
+"Set the drawings" is the same claim on the bag of 10 and 11, where the error is
+not chosen but earned. The two disagree about nothing; they differ in which
+number is the handle.
+
+Peirce's sentences light as you pass through the regimes he names: very precise
+below ±0.02, very slight above ±0.12, and no knowledge at all past ±0.337.
+Between them nothing lights, since he names no case there and the two numbers
+are simply of a size. The highlighting goes out when the example is shut.
+
+The end of the range is the point. There is no curve, because there is no fact.
+The flat line is still drawn — but as the conceptualist's answer and labelled as
+his — with "entirely indefinite" underneath, so the disagreement is staged
+rather than asserted. The note beside it: a half here is not a measurement that
+came out at a half, it is the absence of any measurement written in the same
+notation, and the notation is what makes it look like a fact.
+
+Two details worth knowing. The regime is decided on the unrounded number of
+drawings — an error of ±0.44 stands for six-tenths of a drawing, and rounding
+first called that one drawing and never reached the case the passage is about.
+And the curve's spread is the one that goes with the probable error being used
+(pe is 0.6745 of it exactly) rather than one read off the observed proportion,
+which collapses to nothing the moment a short run comes out all one way and
+leaves no curve to draw at just the point where there is least to go on.
+
+Cut on your instruction: the opening paragraph, and the note that appeared in
+the "very slight" regime. Peirce's own lit sentence carries that one.
+
+
+## 34 (new) — a proportion of what?
+
+### Suggestions
+
+None open.
+
+### Recently completed
+
+#### a proportion of what?
+The sequel to 27, opening from "cannot be used to determine any probability" in
+27's own text, with its panel underneath 27's.
+
+Peirce's two rules drawn as counts. A1 has 100 cases with 81 shaded; A2 has 100
+with 93. Each probability is the shaded part of its own grid, countable. The
+balance of the two is 0.9827, which is not the shaded part of either. The only
+grid it could be the shaded part of is a third one, the cases where both
+antecedents held, and nobody has counted it.
+
+You can then go and count it, and the two arguments barely constrain what you
+find. At an overlap of twenty the proportion can be anything from 0.650 to
+1.000, every value consistent with 81 in 100 and 93 in 100. The rule's 0.9827 is
+one of them, near the top. Nothing in the arguments picked it out; independence
+did.
+
+Two ends worth the visit. At an overlap of none the two antecedents never occur
+together, the third grid is empty, and there is nothing to take a proportion of
+at all. At an overlap of 88 — the largest the counts allow — the answer is
+pinned at exactly 81/88 = 0.9205, and 0.9827 is not it. Past 88 the shared cases
+would have to hold more consequents than A1 contains, so the two arguments
+cannot be about more than 88 of the same cases: they provably do not share a
+population.
+
+The pooled figure is dealt with in passing: 174 in 200, or 0.87, is countable
+but moves when you observe A2 more often, so it is a proportion of how much you
+looked rather than of what you found.
+
+This is the example 32 wanted to link to. Same fact seen twice — no common
+population, so nothing to pool there and nothing to be a proportion of here.
+
+
+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+# Unnumbered examples
+
+
+## "can be used to determine any probability"
+
+### Suggestions
+
+This one needs some work... for now let's hide it.
+
+### Recently completed
+
+Nothing yet.
+
+
+## Blackberries
+
+### Suggestions
+
+"The relative probability of this or that arrangement of Nature is something which we should have a right to talk about if universes were as plenty as blackberries, if we could put a quantity of them in a bag, shake them well up, draw out a sample, and examine them to see what proportion of them had one arrangement and what proportion another. "
+
+not sure yet.
+
+### Recently completed
+
+Nothing yet.
+
+
+## New example — Socrates, and the two kinds of reasoning
+
+### Suggestions
+
+"All our reasonings are of two kinds: 1. Explicative, analytic, or deductive; 2. Amplifiative, synthetic, or (loosely speaking) inductive. In explicative reasoning, certain facts are first laid down in the premises. These facts are, in every case, an inexhaustible multitude, but they may often be summed up in one simple proposition by means of some regularity which runs through them all. Thus, take the proposition that Socrates was a man; this implies (to go no further) that during every fraction of a second of his whole life (or, if you please, during the greater part of them) he was a man. He did not at one instant appear as a tree and at another as a dog; he did not flow into water, or appear in two places at once; you could not put your finger through him as if he were an optical image, etc. Now, the facts being thus laid down, some order among some of them, not particularly made use of for the purpose of stating them, may perhaps be discovered; and this will enable us to throw part or all of them into a new statement, the possibility of which might have escaped attention. Such a statement will be the conclusion of an analytic inference. Of this sort are all mathematical demonstrations. But synthetic reasoning is of another kind. In this case the facts summed up in the conclusion are not among those stated in the premises. They are different facts, as when one sees that the tide rises m times and concludes that it will rise the next time. These are the only inferences which increase our real knowledge, however useful the others may be."
+
+Have a deductive view where the premises are this is socrates and socrates is a man. have a third sort of greyed out premise that is all men are _____
+
+the conclusion can be therefore socrates is _____
+
+have a button that sort of moves a list through the blank spot in the premises, kind of like setting a date on an old iphone or going through a rolodex. just have a list of like 100 things that all men are and have it woosh through them for 2 seconds, and when it lands on one, have it also appear in the conclusion.
+the point is that the informatino oin the conclusion is not in the premises.
+
+Show how a problem in probabilities is set up the same way (have a tab under the deduction view to switch it between probabilities and socrates. highlighting this when in probability view "In any problem in probabilities, we have given the relative frequency of certain events, and we perceive that in these facts the relative frequency of another event is given in a hidden way. This being stated makes the solution."
+
+it could be like i am rolling this dice in my dice box
+Die like this rolled that way come up six ___ percent of the time.
+THerefore, i shoudl expect this one to come up six ___ percent of the time.
+
+
+
+then on the induction view, we want to show that we have different facts.
+
+we could maybe use bean bags. premise one would be that we drew these beans  (could have a slider for like 1-10, and as you move it it randomly generates some beans.
+and the beans came from that bag.
+and the conclusion could be like, the beans in the bag are of the same proportion.
+
+we need a way to show that no fact about any particular bean in your hand has anything to do with a bean in the bag.
+
+### Recently completed
+
+Nothing yet.
+
+
+## Purple beans
+
+### Suggestions
+
+this text:
+"When we draw a deductive or analytic conclusion, our rule of inference is that facts of a certain general character are either invariably or in a certain proportion of cases accompanied by facts of another general character. Then our premise being a fact of the former class, we infer with certainty or with the appropriate degree of probability the existence of a fact of the second class. But the rule for synthetic inference is of a different kind. When we sample a bag of beans we do not in the least assume that the fact of some beans being purple involves the necessity or even the probability of other beans being so. On the contrary, the conceptualistic method of treating probabilities, which really amounts simply to the deductive treatment of them, when rightly carried out leads to the result that a synthetic inference has just an even chance in its favor, or in other words is absolutely worthless. The color of one bean is entirely independent of that of another.
+
+But synthetic inference is founded upon a classification of facts, not according to their characters, but according to the manner of obtaining them. Its rule is, that a number of facts obtained in a given way will in general more or less resemble other facts obtained in the same way; or, experiences whose conditions are the same will have the same general characters.
+
+In the former case, we know that premises precisely similar in form to those of the given ones will yield true conclusions, just once in a calculable number of times. In the latter case, we only know that premises obtained under circumstances similar to the given ones (though perhaps themselves very different) will yield true conclusions, at least once in a calculable number of times. 25We may express this by saying that in the case of analytic inference we know the probability of our conclusion (if the premises are true), but in the case of synthetic inferences we only know the degree of trustworthiness of our proceeding. As all knowledge comes from synthetic inference, we must equally infer that all human certainty consists merely in our knowing that the processes by which our knowledge has been derived are such as must generally have led to true conclusions."
+
+
+Modes for analytic and synthetic. synthetic will then split into conceptualist and materialist.
+
+#### Analytic
+
+[slider] % of beans in this bag are purple
+These [n] beans were drawn [randomly / selectively] from that bag
+:  In the long run, [n] / total beans will approach [the correct percentage].
+
+start the slider at 100% and have it real "all" (when it goes to 0 have it read none). and have the conclusion just follow, these beans will be purple.  as the slider goes into not certainty, modify the conclusion to what is above. note there is no probability about this example, there are however many purple beans there are in the sample. (we could do like the black bean hidden thing above, but have it hide the sample. if the beans are draw selectively, have a note saying that this changes the probability, its like the ace of spades deck abouve, or a magician drawing your card.
+
+if your sample size is the total number of beans, then that becomes also a kind of certainty.
+
+#### Synthetic Conceptualist
+
+needs to make this point: "On the contrary, the conceptualistic method of treating probabilities, which really amounts simply to the deductive treatment of them, when rightly carried out leads to the result that a synthetic inference has just an even chance in its favor, or in other words is absolutely worthless. The color of one bean is entirely independent of that of another."
+
+not sure how to best do this...
+
+#### Synthetic (Materialist)
+
+(no note yet)
+
+### Recently completed
+
+Nothing yet.
+
+
+## New example — the tides, and the treatises
+
+### Suggestions
+
+"Most treatises on probability contain a very different doctrine. They state, for example, that if one of the ancient denizens of the shores of the Mediterranean, who had never heard of tides, had gone to the bay of Biscay, and had there seen the tide rise, say m times, he could know that there was a probability equal to (m + 1) / (m + 2) that it would rise the next time. In a well-known work by Quetelet, much stress is laid on this, and it is made the foundation of a theory of inductive reasoning."
+
+could have bayes theorem pop up and show how you need values for the porbability of events?
+
+### Recently completed
+
+Nothing yet. (29 already carries the rule of succession itself, on the letters
+of this paper rather than the tide.)

@@ -20,9 +20,13 @@ PARTS=(
   src/01_head.html     # <head>, all CSS, the peirce-swirl symbol, opens .article-container
   src/02_article.html  # Peirce's text, example containers, footnotes
   src/03_lib.js        # dnorm/pnorm/qnorm, the canvas renderer, DOM helpers
-  src/04_scaffold.js   # example framework, live numbers, the shared laws of error
-  src/05_ex1.js        # example 1 (the quantity observed and the quantity wanted)
-  src/06_ex2.js        # example 2 (the law of the facility of errors)
+  src/04_scaffold.js   # example framework and live numbers — SHARED VERBATIM with
+                       #   the other papers on this site; do not fork it here
+  src/05_laws.js       # this paper's four laws of facility, used by every example
+  src/06_ex1.js        # example 1 (the quantity observed and the quantity wanted)
+  src/07_ex2.js        # example 2 (the law of the facility of errors)
+  src/08_data.js       # the 24 days of reaction times, from Koenker's transcription
+  src/09_ex3.js        # the twenty-four days: tables, plate, one day (always open)
   src/99_tail.html     # closes </div></body></html>
 )
 

@@ -341,6 +341,18 @@
 
   .help-text { color: var(--ink-faint); font-style: italic; text-align: left; }
 
+  /* The one instruction an example gives the reader is worth seeing. Tinted in
+     the colour the clicked bar takes, so the cue and what it produces are the
+     same colour; it is gone as soon as it has been obeyed. */
+  .click-cue {
+    display: inline-block;
+    background-color: rgba(138, 122, 168, .18);
+    color: #5f5279;
+    border-radius: 2px;
+    padding: 2px 7px;
+    font-style: italic;
+  }
+
   .control-panel, .plot-container, .group-box {
     background: none;
     border: none;
@@ -1106,8 +1118,6 @@
   <h4>ASSISTANT IN THE UNITED STATES COAST SURVEY.</h4>
   <h4>FOURTH PAPER.&mdash;THE PROBABILITY OF INDUCTION.</h4>
 
-  <p style="text-align: center;"><em>(A public domain copy of this text is available <a href="https://en.wikisource.org/wiki/Popular_Science_Monthly/Volume_12/April_1878/Illustrations_of_the_Logic_of_Science_IV" target="_blank" rel="noopener">here</a>.)</em></p>
-
   <div class="section-number">I.</div>
 
   <p>We have found that every argument derives its force from the general truth of the class of inferences to which it belongs; and that probability is the proportion of arguments carrying truth with them among those of any <em>genus</em>. This is most conveniently expressed in the nomenclature of the medi&aelig;val logicians.
@@ -1218,7 +1228,9 @@
 
   <p>In the conceptualistic view of probability, complete ignorance, where the judgment ought not to swerve either toward or away from the hypothesis, is represented by the probability 1/2.<sup class="fn"><a href="#fn2" id="fnref2">2</a></sup></p>
 
-  <p>But let us suppose that we are totally ignorant what colored hair the inhabitants of Saturn have. Let us, then, take a color-chart in which all possible colors are shown shading into one another by imperceptible degrees. In such a chart the relative areas occupied by different classes of colors are perfectly arbitrary. Let us inclose such an area with a closed line, and ask what is the chance on conceptualistic principles that the color of the hair of the inhabitants of Saturn falls within that area? The answer cannot be indeterminate because we must be in some state of belief; and, indeed, conceptualistic writers do not admit indeterminate probabilities. As there is no certainty in the matter, the answer lies between zero and unity. As no numerical value is afforded by the data, the number must be determined by the nature of the scale of probability itself, and not by calculation from the data. The answer can, therefore, only be one-half, since the judgment should neither favor nor oppose the hypothesis. What is true of this area is true of any other one; and it will equally be true of a third area which embraces the other two. But the probability for each of the smaller areas being one-half, that for the larger should be at least unity, which is absurd.</p>
+  <p><span class="example-trigger" data-toggle="example-ex13">But let us suppose that we are totally ignorant what colored hair the inhabitants of Saturn have. Let us, then, take a color-chart in which all possible colors are shown shading into one another by imperceptible degrees. In such a chart the relative areas occupied by different classes of colors are perfectly arbitrary. Let us inclose such an area with a closed line, and ask what is the chance on conceptualistic principles that the color of the hair of the inhabitants of Saturn falls within that area? The answer cannot be indeterminate because we must be in some state of belief; and, indeed, conceptualistic writers do not admit indeterminate probabilities. As there is no certainty in the matter, the answer lies between zero and unity. As no numerical value is afforded by the data, the number must be determined by the nature of the scale of probability itself, and not by calculation from the data. The answer can, therefore, only be one-half, since the judgment should neither favor nor oppose the hypothesis. What is true of this area is true of any other one; and it will equally be true of a third area which embraces the other two. But the probability for each of the smaller areas being one-half, that for the larger should be at least unity, which is absurd.</span></p>
+
+  <div id="example-ex13" class="example-container"></div>
 
   <div class="section-number">III.</div>
 
@@ -1301,17 +1313,17 @@
 
   <div id="example-ex16" class="example-container"></div>
 
-  <p>It may be remarked that when the real value of the probability sought inductively is either very large or very small, the reasoning is more secure. Thus, suppose there were in reality <span class="live k1 phrase" data-live="example-ex18:rate">one white ball in 100</span> in a certain urn, and we were to judge of the number by <span class="live k2" data-live="example-ex18:s">100</span> drawings. <span class="live k3 phrase" data-live="example-ex18:list">The probability of drawing no white ball would be 366/1000; that of drawing one white ball would be 370/1000; that of drawing two would be 185/1000; that of drawing three would be 61/1000; that of drawing four would be 15/1000; that of drawing five would be only 3/1000 etc.</span> <span class="example-trigger" data-toggle="example-ex18">Thus we should be tolerably certain of not being in error by more than one ball in 100.</span></p>
+  <p>It may be remarked that when the real value of the probability sought inductively is either very large or very small, the reasoning is more secure. Thus, suppose there were in reality <span class="live k1 phrase" data-live="example-ex18:rate">one white ball in 100</span> in a certain urn, and we were to judge of the number by <span class="live k2" data-live="example-ex18:s">100</span> drawings. <span class="live k3 phrase" data-live="example-ex18:list">The probability of drawing no white ball would be 366/1000; that of drawing one white ball would be 370/1000; that of drawing two would be 185/1000; that of drawing three would be 61/1000; that of drawing four would be 15/1000; that of drawing five would be only 3/1000 etc.</span> <span class="example-trigger" data-toggle="example-ex18">Thus we should be tolerably certain<span class="live k3 phrase" data-live="example-ex18:certainty"></span> of not being in error by more than <span class="live k1 phrase" data-live="example-ex18:margin">one ball</span> in 100.</span></p>
 
   <div id="example-ex18" class="example-container"></div>
 
   <p>It appears, then, that in one sense we can, and in another we cannot, determine the probability of synthetic inference.</p>
 
-  <p><span class="example-trigger" data-toggle="example-ex19">When I reason in this way: <span class="live k1" data-live="example-ex19:word">Ninety-nine</span> Cretans in a hundred are liars; But Epimenides is a Cretan; Therefore, Epimenides is a liar:&mdash; I know that reasoning similar to that would carry truth <span class="live k1" data-live="example-ex19:n">99</span> times in 100.</span> But when I reason in the opposite direction: Minos, Sarpedon, Rhadamanthus, Deucalion, and Epimenides, are all the Cretans I can think of; But these were all atrocious liars, Therefore, pretty much all Cretans must have been liars;</p>
+  <p><span class="example-trigger" data-toggle="example-ex19">When I reason in this way: <span class="live k1" data-live="example-ex19:word">Ninety-nine</span> Cretans in a hundred are liars; But Epimenides is a Cretan; Therefore, Epimenides is a liar:&mdash; I know that reasoning similar to that would carry truth <span class="live k1" data-live="example-ex19:n">99</span> times in 100.</span> But when I reason in the opposite direction: <span class="live phrase" data-live="example-ex20:names">Minos, Sarpedon, Rhadamanthus, Deucalion, and Epimenides</span>, <span class="live phrase" data-live="example-ex20:howGot">are all the Cretans I can think of</span>; But <span class="live phrase" data-live="example-ex20:allLiars">these were all atrocious liars</span>, Therefore, <span class="live phrase" data-live="example-ex20:conclusion">pretty much all Cretans must have been liars</span>;</p>
 
   <div id="example-ex19" class="example-container"></div>
 
-  <p>I do not in the least know how often such reasoning would carry me right. On the other hand, <span class="example-trigger" data-toggle="example-ex20">what I do know is that some definite proportion of Cretans must have been liars, and that this proportion can be probably approximated to by an induction from <span class="live k2 phrase" data-live="example-ex20:instances">five or six</span> instances. Even in the worst case for the probability of such an inference, that in which about half the Cretans are liars, the ratio so obtained would <span class="live k3 phrase" data-live="example-ex20:probably">probably</span> not be in error by more than <span class="live k3" data-live="example-ex20:err">1/6</span><span class="live k3 phrase" data-live="example-ex20:bounded"></span>.</span> <span class="live phrase" data-live="example-ex20:reading"></span> So much I know; but, then, in the present case the inference is that pretty much all Cretans are liars, and whether there may not be a special improbability in that I do not know.</p>
+  <p>I do not in the least know how often such reasoning would carry me right. On the other hand, <span class="example-trigger" data-toggle="example-ex20">what I do know is that some definite proportion of Cretans must have been liars, and that this proportion can be probably approximated to<span class="live k3 phrase" data-live="example-ex20:within"></span> by an induction from <span class="live k2 phrase" data-live="example-ex20:instances">five or six</span> instances. Even in the worst case for the probability of such an inference, that in which about half the Cretans are liars, the ratio so obtained would <span class="live k3 phrase" data-live="example-ex20:probably">probably</span> not be in error by more than <span class="live k3" data-live="example-ex20:err">1/6</span><span class="live k3 phrase" data-live="example-ex20:bounded"></span>.</span> <span class="live phrase" data-live="example-ex20:reading"></span> So much I know; but, then, in the present case the inference is that pretty much all Cretans are liars, and whether there may not be a special improbability in that I do not know.</p>
 
   <div id="example-ex20" class="example-container"></div>
 
@@ -3876,9 +3888,42 @@ function samplingDistPlot(pl, opts) {
     xlim = rescale ? [Math.max(0, mu - 5 * sigma), Math.min(1, mu + 5 * sigma)] : [0, 1];
     xlab = "p̂";
   }
-  pl.setup({ xlim: xlim, ylim: [0, maxP * 1.3], mar: [4, 5, 3, 2] });
-  pl.axes({});
+  /* The probable error at every proportion, hung under the number line: a comb
+     whose teeth are 0.477 root(2p(1-p)/s) to scale, tallest in the middle and
+     shortest at the two ends. That is the whole of Peirce's remark about
+     extreme values in one picture — the same formula, the same s, and a
+     tolerance worth twice as much out here as it is at a half. Only on the
+     proportion axis, where the teeth stand at the proportions they belong to. */
+  /* Only on the whole number line. Zoomed to five standard errors round an
+     extreme proportion the teeth are all of a length and say nothing, and the
+     band they need would be a third of the plot given over to nothing. */
+  const comb = !!opts.peComb && !useBalls && !rescale;
+  const top = maxP * 1.3;
+  const combH = comb ? top * 0.42 : 0;
+  pl.setup({ xlim: xlim, ylim: [-combH, top], mar: [4, 5, 3, 2] });
+  pl.axes(comb ? { yat: RPlot.ticks(0, top, 5).filter((v) => v >= 0) } : {});
   pl.box();
+  if (comb) {
+    const peAt = (q) => 0.477 * Math.sqrt(2 * q * (1 - q) / s);
+    const peMax = peAt(0.5);                     // the worst case, so the scale means one thing
+    pl.clip(true);
+    pl.segments(xlim[0], 0, xlim[1], 0, { col: PAL.rule, lwd: 1 });
+    const tooth = (q) => (peAt(q) / peMax) * combH * 0.62;
+    for (let i = 0; i <= 100; i++) {
+      const q = i / 100;
+      if (q < xlim[0] || q > xlim[1]) continue;
+      pl.segments(q, -combH * 0.06, q, -combH * 0.06 - tooth(q),
+        { col: i % 10 === 0 ? "#b8bcc2" : "#dcdee2", lwd: i % 10 === 0 ? 1.6 : 1 });
+    }
+    pl.segments(p, -combH * 0.06, p, -combH * 0.06 - tooth(p), { col: PAL.accent2, lwd: 2.5 });
+    pl.clip(false);
+    /* under the teeth, not through them */
+    const middling = Math.abs(p - 0.5) < 0.02;
+    pl.text(xlim[0] + (xlim[1] - xlim[0]) * 0.5, -combH * 0.93,
+      `the probable error at each proportion — ±${fmt(peAt(p), 4)} here`
+      + (middling ? ", which is as wide as it ever gets" : `, ±${fmt(peMax, 4)} at a half`),
+      { cex: 0.7, col: PAL.inkSoft });
+  }
   pl.axisLabels(xlab, "Probability mass");
   pl.title("Sampling distribution", { cex: 1.1 });
   pl.clip(true);
@@ -3916,6 +3961,20 @@ function samplingDistPlot(pl, opts) {
     const cp = dbinom(clicked, s, p);
     pl.segments(cx, 0, cx, cp, { lwd: 5, col: "#8a7aa8" });
     pl.points([cx], [cp], { cex: 1.5, col: "#8a7aa8" });
+    /* The probable error that goes with the estimate, drawn where the estimate
+       is: worked at the proportion the sample came out at, which is the only
+       one an inquirer holding that sample would have. It is not the height of
+       the bar — the height is how often that sample turns up, and the bar is a
+       probability where the band is an error. */
+    if (opts.clickedPE) {
+      const ph = clicked / s;
+      const e = 0.477 * Math.sqrt(2 * ph * (1 - ph) / s);
+      const half = useBalls ? e * s : e;
+      const y = cp + maxP * 0.09;
+      pl.segments(cx - half, y, cx + half, y, { col: "#8a7aa8", lwd: 2 });
+      [-half, half].forEach((d) => pl.segments(cx + d, y - maxP * 0.03, cx + d, y + maxP * 0.03,
+        { col: "#8a7aa8", lwd: 2 }));
+    }
   }
   pl.clip(false);
   pl.legend("topright", {
@@ -4031,7 +4090,7 @@ registerExample("example-ex15", (box) => {
     const useApprox = total > 1000;
     if (clicked === null) {
       $("#ex15_click_text", content).innerHTML = `<div class="click-info">
-        <p><em>Click on any bar to see the exact probability.</em></p>
+        <p><span class="click-cue">Click on any bar of the chart to see the exact probability.</span></p>
         <p>Suppose <strong>${numberWord(pf.num)}</strong> ${pluralBall(pf.num)} out of <strong>${pf.den}</strong>
           is white and the rest black, and that <strong>${numberWord(s)}</strong> balls are drawn.</p></div>`;
     } else {
@@ -4078,7 +4137,11 @@ registerExample("example-ex17", (box) => {
           <button class="btn btn-primary btn-sm" id="ex17_simulate_100">Draw a hundred</button>
           <button class="btn btn-warning btn-sm" id="ex17_reset">Clear</button>
         </div>
+        <div class="ex-buttonbar">
+          <button class="btn btn-sm" id="ex17_peirce">Peirce's example: one in three, four drawn</button>
+        </div>
         <div id="ex17-rescale"></div>
+        <div id="ex17_unreachable"></div>
         <div id="ex17_current_result"></div>
       </div>
       <div class="col col-8"><div class="plot-container" id="ex17-combined-plot"></div></div>
@@ -4091,22 +4154,24 @@ registerExample("example-ex17", (box) => {
 
   $("#ex17-ctl-p", content).appendChild(
     slider("ex17_p", "True proportion (p):", 0.001, 0.999, 0.5, 0.001, (v) => v.toFixed(3), "k1"));
+  /* Down to four, and one ball at a time. Peirce's own case is four drawn, and
+     it is the case the sentence beside the chart is about; a slider that began
+     at ten in tens could not be put there. */
   $("#ex17-ctl-s", content).appendChild(
-    slider("ex17_s", "Balls drawn (s):", 10, 1000, 100, 10, null, "k2"));
-  /* One plain slider rather than a menu with a custom row hanging off it. It
-     runs in nines rather than in percent — k of them means 100(1 - 10^-k) — so
-     that every row of Peirce's printed table is a position on it, from a half
-     at k = 0.301 to his ten-billionth at k = 10. Clicking a row sets it there. */
-  const NINES = (c) => -Math.log10(1 - c / 100);
-  const CONF = () => 100 * (1 - Math.pow(10, -num("ex17_k")));
+    slider("ex17_s", "Balls drawn (s):", 2, 1000, 100, 1, null, "k2"));
+  /* A plain percentage from a half to 99. It ran in nines before — k of them
+     meaning 100(1 - 10^-k) — so that every row of Peirce's printed table was a
+     position on it, out to his ten-billionth. That put almost the whole travel
+     of the thumb in country no reader has any use for, and made the levels
+     anyone does want unhittable. The far rows are still printed above with
+     their own bounds worked out; they are simply not places the slider goes. */
   $("#ex17-ctl-c", content).appendChild(
-    slider("ex17_k", "How often the bound is to hold:", 0.301, 10, 1, 0.001, (v) => {
-      /* as many decimals as the level has nines, so 90, 99.9 and 99.99999999
-         all read as themselves rather than as rounding */
-      const c = 100 * (1 - Math.pow(10, -v));
-      return `${c.toFixed(Math.max(0, Math.ceil(v) - 2))}%`;
-    }, "k3"));
-  $("#ex17-rescale", content).appendChild(checkbox("ex17_rescale", "Rescale charts", false));
+    slider("ex17_conf", "How often the bound is to hold:", 50, 99, 50, 1,
+      (v) => (v <= 50 ? "50% — the probable error"
+        : v === 95 ? "95% — standard today" : `${Math.round(v)}%`), "k3"));
+  const CONF = () => num("ex17_conf");
+  const CONF_MIN = 50, CONF_MAX = 99;
+  $("#ex17-rescale", content).appendChild(checkbox("ex17_rescale", "Rescale charts", true));
 
   content.addEventListener("input", () => update());
   content.addEventListener("change", () => update());
@@ -4135,13 +4200,17 @@ registerExample("example-ex17", (box) => {
   const ex17Row = (i) => () => ex17Bound(CONSTANTS[i]);
   const ex17Table = document.getElementById("ex17-table");
   if (ex17Table) {
-    /* clicking a printed row moves the slider to that row's level */
+    /* clicking a printed row moves the slider to that row's level, for the rows
+       the slider can reach. The three beyond 99 keep their own worked bound —
+       that is what the row is for — but there is nowhere to put the thumb, and
+       clamping it silently to 99 would be a lie about which level was being
+       drawn. */
     ex17Table.addEventListener("click", (ev) => {
       const tr = ev.target.closest("tr[data-conf]");
-      if (!tr || !document.getElementById("ex17_k")) return;
+      if (!tr || !document.getElementById("ex17_conf")) return;
       const c = parseFloat(tr.getAttribute("data-conf"));
-      if (!Number.isFinite(c)) return;
-      setSlider("ex17_k", Math.min(10, Math.max(0.301, NINES(c))));
+      if (!Number.isFinite(c) || c < CONF_MIN || c > CONF_MAX) return;
+      setSlider("ex17_conf", Math.round(c));
       refreshLive("example-ex17");
     });
   }
@@ -4153,10 +4222,7 @@ registerExample("example-ex17", (box) => {
     e3: ex17Row(3), e4: ex17Row(4), e5: ex17Row(5),
     /* the seventh row is wherever the slider is standing, so a level between
        two of Peirce's printed ones still has its bound written out */
-    customLabel: () => {
-      const c = CONF();
-      return `${c >= 99.99 ? fmt(c, 6) : fmt(c, 2)} times out of 100 within`;
-    },
+    customLabel: () => `${Math.round(CONF())} times out of 100 within`,
     customConst: () => fmt(getConstant(), 3),
     eCustom: () => ex17Bound(getConstant())
   }, {
@@ -4167,7 +4233,7 @@ registerExample("example-ex17", (box) => {
       $$("tr[data-conf]", ex17Table).forEach((tr) => {
         const v = parseFloat(tr.getAttribute("data-conf"));
         tr.classList.toggle("conf-active", c !== null && Number.isFinite(v)
-          && Math.abs(NINES(v) - NINES(c)) < 0.005);
+          && Math.abs(v - c) < 0.005);
       });
     }
   });
@@ -4188,6 +4254,24 @@ registerExample("example-ex17", (box) => {
     const df = history.slice(-ROWS).reverse();   // newest first, just under the curve
     const nContain = history.filter((d) => d.containsP).length;
 
+    /* How often each result has actually come up, counted on the lattice the
+       chart already draws. The stems keep their theoretical heights and take
+       the count as their colour, so the empirical distribution is shown on the
+       exact same marks as the distribution it is meant to approach rather than
+       in a second chart beside it. Only samples of the current size are
+       counted: an old record's proportion does not sit on this lattice. */
+    const heat = new Map();
+    history.forEach((d) => { if (d.s === s2) heat.set(d.k, (heat.get(d.k) || 0) + 1); });
+    const heatMax = Math.max(1, ...heat.values());
+    const HEAT_COLD = [201, 204, 209], HEAT_LO = [193, 186, 209], HEAT_HI = [79, 66, 104];
+    const heatCol = (k) => {
+      const c = heat.get(k) || 0;
+      if (!c) return `rgb(${HEAT_COLD.join(",")})`;
+      /* square root, so that one draw among a thousand still shows */
+      const t = Math.sqrt(c / heatMax);
+      return `rgb(${HEAT_LO.map((v, i) => Math.round(v + (HEAT_HI[i] - v) * t)).join(",")})`;
+    };
+
     /* one coordinate system: x is the proportion for both halves, y runs from
        the top of the curve down through the rows */
     pl.setup({ xlim: xlim, ylim: [-ROWS - 1.5, 10], mar: [4, 4, 3, 2] });
@@ -4207,7 +4291,8 @@ registerExample("example-ex17", (box) => {
     const H = 9;
     ks.forEach((k, i) => {
       if (probs[i] <= 0) return;
-      pl.segments(k / s2, 0, k / s2, (probs[i] / maxP) * H, { lwd: 2, col: "#c9ccd1" });
+      pl.segments(k / s2, 0, k / s2, (probs[i] / maxP) * H,
+        { lwd: s2 <= 40 ? 4 : 2, col: heatCol(k) });
     });
     const xs = [], ys = [];
     for (let i = 0; i < 500; i++) {
@@ -4237,8 +4322,10 @@ registerExample("example-ex17", (box) => {
     }
     pl.clip(false);
     pl.legend("topleft", {
-      legend: ["The truth", "Covers it", "Misses it"],
-      col: ["#c79a45", "#4a7c59", "#b0563f"], lwd: [2.5, 2, 2], cex: 0.7
+      legend: history.length ? ["The truth", "Covers it", "Misses it", "Shade: how often drawn"]
+        : ["The truth", "Covers it", "Misses it"],
+      col: ["#c79a45", "#4a7c59", "#b0563f", `rgb(${HEAT_HI.join(",")})`],
+      lwd: [2.5, 2, 2, 4], cex: 0.7
     });
   });
   $("#ex17-combined-plot", content).appendChild(combinedCanvas);
@@ -4251,10 +4338,28 @@ registerExample("example-ex17", (box) => {
     const whiteBalls = rbinom(s, p);
     const pHat = whiteBalls / s;
     const rec = { pHat: pHat, ciLower: pHat - margin, ciUpper: pHat + margin,
-      containsP: (p >= pHat - margin && p <= pHat + margin), p: p };
+      containsP: (p >= pHat - margin && p <= pHat + margin), p: p,
+      k: whiteBalls, s: s };      // where on the lattice it landed, for the shading
     return { rec: rec, whiteBalls: whiteBalls, s: s };
   }
   function confLevel() { return CONF(); }
+
+  /* Peirce's own case: one ball in three, four drawn. No sample of four can
+     come out at a third, so the induction is wrong every single time — and the
+     bound around it still does its work at the rate claimed. The exact figure
+     is worth having rather than the counted one, since it is a claim about the
+     construction and not about any particular run. */
+  const exactCover = () => {
+    const p = num("ex17_p"), s = Math.round(num("ex17_s"));
+    const margin = getConstant() * Math.sqrt(2 * p * (1 - p) / s);
+    let tot = 0;
+    for (let k = 0; k <= s; k++) if (Math.abs(k / s - p) <= margin + 1e-12) tot += dbinom(k, s, p);
+    return tot;
+  };
+  const unreachable = () => {
+    const p = num("ex17_p"), s = Math.round(num("ex17_s"));
+    return Math.abs(p * s - Math.round(p * s)) > 1e-9;
+  };
 
   $("#ex17_simulate_single", content).addEventListener("click", () => {
     const d = drawSample();
@@ -4272,10 +4377,35 @@ registerExample("example-ex17", (box) => {
     update();
   });
   $("#ex17_reset", content).addEventListener("click", () => { history = []; current = null; update(); });
+  $("#ex17_peirce", content).addEventListener("click", () => {
+    history = []; current = null;
+    setSlider("ex17_p", 1 / 3); setSlider("ex17_s", 4); setSlider("ex17_conf", 50);
+    update();
+  });
 
   function update() {
     /* The table of levels and bounds is Peirce's own, printed above; it fills
        in there rather than being repeated here. */
+
+    /* Why the two rates can differ: the estimate has only s + 1 places to land,
+       so the window round the truth catches one of them at some proportions and
+       two at others. The claimed level is the smooth curve through that; at any
+       one proportion the lattice puts the realised rate above or below it. Both
+       figures are given rather than the claim alone, as in 20. */
+    if (unreachable()) {
+      const s17 = Math.round(num("ex17_s")), got = exactCover() * 100, want = CONF();
+      const green = (t) => `<span style="color:#4a7c59;font-weight:700;">${t}</span>`;
+      const close = Math.abs(got - want) < 1.5;
+      $("#ex17_unreachable", content).innerHTML = `<div class="note-block" style="margin:10px 0 14px;">
+        While we can never draw a sample that reflects the true proportion of
+        <span style="color:#9a7b3f;font-weight:700;">${fmt(num("ex17_p"), 3)}</span> &mdash;
+        <span style="color:#b0563f;font-weight:700;">${spellNumber(s17)}</span> drawings can come out at only
+        ${spellNumber(s17 + 1)} values, and it is not among them &mdash; we can be confident that our error
+        bounds will nevertheless contain it ${green(fmt(got, 1) + "%")} of the time${close ? "" :
+          `, against the ${green(fmt(want, 0) + "%")} claimed: an induction from ${spellNumber(s17)} can land
+           on only ${spellNumber(s17 + 1)} values, and the window round the truth catches one of them at this
+           proportion and two at others`}.</div>`;
+    } else $("#ex17_unreachable", content).innerHTML = "";
 
     if (current) {
       const col = current.containsP ? "#4a7c59" : "#b0563f";
@@ -4318,7 +4448,6 @@ registerExample("example-ex16", (box) => {
       <div class="col col-6"><div id="ex16-p-slider"></div></div>
       <div class="col col-6"><div id="ex16-conf-slider"></div></div>
     </div>
-    <div id="ex16_results"></div>
   </div>`);
   box.appendChild(content);
 
@@ -4492,25 +4621,58 @@ registerExample("example-ex16", (box) => {
     const ya = maxY * 0.5;
     pl.arrows(c.p2, ya, c.p1, ya, { code: 3, angle: 20, length: 8, lwd: 2, col: "#8a4331" });
     pl.text((c.p1 + c.p2) / 2, ya * 1.1, `Difference: ${fmt(c.diffObs, 4)}`, { col: "#8a4331", cex: 0.9, font: 2 });
+
+    /* --------------------------------------------------------------------
+       The difference measured in probable errors, laid along it.
+
+       A second rule under the arrow, perforated into lengths of e1 + e2 — each
+       perforation the two errors end to end, in the two groups' own colours,
+       so what the multiple is a multiple OF is visible rather than stated. Ten
+       and a bit of them span the census difference, which is Peirce's sentence
+       drawn.
+
+       They stay probable errors whatever the confidence slider says. That
+       slider widens the shaded bands, which is what a level is for; the count
+       in his sentence is in probable errors, and his table is then consulted
+       for what such a multiple comes to. Perforating in the selected bound as
+       well would count the level twice over, and the picture would stop
+       agreeing with the sentence it illustrates.
+       ------------------------------------------------------------------- */
+    if (c.sumErr > 0 && c.diffObs > 0) {
+      const yb = ya * 0.74;
+      const lo = Math.min(c.p1, c.p2), unit = c.sumErr;
+      const whole = Math.floor(c.ratio + 1e-9);
+      const gap = unit * 0.10;               // the perforation, so the units count
+      const drawUnit = (u0, frac) => {
+        const b = Math.min(c.q1, unit * frac);            // group 1's share first
+        if (b > 0) pl.segments(u0, yb, u0 + b, yb, { col: "#2f6f9f", lwd: 4 });
+        const r = unit * frac - b;
+        if (r > 0) pl.segments(u0 + b, yb, u0 + b + r, yb, { col: "#b8703a", lwd: 4 });
+      };
+      for (let i = 0; i < Math.min(whole, 60); i++) drawUnit(lo + i * unit, 1 - gap / unit);
+      const rest = c.ratio - whole;
+      if (rest > 0.01 && whole < 60) drawUnit(lo + whole * unit, Math.max(0, rest - gap / unit));
+      pl.text((c.p1 + c.p2) / 2, yb * 0.72,
+        `${fmt(c.ratio, 1)} × (e₁ + e₂) — every dash is the two probable errors end to end`,
+        { col: "#575d66", cex: 0.78 });
+      /* the question the confidence slider raises, answered where it arises */
+      if (c.confidence > 50.5 && chk("ex16_show_errors")) {
+        pl.text((c.p1 + c.p2) / 2, yb * 0.5,
+          `the bands follow the ${fmt(c.confidence, 0)}% level; the dashes stay probable errors`,
+          { col: PAL.inkFaint, cex: 0.7 });
+      }
+    }
     pl.clip(false);
     pl.legend("topright", { legend: ["Group 1", "Group 2"], col: ["#2f6f9f", "#b8703a"], lwd: [2, 2], cex: 0.9 });
   });
   $("#ex16-plot", content).appendChild(canvas);
 
+  /* The analysis box is gone. Every figure that was in it — both probable
+     errors, the difference, their sum and the multiple — is in Peirce's own
+     paragraph above and in the perforated rule under the difference, so the box
+     was the same arithmetic printed a third time. */
   function update() {
     confSlider.style.display = chk("ex16_show_errors") ? "" : "none";
-    const c = calc();
-    $("#ex16_results", content).innerHTML = `<div class="result-box">
-      <h4>Analysis Results</h4>
-      <h5>Step 1: Calculate Probable Errors</h5>
-      <p>For Group 1 (n = ${bigmark(c.n1)}): e1 = ${fmt(c.q1, 5)}</p>
-      <p>For Group 2 (n = ${bigmark(c.n2)}): e2 = ${fmt(c.q2, 5)}</p>
-      <hr>
-      <h5>Step 2: Test Against Error Intervals</h5>
-      <p><strong>Observed difference: </strong>${fmt(c.diffObs, 4)}</p>
-      <p><strong>Sum of probable errors: </strong>${fmt(c.sumErr, 4)}</p>
-      <p><strong>Multiple of error: </strong>${fmt(c.ratio, 1)} x (e1 + e2)</p>
-      </div>`;
     drawCanvas(canvas);
   }
   update();
@@ -4526,14 +4688,16 @@ registerExample("example-ex18", (box) => {
       <div class="col col-4">
         <div id="ex18-controls"></div>
         <div id="ex18-pred"></div>
-        <button class="btn btn-primary btn-sm" id="ex18_reset">Reset to Peirce's example</button>
+        <div class="ex-buttonbar">
+          <button class="btn btn-primary btn-sm" id="ex18_reset">Reset to Peirce's example</button>
+          <button class="btn btn-sm" id="ex18_even">Same sample, an even proportion</button>
+        </div>
       </div>
       <div class="col col-8">
         <div id="ex18-plot"></div>
         <div id="ex18_click_text"></div>
       </div>
     </div>
-    <div id="ex18_peirce"></div>
   </div>`);
   box.appendChild(content);
 
@@ -4565,6 +4729,40 @@ registerExample("example-ex18", (box) => {
     return spellOut ? `${n} white balls` : n;
   };
 
+  /* --------------------------------------------------------------------------
+     What "tolerably certain" comes to.
+
+     Peirce's claim is a tolerance and a certainty together: an error of no more
+     than one ball in a hundred, and being tolerably certain of it. Only one of
+     the two can be the handle. The certainty is the handle here, because it is
+     the vaguer of the two words and the one worth pinning down, and the
+     tolerance is then read off — the smallest whole ball in a hundred that the
+     drawings cover that often.
+
+     Counted on the exact binomial, not on the normal curve, so the figure is
+     the same arithmetic he does in the paragraph: at one in a hundred with a
+     hundred drawings, no ball, one, or two covers 0.921 of the cases, and his
+     sentence comes back word for word. Push the proportion to a half and the
+     same certainty needs nine balls in a hundred, which is the whole of his
+     remark about extreme values.
+     ------------------------------------------------------------------------*/
+  function tolerance() {
+    const p = num("ex18_p"), s = Math.round(num("ex18_s")), want = num("ex18_pred_cl");
+    const cover = (m) => {
+      const d = m / 100;
+      let tot = 0;
+      for (let k = 0; k <= s; k++) if (Math.abs(k / s - p) <= d + 1e-12) tot += dbinom(k, s, p);
+      return tot;
+    };
+    for (let m = 0; m <= 100; m++) {
+      const c = cover(m);
+      if (c >= want - 1e-12) return { m: m, delta: m / 100, cover: c };
+    }
+    return { m: 100, delta: 1, cover: 1 };
+  }
+  const ballsPhrase = (m) => (m === 0 ? "not one ball"
+    : m === 1 ? "one ball" : `${spellNumber(m)} balls`);
+
   registerLive("example-ex18", {
     rate: () => {
       const p = num("ex18_p");
@@ -4572,6 +4770,9 @@ registerExample("example-ex18", (box) => {
                       : `${bigmark(p * 100)} white balls in 100`;
     },
     s: () => bigmark(num("ex18_s")),
+    /* his own two words, with the figure they come to */
+    certainty: () => ` &mdash; ${fmt(tolerance().cover * 100, 1)} times in 100 &mdash;`,
+    margin: () => ballsPhrase(tolerance().m),
     list: () => {
       const p = num("ex18_p"), s = Math.round(num("ex18_s"));
       const ks = ex18Window();
@@ -4590,8 +4791,13 @@ registerExample("example-ex18", (box) => {
   ctl.appendChild(checkbox("ex18_rescale", "Rescale chart (zoom)", true));
   ctl.appendChild(checkbox("ex18_xaxis_balls", "X-axis: Number of balls", false));
   const pred = $("#ex18-pred", content);
-  pred.appendChild(checkbox("ex18_show_prediction", "Show prediction interval", true));
-  const predSlider = slider("ex18_pred_cl", "Prediction confidence level:", 0.50, 0.99, 0.50, 0.01, (v) => v.toFixed(2));
+  pred.appendChild(checkbox("ex18_show_prediction", "Show the error allowed", true));
+  /* The slider is what "tolerably certain" means, so it says so and reads as a
+     rate rather than as a decimal. It opens at nine times in ten, which is a
+     fair reading of the words and the one at which his own sentence comes out
+     as he printed it. */
+  const predSlider = slider("ex18_pred_cl", "Tolerably certain means:", 0.50, 0.99, 0.90, 0.01,
+    (v) => `${Math.round(v * 100)} times in 100`, "k3");
   pred.appendChild(predSlider);
 
   content.addEventListener("input", (ev) => { if (ev.target.id === "ex18_p") stickySnap("ex18_p"); update(); });
@@ -4601,20 +4807,34 @@ registerExample("example-ex18", (box) => {
     document.getElementById("ex18_rescale").checked = true;
     document.getElementById("ex18_xaxis_balls").checked = false;
     document.getElementById("ex18_show_prediction").checked = true;
-    setSlider("ex18_pred_cl", 0.50);
+    setSlider("ex18_pred_cl", 0.90);
+    update();
+  });
+  /* The same drawings and the same certainty, moved to the middle of the range:
+     the tolerance is the only thing that gives, and it is the sentence in the
+     text that shows it. Unzoomed, so the comb underneath is on the whole number
+     line where the two ends can be compared. */
+  $("#ex18_even", content).addEventListener("click", () => {
+    setSlider("ex18_p", 0.5);
+    document.getElementById("ex18_rescale").checked = false;
+    document.getElementById("ex18_xaxis_balls").checked = false;
+    clicked = null;
     update();
   });
 
+  /* The band drawn on the chart is the tolerance in the sentence, not a second
+     interval of its own: p either side by the balls the sentence allows. */
   const predInterval = () => {
     if (!chk("ex18_show_prediction")) return null;
-    const p = num("ex18_p"), s = num("ex18_s");
-    return binomTestCI(Math.round(p * s), s, num("ex18_pred_cl"));
+    const p = num("ex18_p"), d = tolerance().delta;
+    return [Math.max(0, p - d), Math.min(1, p + d)];
   };
 
   const canvas = mkCanvas(450, (pl) => {
     samplingDistPlot(pl, {
       p: num("ex18_p"), s: num("ex18_s"), rescale: chk("ex18_rescale"),
-      useBalls: chk("ex18_xaxis_balls"), clicked: clicked, predCI: predInterval()
+      useBalls: chk("ex18_xaxis_balls"), clicked: clicked, predCI: predInterval(),
+      peComb: true, clickedPE: true
     });
   }, {
     onclick: (x) => {
@@ -4625,68 +4845,38 @@ registerExample("example-ex18", (box) => {
   });
   $("#ex18-plot", content).appendChild(canvas);
 
-  /* Peirce's own paragraph with the figures filled in from the sliders.
-     "Not in error by more than one ball in den" is a tolerance on the
-     proportion, |k/s - p| <= 1/den, which at his own settings (p = 1/100,
-     s = 100) is |k - 1| <= 1, so k of 0, 1 or 2 — the three probabilities he
-     lists that carry most of the weight. */
-  function peirceParagraph(p, s) {
-    const pf = decimalToFraction(p);
-    // Peirce names the ball for the first two and then only the number
-    const balls = (k) => (k === 0 ? "no white ball" : k === 1 ? "one white ball" : numberWord(k));
-    /* He enumerates from none upward because his proportion is tiny. Follow the
-       likely counts instead, which lands on his 0 to 5 at his own settings and
-       stays informative when the proportion is not extreme. */
-    const start = Math.max(0, Math.round(p * s) - 2);
-    const terms = [];
-    for (let k = start; k < start + 6 && k <= s; k++) {
-      terms.push(`that of drawing ${balls(k)} would be ${Math.round(dbinom(k, s, p) * 1000)}/1000`);
-    }
-    const first = terms.shift().replace("that of drawing", "The probability of drawing");
-
-    /* The tolerance is Peirce's own concrete claim, one ball in a hundred, so
-       it stays fixed at 0.01 of the proportion however p is set. That is what
-       makes the figure worth watching: at his 1 in 100 it comes to 0.921, and
-       at an even proportion it collapses, which is the security he is pointing
-       to in extreme values. */
-    const tol = 0.01 * s;
-    let certain = 0;
-    for (let k = Math.max(0, Math.ceil(p * s - tol)); k <= Math.min(s, Math.floor(p * s + tol)); k++) {
-      certain += dbinom(k, s, p);
-    }
-    const subject = pf.num === 1 ? "one white ball" : `${pf.num} white balls`;
-    return `<div class="note-block">
-      Thus, suppose there were in reality ${subject} in <strong>${bigmark(pf.den)}</strong> in a certain urn,
-      and we were to judge of the number by <strong>${bigmark(s)}</strong> drawings.
-      ${first}; ${terms.join("; ")}, etc.
-      Thus we should be tolerably certain of not being in error by more than one ball in 100
-      (<strong>${fmt(certain, 3)}</strong>).</div>`;
-  }
-
   function update() {
     predSlider.style.display = chk("ex18_show_prediction") ? "" : "none";
     const p = num("ex18_p"), s = num("ex18_s");
     if (clicked !== null && clicked > s) clicked = null;
-    const pf = decimalToFraction(p);
-    $("#ex18_peirce", content).innerHTML = peirceParagraph(p, s);
+    /* Peirce's sentence in the text above is the readout now — the enumerated
+       list, the certainty and the tolerance are all in it — so the panel says
+       only what the text cannot: which bar has been clicked. */
     if (clicked === null) {
-      let predText = "";
-      const ci = predInterval();
-      if (ci) {
-        const margin = Math.max(Math.abs(p - ci[0]), Math.abs(ci[1] - p)) * s;
-        predText = `<p>We should be tolerably certain of not being in error by more than
-          <strong>${fmt(margin, 1)}</strong> ${pluralBall(Math.round(margin))} in <strong>${pf.den}</strong>.</p>`;
-      }
-      $("#ex18_click_text", content).innerHTML =
-        `<div class="click-info"><p><em>Click on any bar to see the exact probability.</em></p>${predText}</div>`;
+      /* the comb only exists on the whole number line, so say where it is */
+      const combNote = (chk("ex18_rescale") && !chk("ex18_xaxis_balls"))
+        ? `<p class="help-text" style="margin-bottom:0;">Untick <em>Rescale</em> to see the probable error at
+           every proportion, drawn under the chart.</p>` : "";
+      $("#ex18_click_text", content).innerHTML = `<div class="click-info">
+        <p><span class="click-cue">Click on any bar of the chart to see the exact probability.</span></p>
+        ${combNote}</div>`;
     } else {
       const prob = dbinom(clicked, s, p);
       const probNum = Math.round(prob * 1000);
       const numText = clicked === 1 ? `${numberWord(clicked)} ${pluralBall(clicked)}` : `${clicked} ${pluralBall(clicked)}`;
+      const ph = clicked / s;
+      const e = 0.477 * Math.sqrt(2 * ph * (1 - ph) / s);
+      const covers = Math.abs(ph - p) <= e + 1e-12;
       $("#ex18_click_text", content).innerHTML = `<div class="click-info">
         <p><strong>Clicked outcome: </strong>${clicked} white balls out of ${s} drawings</p>
         <p>The probability of drawing <strong>${numText}</strong> would be
-          <strong>${probNum}/1000</strong> = <strong>${fmt(prob, 3)}</strong>.</p></div>`;
+          <strong>${probNum}/1000</strong> = <strong>${fmt(prob, 3)}</strong>.</p>
+        <p style="margin-bottom:0;">An induction from that sample gives
+          <strong style="color:#6b5c86;">${fmt(ph, 3)} &plusmn; ${fmt(e, 4)}</strong>, drawn as the bar across
+          the top of the stem &mdash; ${covers ? "which covers" : "which does not cover"} the real proportion of
+          ${fmt(p, 3)}. That is the probable error worked at the proportion the sample came out at, which is
+          the only one an inquirer holding it would have. It belongs to the estimate, not to the height of the
+          bar: the height says how often that sample turns up.</p></div>`;
     }
     drawCanvas(canvas);
   }
@@ -5614,10 +5804,15 @@ registerExample("example-ex32", (box) => {
       <button class="btn btn-primary" data-act="run">Run the tests</button>
       <button class="btn btn-warning btn-sm" data-act="fresh">New arguments</button>
     </div>
+    <!-- The weighted view is held back for now. Everything behind it is intact:
+         put the two lines below back inside the markup and it returns, tab,
+         shrinkage, table column and all. -->
+    <!--
     <div class="mode-tabs">
       <button class="mode-tab active" data-view="rule">The rule as stated</button>
       <button class="mode-tab" data-view="weighted">Weighted by how well each is known</button>
     </div>
+    -->
     <div class="row">
       <div class="col col-4" id="ex32-ctl-n"></div>
       <div class="col col-4" id="ex32-ctl-effort"></div>
@@ -5856,8 +6051,11 @@ registerExample("example-ex32", (box) => {
          <p style="margin-bottom:0;">As we have seen, each argument is determined by two numbers, a
           determination of its probability and its probable error. The method of balancing reasons only
           considers the determination of probability. We have let you set a threshold for how good an
-          argument must be for you to consider its value. Click <em>weighted by how well each is known</em>
-          to see why we can't simply weigh each argument according to its probable error.</p>`}</div>`;
+          argument must be for you to consider its value, and moving that threshold moves the answer.
+          The rule did not leave anything out; the line you drew did.</p>`}</div>`;
+    /* The last sentence used to send the reader to the weighted tab. That tab is
+       held back at the moment, so the pointer would be a door with nothing
+       behind it; restore it along with the tab. */
 
     const rows = st.rows.map((r) => `<tr${(st.mode === "weighted" ? r.w > 0.15 : r.inSum)
       ? "" : ' style="color:#a8adb4;"'}>
@@ -7001,6 +7199,16 @@ registerExample("example-ex33", (box) => {
 
   let truth = 0.5, cum = new Int32Array(0), extra = 0;
 
+  /* The error held as a real number rather than read back off its own slider.
+     A drawing added to a long run changes the error by less than the slider's
+     0.002 step, so rounding to the step and reading that back meant the button
+     did nothing at all over most of the range — the count never moved, and the
+     button looked broken because it was. The slider is still written to, so the
+     thumb goes where it can; this is what the example is actually working on.
+     Any hand movement of the slider drops it and the slider is the handle
+     again. */
+  let peReal = null;
+
   function newBag() {
     truth = 0.12 + Math.random() * 0.76;
     cum = new Int32Array(MAXN + 1);
@@ -7016,7 +7224,7 @@ registerExample("example-ex33", (box) => {
   function state() {
     let raw, pe;
     if (mode === "pe") {
-      pe = num("ex33_pe");
+      pe = peReal === null ? num("ex33_pe") : peReal;
       raw = nFromPE(pe);
     } else {
       raw = STOPS[Math.round(num("ex33_i"))] + extra;
@@ -7120,8 +7328,15 @@ registerExample("example-ex33", (box) => {
     const st = state();
     light(st);
 
-    $("[data-act='one']", content).textContent =
-      mode === "pe" ? "Take one more sample" : "Draw one more bean";
+    const oneBtn = $("[data-act='one']", content);
+    oneBtn.textContent = mode === "pe" ? "Take one more sample" : "Draw one more bean";
+    /* with the bag counted exactly there is no drawing left to take, so the
+       button goes rather than sitting there doing nothing */
+    oneBtn.style.display = (mode === "pe" && st.exact) ? "none" : "";
+    /* the slider can only show its own step; while an exact error is being held
+       the readout gives that instead, so the two do not disagree */
+    const peVal = document.getElementById("ex33_pe_val");
+    if (peVal && mode === "pe" && peReal !== null) peVal.textContent = `±${peReal.toFixed(3)}`;
 
     const implied = st.exact ? "the whole bag counted"
       : st.none ? "fewer than one drawing — nothing has been drawn"
@@ -7160,7 +7375,11 @@ registerExample("example-ex33", (box) => {
     drawCanvas(canvas);
   }
 
-  content.addEventListener("input", () => { if (mode === "beans") extra = 0; update(); });
+  content.addEventListener("input", (ev) => {
+    if (mode === "beans") extra = 0;
+    if (ev.target && ev.target.id === "ex33_pe") peReal = null;
+    update();
+  });
   content.addEventListener("click", (ev) => {
     const tab = ev.target.closest(".mode-tab");
     if (tab) {
@@ -7168,7 +7387,7 @@ registerExample("example-ex33", (box) => {
       $$(".mode-tab", content).forEach((x) => x.classList.toggle("active", x === tab));
       $("#ex33-ctl-pe", content).style.display = mode === "pe" ? "" : "none";
       $("#ex33-ctl-beans", content).style.display = mode === "beans" ? "" : "none";
-      extra = 0;
+      extra = 0; peReal = null;
       update();
       return;
     }
@@ -7179,12 +7398,17 @@ registerExample("example-ex33", (box) => {
       if (mode === "beans") extra++;
       else {
         /* one more sample, expressed as what it does to the error one is
-           holding: the slider steps down by exactly that much */
+           holding. The slider is moved to the nearest step it can show, and the
+           exact value is kept beside it — setSlider fires an input event, which
+           clears peReal, so the exact figure is assigned after it. */
         const st = state();
-        if (!st.exact) setSlider("ex33_pe",
-          Math.max(0, Math.round(peFromN(Math.max(1, st.raw) + 1) / 0.002) * 0.002));
+        if (!st.exact) {
+          const next = peFromN(Math.max(1, st.raw) + 1);
+          setSlider("ex33_pe", Math.max(0, Math.round(next / 0.002) * 0.002));
+          peReal = next;
+        }
       }
-    } else if (a === "newbag") { newBag(); extra = 0; }
+    } else if (a === "newbag") { newBag(); extra = 0; peReal = null; }
     else return;
     update();
   });
@@ -7212,6 +7436,35 @@ const CRETAN_UNSEEN = "#e2e0d9";     // pale, so an uncovered Cretan is the thin
 const CRETAN_LIAR_INK = "#8a4331";
 const CRETAN_TRUE_INK = "#547c62";
 const EST_COL = "#7a6a94";           // our own estimate, distinct from either
+
+/* A hundred Cretans by name, so that the sample in the boxes is the same thing
+   as the list of names in Peirce's sentence. His own five come first, in his
+   own order, because they are the ones the sentence prints when it is shut and
+   the ones a reader will look for; the rest are ancient Greek, women and men
+   alternating through the roll so that neither sex belongs to one end of it.
+   The roll is fixed: which of them lies is decided separately, and moves. */
+const CRETAN_NAMES = [
+  "Minos", "Sarpedon", "Rhadamanthus", "Deucalion", "Epimenides",
+  "Ariadne", "Idomeneus", "Pasiphaë", "Catreus", "Phaedra",
+  "Androgeus", "Europa", "Talos", "Britomartis", "Glaucus",
+  "Acacallis", "Asterion", "Dictynna", "Xenodice", "Meriones",
+  "Aerope", "Lycastus", "Clymene", "Deiphobus", "Eurymedon",
+  "Althaea", "Nauplius", "Kydon", "Melissa", "Iasus",
+  "Amaltheia", "Cleitus", "Arsinoe", "Doreus", "Chryseis",
+  "Ampelos", "Nikaia", "Kleoboulos", "Thessala", "Antiphates",
+  "Erigone", "Kritias", "Praxilla", "Oenopion", "Timandra",
+  "Lykomedes", "Aglaia", "Diomedes", "Kalliste", "Hipparchus",
+  "Theano", "Alkaios", "Melantho", "Pyrrhos", "Iphianassa",
+  "Straton", "Korinna", "Neoptolemus", "Damaris", "Charilaus",
+  "Eupraxia", "Phoinix", "Anthousa", "Kleisthenes", "Myrrhine",
+  "Archelaus", "Zenodora", "Philemon", "Hegesippe", "Menandros",
+  "Alkmene", "Xanthippos", "Berenike", "Polydorus", "Lysandra",
+  "Nikias", "Phanessa", "Gorgias", "Melitta", "Aristarchos",
+  "Isidora", "Kallias", "Sostrate", "Demetrios", "Eirene",
+  "Prokles", "Thaleia", "Timaeus", "Glykera", "Aristides",
+  "Herais", "Leontios", "Kleopatra", "Sosthenes", "Aspasia",
+  "Euthymios", "Danae", "Onesimos", "Rhodanthe", "Theophrastos"
+];
 
 /* ==========================================================================
    EXAMPLE 19 — Epimenides. Deduction from a known proportion.
@@ -7369,6 +7622,7 @@ registerExample("example-ex20", (box) => {
   const content = h(`<div id="ex20-content" class="example-content">
     <div class="ex-buttonbar">
       <button class="btn btn-primary" data-act="one">Take a sample</button>
+      <button class="btn btn-primary" data-act="five">Take five samples</button>
       <button class="btn btn-primary" data-act="many">Take a hundred samples</button>
       <button class="btn btn-primary" data-act="lots">Take a thousand</button>
       <button class="btn btn-warning btn-sm" data-act="clear">Clear the samples</button>
@@ -7391,8 +7645,11 @@ registerExample("example-ex20", (box) => {
 
   const N = 100;                       // the roll of Cretans, so a proportion is a count
 
+  /* The names in his sentence are this slider: "five or six instances" is the
+     length of the list above, not the number of times one draws. How many times
+     one draws is what the buttons do. */
   $("#ex20-ctl-s", content).appendChild(
-    slider("ex20_s", "Cretans in each sample:", 2, 20, 5, 1, (v) => v, "k2"));
+    slider("ex20_s", "Cretans named in each sample:", 2, 20, 5, 1, (v) => v, "k2"));
   /* The confidence level is the word "probably" in Peirce's sentence, so the
      slider carrying it is the one his word is coloured for. Its two ends are
      the first and third rows of the table above: 0.477 and 1.821. */
@@ -7444,10 +7701,79 @@ registerExample("example-ex20", (box) => {
   const tint = (col, s) => `<span style="color:${col};">${s}</span>`;
   const K2 = "#b0563f", K3 = "#4a7c59", GOLD = "#9a7b3f";
 
+  /* --------------------------------------------------------------------------
+     Peirce's five names are the sample.
+
+     His list is the sample size, so the two are one control: move the slider
+     and the list lengthens, take a sample and the list is who was drawn. Which
+     of them lies is settled behind the boxes and nowhere else, so a name is
+     coloured only once its box has been uncovered — the sentence and the
+     hundred boxes can never disagree, being the same fact read twice.
+
+     Unmixed, the draw is the front of the roll, and the front of the roll is
+     Minos, Sarpedon, Rhadamanthus, Deucalion and Epimenides, all of them liars.
+     So at the setting his own paragraph describes the sentence comes out
+     exactly as he printed it, and it is the mixing slider that takes it away
+     from him.
+     ------------------------------------------------------------------------*/
+  function drawn() {
+    const s = Math.round(num("ex20_s"));
+    /* before anything is drawn, the front of the roll — which is what "all the
+       Cretans I can think of" means, and prints his own five at five */
+    return sample.length ? sample.slice(0, s) : Array.from({ length: s }, (_, i) => i);
+  }
+  function nameList() {
+    const idx = drawn(), uncovered = sample.length > 0;
+    const parts = idx.map((i) => {
+      const nm = CRETAN_NAMES[i % CRETAN_NAMES.length];
+      if (!uncovered) return nm;
+      return tint(pop[i] ? CRETAN_LIAR_INK : CRETAN_TRUE_INK, nm);
+    });
+    if (parts.length <= 1) return parts.join("");
+    return `${parts.slice(0, -1).join(", ")}, and ${parts[parts.length - 1]}`;
+  }
+  const liarsDrawn = () => drawn().filter((i) => pop[i]).length;
+
   registerLive("example-ex20", {
     instances: () => {
       const s = Math.round(num("ex20_s"));
       return `${spellNumber(s)} or ${spellNumber(s + 1)}`;
+    },
+    /* What "approximated" comes to, in the units the example is already
+       counting in. His adverb is left alone: "probably" is a modal about how
+       often the bound holds, which the confidence slider governs three clauses
+       later, and the closeness is a different quantity — so it is added rather
+       than swapped for. A hundred Cretans makes whole Cretans the natural unit,
+       and it is his worst case throughout, since that is what his sentence is
+       about and, until the reveal, the only bound there is. */
+    within: () => ` within ${spellNumber(Math.max(1, Math.round(bound() * 100)))} in a hundred`,
+    names: () => nameList(),
+    /* the mixing slider, said in his own clause: at one end they are the ones
+       that come to mind, at the other they are a fair draw */
+    howGot: () => {
+      const st = state();
+      const s = st.s;
+      /* until a sample is taken the list is the front of the roll, which is
+         what his clause says it is; the draw is what can make it something
+         else */
+      if (!sample.length) return null;
+      if (st.fair) return `are ${tint(K2, spellNumber(s))} Cretans drawn at random`;
+      if (st.notRandom) return `are all the Cretans I can think of`;
+      return `are ${tint(K2, spellNumber(s))} Cretans, the roll only partly mixed`;
+    },
+    allLiars: () => {
+      if (!sample.length) return null;             // his sentence, until there is a draw
+      const k = liarsDrawn(), s = drawn().length;
+      if (k === s) return "these were all atrocious liars";
+      if (k === 0) return `not one of these ${spellNumber(s)} was a liar`;
+      return `${spellNumber(k)} of these ${spellNumber(s)} were atrocious liars`;
+    },
+    conclusion: () => {
+      if (!sample.length) return null;
+      const k = liarsDrawn(), s = drawn().length;
+      if (k === s) return "pretty much all Cretans must have been liars";
+      if (k === 0) return "pretty much no Cretan can have been a liar";
+      return `about ${tint(EST_COL, fracWord(k, s))} of the Cretans must have been liars`;
     },
     /* "Probably" is a rate and nothing else, so the slider that sets the rate
        rewrites the word. At the probable error it is his own. */
@@ -7505,13 +7831,25 @@ registerExample("example-ex20", (box) => {
          either way and is what is left once the first is accounted for. */
       const eFit = boundAtP(st.conf, st.s, truth);
       const slack = st.e > eFit * 1.02;
+      /* "Even in the worst case" cuts the other way too, and this is the half
+         of it his sentence leaves implicit: away from a half the same bound is
+         bought with fewer instances. Setting 0.477 root(2q(1-q)/n) equal to the
+         worst case at s gives n = 4 s q(1-q) — at nine liars in ten, two
+         Cretans do what five do at a half. */
+      const nEquiv = Math.max(1, Math.round(4 * st.s * truth * (1 - truth)));
+      const fewer = nEquiv < st.s
+        ? ` At that proportion ${tint(K2, spellNumber(nEquiv))}
+            ${nEquiv === 1 ? "instance" : "instances"} would buy the bound that
+            ${tint(K2, spellNumber(st.s))} do at a half, which is the other half of
+            &ldquo;even in the worst case&rdquo;.`
+        : "";
       const why = st.fair
         ? `A fair draw of ${from} from a hundred puts that rate at ${tint(K3, fmt(exactRate(st.e), 3))}. `
           + (slack
             ? `Peirce's bound is the worst case, p = &frac12;, so it is wider than this proportion warrants:
                at ${tint(GOLD, fmt(truth, 2))} the probable error is ${tint(K3, "&plusmn;" + fmt(eFit, 4))},
-               and a bound that size would be caught ${tint(K3, fmt(exactRate(eFit) * 100, 1))} in 100. What
-               is left over is the lattice &mdash; `
+               and a bound that size would be caught ${tint(K3, fmt(exactRate(eFit) * 100, 1))} in 100.${fewer}
+               What is left over is the lattice &mdash; `
             : `The bound already fits this proportion, so what moves the rate off the claim is the lattice
                &mdash; `)
           + `an induction from ${from} can land on only ${tint(K2, spellNumber(st.s + 1))} values, and the
@@ -7689,7 +8027,10 @@ registerExample("example-ex20", (box) => {
       const shown = revealed || inSample.has(i);
       const bg = shown ? (pop[i] ? CRETAN_LIAR : CRETAN_TRUE) : CRETAN_UNSEEN;
       const ring = inSample.has(i) ? "box-shadow:0 0 0 2px #2c3138;" : "";
-      cells += `<span style="display:inline-block;width:20px;height:20px;margin:2px;border-radius:3px;
+      /* every box is somebody, and the five in the sentence above are five of
+         these: the name is on the box so the two can be matched by hand */
+      cells += `<span title="${CRETAN_NAMES[i % CRETAN_NAMES.length]}"
+        style="display:inline-block;width:20px;height:20px;margin:2px;border-radius:3px;
         border:1px solid #a8adb4;${ring}background:${bg};color:#8a9099;font-size:0.72em;line-height:20px;
         text-align:center;vertical-align:top;">${shown ? "" : "?"}</span>`;
     }
@@ -7725,6 +8066,7 @@ registerExample("example-ex20", (box) => {
     if (!b) return;
     const a = b.getAttribute("data-act");
     if (a === "one") takeSamples(1);
+    else if (a === "five") takeSamples(5);
     else if (a === "many") takeSamples(100);
     else if (a === "lots") takeSamples(1000);
     else if (a === "clear") clearSamples();
@@ -9497,8 +9839,12 @@ registerExample("example-ex13", (box) => {
    The examples themselves are untouched, above and in their own files; this
    only replaces what their triggers open, so that nothing has to be unpicked
    to put them back. Delete this block and they return as they were.
+
+   13 is here too, the colour chart being complete but waiting on where it
+   stands now that 21's demonstration has gone; take it out of the list and it
+   is back exactly as it was, the whole of it being still above.
    ========================================================================*/
-["example-ex22", "example-ex23", "example-ex24", "example-ex25"].forEach((id) => {
+["example-ex13", "example-ex22", "example-ex23", "example-ex24", "example-ex25"].forEach((id) => {
   registerExample(id, (box) => {
     box.appendChild(h(`<div class="example-content" style="padding-top:2px;">
       <p class="ed-note" style="margin-bottom:0;">Coming soon.</p></div>`));

@@ -3,13 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fechner's three methods (interactive)</title>
+<title>Fechner's three methods</title>
 <style>
   /* ==========================================================================
-     Same palette and setting as the other papers on this site. Nothing is
-     fetched at run time: no fonts, no scripts, no data. The plots draw with
-     PAL below, in the same serif as the prose, so they read as part of the
-     page rather than as apparatus placed on it.
+     Shared by every page. Same palette and setting as the other papers here.
+     Nothing is fetched at run time: no fonts, no scripts, no data. Plots draw
+     with PAL in _lib.js, in the same serif as the prose.
      ========================================================================*/
   :root {
     --page:      #f4f1ea;
@@ -43,12 +42,50 @@
 
   .article-container {
     background-color: var(--paper);
-    padding: 52px 56px;
+    padding: 44px 56px 52px 56px;
     box-shadow: 0 1px 3px rgba(60, 50, 30, .10);
     border-radius: 2px;
   }
-  @media (max-width: 720px) { .article-container { padding: 30px 20px; } }
+  @media (max-width: 720px) { .article-container { padding: 26px 20px 34px 20px; } }
 
+  /* ------------------------------------------------------------------ nav */
+  nav.top {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2px 22px;
+    padding-bottom: 14px;
+    margin-bottom: 30px;
+    border-bottom: 1px solid var(--rule-soft);
+  }
+  nav.top a {
+    font-size: .82em;
+    font-variant: small-caps;
+    letter-spacing: .07em;
+    color: var(--ink-faint);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    padding-bottom: 3px;
+  }
+  nav.top a:hover { color: var(--ink-soft); }
+  nav.top a.here { color: var(--ink); border-bottom-color: var(--accent); }
+  nav.top .n { color: var(--rule); margin-right: 5px; }
+
+  nav.foot {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    margin-top: 44px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule-soft);
+    font-variant: small-caps;
+    letter-spacing: .06em;
+    font-size: .92em;
+  }
+  nav.foot a { color: var(--accent); text-decoration: none; }
+  nav.foot a:hover { color: var(--ink); }
+  nav.foot .sp { color: var(--ink-faint); }
+
+  /* -------------------------------------------------------------- headings */
   h2 {
     text-align: center;
     font-weight: normal;
@@ -59,14 +96,15 @@
   h3 {
     text-align: center;
     font-variant: small-caps;
-    margin-top: 40px;
-    margin-bottom: 30px;
+    margin-top: 46px;
+    margin-bottom: 26px;
     letter-spacing: 1px;
   }
   h4 {
-    text-align: center;
     font-weight: normal;
-    margin-bottom: 10px;
+    font-size: 1.06em;
+    margin: 34px 0 4px 0;
+    color: var(--ink);
   }
   h5 {
     font-size: .82em;
@@ -74,75 +112,37 @@
     font-variant: small-caps;
     letter-spacing: .09em;
     color: var(--ink-faint);
-    margin: 26px 0 8px 0;
+    margin: 30px 0 8px 0;
   }
   .standfirst {
     text-align: center;
     color: var(--ink-soft);
     font-style: italic;
-    margin: 0 auto 6px auto;
+    margin: 0 auto 30px auto;
     max-width: 34em;
   }
-  .byline {
-    text-align: center;
-    font-size: .82em;
+  .step-of {
+    font-size: .78em;
     font-variant: small-caps;
-    letter-spacing: .09em;
-    color: var(--ink-faint);
-    margin-bottom: 34px;
+    letter-spacing: .1em;
+    color: var(--accent-4);
+    margin: 30px 0 -2px 0;
   }
 
   p { text-align: justify; margin-bottom: 15px; }
-
-  hr.div {
-    border: none;
-    border-top: 1px solid var(--rule-soft);
-    margin: 40px 0;
-  }
-
-  /* --------------------------------------------------------- mode switches */
-  .mode-tabs {
-    display: flex;
-    gap: 24px;
-    margin-bottom: 22px;
-    flex-wrap: wrap;
-    border-bottom: 1px solid var(--rule-soft);
-  }
-  .mode-tab {
-    padding: 3px 0 8px 0;
-    background: none;
-    border: none;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: .95em;
-    font-weight: 400;
-    font-variant: small-caps;
-    letter-spacing: .06em;
-    color: var(--ink-faint);
-    transition: color .2s, border-color .2s;
-  }
-  .mode-tab:hover { color: var(--ink-soft); }
-  .mode-tab.active { color: var(--ink); border-bottom-color: var(--accent); }
-  .tabpanel { display: none; }
-  .tabpanel.on { display: block; }
+  .lead { font-size: 1.04em; }
+  hr.div { border: none; border-top: 1px solid var(--rule-soft); margin: 44px 0; }
 
   /* -------------------------------------------------------------- controls */
   .ctl { margin-bottom: 16px; }
   .ctl > label {
-    display: block;
-    font-size: .92em;
-    color: var(--ink-soft);
-    margin-bottom: 2px;
-    line-height: 1.5;
+    display: block; font-size: .92em; color: var(--ink-soft);
+    margin-bottom: 2px; line-height: 1.5;
   }
   .ctl input[type=range] { width: 100%; accent-color: var(--accent); margin: 2px 0; }
   .ctl .slider-val {
-    font-size: .95em;
-    color: var(--accent);
-    font-weight: 700;
-    font-variant-numeric: tabular-nums;
+    font-size: .95em; color: var(--accent);
+    font-weight: 700; font-variant-numeric: tabular-nums;
   }
 
   button.btn {
@@ -160,7 +160,7 @@
     transition: color .18s, border-color .18s, background-color .18s;
   }
   button.btn:hover:not(:disabled) { background-color: var(--wash); color: var(--ink); border-color: var(--ink-faint); }
-  button.btn:disabled { opacity: .38; cursor: default; }
+  button.btn:disabled { opacity: .35; cursor: default; }
   button.btn-primary { color: var(--accent);   border-color: rgba(47, 111, 159, .45); }
   button.btn-success { color: var(--accent-3); border-color: rgba(74, 124, 89, .45); }
   button.btn-danger  { color: var(--accent-2); border-color: rgba(176, 86, 63, .45); }
@@ -169,83 +169,130 @@
   button.btn-danger:hover:not(:disabled)  { background-color: var(--tint-2); color: var(--accent-2); }
   button.btn-lg { font-size: 1em; padding: 8px 18px; }
 
-  .ex-buttonbar {
-    display: flex; flex-wrap: wrap; align-items: center;
-    gap: 4px 6px; margin-bottom: 16px;
-  }
+  .ex-buttonbar { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-bottom: 16px; }
   .ex-buttonbar .btn { margin: 0; }
+  .ex-buttonbar .sep { flex-basis: 100%; height: 0; }
 
-  /* ------------------------------------------------------------- asides */
-  .key-insight {
-    border-left: 2px solid var(--accent-4);
-    padding: 1px 0 1px 18px;
-    margin: 20px 0;
-    font-style: italic;
-    display: none;
-  }
-  .key-insight.on { display: block; }
-  .key-insight strong { font-style: normal; }
-
+  /* ---------------------------------------------------------------- asides */
   .note-block {
-    font-size: .9em;
-    color: var(--ink-soft);
+    font-size: .9em; color: var(--ink-soft);
     border-left: 2px solid var(--rule);
-    padding: 1px 0 1px 18px;
-    margin: 16px 0;
+    padding: 1px 0 1px 18px; margin: 18px 0;
   }
-  .help-text { color: var(--ink-faint); font-style: italic; }
-
-  .plot-container { margin: 18px 0; }
+  .note-block b { color: var(--ink); font-weight: 400; font-variant: small-caps; letter-spacing: .05em; }
+  .help-text { color: var(--ink-faint); font-style: italic; font-size: .93em; }
+  .plot-container { margin: 16px 0 6px 0; }
+  .plot-cap {
+    font-size: .82em; color: var(--ink-faint);
+    text-align: center; margin: 0 0 22px 0; line-height: 1.5;
+  }
   canvas.plot { width: 100%; display: block; }
 
-  /* --------------------------------------------------------- readouts */
-  .readout {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
-    gap: 14px 20px;
-    margin: 20px 0;
-    padding-top: 14px;
-    border-top: 1px solid var(--rule-soft);
-  }
-  .readout div span {
-    display: block;
+  /* -------------------------------------------------------- protocol sheet */
+  .sheet-wrap { overflow-x: auto; margin: 16px 0 6px 0; }
+  table.sheet {
+    border-collapse: collapse;
     font-size: .78em;
-    font-variant: small-caps;
-    letter-spacing: .07em;
-    color: var(--ink-faint);
-  }
-  .readout div b {
-    font-weight: 400;
-    font-size: 1.22em;
     font-variant-numeric: tabular-nums;
-    color: var(--ink);
+    margin: 0 auto;
   }
-  .readout div b.k1 { color: var(--accent); }
-  .readout div b.k2 { color: var(--accent-2); }
-  .readout div b.k3 { color: var(--accent-3); }
+  table.sheet th {
+    font-weight: 400; font-variant: small-caps; letter-spacing: .06em;
+    color: var(--ink-faint); padding: 2px 6px 5px 6px;
+    border-bottom: 1px solid var(--rule); white-space: nowrap;
+  }
+  table.sheet th.rot { font-size: .92em; }
+  table.sheet td {
+    text-align: center; padding: 3px 7px;
+    border-left: 1px solid var(--rule-soft);
+    white-space: nowrap;
+  }
+  table.sheet td:first-child { border-left: none; }
+  table.sheet td.rowhead {
+    text-align: right; color: var(--ink-soft);
+    padding-right: 10px; border-left: none;
+  }
+  table.sheet td.yes  { color: var(--accent);   font-weight: 700; }
+  table.sheet td.no   { color: var(--ink-faint); }
+  table.sheet td.gt   { color: var(--accent-2); font-weight: 700; }
+  table.sheet td.eq   { color: var(--accent-3); font-weight: 700; }
+  table.sheet td.lt   { color: var(--accent);   font-weight: 700; }
+  table.sheet td.blank { color: var(--rule); }
+  table.sheet td.brack { background: var(--tint-4); }
+  table.sheet tr.rule td { border-top: 1px solid var(--rule); }
+  table.sheet tr.derived td { color: var(--accent-3); font-weight: 700; padding-top: 5px; }
+  table.sheet tr.derived td.rowhead { color: var(--ink-faint); font-weight: 400; }
+  table.sheet caption {
+    caption-side: bottom; font-size: .95em; color: var(--ink-faint);
+    padding-top: 9px; text-align: center; line-height: 1.5;
+  }
+  .sheet-empty {
+    color: var(--ink-faint); font-style: italic; font-size: .9em;
+    text-align: center; padding: 22px 0;
+    border-top: 1px solid var(--rule-soft); border-bottom: 1px solid var(--rule-soft);
+    margin: 16px 0;
+  }
 
-  .trial-log {
-    font-size: .82em;
-    line-height: 1.7;
-    color: var(--ink-soft);
-    max-height: 110px;
-    overflow-y: auto;
+  /* ---------------------------------------------------- worked calculation */
+  .calc {
+    font-variant-numeric: tabular-nums;
+    margin: 20px 0 22px 0;
     border-left: 2px solid var(--rule-soft);
-    padding: 4px 0 4px 16px;
-    margin: 14px 0;
+    padding: 6px 0 6px 20px;
+  }
+  .calc .line {
+    display: grid;
+    grid-template-columns: minmax(90px, 200px) minmax(0, 1fr) max-content;
+    gap: 6px 16px; align-items: baseline;
+    padding: 2px 0; line-height: 1.7;
+  }
+  .calc .line.sum { border-top: 1px solid var(--rule-soft); margin-top: 6px; padding-top: 7px; }
+  .calc .lbl { color: var(--ink-soft); font-size: .9em; text-align: right; }
+  .calc .expr { color: var(--ink-faint); font-size: .92em; }
+  .calc .res { font-weight: 700; text-align: right; white-space: nowrap; }
+  .calc .res.k1 { color: var(--accent); }
+  .calc .res.k2 { color: var(--accent-2); }
+  .calc .res.k3 { color: var(--accent-3); }
+  @media (max-width: 600px) {
+    .calc .line { grid-template-columns: 1fr max-content; }
+    .calc .expr { grid-column: 1 / -1; text-align: right; }
+  }
+
+  /* ---------------------------------------------------------------- trials */
+  .trial-log {
+    font-size: .82em; line-height: 1.7; color: var(--ink-soft);
+    max-height: 108px; overflow-y: auto;
+    border-left: 2px solid var(--rule-soft);
+    padding: 4px 0 4px 16px; margin: 14px 0;
     font-variant-numeric: tabular-nums;
   }
   .trial-log .r { color: var(--accent-3); }
   .trial-log .w { color: var(--accent-2); }
 
-  /* --------------------------------------------------- the self-test stage */
+  .apparatus {
+    display: flex; align-items: baseline; justify-content: center;
+    gap: 8px 26px; flex-wrap: wrap;
+    border-top: 1px solid var(--rule-soft);
+    border-bottom: 1px solid var(--rule-soft);
+    padding: 16px 10px; margin: 18px 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .apparatus .slot { text-align: center; min-width: 116px; }
+  .apparatus .slot span {
+    display: block; font-size: .76em; font-variant: small-caps;
+    letter-spacing: .07em; color: var(--ink-faint);
+  }
+  .apparatus .slot b { font-weight: 400; font-size: 1.5em; }
+  .apparatus .slot b.k1 { color: var(--accent); }
+  .apparatus .slot b.k2 { color: var(--accent-2); }
+  .apparatus .slot b.k3 { color: var(--accent-3); }
+  .apparatus .says { font-size: 1.15em; font-style: italic; min-width: 130px; text-align: center; }
+
+  /* --------------------------------------------------------- self-test bits */
   .stage {
-    background: #7a7a7a;
-    padding: 40px 26px;
-    display: flex; gap: 40px;
-    justify-content: center; align-items: center;
-    margin: 20px 0;
-    border-radius: 2px;
+    background: #7a7a7a; padding: 40px 26px;
+    display: flex; gap: 40px; justify-content: center; align-items: center;
+    margin: 20px 0; border-radius: 2px;
   }
   .patch { width: 140px; height: 140px; border-radius: 2px; }
   @media (max-width: 600px) { .patch { width: 104px; height: 104px; } .stage { gap: 20px; padding: 28px 16px; } }
@@ -254,1014 +301,1007 @@
   .prog i { display: block; height: 100%; background: var(--accent); width: 0; }
   .hidden { display: none; }
 
-  .nextlink {
-    text-align: center;
-    margin: 34px 0 0 0;
-    font-variant: small-caps;
-    letter-spacing: .06em;
-  }
-  .nextlink a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(47,111,159,.35); }
-  .nextlink a:hover { color: var(--ink); border-bottom-color: var(--ink-faint); }
-
   .colophon {
-    margin-top: 44px;
-    padding-top: 18px;
+    margin-top: 40px; padding-top: 18px;
     border-top: 1px solid var(--rule-soft);
-    font-size: .84em;
-    color: var(--ink-faint);
-    text-align: left;
+    font-size: .84em; color: var(--ink-faint); text-align: left;
   }
   @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
 </style>
 </head>
-<body>
+<body data-page="intro">
 <div class="article-container">
 
+<nav class="top">
+  <a href="index.html"                data-p="intro"><span class="n">0</span>Introduction</a>
+  <a href="right-and-wrong-cases.html" data-p="rw"><span class="n">1</span>Right and wrong cases</a>
+  <a href="just-noticeable-differences.html" data-p="jnd"><span class="n">2</span>Just noticeable differences</a>
+  <a href="average-error.html"         data-p="ae"><span class="n">3</span>Average error</a>
+  <a href="results.html"               data-p="res"><span class="n">4</span>The three together</a>
+  <a href="try-it-yourself.html"       data-p="try"><span class="n">5</span>Try it yourself</a>
+</nav>
+
 <h2>Fechner's three methods</h2>
-<p class="standfirst">A subject lifts brass weights. Three ways of turning what he says into a number.</p>
-<p class="byline">Elemente der Psychophysik, 1860</p>
+<p class="standfirst">A subject sits at a bench with brass weights. Five pages working through how what he says becomes a number.</p>
 
-<p>Fechner wanted to measure the smallest difference a subject can feel. A 100&nbsp;g weight sits in one hand and a slightly heavier one in the other. How much heavier does the second have to be before he notices?</p>
+<p class="lead">Gustav Fechner set out three procedures for measuring a sense in <i>Elemente der Psychophysik</i> (1860). Each page here takes one of them: what the subject is asked to do, the record that produces, and the arithmetic that turns that record into a threshold. The last two pages put the results side by side and let you run the methods on yourself.</p>
 
-<p>He described three ways of finding out. Each asks the subject to do something different, and each records something different. None of them observes a threshold. Each produces some other quantity and then applies a rule to turn it into one.</p>
+<h3>Two thresholds</h3>
 
-<p>Work through the tabs in any order. Each ends with the method run on you.</p>
+<p>Every method below is used to find two different quantities, and it is worth keeping them apart from the start.</p>
 
-<div class="mode-tabs" role="tablist">
-  <button class="mode-tab active" id="tab-rw" role="tab">Right and wrong cases</button>
-  <button class="mode-tab" id="tab-jnd" role="tab">Just noticeable differences</button>
-  <button class="mode-tab" id="tab-ae" role="tab">Average error</button>
-</div>
+<h5>The absolute threshold</h5>
+<p>Weights are laid on the subject's palm, one at a time. Very light ones he does not feel at all. The <b>absolute threshold</b>, Fechner's <i>Reizlimen</i> or RL, is the weight at which sensation begins. Because his answer at any one weight varies from trial to trial, it is taken as the weight he feels half the time.</p>
 
-<!-- =================== RIGHT AND WRONG CASES =================== -->
-<div class="tabpanel on" id="panel-rw" role="tabpanel">
+<h5>The difference threshold</h5>
+<p>A 100&nbsp;g standard sits in one hand and a comparison weight in the other. Small differences he cannot tell apart. The <b>difference threshold</b>, the <i>Unterschiedsschwelle</i> or DL, is the smallest change he can notice. It is the same idea as the <b>just noticeable difference</b>.</p>
 
-  <h3>The method of right and wrong cases</h3>
+<p>Two further quantities come out of the comparison task and are worth naming now, because two of the methods report them:</p>
+<ul>
+<li>The <b>point of subjective equality</b> is the comparison weight that feels equal to the standard. There is no guarantee it is 100&nbsp;g.</li>
+<li>The <b>constant error</b> is how far that point sits from the true 100&nbsp;g. It is steady across sessions and depends on things like which hand holds the standard.</li>
+</ul>
 
-  <p>Pick a few fixed differences in advance. Present them over and over in random order. Mark each answer right or wrong, and count.</p>
+<h3>The subject</h3>
 
-  <h5>One trial</h5>
-  <p>The subject lifts 100&nbsp;g in one hand and 103&nbsp;g in the other and says which is heavier. That is the whole task.</p>
-  <div class="ex-buttonbar">
-    <button class="btn btn-primary" id="rw-1">One trial</button>
-    <button class="btn" id="rw-10">Ten</button>
-    <button class="btn" id="rw-100">A hundred</button>
-    <button class="btn" id="rw-reset">Clear</button>
-  </div>
-  <div class="trial-log" id="rw-log">No trials yet.</div>
-  <div class="readout">
-    <div><span>Trials</span><b id="rw-n">0</b></div>
-    <div><span>Right</span><b id="rw-c">0</b></div>
-    <div><span>Proportion</span><b class="k1" id="rw-p">—</b></div>
-  </div>
-  <div class="plot-container"><canvas class="plot" id="rw-plot" height="170"></canvas></div>
-  <div class="key-insight" id="rw-rev1">A single trial tells you a direction, not a size. The proportion means something; one answer does not. Fechner said each observation here has next to no meaning on its own.</div>
+<p>The subject on these pages is simulated, so that the answer is known while you work. Five numbers describe him. The first two are his senses. The last two are not, and that is what makes the three methods disagree later.</p>
 
-  <h5>Several differences</h5>
-  <p>Run the same procedure at other comparison weights. Each button runs 120 trials at one difference.</p>
-  <div class="ex-buttonbar" id="rw-levels"></div>
-  <div class="plot-container"><canvas class="plot" id="rw-curve" height="230"></canvas></div>
-  <p>If he had a real cut-off, the points would sit flat at one half and then rise. Try the overlays.</p>
-  <div class="ex-buttonbar">
-    <button class="btn" id="rw-ov-step">A real cut-off</button>
-    <button class="btn" id="rw-ov-smooth">No cut-off</button>
-    <button class="btn" id="rw-ov-clear">Clear overlay</button>
-  </div>
-  <div class="key-insight" id="rw-rev2">There is no corner. The points climb out of chance from the smallest difference upward. Whatever is being measured, it is not a hard boundary.</div>
+<div id="subj-sheet"></div>
 
-  <h5>Fitting a curve</h5>
-  <p>Suppose each lift registers as the true weight plus an error. Two lifts give two noisy values and he reports the larger. He is right whenever the error does not reverse the true order. Move the slider until the curve matches the points.</p>
-  <div class="ctl">
-    <label for="rw-sigma">Error per lift <span class="slider-val" id="rw-sigmav">11.00 g</span></label>
-    <input type="range" id="rw-sigma" min="1" max="14" step=".05" value="11">
-  </div>
-  <div class="plot-container"><canvas class="plot" id="rw-fit" height="230"></canvas></div>
-  <div class="readout">
-    <div><span>Error per lift</span><b class="k1" id="rw-s1">—</b></div>
-    <div><span>Error of the difference</span><b class="k1" id="rw-s2">—</b></div>
-    <div><span>Threshold</span><b class="k3" id="rw-th">—</b></div>
-    <div><span>Misfit</span><b id="rw-rms">—</b></div>
-  </div>
-  <div class="key-insight" id="rw-rev3">The number came from a curve you chose and then adjusted, not from anything observed. Assume a different curve and you get a different number.</div>
-  <div class="note-block"><b>The rule.</b> A spread is not a threshold. You have to name a point on the curve and call it one. Here it is the probable error: 0.6745 times the spread, the difference he gets right three times in four. Pick a different fraction and every number on this page moves.</div>
+<p>Nothing in these figures has been chosen to make the methods agree. Where they agree it is because they are recovering the same quantity; where they differ, the page says which part of the procedure the difference comes from.</p>
 
-  <h5>Now you</h5>
-  <p>The right patch is a little lighter than the left, by one of four amounts, shuffled. Say whether you can see a difference. Guess if you have to.</p>
-  <p class="help-text">Best in a dim room. 32 trials, about a minute.</p>
-  <div class="ex-buttonbar" id="rwt-intro"><button class="btn btn-primary btn-lg" id="rwt-start">Begin</button></div>
-  <div id="rwt-run" class="hidden">
-    <div class="stage"><div class="patch" id="rwt-ref"></div><div class="patch" id="rwt-test"></div></div>
-    <div class="keys">
-      <button class="btn btn-lg" id="rwt-yes">Different</button>
-      <button class="btn btn-lg" id="rwt-no">The same</button>
-    </div>
-    <div class="prog"><i id="rwt-bar"></i></div>
-    <p class="help-text" id="rwt-count"></p>
-  </div>
-  <div id="rwt-done" class="hidden">
-    <div class="plot-container"><canvas class="plot" id="rwt-plot" height="215"></canvas></div>
-    <div class="readout">
-      <div><span>Your spread</span><b class="k1" id="rwt-sd">—</b></div>
-      <div><span>Your threshold</span><b class="k3" id="rwt-th">—</b></div>
-    </div>
-    <div class="key-insight on" id="rwt-rev"></div>
-    <div class="ex-buttonbar"><button class="btn" id="rwt-again">Run it again</button></div>
-  </div>
-</div>
-
-<!-- =================== JUST NOTICEABLE DIFFERENCES =================== -->
-<div class="tabpanel" id="panel-jnd" role="tabpanel">
-
-  <h3>The method of just noticeable differences</h3>
-
-  <p>Here the experimenter moves the comparison in small steps and asks after each one: different, or the same? The subject feels a ladder being climbed or descended. Later writers call this the method of limits.</p>
-
-  <h5>One series</h5>
-  <p>A series starts well away from the standard and steps toward it. It stops when his answer changes. Each series is a column below. Filled circles are "different", open circles "the same". The crossing is the midpoint of the last two steps, marked in green.</p>
-  <div class="ex-buttonbar">
-    <button class="btn btn-primary" id="jnd-run">Run a series</button>
-    <button class="btn" id="jnd-run10">Ten more</button>
-    <button class="btn" id="jnd-clear">Clear</button>
-  </div>
-  <div class="plot-container"><canvas class="plot" id="jnd-ladder" height="300"></canvas></div>
-  <div class="readout">
-    <div><span>Series</span><b id="jnd-n">0</b></div>
-    <div><span>Direction</span><b id="jnd-dir">—</b></div>
-    <div><span>Steps taken</span><b id="jnd-steps">—</b></div>
-    <div><span>This crossing</span><b class="k3" id="jnd-last">—</b></div>
-  </div>
-  <div class="key-insight" id="jnd-rev1">One series gives one number. It cost a handful of trials, which is why the method was popular. But you have one crossing on one occasion, and nothing yet says how much it would move if you ran it again.</div>
-  <div class="key-insight" id="jnd-rev2">Run another and the direction reverses. Descending series cross low, ascending series cross high. He carries his last answer forward a step or two before switching. Fechner called this habituation.</div>
-
-  <h5>The crossings</h5>
-  <p>Every crossing from the columns above collects here, sorted by direction.</p>
-  <div class="plot-container"><canvas class="plot" id="jnd-cross" height="195"></canvas></div>
-  <div class="ctl">
-    <label for="jnd-bias">His habituation <span class="slider-val" id="jnd-biasv">1.00 g</span></label>
-    <input type="range" id="jnd-bias" min="0" max="2.5" step=".05" value="1">
-  </div>
-  <div class="readout">
-    <div><span>Ascending</span><b class="k1" id="jnd-am">—</b></div>
-    <div><span>Descending</span><b class="k2" id="jnd-dm">—</b></div>
-    <div><span>Gap</span><b id="jnd-gap">—</b></div>
-    <div><span>Threshold</span><b class="k3" id="jnd-th">—</b></div>
-  </div>
-  <div class="key-insight" id="jnd-rev3">Raise his habituation and the two rows separate. The average of the two barely moves. Neither direction on its own estimates anything you want; each is the threshold plus a bias, with the sign reversed between them.</div>
-  <div class="note-block"><b>The rule.</b> Take the mean of all crossings, both directions together. This method needs no chosen percentage. It assumes instead that the two directions err by the same amount in opposite directions. Nothing in the data shows that.</div>
-
-  <h5>Three quantities from one procedure</h5>
-  <p>Now allow a third answer. Sweep the comparison from well below the standard to well above, and back down on alternate runs, letting him say less, equal, or greater. Each sweep changes twice.</p>
-  <div class="ex-buttonbar"><button class="btn btn-primary" id="gel-run">Run ten sweeps</button></div>
-  <div class="plot-container"><canvas class="plot" id="gel-plot" height="215"></canvas></div>
-  <div class="readout">
-    <div><span>Lower limen</span><b class="k1" id="gel-lo">—</b></div>
-    <div><span>Upper limen</span><b class="k1" id="gel-hi">—</b></div>
-    <div><span>Interval of uncertainty</span><b id="gel-iu">—</b></div>
-    <div><span>Point of subjective equality</span><b class="k2" id="gel-pse">—</b></div>
-    <div><span>Just noticeable difference</span><b class="k3" id="gel-jnd">—</b></div>
-  </div>
-  <div class="key-insight" id="gel-rev">The band where he says "equal" is the interval of uncertainty. Its middle is the point of subjective equality, which need not sit where the weights are actually equal. Half its width is the just noticeable difference. One procedure, three numbers, three different rules for reading them off.</div>
-
-  <h5>Now you</h5>
-  <p>The difference between the patches steps up or down on its own. Press the button, or the space bar, the moment your answer changes. Six series.</p>
-  <p class="help-text">Do not deliberate. The method wants your first crossing.</p>
-  <div class="ex-buttonbar" id="jt-intro"><button class="btn btn-primary btn-lg" id="jt-start">Begin</button></div>
-  <div id="jt-run" class="hidden">
-    <p id="jt-instr"></p>
-    <div class="stage"><div class="patch" id="jt-ref"></div><div class="patch" id="jt-test"></div></div>
-    <div class="keys"><button class="btn btn-lg" id="jt-resp">I notice it</button></div>
-    <p class="help-text" id="jt-count"></p>
-  </div>
-  <div id="jt-done" class="hidden">
-    <div class="plot-container"><canvas class="plot" id="jt-plot" height="195"></canvas></div>
-    <div class="readout">
-      <div><span>Your ascending</span><b class="k1" id="jt-a">—</b></div>
-      <div><span>Your descending</span><b class="k2" id="jt-d">—</b></div>
-      <div><span>Your threshold</span><b class="k3" id="jt-th">—</b></div>
-    </div>
-    <div class="key-insight on" id="jt-rev"></div>
-    <div class="ex-buttonbar"><button class="btn" id="jt-again">Run it again</button></div>
-  </div>
-</div>
-
-<!-- =================== AVERAGE ERROR =================== -->
-<div class="tabpanel" id="panel-ae" role="tabpanel">
-
-  <h3>The method of average error</h3>
-
-  <p>Now the subject holds the controls. He moves the comparison until it matches the standard and you write down where he stopped. What you record is a setting, not an answer to a question.</p>
-
-  <h5>One setting</h5>
-  <p>He adjusts until the two feel the same, and stops.</p>
-  <div class="ex-buttonbar">
-    <button class="btn btn-primary" id="ae-1">One setting</button>
-    <button class="btn" id="ae-4">Four more</button>
-    <button class="btn" id="ae-35">Thirty-five more</button>
-    <button class="btn" id="ae-reset">Clear</button>
-  </div>
-  <div class="plot-container"><canvas class="plot" id="ae-plot" height="200"></canvas></div>
-  <div class="readout">
-    <div><span>Settings</span><b id="ae-n">0</b></div>
-    <div><span>This one</span><b class="k1" id="ae-last">—</b></div>
-    <div><span>Off by</span><b id="ae-err">—</b></div>
-  </div>
-  <div class="key-insight" id="ae-rev1">He did not stop at 100, and he was sure it looked right. One setting looks like a measurement, which makes it more misleading than a single right-or-wrong trial, not less. You cannot yet tell whether the miss is a quirk or a habit.</div>
-  <div class="key-insight" id="ae-rev2">Take more and the shape appears. Every setting misses, by different amounts in both directions. This is the astronomer's situation: repeated observations of one quantity, scattering around it.</div>
-
-  <h5>Two numbers</h5>
-  <p>A scatter takes two numbers to describe. They answer different questions.</p>
-  <div class="readout">
-    <div><span>Mean setting</span><b class="k1" id="ae-mean">—</b></div>
-    <div><span>Constant error</span><b class="k2" id="ae-ce">—</b></div>
-    <div><span>Spread</span><b id="ae-sd">—</b></div>
-    <div><span>Threshold</span><b class="k3" id="ae-th">—</b></div>
-  </div>
-  <div class="key-insight" id="ae-rev3">The middle is a location. The width is a sensitivity. The mean is where "equal" sits for him, and its distance from 100&nbsp;g is a constant error, which stays put across sessions: which hand held the standard, which weight he lifted first. The threshold comes from the width alone. A subject can be precise and reliably wrong at the same time.</div>
-  <div class="note-block"><b>The rule.</b> The same move as the first method in different dress: multiply the spread by 0.6745 and call the result a threshold. Note also what this method cannot do. "Adjust until it matches" needs something to match, so there is no way here to find the faintest weight he can feel at all.</div>
-  <div class="note-block"><b>What rides along.</b> A setting is a movement, so unsteady hands add to the spread and count as dullness.</div>
-
-  <h5>Now you</h5>
-  <p>Drag the slider until the two patches look identical, then set it. The slider runs both ways, and each setting starts somewhere new. Seven settings.</p>
-  <p class="help-text">Your mean shows where identical sits for you. Your scatter gives your threshold.</p>
-  <div class="ex-buttonbar" id="at-intro"><button class="btn btn-primary btn-lg" id="at-start">Begin</button></div>
-  <div id="at-run" class="hidden">
-    <div class="stage"><div class="patch" id="at-ref"></div><div class="patch" id="at-test"></div></div>
-    <div class="ctl">
-      <label for="at-slider">Right patch <span class="slider-val" id="at-sv">—</span></label>
-      <input type="range" id="at-slider" min="-25" max="25" step=".5" value="12">
-    </div>
-    <div class="ex-buttonbar"><button class="btn btn-primary btn-lg" id="at-set">They match — set it</button></div>
-    <p class="help-text" id="at-count"></p>
-  </div>
-  <div id="at-done" class="hidden">
-    <div class="plot-container"><canvas class="plot" id="at-plot" height="180"></canvas></div>
-    <div class="readout">
-      <div><span>Your mean</span><b class="k1" id="at-m">—</b></div>
-      <div><span>Your constant error</span><b class="k2" id="at-ce">—</b></div>
-      <div><span>Your spread</span><b id="at-s">—</b></div>
-      <div><span>Your threshold</span><b class="k3" id="at-th">—</b></div>
-    </div>
-    <div class="key-insight on" id="at-rev"></div>
-    <div class="ex-buttonbar"><button class="btn" id="at-again">Run it again</button></div>
-  </div>
-</div>
-
-<p class="nextlink"><a href="comparison.html">The three side by side &rarr;</a></p>
-
-<hr class="div">
-
-<h3>What a threshold is for</h3>
-
-<p>A threshold on its own is a small fact about one weight. Fechner wanted a scale of sensation, and two further steps got him there.</p>
-
-<h5>The same subject at other weights</h5>
-<p>Nothing so far says he behaves the same way at 25&nbsp;g or 400&nbsp;g. Run the whole procedure again at each standard.</p>
-<div class="ex-buttonbar" id="web-btns"></div>
-<div class="plot-container"><canvas class="plot" id="web-plot" height="250"></canvas></div>
-<div class="readout" id="web-stats"></div>
-<div class="key-insight" id="web-rev">The thresholds in grams range over an order of magnitude. As a fraction of the standard they hardly move. That is Weber's law. It is a finding, not a definition: he could have come out otherwise.</div>
-
-<h5>Counting</h5>
-<p>Now Fechner's step. Call one threshold one unit of sensation, the same size wherever it falls. Start at the faintest weight he can feel and climb, one unit at a time.</p>
+<h5>How he answers</h5>
+<p>Set a weight on his palm and see how often he says he feels it. The curve is his detection probability; the bars are what actually happened on the trials you ran.</p>
 <div class="ex-buttonbar">
-  <button class="btn btn-primary" id="sc-1">One unit</button>
-  <button class="btn" id="sc-10">Ten</button>
-  <button class="btn" id="sc-100">Climb to 100 g</button>
-  <button class="btn" id="sc-reset">Back to the start</button>
+  <button class="btn btn-primary" id="in-run">Try 40 trials at each weight</button>
+  <button class="btn" id="in-clear">Clear</button>
 </div>
-<div class="readout">
-  <div><span>Units climbed</span><b class="k1" id="sc-n">0</b></div>
-  <div><span>Weight now</span><b id="sc-w">1.00 g</b></div>
-  <div><span>This step</span><b id="sc-st">—</b></div>
-</div>
-<div class="plot-container"><canvas class="plot" id="sc-plot" height="270"></canvas></div>
-<div class="key-insight" id="sc-rev">You counted, and a logarithm appeared. Equal steps of sensation are equal ratios of weight, so the physical steps grow as you climb. That is Fechner's law. Note what set the bottom of the scale: the faintest weight he can feel. Move that and every number on the scale moves.</div>
+<div class="plot-container" id="in-plot"></div>
+<p class="plot-cap">His chance of feeling a weight on the palm, against the weight. The absolute threshold is where the curve passes one half.</p>
 
-<hr class="div">
-
-<h3>What was measured, and what was decided</h3>
-
-<p>Reading back: answers gave proportions; proportions and an assumed curve gave a spread; a spread and a chosen fraction gave a threshold; a threshold and Weber's law gave a unit; a unit and a starting point gave a scale.</p>
-
-<p>Two of those steps are measurements. Three are decisions. The subject supplied the proportions, the constancy of the ratio, and the crossings. The experimenter supplied the shape of the error curve, the fraction that turns a curve into a threshold, and the rule that a just noticeable difference is the same size wherever it occurs. All five are needed to reach a number, and the number does not say which of them it came from.</p>
-
-<p class="nextlink"><a href="comparison.html">The three side by side &rarr;</a></p>
+<h3>What is on the other pages</h3>
+<ul>
+<li><b>Right and wrong cases</b> — fixed weights presented many times in random order; count how often he is right.</li>
+<li><b>Just noticeable differences</b> — the weight moved in small steps until his answer changes.</li>
+<li><b>Average error</b> — the subject himself moves the weight until it seems right, over and over.</li>
+<li><b>The three together</b> — the results in one table, then what a threshold is used for.</li>
+<li><b>Try it yourself</b> — the same three methods, run on your own eyes with grey patches.</li>
+</ul>
 
 <div class="colophon">
-  The subject is simulated, with one error distribution behind all three methods, so the numbers agree more neatly than any real subject's would. Weights are in grams; the self-tests are in grey levels out of 255 and depend on your screen. Nothing is loaded from anywhere: the page works offline.
+Weights are in grams. Nothing is loaded from anywhere, so these pages work offline. Results from the method pages are kept in this browser only, so that the summary page can collect them.
 </div>
 
+<nav class="foot" id="footnav"></nav>
 </div>
-
 <script>
-/* ---------------------------------------------------------------- maths */
-function ncdf(z){const t=1/(1+.2316419*Math.abs(z)),d=.3989423*Math.exp(-z*z/2);
-  let p=d*t*(.3193815+t*(-.3565638+t*(1.781478+t*(-1.821256+t*1.330274))));return z>0?1-p:p;}
-function npdf(x,m,s){return Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*Math.sqrt(2*Math.PI));}
-function ninv(p){const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.3577518672690,-30.66479806614716,2.506628277459239],
- b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],
- c=[-.007784894002430293,-.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],
- d=[.007784695709041462,.3224671290700398,2.445134137142996,3.754408661907416];
- const pl=.02425;let q,r;
- if(p<pl){q=Math.sqrt(-2*Math.log(p));return(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
- if(p>1-pl){q=Math.sqrt(-2*Math.log(1-p));return-(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5])/((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);}
- q=p-.5;r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}
-let spare=null;
-function randn(){if(spare!==null){const s=spare;spare=null;return s;}
-  let u,v,s2;do{u=Math.random()*2-1;v=Math.random()*2-1;s2=u*u+v*v;}while(s2>=1||s2===0);
-  const f=Math.sqrt(-2*Math.log(s2)/s2);spare=v*f;return u*f;}
-const mean=a=>a.reduce((x,y)=>x+y,0)/a.length;
-const sdev=a=>{const m=mean(a);return Math.sqrt(mean(a.map(v=>(v-m)**2)));};
-function probitSpread(pts){let num=0,den=0;
-  pts.forEach(([L,pr])=>{const z=ninv(Math.min(.995,Math.max(.505,pr)));num+=L*z;den+=L*L;});
-  return den/num;}
+/* ============================================================================
+   Peirce, "The Probability of Induction" — interactive edition
+   Port of the R/Shiny app (app.R) to a self-contained HTML page.
 
-/* ------------------------------------------------------- the subject */
-const WEBER=0.0715;
-const sigD=W=>WEBER*W, sigL=W=>sigD(W)/Math.SQRT2;
-function lift(W,delta){const s=sigL(W);return (W+delta+randn()*s)>(W+randn()*s);}
-const PEZ=0.6745, W0=1;
+   Part 1: statistical primitives (replacing R's stats package)
+   Part 2: a small canvas renderer that mimics R base graphics
+   ==========================================================================*/
 
-/* ------------------------------------------------------------- drawing */
-const PAL={paper:"#ffffff",ink:"#1f2328",inkSoft:"#575d66",inkFaint:"#8a9099",
-  rule:"#dbd6cb",ruleSoft:"#ece8df",accent:"#2f6f9f",accent2:"#b0563f",
-  accent3:"#4a7c59",accent4:"#9a7b3f"};
-const FACE='Georgia, "Times New Roman", serif';
-const $=id=>document.getElementById(id);
-const show=(id,on)=>$(id).classList.toggle('on',on!==false);
+/* ---------------------------------------------------------------- MATH --- */
 
-function cv(id,h){
-  const el=$(id);if(!el||!el.clientWidth)return null;
-  const dpr=window.devicePixelRatio||1,w=el.clientWidth;
-  el.width=w*dpr;el.height=h*dpr;el.style.height=h+'px';
-  const x=el.getContext('2d');x.setTransform(dpr,0,0,dpr,0,0);
-  x.fillStyle=PAL.paper;x.fillRect(0,0,w,h);
-  x.font='12px '+FACE;
-  return{x,w,h};
-}
-function axes(x,g,opts){
-  const{L,R,T,B,w,h}=g;
-  x.strokeStyle=PAL.ruleSoft;x.lineWidth=1;
-  x.fillStyle=PAL.inkFaint;x.font='11px '+FACE;
-  if(opts.yticks){x.textAlign='right';x.textBaseline='middle';
-    opts.yticks.forEach(([v,py])=>{x.beginPath();x.moveTo(L,py);x.lineTo(w-R,py);x.stroke();
-      x.fillText(opts.yfmt?opts.yfmt(v):v,L-8,py);});}
-  x.strokeStyle=PAL.rule;x.beginPath();x.moveTo(L,h-B);x.lineTo(w-R,h-B);x.stroke();
-  if(opts.xticks){x.fillStyle=PAL.inkFaint;x.textAlign='center';x.textBaseline='top';
-    opts.xticks.forEach(([v,px])=>x.fillText(opts.xfmt?opts.xfmt(v):v,px,h-B+7));}
-  if(opts.xlab){x.fillStyle=PAL.inkSoft;x.textAlign='center';x.textBaseline='bottom';
-    x.font='11px '+FACE;x.fillText(opts.xlab,(L+w-R)/2,h-4);}
-  if(opts.ylab){x.save();x.fillStyle=PAL.inkSoft;x.textAlign='center';x.textBaseline='top';
-    x.translate(9,(T+h-B)/2);x.rotate(-Math.PI/2);x.font='11px '+FACE;x.fillText(opts.ylab,0,0);x.restore();}
-}
-function empty(x,g,msg){
-  x.fillStyle=PAL.inkFaint;x.font='italic 13px '+FACE;
-  x.textAlign='center';x.textBaseline='middle';
-  x.fillText(msg,(g.L+g.w-g.R)/2,(g.T+g.h-g.B)/2);
+const LG_C = [676.5203681218851, -1259.1392167224028, 771.32342877765313,
+  -176.61502916214059, 12.507343278686905, -0.13857109526572012,
+  9.9843695780195716e-6, 1.5056327351493116e-7];
+
+function lgamma(z) {
+  if (z < 0.5) return Math.log(Math.PI / Math.sin(Math.PI * z)) - lgamma(1 - z);
+  z -= 1;
+  let x = 0.99999999999980993;
+  for (let i = 0; i < 8; i++) x += LG_C[i] / (z + i + 1);
+  const t = z + 7.5;
+  return 0.5 * Math.log(2 * Math.PI) + (z + 0.5) * Math.log(t) - t + Math.log(x);
 }
 
-/* --------------------------------------------------- carrying results */
-const SAVE_KEY='fechners-lab';
-function saveResults(){
-  const d={
-    sim:{rw:RW.fitted?PEZ*RW.sigma*Math.SQRT2:null,
-         jnd:JND.series.length>=8?jndStats().th:null,
-         ae:AE.set.length>=20?PEZ*sdev(AE.set):null},
-    you:{rw:RWT.th,jnd:JT.th,ae:AT.th},
-    truth:PEZ*sigD(100)
+function lchoose(n, k) {
+  if (k < 0 || k > n) return -Infinity;
+  return lgamma(n + 1) - lgamma(k + 1) - lgamma(n - k + 1);
+}
+
+// exact for the small n used here; falls back to lgamma for large n
+function choose(n, k) {
+  if (k < 0 || k > n) return 0;
+  k = Math.min(k, n - k);
+  if (n <= 60) {
+    let r = 1;
+    for (let i = 1; i <= k; i++) r = r * (n - k + i) / i;
+    return Math.round(r);
+  }
+  return Math.exp(lchoose(n, k));
+}
+
+function dbinom(k, n, p) {
+  if (k < 0 || k > n) return 0;
+  if (p === 0) return k === 0 ? 1 : 0;
+  if (p === 1) return k === n ? 1 : 0;
+  return Math.exp(lchoose(n, k) + k * Math.log(p) + (n - k) * Math.log1p(-p));
+}
+
+function dnorm(x, mean, sd) {
+  const z = (x - mean) / sd;
+  return Math.exp(-0.5 * z * z) / (sd * Math.sqrt(2 * Math.PI));
+}
+
+// Abramowitz & Stegun 7.1.26-style erf, refined; |err| < 1.2e-7 is not enough
+// for the tail probabilities used in ex16, so use a Chebyshev erfc instead.
+function erfc(x) {
+  const z = Math.abs(x), t = 2 / (2 + z);
+  const ty = 4 * t - 2;
+  const cof = [-1.3026537197817094, 6.4196979235649026e-1, 1.9476473204185836e-2,
+    -9.561514786808631e-3, -9.46595344482036e-4, 3.66839497852761e-4,
+    4.2523324806907e-5, -2.0278578112534e-5, -1.624290004647e-6,
+    1.303655835580e-6, 1.5626441722e-8, -8.5238095915e-8,
+    6.529054439e-9, 5.059343495e-9, -9.91364156e-10,
+    -2.27365122e-10, 9.6467911e-11, 2.394038e-12,
+    -6.886027e-12, 8.94487e-13, 3.13092e-13,
+    -1.12708e-13, 3.81e-16, 7.106e-15];
+  let d = 0, dd = 0, tmp;
+  for (let j = cof.length - 1; j > 0; j--) { tmp = d; d = ty * d - dd + cof[j]; dd = tmp; }
+  const ans = t * Math.exp(-z * z + 0.5 * (cof[0] + ty * d) - dd);
+  return x >= 0 ? ans : 2 - ans;
+}
+
+function pnorm(x, mean = 0, sd = 1) { return 0.5 * erfc(-((x - mean) / sd) / Math.SQRT2); }
+
+// Wichura AS241-quality inverse normal (Acklam + one Halley refinement)
+function qnorm(p, mean = 0, sd = 1) {
+  if (p <= 0) return -Infinity;
+  if (p >= 1) return Infinity;
+  const a = [-3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02,
+    1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00];
+  const b = [-5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02,
+    6.680131188771972e+01, -1.328068155288572e+01];
+  const c = [-7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00,
+    -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00];
+  const d = [7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00,
+    3.754408661907416e+00];
+  const pl = 0.02425, ph = 1 - pl;
+  let q, r, x;
+  if (p < pl) {
+    q = Math.sqrt(-2 * Math.log(p));
+    x = (((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  } else if (p <= ph) {
+    q = p - 0.5; r = q * q;
+    x = (((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q /
+        (((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);
+  } else {
+    q = Math.sqrt(-2 * Math.log(1 - p));
+    x = -(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]) / ((((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1);
+  }
+  const e = pnorm(x) - p, u = e * Math.sqrt(2 * Math.PI) * Math.exp(x * x / 2);
+  x = x - u / (1 + x * u / 2);
+  return mean + sd * x;
+}
+
+// regularized incomplete beta, via Lentz continued fraction (NR 6.4)
+function betacf(a, b, x) {
+  const FPMIN = 1e-300, EPS = 3e-16;
+  const qab = a + b, qap = a + 1, qam = a - 1;
+  let c = 1, d = 1 - qab * x / qap;
+  if (Math.abs(d) < FPMIN) d = FPMIN;
+  d = 1 / d;
+  let h = d;
+  for (let m = 1; m <= 300; m++) {
+    const m2 = 2 * m;
+    let aa = m * (b - m) * x / ((qam + m2) * (a + m2));
+    d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+    c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+    d = 1 / d; h *= d * c;
+    aa = -(a + m) * (qab + m) * x / ((a + m2) * (qap + m2));
+    d = 1 + aa * d; if (Math.abs(d) < FPMIN) d = FPMIN;
+    c = 1 + aa / c; if (Math.abs(c) < FPMIN) c = FPMIN;
+    d = 1 / d;
+    const del = d * c; h *= del;
+    if (Math.abs(del - 1) < EPS) break;
+  }
+  return h;
+}
+
+function pbeta(x, a, b) {
+  if (x <= 0) return 0;
+  if (x >= 1) return 1;
+  const bt = Math.exp(lgamma(a + b) - lgamma(a) - lgamma(b) +
+                      a * Math.log(x) + b * Math.log1p(-x));
+  return x < (a + 1) / (a + b + 2) ? bt * betacf(a, b, x) / a
+                                   : 1 - bt * betacf(b, a, 1 - x) / b;
+}
+
+function qbeta(p, a, b) {
+  if (p <= 0) return 0;
+  if (p >= 1) return 1;
+  let lo = 0, hi = 1, mid;
+  for (let i = 0; i < 200; i++) {
+    mid = (lo + hi) / 2;
+    if (pbeta(mid, a, b) < p) lo = mid; else hi = mid;
+  }
+  return (lo + hi) / 2;
+}
+
+// Clopper-Pearson interval, i.e. R's binom.test(x, n, conf.level)$conf.int
+function binomTestCI(x, n, conf) {
+  const alpha = 1 - conf;
+  const lower = x === 0 ? 0 : qbeta(alpha / 2, x, n - x + 1);
+  const upper = x === n ? 1 : qbeta(1 - alpha / 2, x + 1, n - x);
+  return [lower, upper];
+}
+
+/* -- random numbers -------------------------------------------------------
+   R's Mersenne-Twister stream cannot be reproduced here, so seeded routines
+   use mulberry32. Anything that R seeded with set.seed(42) is seeded with 42
+   here: results are stable across reloads, but are not R's exact draws.      */
+
+function mulberry32(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a = (a + 0x6D2B79F5) >>> 0;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
   };
-  try{localStorage.setItem(SAVE_KEY,JSON.stringify(d));}catch(e){}
 }
 
-/* =================== RIGHT AND WRONG CASES =================== */
-const RW={n:0,c:0,hist:[],log:[],levels:{},ov:null,sigma:11,fitted:false};
+const runif = () => Math.random();
+const sampleInt = (n) => Math.floor(Math.random() * n);      // 1..n -> 0..n-1
+function rbinom(n, p) { let k = 0; for (let i = 0; i < n; i++) if (Math.random() < p) k++; return k; }
+function shuffle(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) { const j = sampleInt(i + 1); [a[i], a[j]] = [a[j], a[i]]; }
+  return a;
+}
 
-function rwRun(k){
-  for(let i=0;i<k;i++){const ok=lift(100,3);RW.n++;if(ok)RW.c++;RW.hist.push(RW.c/RW.n);
-    if(RW.log.length<300)RW.log.push('trial '+RW.n+' &nbsp; 100 g vs 103 g &nbsp; <span class="'+
-      (ok?'r':'w')+'">'+(ok?'right':'wrong')+'</span>');}
-  $('rw-n').textContent=RW.n;$('rw-c').textContent=RW.c;
-  $('rw-p').textContent=RW.n?(RW.c/RW.n).toFixed(3):'—';
-  $('rw-log').innerHTML=RW.log.slice(-100).reverse().join('<br>')||'No trials yet.';
-  if(RW.n>=50)show('rw-rev1');
-  rwPlot();
-}
-function rwPlot(){
-  const p=cv('rw-plot',170);if(!p)return;const{x,w,h}=p;
-  const g={L:46,R:14,T:12,B:32,w,h};
-  const N=Math.max(RW.hist.length,20);
-  const X=i=>g.L+i/(N-1||1)*(w-g.L-g.R), Y=v=>h-g.B-(v-.3)/.6*(h-g.T-g.B);
-  axes(x,g,{yticks:[.3,.5,.7,.9].map(v=>[v,Y(v)]),yfmt:v=>v.toFixed(1),
-    xlab:'trials',xticks:[]});
-  x.strokeStyle=PAL.inkFaint;x.setLineDash([3,3]);
-  x.beginPath();x.moveTo(g.L,Y(.5));x.lineTo(w-g.R,Y(.5));x.stroke();x.setLineDash([]);
-  if(!RW.hist.length){empty(x,g,'no trials yet');return;}
-  x.beginPath();RW.hist.forEach((v,i)=>{const px=X(i),py=Y(Math.max(.3,Math.min(.9,v)));
-    i?x.lineTo(px,py):x.moveTo(px,py);});
-  x.strokeStyle=PAL.accent;x.lineWidth=1.5;x.stroke();
-  const last=RW.hist[RW.hist.length-1];
-  x.beginPath();x.arc(X(RW.hist.length-1),Y(Math.max(.3,Math.min(.9,last))),3.2,0,7);
-  x.fillStyle=PAL.accent;x.fill();
-}
-const RW_LV=[1,2,3,4,6,8,10];
-$('rw-levels').innerHTML=RW_LV.map(v=>'<button class="btn" data-l="'+v+'">'+v+' g</button>').join('')+
-  '<button class="btn" id="rw-lvclear">Clear</button>';
-$('rw-levels').querySelectorAll('button[data-l]').forEach(b=>b.onclick=()=>{
-  const L=+b.dataset.l;let c=0;for(let i=0;i<120;i++)if(lift(100,L))c++;
-  RW.levels[L]=RW.levels[L]||{n:0,c:0};RW.levels[L].n+=120;RW.levels[L].c+=c;
-  if(Object.keys(RW.levels).length>=4)show('rw-rev2');
-  rwCurve();rwFit();});
-$('rw-lvclear').onclick=()=>{RW.levels={};RW.ov=null;rwCurve();rwFit();};
-$('rw-ov-step').onclick=()=>{RW.ov='step';rwCurve();};
-$('rw-ov-smooth').onclick=()=>{RW.ov='smooth';rwCurve();};
-$('rw-ov-clear').onclick=()=>{RW.ov=null;rwCurve();};
+/* ---------------------------------------------------------- FORMATTING --- */
 
-function rwFrame(w,h){const L=46,R=16,T=14,B=36;
-  return{L,R,T,B,w,h,X:v=>L+v/11*(w-L-R),Y:p=>h-B-(p-.4)/.62*(h-T-B)};}
-function rwCurve(){
-  const p=cv('rw-curve',230);if(!p)return;const{x,w,h}=p,f=rwFrame(w,h);
-  axes(x,f,{yticks:[.5,.6,.7,.8,.9,1].map(v=>[v,f.Y(v)]),yfmt:v=>v.toFixed(1),
-    xticks:[0,2,4,6,8,10].map(v=>[v,f.X(v)]),xlab:'difference in grams',ylab:'proportion right'});
-  x.strokeStyle=PAL.inkFaint;x.setLineDash([3,3]);
-  x.beginPath();x.moveTo(f.L,f.Y(.5));x.lineTo(w-f.R,f.Y(.5));x.stroke();x.setLineDash([]);
-  if(RW.ov==='step'){const th=4.8;
-    x.strokeStyle=PAL.accent2;x.lineWidth=1.5;x.setLineDash([5,4]);x.beginPath();
-    x.moveTo(f.X(0),f.Y(.5));x.lineTo(f.X(th),f.Y(.5));
-    for(let v=th;v<=11;v+=.1)x.lineTo(f.X(v),f.Y(Math.min(1,.5+(v-th)*.075)));
-    x.stroke();x.setLineDash([]);
-    x.fillStyle=PAL.accent2;x.textAlign='left';x.font='11px '+FACE;x.textBaseline='bottom';
-    x.fillText('if there were a cut-off',f.X(.2),f.Y(.55));}
-  if(RW.ov==='smooth'){x.strokeStyle=PAL.accent3;x.lineWidth=1.5;x.setLineDash([5,4]);x.beginPath();
-    for(let v=0;v<=11;v+=.1){const px=f.X(v),py=f.Y(ncdf(v/sigD(100)));v?x.lineTo(px,py):x.moveTo(px,py);}
-    x.stroke();x.setLineDash([]);
-    x.fillStyle=PAL.accent3;x.textAlign='left';x.font='11px '+FACE;x.textBaseline='bottom';
-    x.fillText('if there were none',f.X(.2),f.Y(.55));}
-  const ks=Object.keys(RW.levels);
-  if(!ks.length){empty(x,f,'run some differences');return;}
-  ks.forEach(L=>{const o=RW.levels[L],pr=o.c/o.n;
-    x.beginPath();x.arc(f.X(+L),f.Y(pr),4.2,0,7);x.fillStyle=PAL.paper;x.fill();
-    x.strokeStyle=PAL.accent;x.lineWidth=1.6;x.stroke();
-    x.fillStyle=PAL.inkSoft;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='bottom';
-    x.fillText(pr.toFixed(2),f.X(+L),f.Y(pr)-8);});
+const fmt = (x, d) => (Number.isFinite(x) ? x.toFixed(d) : String(x));
+// R's round(x, d) then default printing: 0.5 -> "0.5", not "0.5000"
+function rround(x, d) {
+  if (!Number.isFinite(x)) return String(x);
+  const r = Number(x.toFixed(d));
+  return String(r);
 }
-$('rw-sigma').oninput=e=>{RW.sigma=+e.target.value;rwFit();};
-function rwFit(){
-  const sd=RW.sigma*Math.SQRT2;
-  $('rw-sigmav').textContent=RW.sigma.toFixed(2)+' g';
-  $('rw-s1').textContent=RW.sigma.toFixed(2)+' g';
-  $('rw-s2').textContent=sd.toFixed(2)+' g';
-  $('rw-th').textContent=(PEZ*sd).toFixed(2)+' g';
-  let ss=0,vv=0,k=0,top=0;
-  Object.keys(RW.levels).forEach(L=>{const o=RW.levels[L],pr=o.c/o.n;
-    ss+=(pr-ncdf(+L/sd))**2; vv+=pr*(1-pr)/o.n; k++; top=Math.max(top,+L);});
-  const rms=k?Math.sqrt(ss/k):null, floor=k?Math.sqrt(vv/k):null;
-  $('rw-rms').textContent=k?rms.toFixed(4):'—';
-  /* Judged against the data's own noise: a fixed cut-off would be unreachable
-     at small trial counts, where a proportion wobbles by sqrt(p(1-p)/n) even
-     under a perfect model. The top-level test matters as much. Below about 6 g
-     every candidate curve is still near one half, so a badly wrong spread fits
-     the small differences as well as the right one does. Without it the fit can
-     be declared on data that cannot tell the two apart. */
-  if(k>=4&&top>=6&&rms<Math.max(0.02,1.6*floor)){RW.fitted=true;show('rw-rev3');}
-  if(RW.fitted)saveResults();
-  const p=cv('rw-fit',230);if(!p)return;const{x,w,h}=p,f=rwFrame(w,h);
-  axes(x,f,{yticks:[.5,.6,.7,.8,.9,1].map(v=>[v,f.Y(v)]),yfmt:v=>v.toFixed(1),
-    xticks:[0,2,4,6,8,10].map(v=>[v,f.X(v)]),xlab:'difference in grams',ylab:'proportion right'});
-  x.beginPath();for(let v=0;v<=11;v+=.1){const px=f.X(v),py=f.Y(ncdf(v/sd));
-    v?x.lineTo(px,py):x.moveTo(px,py);}
-  x.strokeStyle=PAL.accent3;x.lineWidth=1.6;x.stroke();
-  if(!k){empty(x,f,'run some differences first');return;}
-  Object.keys(RW.levels).forEach(L=>{const o=RW.levels[L],pr=o.c/o.n;
-    x.beginPath();x.arc(f.X(+L),f.Y(pr),4.2,0,7);x.fillStyle=PAL.paper;x.fill();
-    x.strokeStyle=PAL.accent;x.lineWidth=1.6;x.stroke();});
-}
-$('rw-1').onclick=()=>rwRun(1);$('rw-10').onclick=()=>rwRun(10);$('rw-100').onclick=()=>rwRun(100);
-$('rw-reset').onclick=()=>{RW.n=RW.c=0;RW.hist=[];RW.log=[];rwRun(0);};
+const bigmark = (x) => Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+const pluralBall = (n) => (n === 1 ? "ball" : "balls");
+const NUMBER_WORDS = ["zero", "one", "two", "three", "four", "five", "six",
+  "seven", "eight", "nine", "ten"];
+const numberWord = (n) => (n >= 0 && n <= 10 ? NUMBER_WORDS[n] : String(n));
 
-/* ---- the self-test ---- */
-const GBASE=128;
-function patchCol(v){const c=Math.max(0,Math.min(255,Math.round(v)));return 'rgb('+c+','+c+','+c+')';}
-function setPatches(a,b,d){$(a).style.background=patchCol(GBASE);$(b).style.background=patchCol(GBASE+d);}
-const RWT_LV=[3,6,10,16],RWT_REPS=8;
-const RWT={q:[],i:0,res:{},sd:null,th:null};
-function rwtBuild(){RWT.q=[];RWT_LV.forEach(d=>{for(let r=0;r<RWT_REPS;r++)RWT.q.push(d);});
-  for(let i=RWT.q.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));
-    [RWT.q[i],RWT.q[j]]=[RWT.q[j],RWT.q[i]];}
-  RWT.i=0;RWT.res={};RWT_LV.forEach(d=>RWT.res[d]={n:0,yes:0});RWT.sd=RWT.th=null;}
-function rwtDraw(){const d=RWT.q[RWT.i];if(d===undefined)return rwtEnd();
-  setPatches('rwt-ref','rwt-test',d);
-  $('rwt-bar').style.width=(RWT.i/RWT.q.length*100)+'%';
-  $('rwt-count').textContent='trial '+(RWT.i+1)+' of '+RWT.q.length;}
-function rwtAns(yes){const d=RWT.q[RWT.i];if(d===undefined)return;
-  RWT.res[d].n++;if(yes)RWT.res[d].yes++;RWT.i++;
-  RWT.i<RWT.q.length?rwtDraw():rwtEnd();}
-function rwtEnd(){
-  $('rwt-run').classList.add('hidden');$('rwt-done').classList.remove('hidden');
-  RWT.sd=probitSpread(RWT_LV.map(d=>[d,RWT.res[d].yes/RWT.res[d].n]));
-  RWT.th=PEZ*RWT.sd;
-  $('rwt-sd').textContent=RWT.sd.toFixed(2);
-  $('rwt-th').textContent=RWT.th.toFixed(2);
-  const e=RWT.res[RWT_LV[0]],pr=e.yes/e.n;
-  $('rwt-rev').innerHTML='<strong>Your threshold: '+RWT.th.toFixed(2)+' grey levels, or '+
-    (RWT.th/GBASE*100).toFixed(2)+'% of the standard.</strong> '+(pr>.55
-      ? 'At the smallest difference you still said "different" '+e.yes+' times in '+e.n+'. '+
-        'The number came from a curve fitted to your answers and a fraction nobody measured.'
-      : 'At the smallest difference you were near chance ('+e.yes+' of '+e.n+'), which usually means '+
-        'that step is below what your screen can show. The larger levels carry the estimate.');
-  rwtPlot();saveResults();}
-function rwtPlot(){
-  const p=cv('rwt-plot',215);if(!p)return;const{x,w,h}=p;
-  const g={L:46,R:16,T:14,B:36,w,h};
-  const X=v=>g.L+v/20*(w-g.L-g.R), Y=pr=>h-g.B-(pr-.4)/.62*(h-g.T-g.B);
-  axes(x,g,{yticks:[.5,.75,1].map(v=>[v,Y(v)]),yfmt:v=>v.toFixed(2),
-    xticks:[0,5,10,15,20].map(v=>[v,X(v)]),xlab:'difference in grey levels',ylab:'proportion "different"'});
-  x.strokeStyle=PAL.inkFaint;x.setLineDash([3,3]);
-  x.beginPath();x.moveTo(g.L,Y(.5));x.lineTo(w-g.R,Y(.5));x.stroke();x.setLineDash([]);
-  if(!RWT.sd)return;
-  x.beginPath();for(let v=0;v<=20;v+=.2){const px=X(v),py=Y(ncdf(v/RWT.sd));
-    v?x.lineTo(px,py):x.moveTo(px,py);}
-  x.strokeStyle=PAL.accent3;x.lineWidth=1.6;x.stroke();
-  RWT_LV.forEach(d=>{const pr=RWT.res[d].yes/RWT.res[d].n;
-    x.beginPath();x.arc(X(d),Y(Math.max(.4,Math.min(1,pr))),4.2,0,7);
-    x.fillStyle=PAL.paper;x.fill();x.strokeStyle=PAL.accent;x.lineWidth=1.6;x.stroke();
-    x.fillStyle=PAL.inkSoft;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='bottom';
-    x.fillText(RWT.res[d].yes+'/'+RWT.res[d].n,X(d),Y(Math.max(.4,Math.min(1,pr)))-8);});
+/* Peirce writes his figures out in words ("Ninety-nine Cretans in a hundred"),
+   so a number standing in for one of those has to be spelled as well. */
+const TEENS = ["ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
+  "sixteen", "seventeen", "eighteen", "nineteen"];
+const TENS = ["", "", "twenty", "thirty", "forty", "fifty", "sixty", "seventy",
+  "eighty", "ninety"];
+function spellNumber(n) {
+  n = Math.round(n);
+  if (n < 0 || n > 99) return String(n);
+  if (n <= 9) return NUMBER_WORDS[n];
+  if (n <= 19) return TEENS[n - 10];
+  const t = TENS[Math.floor(n / 10)], u = n % 10;
+  return u ? `${t}-${NUMBER_WORDS[u]}` : t;
 }
-$('rwt-yes').onclick=()=>rwtAns(true);
-$('rwt-no').onclick=()=>rwtAns(false);
-$('rwt-start').onclick=()=>{rwtBuild();$('rwt-intro').classList.add('hidden');
-  $('rwt-done').classList.add('hidden');$('rwt-run').classList.remove('hidden');rwtDraw();};
-$('rwt-again').onclick=()=>{rwtBuild();$('rwt-done').classList.add('hidden');
-  $('rwt-run').classList.remove('hidden');rwtDraw();};
+const capitalise = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
-/* =================== JUST NOTICEABLE DIFFERENCES =================== */
-const JND_STEP=1, JND_TOP=16, JND_SHOW=14;
-const JND={bias:1,series:[]};
-$('jnd-bias').oninput=e=>{JND.bias=+e.target.value;
-  $('jnd-biasv').textContent=JND.bias.toFixed(2)+' g';};
+/* "one-third", "two-thirds", "one-half" — Peirce writes his fractions out in
+   the granary paragraphs, so a fraction standing in for one of his has to be
+   spelled the same way. */
+const FRAC_ORDINALS = ["", "", "half", "third", "fourth", "fifth", "sixth",
+  "seventh", "eighth", "ninth", "tenth", "eleventh", "twelfth"];
+function fracWord(n, d) {
+  const ord = FRAC_ORDINALS[d];
+  if (!ord) return `${n}&frasl;${d}`;
+  return `${spellNumber(n)}-${ord}${n === 1 ? "" : "s"}`;
+}
 
-function jndSay(d,dir){
-  const eff=PEZ*sigD(100)+(dir==='asc'?JND.bias:-JND.bias);
-  return (d+randn()*0.15*sigD(100))>eff?'different':'same';
-}
-/* one whole series, run to its crossing */
-function jndRunSeries(dir){
-  const s={dir,rows:[],cross:null};
-  let d=dir==='desc'?JND_TOP:0;
-  for(let k=0;k<200;k++){
-    const say=jndSay(d,dir);
-    s.rows.push({d,say});
-    const flipped=(dir==='desc')?(say==='same'):(say==='different');
-    if(flipped){s.cross=(dir==='desc')?d+JND_STEP/2:d-JND_STEP/2;
-      s.cross=Math.max(0,Math.min(JND_TOP,s.cross));break;}
-    d+=(dir==='desc')?-JND_STEP:JND_STEP;
-    if(d<0||d>JND_TOP){s.cross=Math.max(0,Math.min(JND_TOP,d));break;}
-  }
-  JND.series.push(s);return s;
-}
-function jndCross(dir){return JND.series.filter(s=>s.dir===dir&&s.cross!=null).map(s=>s.cross);}
-function jndStats(){
-  const a=jndCross('asc'),d=jndCross('desc');
-  const all=JND.series.filter(s=>s.cross!=null).map(s=>s.cross);
-  return{a,d,am:a.length?mean(a):null,dm:d.length?mean(d):null,
-    th:all.length?mean(all):null,n:JND.series.length};
-}
-function jndUpdate(){
-  const st=jndStats(), last=JND.series[JND.series.length-1];
-  $('jnd-n').textContent=st.n;
-  $('jnd-dir').textContent=last?(last.dir==='asc'?'ascending':'descending'):'—';
-  $('jnd-steps').textContent=last?last.rows.length:'—';
-  $('jnd-last').textContent=last&&last.cross!=null?last.cross.toFixed(2)+' g':'—';
-  $('jnd-am').textContent=st.am!=null?st.am.toFixed(2)+' g':'—';
-  $('jnd-dm').textContent=st.dm!=null?st.dm.toFixed(2)+' g':'—';
-  $('jnd-gap').textContent=(st.am!=null&&st.dm!=null)?(st.am-st.dm).toFixed(2)+' g':'—';
-  $('jnd-th').textContent=st.th!=null?st.th.toFixed(2)+' g':'—';
-  if(st.n>=1)show('jnd-rev1');
-  if(st.a.length&&st.d.length)show('jnd-rev2');
-  if(st.n>=8){show('jnd-rev3');saveResults();}
-  jndLadder();jndCrossPlot();
-}
-function jndLadder(){
-  const p=cv('jnd-ladder',300);if(!p)return;const{x,w,h}=p;
-  const g={L:46,R:18,T:16,B:40,w,h};
-  const shown=JND.series.slice(-JND_SHOW);
-  const n=Math.max(shown.length,6);
-  const X=i=>g.L+(i+.5)/n*(w-g.L-g.R), Y=v=>h-g.B-v/JND_TOP*(h-g.T-g.B);
-  axes(x,g,{yticks:[0,4,8,12,16].map(v=>[v,Y(v)]),
-    xlab:'series',ylab:'difference in grams',xticks:[]});
-  if(!shown.length){empty(x,g,'run a series');return;}
-  shown.forEach((s,i)=>{
-    const px=X(i);
-    x.strokeStyle=PAL.ruleSoft;x.lineWidth=1;
-    x.beginPath();x.moveTo(px,g.T);x.lineTo(px,h-g.B);x.stroke();
-    s.rows.forEach(r=>{
-      x.beginPath();x.arc(px,Y(r.d),3.6,0,7);
-      if(r.say==='different'){x.fillStyle=s.dir==='asc'?PAL.accent:PAL.accent2;x.fill();}
-      else{x.fillStyle=PAL.paper;x.fill();
-        x.strokeStyle=s.dir==='asc'?PAL.accent:PAL.accent2;x.lineWidth=1.4;x.stroke();}
-    });
-    if(s.cross!=null){
-      x.beginPath();x.arc(px,Y(s.cross),5.2,0,7);
-      x.fillStyle=PAL.accent3;x.fill();
-      x.strokeStyle=PAL.paper;x.lineWidth=1.4;x.stroke();
+function decimalToFraction(x) {
+  const common = { "1/2": 0.5, "1/3": 1/3, "2/3": 2/3, "1/4": 0.25, "3/4": 0.75,
+    "1/5": 0.2, "2/5": 0.4, "3/5": 0.6, "4/5": 0.8,
+    "1/10": 0.1, "1/100": 0.01, "1/1000": 0.001 };
+  for (const key in common) {
+    if (Math.abs(x - common[key]) < 0.001) {
+      const parts = key.split("/");
+      return { num: +parts[0], den: +parts[1] };
     }
-    x.fillStyle=PAL.inkFaint;x.font='10px '+FACE;x.textAlign='center';x.textBaseline='top';
-    x.fillText(s.dir==='asc'?'up':'down',px,h-g.B+7);
-  });
-  x.fillStyle=PAL.inkFaint;x.font='11px '+FACE;x.textAlign='left';x.textBaseline='top';
-  x.fillText(JND.series.length>JND_SHOW
-    ? 'last '+JND_SHOW+' of '+JND.series.length+' series'
-    : 'filled = "different"    green = crossing', g.L+2, g.T-2);
-}
-function jndCrossPlot(){
-  const p=cv('jnd-cross',195);if(!p)return;const{x,w,h}=p;
-  const g={L:84,R:18,T:22,B:36,w,h};
-  const X=v=>g.L+v/JND_TOP*(w-g.L-g.R);
-  x.strokeStyle=PAL.ruleSoft;x.lineWidth=1;
-  [0,4,8,12,16].forEach(v=>{x.beginPath();x.moveTo(X(v),g.T);x.lineTo(X(v),h-g.B);x.stroke();});
-  x.fillStyle=PAL.inkFaint;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-  [0,4,8,12,16].forEach(v=>x.fillText(v,X(v),h-g.B+7));
-  x.fillStyle=PAL.inkSoft;x.textBaseline='bottom';
-  x.fillText('crossing, in grams above the standard',(g.L+w-g.R)/2,h-4);
-  const st=jndStats(), rA=g.T+28, rD=g.T+74;
-  x.textAlign='right';x.textBaseline='middle';x.fillStyle=PAL.inkSoft;x.font='12px '+FACE;
-  x.fillText('ascending',g.L-12,rA);x.fillText('descending',g.L-12,rD);
-  if(!st.n){empty(x,g,'no crossings yet');return;}
-  [[st.a,rA,PAL.accent],[st.d,rD,PAL.accent2]].forEach(([arr,r,col])=>
-    arr.forEach((v,i)=>{x.beginPath();x.arc(X(v),r+((i%3)-1)*7,3.8,0,7);
-      x.fillStyle=PAL.paper;x.fill();x.strokeStyle=col;x.lineWidth=1.5;x.stroke();}));
-  [[st.am,rA,PAL.accent],[st.dm,rD,PAL.accent2]].forEach(([m,r,col])=>{if(m==null)return;
-    x.strokeStyle=col;x.lineWidth=1.6;x.beginPath();
-    x.moveTo(X(m),r-18);x.lineTo(X(m),r+18);x.stroke();});
-  if(st.th!=null){
-    x.strokeStyle=PAL.accent3;x.lineWidth=1.6;x.setLineDash([5,4]);
-    x.beginPath();x.moveTo(X(st.th),g.T);x.lineTo(X(st.th),h-g.B);x.stroke();x.setLineDash([]);
-    x.fillStyle=PAL.accent3;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-    x.fillText('mean '+st.th.toFixed(2),X(st.th),g.T-1);}
-}
-$('jnd-run').onclick=()=>{jndRunSeries(JND.series.length%2===0?'desc':'asc');jndUpdate();};
-$('jnd-run10').onclick=()=>{for(let i=0;i<10;i++)
-  jndRunSeries(JND.series.length%2===0?'desc':'asc');jndUpdate();};
-$('jnd-clear').onclick=()=>{JND.series=[];jndUpdate();};
-
-/* ---- less, equal, greater ---- */
-const GEL={sweeps:[],lo:null,hi:null};
-$('gel-run').onclick=()=>{
-  GEL.sweeps=[];
-  const crit=PEZ*sigD(100),ns=0.15*sigD(100);
-  const answer=d=>{const e=d+randn()*ns;
-    return e>crit?'greater':(e<-crit?'less':'equal');};
-  /* sweeps alternate direction for the same reason the series above do:
-     taking the first change in one direction only drags both limens the way
-     the sweep travels, and with them the point of subjective equality */
-  for(let s=0;s<10;s++){
-    const up=(s%2===0);let lo=null,hi=null,prev=null;
-    if(up){for(let d=-22;d<=22;d+=0.5){const say=answer(d);
-      if(prev==='less'&&say==='equal'&&lo===null)lo=d-0.25;
-      if(prev==='equal'&&say==='greater'&&hi===null)hi=d-0.25;prev=say;}}
-    else{for(let d=22;d>=-22;d-=0.5){const say=answer(d);
-      if(prev==='greater'&&say==='equal'&&hi===null)hi=d+0.25;
-      if(prev==='equal'&&say==='less'&&lo===null)lo=d+0.25;prev=say;}}
-    if(lo!==null&&hi!==null&&hi>lo)GEL.sweeps.push({lo,hi,up});
   }
-  if(GEL.sweeps.length){
-    GEL.lo=mean(GEL.sweeps.map(s=>s.lo));GEL.hi=mean(GEL.sweeps.map(s=>s.hi));
-    const iu=GEL.hi-GEL.lo;
-    $('gel-lo').textContent=GEL.lo.toFixed(2)+' g';
-    $('gel-hi').textContent=GEL.hi.toFixed(2)+' g';
-    $('gel-iu').textContent=iu.toFixed(2)+' g';
-    $('gel-pse').textContent=((GEL.hi+GEL.lo)/2).toFixed(2)+' g';
-    $('gel-jnd').textContent=(iu/2).toFixed(2)+' g';
-    show('gel-rev');
+  const num1000 = Math.round(x * 1000);
+  if (Math.abs(x - num1000 / 1000) < 0.001) return { num: num1000, den: 1000 };
+  for (const den of [100, 500, 200, 250]) {
+    const num = Math.round(x * den);
+    if (Math.abs(x - num / den) < 0.001) return { num: num, den: den };
   }
-  gelPlot();
+  return { num: num1000, den: 1000 };
+}
+
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
+// tiny fraction markup used in place of MathJax
+const frac = (n, d) => `<span class="frac"><span class="num">${n}</span><span class="den">${d}</span></span>`;
+
+/* ------------------------------------------------------------ PLOTTING --- */
+/* A minimal re-implementation of the parts of R base graphics the app uses:
+   plot(NULL)/rect/text/lines/points/segments/polygon/abline/axis/legend.
+   Coordinates passed to these methods are USER (data) coordinates.          */
+
+/* The plots share the page's palette and its typeface. Canvases paint their
+   own background, which is the same white as the article, so with the frames
+   off the plot sits on the page rather than in a panel on it. Names match the
+   CSS custom properties in the head. */
+const PAL = {
+  paper:    "#ffffff",
+  ink:      "#1f2328",
+  inkSoft:  "#575d66",
+  inkFaint: "#8a9099",
+  rule:     "#dbd6cb",
+  ruleSoft: "#ece8df",
+  accent:   "#2f6f9f",
+  accent2:  "#b0563f",
+  accent3:  "#4a7c59",
+  accent4:  "#9a7b3f"
 };
-function gelPlot(){
-  const p=cv('gel-plot',215);if(!p)return;const{x,w,h}=p;
-  const g={L:46,R:18,T:26,B:38,w,h};
-  const LOW=-22,HIGH=22, X=v=>g.L+(v-LOW)/(HIGH-LOW)*(w-g.L-g.R);
-  x.strokeStyle=PAL.ruleSoft;x.lineWidth=1;
-  [-20,-10,0,10,20].forEach(v=>{x.beginPath();x.moveTo(X(v),g.T);x.lineTo(X(v),h-g.B);x.stroke();});
-  x.fillStyle=PAL.inkFaint;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-  [-20,-10,0,10,20].forEach(v=>x.fillText(v,X(v),h-g.B+7));
-  x.fillStyle=PAL.inkSoft;x.textBaseline='bottom';
-  x.fillText('comparison minus standard, in grams',(g.L+w-g.R)/2,h-4);
-  if(!GEL.sweeps.length){empty(x,g,'run the sweeps');return;}
-  const lane=(h-g.T-g.B-14)/GEL.sweeps.length;
-  GEL.sweeps.forEach((s,i)=>{
-    const py=g.T+7+lane*i+lane/2;
-    x.strokeStyle=PAL.ruleSoft;x.lineWidth=1;
-    x.beginPath();x.moveTo(g.L,py);x.lineTo(w-g.R,py);x.stroke();
-    x.fillStyle='rgba(47,111,159,.14)';
-    x.fillRect(X(s.lo),py-lane*.32,X(s.hi)-X(s.lo),lane*.64);
-    [s.lo,s.hi].forEach(v=>{x.beginPath();x.arc(X(v),py,3,0,7);x.fillStyle=PAL.accent;x.fill();});
-    x.fillStyle=PAL.inkFaint;x.font='10px '+FACE;x.textAlign='right';x.textBaseline='middle';
-    x.fillText(s.up?'up':'down',g.L-5,py);
+
+const BASE_FONT = 12;
+const PLOT_FACE = 'Georgia, "Times New Roman", serif';
+
+class RPlot {
+  constructor(ctx, cssW, cssH) {
+    this.ctx = ctx; this.W = cssW; this.H = cssH;
+    this.mar = [40, 45, 32, 16];   // bottom, left, top, right, in px
+    this.xlim = [0, 1]; this.ylim = [0, 1];
+    this.xpd = false;
+  }
+  /* mar is given in R "lines"; ~13px per line at this font size.
+     Reproduces R's default xaxs/yaxs = "r" (4% padding) and, when asp is set,
+     R's behaviour of EXPANDING the user limits of the roomier axis rather
+     than shrinking the plot region — several plots in the original app draw
+     legends outside the nominal limits and rely on that. */
+  setup(opts) {
+    const o = opts || {};
+    if (o.mar) this.mar = o.mar.map((m) => m * 13);
+    let xlim = (o.xlim || [0, 1]).slice(), ylim = (o.ylim || [0, 1]).slice();
+    if (o.ext !== false) {
+      const dx = (xlim[1] - xlim[0]) * 0.04, dy = (ylim[1] - ylim[0]) * 0.04;
+      xlim = [xlim[0] - dx, xlim[1] + dx];
+      ylim = [ylim[0] - dy, ylim[1] + dy];
+    }
+    const [mb, ml, mt, mr] = this.mar;
+    const px0 = ml, px1 = this.W - mr, py0 = this.H - mb, py1 = mt;
+    if (o.asp) {
+      const availW = px1 - px0, availH = py0 - py1;
+      const uw = xlim[1] - xlim[0], uh = ylim[1] - ylim[0];
+      const scale = Math.min(availW / uw, availH / (uh * o.asp));
+      const newUw = availW / scale, newUh = availH / (scale * o.asp);
+      const cx = (xlim[0] + xlim[1]) / 2, cy = (ylim[0] + ylim[1]) / 2;
+      xlim = [cx - newUw / 2, cx + newUw / 2];
+      ylim = [cy - newUh / 2, cy + newUh / 2];
+    }
+    this.xlim = xlim; this.ylim = ylim;
+    this.px0 = px0; this.px1 = px1; this.py0 = py0; this.py1 = py1;
+    return this;
+  }
+  X(x) { return this.px0 + (x - this.xlim[0]) / (this.xlim[1] - this.xlim[0]) * (this.px1 - this.px0); }
+  Y(y) { return this.py0 + (y - this.ylim[0]) / (this.ylim[1] - this.ylim[0]) * (this.py1 - this.py0); }
+  invX(px) { return this.xlim[0] + (px - this.px0) / (this.px1 - this.px0) * (this.xlim[1] - this.xlim[0]); }
+  invY(py) { return this.ylim[0] + (py - this.py0) / (this.py1 - this.py0) * (this.ylim[1] - this.ylim[0]); }
+
+  _font(cex, font) {
+    const size = BASE_FONT * (cex || 1);
+    const weight = (font === 2) ? "bold " : "";
+    const style = (font === 3) ? "italic " : "";
+    this.ctx.font = `${style}${weight}${size}px ${PLOT_FACE}`;
+    return size;
+  }
+  _lty(lty) {
+    const c = this.ctx;
+    if (lty === 2) c.setLineDash([7, 5]);
+    else if (lty === 3) c.setLineDash([2, 3]);
+    else if (lty === 4) c.setLineDash([2, 3, 7, 3]);
+    else c.setLineDash([]);
+  }
+  clip(on) {
+    const c = this.ctx;
+    if (on) {
+      c.save(); c.beginPath();
+      c.rect(Math.min(this.px0, this.px1), Math.min(this.py0, this.py1),
+             Math.abs(this.px1 - this.px0), Math.abs(this.py0 - this.py1));
+      c.clip();
+    } else c.restore();
+  }
+  rect(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    const X0 = this.X(x0), X1 = this.X(x1), Y0 = this.Y(y0), Y1 = this.Y(y1);
+    if (o.col && o.col !== "transparent") { c.fillStyle = o.col; c.fillRect(X0, Y1, X1 - X0, Y0 - Y1); }
+    if (o.border !== null && o.border !== undefined && o.border !== "NA") {
+      c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+      c.strokeRect(X0, Y1, X1 - X0, Y0 - Y1); c.setLineDash([]);
+    }
+  }
+  text(x, y, str, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex, o.font);
+    c.fillStyle = o.col || "black";
+    c.textBaseline = "middle";
+    c.textAlign = o.adj === 0 ? "left" : (o.adj === 1 ? "right" : "center");
+    const lines = String(str).split("\n");
+    const lh = BASE_FONT * (o.cex || 1) * 1.25;
+    const y0 = this.Y(y) - lh * (lines.length - 1) / 2;
+    lines.forEach((ln, i) => c.fillText(ln, this.X(x), y0 + i * lh));
+  }
+  lines(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+    c.beginPath();
+    let started = false;
+    for (let i = 0; i < xs.length; i++) {
+      if (!Number.isFinite(ys[i])) { started = false; continue; }
+      const px = this.X(xs[i]), py = this.Y(ys[i]);
+      if (!started) { c.moveTo(px, py); started = true; } else c.lineTo(px, py);
+    }
+    c.stroke(); c.setLineDash([]);
+  }
+  points(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.fillStyle = o.col || "black"; c.strokeStyle = o.col || "black";
+    const r = 2.2 * (o.cex || 1);
+    for (let i = 0; i < xs.length; i++) {
+      c.beginPath(); c.arc(this.X(xs[i]), this.Y(ys[i]), r, 0, 2 * Math.PI);
+      if (o.pch === 21) { c.fillStyle = "white"; c.fill(); c.stroke(); } else c.fill();
+    }
+  }
+  segments(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1; this._lty(o.lty || 1);
+    c.beginPath(); c.moveTo(this.X(x0), this.Y(y0)); c.lineTo(this.X(x1), this.Y(y1));
+    c.stroke(); c.setLineDash([]);
+  }
+  abline(o = {}) {
+    if (o.h !== undefined) this.segments(this.xlim[0], o.h, this.xlim[1], o.h, o);
+    if (o.v !== undefined) this.segments(o.v, this.ylim[0], o.v, this.ylim[1], o);
+  }
+  polygon(xs, ys, o = {}) {
+    const c = this.ctx;
+    c.beginPath();
+    c.moveTo(this.X(xs[0]), this.Y(ys[0]));
+    for (let i = 1; i < xs.length; i++) c.lineTo(this.X(xs[i]), this.Y(ys[i]));
+    c.closePath();
+    if (o.col) { c.fillStyle = o.col; c.fill(); }
+    if (o.border) { c.strokeStyle = o.border; c.lineWidth = o.lwd || 1; c.stroke(); }
+  }
+  arrows(x0, y0, x1, y1, o = {}) {
+    const c = this.ctx;
+    this.segments(x0, y0, x1, y1, o);
+    const P0 = [this.X(x0), this.Y(y0)], P1 = [this.X(x1), this.Y(y1)];
+    const len = o.length || 8;
+    const ang = Math.atan2(P1[1] - P0[1], P1[0] - P0[0]);
+    const spread = (o.angle || 20) * Math.PI / 180;
+    c.strokeStyle = o.col || "black"; c.lineWidth = o.lwd || 1;
+    const head = (P, a) => {
+      c.beginPath();
+      c.moveTo(P[0], P[1]); c.lineTo(P[0] - len * Math.cos(a - spread), P[1] - len * Math.sin(a - spread));
+      c.moveTo(P[0], P[1]); c.lineTo(P[0] - len * Math.cos(a + spread), P[1] - len * Math.sin(a + spread));
+      c.stroke();
+    };
+    head(P1, ang);
+    if (o.code === 3) head(P0, ang + Math.PI);
+  }
+  title(main, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex || 1.1, 2);
+    c.fillStyle = PAL.ink; c.textAlign = "center"; c.textBaseline = "middle";
+    c.fillText(main, (this.px0 + this.px1) / 2, Math.max(12, this.py1 - 14));
+  }
+  axisLabels(xlab, ylab) {
+    const c = this.ctx;
+    if (xlab) {
+      this._font(0.95, 1); c.fillStyle = PAL.inkSoft; c.textAlign = "center"; c.textBaseline = "alphabetic";
+      c.fillText(xlab, (this.px0 + this.px1) / 2, this.H - 6);
+    }
+    if (ylab) {
+      c.save(); this._font(0.95, 1); c.fillStyle = PAL.inkSoft;
+      c.translate(11, (this.py0 + this.py1) / 2); c.rotate(-Math.PI / 2);
+      c.textAlign = "center"; c.textBaseline = "middle"; c.fillText(ylab, 0, 0); c.restore();
+    }
+  }
+  /* full numeric axes with automatic ticks (side 1 = bottom, 2 = left) */
+  box() {
+    const c = this.ctx;
+    c.strokeStyle = PAL.rule; c.lineWidth = 1; c.setLineDash([]);
+    c.strokeRect(this.px0, this.py1, this.px1 - this.px0, this.py0 - this.py1);
+  }
+  static ticks(lo, hi, n = 5) {
+    const span = hi - lo;
+    if (!(span > 0)) return [lo];
+    const raw = span / n;
+    const mag = Math.pow(10, Math.floor(Math.log10(raw)));
+    const norm = raw / mag;
+    const step = (norm < 1.5 ? 1 : norm < 3 ? 2 : norm < 7 ? 5 : 10) * mag;
+    const out = [];
+    for (let v = Math.ceil(lo / step) * step; v <= hi + 1e-9; v += step) out.push(+v.toFixed(10));
+    return out;
+  }
+  axes(o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = PAL.inkFaint; c.fillStyle = PAL.inkSoft; c.lineWidth = 1; c.setLineDash([]);
+    this._font(0.85, 1);
+    const xt = o.xat || RPlot.ticks(this.xlim[0], this.xlim[1], o.nx || 5);
+    const yt = o.yat || RPlot.ticks(this.ylim[0], this.ylim[1], o.ny || 5);
+    c.beginPath(); c.moveTo(this.px0, this.py0); c.lineTo(this.px1, this.py0); c.stroke();
+    c.textAlign = "center"; c.textBaseline = "top";
+    xt.forEach((v, i) => {
+      const px = this.X(v);
+      if (px < this.px0 - 0.5 || px > this.px1 + 0.5) return;
+      c.beginPath(); c.moveTo(px, this.py0); c.lineTo(px, this.py0 + 5); c.stroke();
+      c.fillText(o.xlabels ? o.xlabels[i] : String(v), px, this.py0 + 7);
+    });
+    c.beginPath(); c.moveTo(this.px0, this.py0); c.lineTo(this.px0, this.py1); c.stroke();
+    c.textAlign = "right"; c.textBaseline = "middle";
+    yt.forEach((v, i) => {
+      const py = this.Y(v);
+      if (py > this.py0 + 0.5 || py < this.py1 - 0.5) return;
+      c.beginPath(); c.moveTo(this.px0, py); c.lineTo(this.px0 - 5, py); c.stroke();
+      c.fillText(o.ylabels ? o.ylabels[i] : String(v), this.px0 - 7, py);
+    });
+  }
+  /* bare label rows, like R's axis(side, at, labels, tick = FALSE) */
+  axisPlain(side, at, labels, o = {}) {
+    const c = this.ctx;
+    this._font(o.cex || 0.8, 1); c.fillStyle = PAL.inkSoft;
+    at.forEach((v, i) => {
+      const lab = String(labels[i]);
+      if (side === 1) { c.textAlign = "center"; c.textBaseline = "top"; c.fillText(lab, this.X(v), this.py0 + 4); }
+      else if (side === 3) { c.textAlign = "center"; c.textBaseline = "bottom"; c.fillText(lab, this.X(v), this.py1 - 3); }
+      else if (side === 2) { c.textAlign = "right"; c.textBaseline = "middle"; c.fillText(lab, this.px0 - 5, this.Y(v)); }
+    });
+  }
+  grid(o = {}) {
+    const c = this.ctx;
+    c.strokeStyle = o.col || "#cfcabf"; c.lineWidth = 1; this._lty(3);
+    if (o.ny !== null) RPlot.ticks(this.ylim[0], this.ylim[1], 5).forEach((v) => {
+      const py = this.Y(v);
+      if (py > this.py0 || py < this.py1) return;
+      c.beginPath(); c.moveTo(this.px0, py); c.lineTo(this.px1, py); c.stroke();
+    });
+    if (o.nx !== null && o.nx !== undefined) RPlot.ticks(this.xlim[0], this.xlim[1], 5).forEach((v) => {
+      const px = this.X(v);
+      c.beginPath(); c.moveTo(px, this.py0); c.lineTo(px, this.py1); c.stroke();
+    });
+    c.setLineDash([]);
+  }
+  legend(pos, o = {}) {
+    const c = this.ctx;
+    const cex = o.cex || 0.85;
+    this._font(cex, 1);
+    const items = o.legend;
+    const pad = 6, sw = 20, gap = 6;
+    const lh = BASE_FONT * cex * 1.5;
+    let boxW, boxH, x, y;
+    if (o.horiz) {
+      const widths = items.map((t) => sw + gap + c.measureText(t).width + 12);
+      boxW = widths.reduce((a, b) => a + b, 0) + 2 * pad;
+      boxH = lh + 2 * pad;
+    } else {
+      boxW = 2 * pad + sw + gap + Math.max(...items.map((t) => c.measureText(t).width));
+      boxH = 2 * pad + items.length * lh;
+    }
+    if (pos === "topright") { x = this.px1 - boxW - 4; y = this.py1 + 4; }
+    else if (pos === "topleft") { x = this.px0 + 4; y = this.py1 + 4; }
+    else if (pos === "right") { x = this.px1 - boxW - 4; y = (this.py0 + this.py1) / 2 - boxH / 2; }
+    else if (pos === "bottomright") { x = this.px1 - boxW - 4; y = this.py0 - boxH - 4; }
+    else { /* bottom */ x = (this.px0 + this.px1) / 2 - boxW / 2; y = this.py0 + (o.inset || 20); }
+    if (o.bg !== "n") { c.fillStyle = o.bg || "rgba(255,255,255,0.88)"; c.fillRect(x, y, boxW, boxH); }
+    if (o.bty !== "n" && o.bg !== "n") { c.strokeStyle = PAL.ruleSoft; c.lineWidth = 1; c.setLineDash([]); c.strokeRect(x, y, boxW, boxH); }
+    let cx = x + pad, cy = y + pad + lh / 2;
+    items.forEach((t, i) => {
+      if (o.horiz) {
+        const w = sw + gap + c.measureText(t).width + 12;
+        this._drawKey(cx, cy, sw, o, i);
+        c.fillStyle = PAL.ink; c.textAlign = "left"; c.textBaseline = "middle";
+        this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
+        cx += w;
+      } else {
+        this._drawKey(cx, cy, sw, o, i);
+        c.fillStyle = PAL.ink; c.textAlign = "left"; c.textBaseline = "middle";
+        this._font(cex, 1); c.fillText(t, cx + sw + gap, cy);
+        cy += lh;
+      }
+    });
+  }
+  _drawKey(cx, cy, sw, o, i) {
+    const c = this.ctx;
+    const pick = (v) => Array.isArray(v) ? v[i] : v;
+    if (o.fill) {
+      c.fillStyle = pick(o.fill); c.fillRect(cx, cy - 6, sw - 4, 12);
+      c.strokeStyle = "#3a3f45"; c.lineWidth = 0.8; c.setLineDash([]); c.strokeRect(cx, cy - 6, sw - 4, 12);
+    } else {
+      c.strokeStyle = pick(o.col) || "black";
+      c.lineWidth = pick(o.lwd) || 1;
+      this._lty(pick(o.lty) || 1);
+      c.beginPath(); c.moveTo(cx, cy); c.lineTo(cx + sw - 4, cy); c.stroke(); c.setLineDash([]);
+      if (o.pch) { c.fillStyle = pick(o.col) || "black"; c.beginPath(); c.arc(cx + (sw - 4) / 2, cy, 2.5, 0, 2 * Math.PI); c.fill(); }
+    }
+  }
+}
+
+/* ---- canvas plumbing: responsive sizing, redraw registry, click mapping -- */
+
+const CANVASES = [];
+
+function mkCanvas(height, drawFn, opts = {}) {
+  const el = document.createElement("canvas");
+  el.className = "plot";
+  el.style.height = height + "px";
+  el._draw = drawFn;
+  el._h = height;
+  el._nplots = opts.nplots || 1;   // for mfrow-style side-by-side panels
+  CANVASES.push(el);
+  if (opts.onclick) {
+    el.style.cursor = "pointer";
+    el.addEventListener("click", (ev) => {
+      const r = el.getBoundingClientRect();
+      const pl = el._pl;
+      if (!pl) return;
+      opts.onclick(pl.invX(ev.clientX - r.left), pl.invY(ev.clientY - r.top), pl);
+    });
+  }
+  requestAnimationFrame(() => drawCanvas(el));
+  return el;
+}
+
+function drawCanvas(el) {
+  const cssW = el.clientWidth || el.parentElement && el.parentElement.clientWidth || 600;
+  const cssH = el._h;
+  if (!cssW) return;
+  const dpr = window.devicePixelRatio || 1;
+  el.width = Math.round(cssW * dpr);
+  el.height = Math.round(cssH * dpr);
+  const ctx = el.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  ctx.clearRect(0, 0, cssW, cssH);
+  ctx.fillStyle = PAL.paper; ctx.fillRect(0, 0, cssW, cssH);
+  const pl = new RPlot(ctx, cssW, cssH);
+  el._pl = pl;
+  try { el._draw(pl, cssW, cssH); } catch (e) { /* eslint-disable-line */ console.error(e); }
+}
+
+/* A shut example is clipped to zero height rather than display:none, so it
+   still has an offsetParent; skip anything inside one. */
+function redrawAll() {
+  CANVASES.forEach((el) => {
+    if (!el.isConnected || el.offsetParent === null) return;
+    if (el.closest(".example-container:not(.open)")) return;
+    drawCanvas(el);
   });
-  const pse=(GEL.lo+GEL.hi)/2;
-  x.strokeStyle=PAL.accent3;x.lineWidth=1.5;x.setLineDash([5,4]);
-  [GEL.lo,GEL.hi].forEach(v=>{x.beginPath();x.moveTo(X(v),g.T);x.lineTo(X(v),h-g.B);x.stroke();});
-  x.setLineDash([]);
-  x.strokeStyle=PAL.accent2;x.lineWidth=1.5;
-  x.beginPath();x.moveTo(X(pse),g.T);x.lineTo(X(pse),h-g.B);x.stroke();
-  x.fillStyle=PAL.accent3;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-  x.fillText('interval of uncertainty',(X(GEL.lo)+X(GEL.hi))/2,g.T-14);
 }
 
-/* ---- the self-test ---- */
-const JT_STEP=1.5,JT_MAX=30,JT_TICK=380,JT_SERIES=6;
-const JT={series:0,dir:'asc',delta:0,timer:null,crossings:[],active:false,th:null};
-function jtLabel(){
-  $('jt-instr').textContent=JT.dir==='asc'
-    ?'Climbing from nothing. Press when you first see a difference.'
-    :'Falling from a clear difference. Press when it stops looking different.';
-  $('jt-resp').textContent=JT.dir==='asc'?'I see it now':'They match now';
-  $('jt-count').textContent='series '+Math.min(JT.series+1,JT_SERIES)+' of '+JT_SERIES;
-}
-function jtNext(){
-  if(JT.series>=JT_SERIES)return jtEnd();
-  JT.dir=(JT.series%2===0)?'asc':'desc';
-  JT.delta=JT.dir==='asc'?0:JT_MAX;
-  JT.active=true;jtLabel();setPatches('jt-ref','jt-test',JT.delta);
-  clearInterval(JT.timer);
-  JT.timer=setInterval(()=>{
-    JT.delta+=JT.dir==='asc'?JT_STEP:-JT_STEP;
-    if(JT.dir==='asc'&&JT.delta>=JT_MAX)return jtCross(JT_MAX);
-    if(JT.dir==='desc'&&JT.delta<=0)return jtCross(0);
-    setPatches('jt-ref','jt-test',JT.delta);
-  },JT_TICK);
-}
-function jtCross(v){
-  if(!JT.active)return;JT.active=false;clearInterval(JT.timer);
-  JT.crossings.push({dir:JT.dir,v});JT.series++;jtPlot();
-  setTimeout(()=>{if($('panel-jnd').classList.contains('on'))jtNext();},500);
-}
-function jtAbort(){clearInterval(JT.timer);JT.active=false;
-  $('jt-run').classList.add('hidden');$('jt-intro').classList.remove('hidden');}
-$('jt-resp').onclick=()=>{if(JT.active)jtCross(JT.delta);};
-document.addEventListener('keydown',e=>{
-  if(!$('panel-jnd').classList.contains('on'))return;
-  if($('jt-run').classList.contains('hidden'))return;
-  if(e.code==='Space'){e.preventDefault();if(JT.active)jtCross(JT.delta);}
-});
-function jtEnd(){
-  $('jt-run').classList.add('hidden');$('jt-done').classList.remove('hidden');
-  const a=JT.crossings.filter(c=>c.dir==='asc').map(c=>c.v);
-  const d=JT.crossings.filter(c=>c.dir==='desc').map(c=>c.v);
-  JT.th=mean(JT.crossings.map(c=>c.v));
-  $('jt-a').textContent=a.length?mean(a).toFixed(2):'—';
-  $('jt-d').textContent=d.length?mean(d).toFixed(2):'—';
-  $('jt-th').textContent=JT.th.toFixed(2);
-  const gap=a.length&&d.length?mean(a)-mean(d):0;
-  $('jt-rev').innerHTML='<strong>Your threshold: '+JT.th.toFixed(2)+' grey levels.</strong> '+
-    'Your ascending crossings averaged '+(a.length?mean(a).toFixed(2):'—')+
-    ' and your descending ones '+(d.length?mean(d).toFixed(2):'—')+', a gap of '+
-    Math.abs(gap).toFixed(2)+'. That gap is your own habituation. '+
-    (Math.abs(gap)>2?'Yours is large, so one direction alone would have misled you.'
-      :'Yours is small, but running one direction only would not have told you that.');
-  jtPlot();saveResults();
-}
-function jtPlot(){
-  const p=cv('jt-plot',195);if(!p)return;const{x,w,h}=p;
-  const g={L:84,R:18,T:22,B:36,w,h};
-  const X=v=>g.L+v/JT_MAX*(w-g.L-g.R);
-  x.strokeStyle=PAL.ruleSoft;x.lineWidth=1;
-  [0,10,20,30].forEach(v=>{x.beginPath();x.moveTo(X(v),g.T);x.lineTo(X(v),h-g.B);x.stroke();});
-  x.fillStyle=PAL.inkFaint;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-  [0,10,20,30].forEach(v=>x.fillText(v,X(v),h-g.B+7));
-  x.fillStyle=PAL.inkSoft;x.textBaseline='bottom';
-  x.fillText('crossing, in grey levels',(g.L+w-g.R)/2,h-4);
-  const rA=g.T+28,rD=g.T+72;
-  x.textAlign='right';x.textBaseline='middle';x.fillStyle=PAL.inkSoft;x.font='12px '+FACE;
-  x.fillText('ascending',g.L-12,rA);x.fillText('descending',g.L-12,rD);
-  const a=JT.crossings.filter(c=>c.dir==='asc').map(c=>c.v);
-  const d=JT.crossings.filter(c=>c.dir==='desc').map(c=>c.v);
-  [[a,rA,PAL.accent],[d,rD,PAL.accent2]].forEach(([arr,r,col])=>arr.forEach((v,i)=>{
-    x.beginPath();x.arc(X(v),r+((i%2)?6:-6),4,0,7);
-    x.fillStyle=PAL.paper;x.fill();x.strokeStyle=col;x.lineWidth=1.5;x.stroke();}));
-  if(JT.crossings.length){const m=mean(JT.crossings.map(c=>c.v));
-    x.strokeStyle=PAL.accent3;x.lineWidth=1.6;x.setLineDash([5,4]);
-    x.beginPath();x.moveTo(X(m),g.T);x.lineTo(X(m),h-g.B);x.stroke();x.setLineDash([]);
-    x.fillStyle=PAL.accent3;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-    x.fillText('mean '+m.toFixed(2),X(m),g.T-1);}
-}
-$('jt-start').onclick=()=>{JT.series=0;JT.crossings=[];
-  $('jt-intro').classList.add('hidden');$('jt-done').classList.add('hidden');
-  $('jt-run').classList.remove('hidden');jtNext();};
-$('jt-again').onclick=()=>{JT.series=0;JT.crossings=[];
-  $('jt-done').classList.add('hidden');$('jt-run').classList.remove('hidden');jtNext();};
+let _rzT = null;
+window.addEventListener("resize", () => { clearTimeout(_rzT); _rzT = setTimeout(redrawAll, 120); });
 
-/* =================== AVERAGE ERROR =================== */
-/* his constant error, set clear of the noise in the mean of forty settings
-   (about 1.1 g) so that it reads as a habit rather than a coin flip */
-const AE_CE=3.4;
-const AE={set:[]};
-function aeTake(k){const s=sigD(100);
-  for(let i=0;i<k;i++)AE.set.push(100+AE_CE+randn()*s);aeUpdate();}
-function aeUpdate(){
-  const n=AE.set.length,last=n?AE.set[n-1]:null;
-  $('ae-n').textContent=n;
-  $('ae-last').textContent=last!=null?last.toFixed(2)+' g':'—';
-  $('ae-err').textContent=last!=null?((last-100>=0?'+':'')+(last-100).toFixed(2)+' g'):'—';
-  if(n>=2){const m=mean(AE.set),sd=sdev(AE.set);
-    $('ae-mean').textContent=m.toFixed(2)+' g';
-    $('ae-ce').textContent=(m-100>=0?'+':'')+(m-100).toFixed(2)+' g';
-    $('ae-sd').textContent=sd.toFixed(2)+' g';
-    $('ae-th').textContent=(PEZ*sd).toFixed(2)+' g';}
-  else['ae-mean','ae-ce','ae-sd','ae-th'].forEach(k=>$(k).textContent='—');
-  if(n>=1)show('ae-rev1');
-  if(n>=3)show('ae-rev2');
-  if(n>=20){show('ae-rev3');saveResults();}
-  aePlot();
-}
-function aePlot(){
-  const p=cv('ae-plot',200);if(!p)return;const{x,w,h}=p;
-  const g={L:34,R:22,T:26,B:38,w,h};
-  const LOW=84,HIGH=116, X=v=>g.L+(v-LOW)/(HIGH-LOW)*(w-g.L-g.R);
-  x.strokeStyle=PAL.rule;x.beginPath();x.moveTo(g.L,h-g.B);x.lineTo(w-g.R,h-g.B);x.stroke();
-  x.fillStyle=PAL.inkFaint;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-  [90,95,100,105,110].forEach(v=>x.fillText(v,X(v),h-g.B+7));
-  x.fillStyle=PAL.inkSoft;x.textBaseline='bottom';
-  x.fillText('where he set the comparison, in grams',(g.L+w-g.R)/2,h-4);
-  x.strokeStyle=PAL.ink;x.lineWidth=1;x.setLineDash([4,3]);
-  x.beginPath();x.moveTo(X(100),g.T);x.lineTo(X(100),h-g.B);x.stroke();x.setLineDash([]);
-  x.fillStyle=PAL.inkSoft;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-  x.fillText('100 g',X(100),g.T-14);
-  if(!AE.set.length){empty(x,g,'take a setting');return;}
-  AE.set.forEach((v,i)=>{x.beginPath();x.arc(X(v),h-g.B-12-((i%9)*8),3.4,0,7);
-    x.fillStyle=(i===AE.set.length-1)?PAL.accent2:'rgba(47,111,159,.5)';x.fill();});
-  if(AE.set.length>=2){
-    const m=mean(AE.set),sd=sdev(AE.set);
-    x.fillStyle='rgba(74,124,89,.13)';
-    x.fillRect(X(m-PEZ*sd),g.T+2,X(m+PEZ*sd)-X(m-PEZ*sd),h-g.B-g.T-2);
-    x.strokeStyle=PAL.accent3;x.lineWidth=1.6;
-    x.beginPath();x.moveTo(X(m),g.T+2);x.lineTo(X(m),h-g.B);x.stroke();
-    x.fillStyle=PAL.accent3;x.font='11px '+FACE;x.textAlign='left';x.textBaseline='top';
-    x.fillText('mean '+m.toFixed(2),X(m)+5,g.T+2);}
-}
-$('ae-1').onclick=()=>aeTake(1);
-$('ae-4').onclick=()=>aeTake(4);
-$('ae-35').onclick=()=>aeTake(35);
-$('ae-reset').onclick=()=>{AE.set=[];aeUpdate();};
-
-/* ---- the self-test ---- */
-const AT_N=7;
-const AT={i:0,set:[],th:null,m:null,sd:null};
-function atNext(){
-  if(AT.i>=AT_N)return atEnd();
-  $('at-slider').value=((Math.random()<.5?-1:1)*(8+Math.random()*14)).toFixed(1);
-  atUpdate();$('at-count').textContent='setting '+(AT.i+1)+' of '+AT_N;
-}
-function atUpdate(){const v=+$('at-slider').value;
-  $('at-sv').textContent=(v>=0?'+':'')+v.toFixed(1);
-  setPatches('at-ref','at-test',v);}
-$('at-slider').oninput=atUpdate;
-$('at-set').onclick=()=>{AT.set.push(+$('at-slider').value);AT.i++;
-  AT.i<AT_N?atNext():atEnd();};
-function atEnd(){
-  $('at-run').classList.add('hidden');$('at-done').classList.remove('hidden');
-  AT.m=mean(AT.set);AT.sd=sdev(AT.set);AT.th=PEZ*AT.sd;
-  $('at-m').textContent=(AT.m>=0?'+':'')+AT.m.toFixed(2);
-  $('at-ce').textContent=(AT.m>=0?'+':'')+AT.m.toFixed(2);
-  $('at-s').textContent=AT.sd.toFixed(2);
-  $('at-th').textContent=AT.th.toFixed(2);
-  $('at-rev').innerHTML='<strong>Your threshold: '+AT.th.toFixed(2)+' grey levels.</strong> '+
-    'The patches match physically at 0, and your settings averaged '+
-    (AT.m>=0?'+':'')+AT.m.toFixed(2)+'. That offset is your constant error: where identical sits for you'+
-    (Math.abs(AT.m)>1.5?', and it is not small.':'.')+
-    ' Only the scatter around it fed the threshold. Two separate facts, from one column of numbers.';
-  atPlot();saveResults();
-}
-function atPlot(){
-  const p=cv('at-plot',180);if(!p)return;const{x,w,h}=p;
-  const g={L:34,R:22,T:26,B:38,w,h};
-  const LOW=-26,HIGH=26, X=v=>g.L+(v-LOW)/(HIGH-LOW)*(w-g.L-g.R);
-  x.strokeStyle=PAL.rule;x.beginPath();x.moveTo(g.L,h-g.B);x.lineTo(w-g.R,h-g.B);x.stroke();
-  x.fillStyle=PAL.inkFaint;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-  [-20,-10,0,10,20].forEach(v=>x.fillText(v,X(v),h-g.B+7));
-  x.fillStyle=PAL.inkSoft;x.textBaseline='bottom';
-  x.fillText('your setting, in grey levels',(g.L+w-g.R)/2,h-4);
-  x.strokeStyle=PAL.ink;x.lineWidth=1;x.setLineDash([4,3]);
-  x.beginPath();x.moveTo(X(0),g.T);x.lineTo(X(0),h-g.B);x.stroke();x.setLineDash([]);
-  x.fillStyle=PAL.inkSoft;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='top';
-  x.fillText('identical',X(0),g.T-14);
-  AT.set.forEach((v,i)=>{x.beginPath();x.arc(X(v),h-g.B-12-((i%5)*8),3.6,0,7);
-    x.fillStyle='rgba(47,111,159,.55)';x.fill();});
-  if(AT.set.length>=2&&AT.m!==null){
-    x.fillStyle='rgba(74,124,89,.13)';
-    x.fillRect(X(AT.m-AT.th),g.T+2,X(AT.m+AT.th)-X(AT.m-AT.th),h-g.B-g.T-2);
-    x.strokeStyle=PAL.accent3;x.lineWidth=1.6;
-    x.beginPath();x.moveTo(X(AT.m),g.T+2);x.lineTo(X(AT.m),h-g.B);x.stroke();
-    x.fillStyle=PAL.accent3;x.font='11px '+FACE;x.textAlign='left';x.textBaseline='top';
-    x.fillText('mean '+AT.m.toFixed(2),X(AT.m)+5,g.T+2);}
-}
-$('at-start').onclick=()=>{AT.i=0;AT.set=[];AT.m=AT.sd=AT.th=null;
-  $('at-intro').classList.add('hidden');$('at-done').classList.add('hidden');
-  $('at-run').classList.remove('hidden');atNext();};
-$('at-again').onclick=()=>{AT.i=0;AT.set=[];AT.m=AT.sd=AT.th=null;
-  $('at-done').classList.add('hidden');$('at-run').classList.remove('hidden');atNext();};
-
-/* =================== WEBER =================== */
-const STD=[25,50,100,200,400],WEB={};
-$('web-btns').innerHTML=STD.map(v=>'<button class="btn" data-s="'+v+'">'+v+' g</button>').join('');
-$('web-btns').querySelectorAll('button').forEach(b=>b.onclick=()=>{
-  const W=+b.dataset.s,lv=[.02,.04,.06,.09,.13].map(f=>+(f*W).toFixed(2)),pts=[];
-  lv.forEach(L=>{let c=0;for(let i=0;i<160;i++)if(lift(W,L))c++;pts.push([L,c/160]);});
-  const sd=probitSpread(pts);WEB[W]={sd,th:PEZ*sd};
-  if(Object.keys(WEB).length>=4)show('web-rev');
-  webPlot();});
-function webPlot(){
-  const p=cv('web-plot',250);if(!p)return;const{x,w,h}=p;
-  const L=52,R=16,T=18,B=38,mid=(h-T-B)*.52+T;
-  const X=v=>L+v/430*(w-L-R);
-  const Yt=v=>mid-12-v/26*(mid-12-T), Yf=v=>h-B-v/.09*(h-B-(mid+22));
-  x.strokeStyle=PAL.ruleSoft;x.lineWidth=1;x.fillStyle=PAL.inkFaint;
-  x.textAlign='right';x.textBaseline='middle';x.font='11px '+FACE;
-  [0,10,20].forEach(v=>{x.beginPath();x.moveTo(L,Yt(v));x.lineTo(w-R,Yt(v));x.stroke();
-    x.fillText(v,L-8,Yt(v));});
-  [0,.04,.08].forEach(v=>{x.beginPath();x.moveTo(L,Yf(v));x.lineTo(w-R,Yf(v));x.stroke();
-    x.fillText((v*100).toFixed(0)+'%',L-8,Yf(v));});
-  x.fillStyle=PAL.inkSoft;x.textAlign='left';x.textBaseline='bottom';
-  x.fillText('threshold in grams',L,T+2);
-  x.fillText('threshold as a fraction of the standard',L,mid+16);
-  x.fillStyle=PAL.inkFaint;x.textAlign='center';x.textBaseline='top';
-  [0,100,200,300,400].forEach(v=>x.fillText(v,X(v),h-B+7));
-  x.fillStyle=PAL.inkSoft;x.textBaseline='bottom';
-  x.fillText('standard weight in grams',(L+w-R)/2,h-4);
-  const E=Object.keys(WEB).map(k=>[+k,WEB[k]]).sort((a,b)=>a[0]-b[0]);
-  if(!E.length){empty(x,{L,R,T,B,w,h},'measure a standard or two');return;}
-  if(E.length>1){x.beginPath();E.forEach(([W,o],i)=>{const px=X(W),py=Yt(o.th);
-    i?x.lineTo(px,py):x.moveTo(px,py);});
-    x.strokeStyle=PAL.accent;x.lineWidth=1.2;x.stroke();}
-  E.forEach(([W,o])=>{
-    x.beginPath();x.arc(X(W),Yt(o.th),4,0,7);x.fillStyle=PAL.accent;x.fill();
-    x.beginPath();x.arc(X(W),Yf(o.th/W),4,0,7);x.fillStyle=PAL.accent3;x.fill();
-    x.fillStyle=PAL.inkSoft;x.font='11px '+FACE;x.textAlign='center';x.textBaseline='bottom';
-    x.fillText(o.th.toFixed(1),X(W),Yt(o.th)-7);
-    x.fillText((o.th/W*100).toFixed(1)+'%',X(W),Yf(o.th/W)-7);});
-  $('web-stats').innerHTML=E.map(([W,o])=>
-    '<div><span>'+W+' g standard</span><b class="k3">'+(o.th/W*100).toFixed(2)+'%</b></div>').join('');
+function blankPlot(pl, msg) {
+  pl.setup({ xlim: [0, 1], ylim: [0, 1], mar: [1, 1, 1, 1] });
+  pl.text(0.5, 0.5, msg, { cex: 1.15, col: PAL.inkFaint });
 }
 
-/* =================== THE SCALE =================== */
-const SC={n:0};
-const kW=()=>PEZ*WEBER, mult=()=>1+kW(), wAt=n=>W0*Math.pow(mult(),n);
-function scUpd(){
-  const W=wAt(SC.n);
-  $('sc-n').textContent=SC.n;
-  $('sc-w').textContent=W.toFixed(2)+' g';
-  $('sc-st').textContent=SC.n?(W-wAt(SC.n-1)).toFixed(3)+' g':'—';
-  if(SC.n>=25)show('sc-rev');
-  scPlot();
-}
-function scPlot(){
-  const p=cv('sc-plot',270);if(!p)return;const{x,w,h}=p;
-  const g={L:48,R:18,T:18,B:42,w,h};
-  const nMax=Math.log(120/W0)/Math.log(mult());
-  const X=v=>g.L+v/120*(w-g.L-g.R), Y=n=>h-g.B-n/(nMax*1.05)*(h-g.T-g.B);
-  axes(x,g,{yticks:[0,25,50,75,100].filter(v=>v<=nMax*1.05).map(v=>[v,Y(v)]),
-    xticks:[0,20,40,60,80,100,120].map(v=>[v,X(v)]),
-    xlab:'weight in grams',ylab:'units of sensation'});
-  for(let i=0;i<=SC.n;i++){const W=wAt(i);if(W>120)break;
-    x.strokeStyle=i===SC.n?PAL.accent3:'rgba(74,124,89,.32)';x.lineWidth=i===SC.n?1.6:1;
-    x.beginPath();x.moveTo(X(W),h-g.B);x.lineTo(X(W),h-g.B-(i===SC.n?14:7));x.stroke();}
-  if(SC.n>0){
-    x.beginPath();
-    for(let i=0;i<=SC.n;i++){const W=wAt(i);if(W>120)break;const px=X(W),py=Y(i);
-      i?x.lineTo(px,py):x.moveTo(px,py);}
-    x.strokeStyle=PAL.accent;x.lineWidth=1.8;x.stroke();
-    const W=Math.min(120,wAt(SC.n));
-    x.beginPath();x.arc(X(W),Y(SC.n),4,0,7);x.fillStyle=PAL.accent;x.fill();
-    x.fillStyle=PAL.ink;x.font='12px '+FACE;x.textAlign='right';x.textBaseline='bottom';
-    x.fillText(SC.n+' units at '+W.toFixed(1)+' g',X(W)-8,Y(SC.n)-4);}
-}
-$('sc-1').onclick=()=>{SC.n++;scUpd();};
-$('sc-10').onclick=()=>{SC.n+=10;scUpd();};
-$('sc-100').onclick=()=>{SC.n=Math.round(Math.log(100/W0)/Math.log(mult()));scUpd();};
-$('sc-reset').onclick=()=>{SC.n=0;scUpd();};
+/* ------------------------------------------------- tiny DOM utilities --- */
 
-/* =================== TABS =================== */
-const TABS={
-  rw:()=>{rwPlot();rwCurve();rwFit();rwtPlot();},
-  jnd:()=>{jndLadder();jndCrossPlot();gelPlot();jtPlot();},
-  ae:()=>{aePlot();atPlot();}
+function h(html) {
+  const t = document.createElement("template");
+  t.innerHTML = html.trim();
+  return t.content.firstElementChild;
+}
+const $ = (sel, root) => (root || document).querySelector(sel);
+const $$ = (sel, root) => Array.from((root || document).querySelectorAll(sel));
+
+/* `key` is a colour key, k1..k4. A slider given one is drawn in that hue, and
+   so is every figure in the text it moves — see registerLive. */
+/* ---- number lines -------------------------------------------------------
+   A rule with ticks and a travelling marker, laid out by .nl-grid so that
+   several of them share one axis. `ticks` are {pos 0..1, major, label}. Used
+   by ex8, ex9 and ex26; the marker is omitted where a real slider supplies it.
+   -----------------------------------------------------------------------*/
+function nlDraw(el, ticks, withMarker) {
+  if (!el) return;
+  el.innerHTML =
+    (withMarker ? '<div class="nl-rule"></div><div class="nl-dot"></div>' : "") +
+    ticks.map((t) =>
+      `<div class="nl-tick${t.major ? " major" : ""}" style="left:${t.pos * 100}%"></div>` +
+      (t.label == null ? "" : `<div class="nl-ticklab" style="left:${t.pos * 100}%">${t.label}</div>`)
+    ).join("");
+}
+
+/* the next 1, 2 or 5 of a decade at or above v — for a ruler that has to grow
+   to keep its marker on it */
+function niceMax(v, floor) {
+  const lo = floor === undefined ? 2 : floor;
+  if (!(v > 0) || v <= lo) return lo;   // the floor is a floor, not just a minimum
+  const base = Math.pow(10, Math.floor(Math.log10(v)));
+  for (const m of [1, 2, 5, 10]) if (v <= m * base) return Math.max(lo, m * base);
+  return Math.max(lo, 10 * base);
+}
+
+function slider(id, label, min, max, value, step, fmtFn, key) {
+  const d = document.createElement("div");
+  d.className = "ctl" + (key ? " " + key : "");
+  d.innerHTML = `<label for="${id}">${label} <span class="slider-val" id="${id}_val"></span></label>
+    <input type="range" id="${id}" min="${min}" max="${max}" step="${step}" value="${value}">`;
+  const inp = d.querySelector("input"), out = d.querySelector(".slider-val");
+  const show = () => { out.textContent = fmtFn ? fmtFn(+inp.value) : inp.value; };
+  inp.addEventListener("input", show);
+  show();
+  return d;
+}
+function select(id, label, choices, selected) {
+  const opts = choices.map(([v, t]) => `<option value="${esc(v)}"${v === selected ? " selected" : ""}>${esc(t)}</option>`).join("");
+  return h(`<div class="ctl"><label for="${id}">${label}</label><select id="${id}">${opts}</select></div>`);
+}
+function checkbox(id, label, checked) {
+  return h(`<div class="ctl checkbox"><label><input type="checkbox" id="${id}"${checked ? " checked" : ""}> ${label}</label></div>`);
+}
+function radios(name, label, choices, selected, stacked) {
+  const items = choices.map(([v, t]) =>
+    `<label><input type="radio" name="${name}" value="${esc(v)}"${v === selected ? " checked" : ""}> ${esc(t)}</label>`).join("");
+  return h(`<div class="ctl"><label>${label}</label><div class="radio-row${stacked ? " stacked" : ""}">${items}</div></div>`);
+}
+function numberInput(id, label, value, min, max, step) {
+  return h(`<div class="ctl"><label for="${id}">${label}</label>
+    <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}"></div>`);
+}
+const val = (id) => { const e = document.getElementById(id); return e ? e.value : null; };
+const num = (id) => +val(id);
+const chk = (id) => { const e = document.getElementById(id); return e ? e.checked : false; };
+const radioVal = (name) => { const e = document.querySelector(`input[name="${name}"]:checked`); return e ? e.value : null; };
+function setSlider(id, v) {
+  const e = document.getElementById(id);
+  if (!e) return;
+  e.value = v;
+  e.dispatchEvent(new Event("input", { bubbles: true }));
+}
+</script>
+<script>
+/* ==========================================================================
+   Specific to these pages: the simulated subject, the protocol sheet and
+   worked-calculation renderers, and the store that carries results to the
+   summary page. Everything general — the maths, RPlot, mkCanvas, the control
+   builders — comes from 03_lib.js and is shared with the other papers.
+   ========================================================================*/
+
+/* a standard normal deviate, from the shared quantile function */
+const gauss = () => qnorm(Math.random());
+const mean = (a) => a.reduce((x, y) => x + y, 0) / a.length;
+const sdev = (a) => { const m = mean(a); return Math.sqrt(mean(a.map((v) => (v - m) ** 2))); };
+/* the "average error" the third method is named after: how far a setting
+   typically falls from the middle of the settings */
+const mad = (a) => { const m = mean(a); return mean(a.map((v) => Math.abs(v - m))); };
+
+/* Two summaries of one spread, and the number converting between them. The
+   probable error is the half-range holding the middle half of a normal
+   distribution; the mean absolute deviation is a different summary of the same
+   spread. PE = 0.6745 sigma and MAD = 0.7979 sigma, so PE = 0.8454 x MAD.
+   That is an identity of the normal curve, not a tuning constant. */
+const PE_Z = 0.6745;
+const MAD_TO_PE = PE_Z / Math.sqrt(2 / Math.PI);       /* 0.8454 */
+
+/* least-squares probit line through (level, proportion) points */
+function probitFit(pts) {
+  let sx = 0, sy = 0, sxx = 0, sxy = 0, n = 0;
+  pts.forEach(([L, pr]) => {
+    const z = qnorm(Math.min(0.995, Math.max(0.005, pr)));
+    sx += L; sy += z; sxx += L * L; sxy += L * z; n++;
+  });
+  const slope = (n * sxy - sx * sy) / (n * sxx - sx * sx), icept = (sy - slope * sx) / n;
+  return {
+    slope, icept,
+    sigma: 1 / slope,
+    at: (p) => (qnorm(p) - icept) / slope,             /* level giving proportion p */
+    p: (L) => pnorm(icept + slope * L)                 /* proportion at level L */
+  };
+}
+
+/* -------------------------------------------------------------- the subject
+   One man, used by all three methods, so the pages can be compared.
+
+   Only WEBER and RL_SD are senses. The other two are not, and that matters:
+   CAUTION is how large a felt difference has to be before he will commit to
+   "greater" rather than "equal" — a matter of what he was told to do, not of
+   what he can feel — and MOTOR is the unsteadiness of his hand, which only
+   enters when he is the one moving the weight.
+
+   So the three methods are not measuring quite the same thing, and their
+   difference thresholds should not be expected to match. Nothing here is set
+   to make them agree.                                                       */
+const SUBJ = {
+  RL:      3.0,      /* absolute threshold, grams resting on the palm */
+  RL_SD:   0.9,      /* trial-to-trial noise on detection */
+  WEBER:   0.0715,   /* sensory spread of a comparison = WEBER x standard */
+  CE:      2.0,      /* constant error on comparisons, grams */
+  CAUTION: 0.95,     /* he says "equal" until the difference exceeds this,
+                        measured in units of the sensory spread */
+  MOTOR:   3.0       /* extra grams of scatter when he works the dial himself */
 };
-function showTab(t){
-  if(t!=='jnd')jtAbort();
-  Object.keys(TABS).forEach(k=>{
-    $('tab-'+k).classList.toggle('active',k===t);
-    $('panel-'+k).classList.toggle('on',k===t);});
-  requestAnimationFrame(TABS[t]);
-}
-Object.keys(TABS).forEach(k=>$('tab-'+k).onclick=()=>showTab(k));
+const sigD = (S) => SUBJ.WEBER * S;                    /* 7.15 g at a 100 g standard */
 
-/* ---- first paint ---- */
-rwRun(0);TABS.rw();webPlot();scUpd();
-window.addEventListener('resize',()=>{
-  const a=Object.keys(TABS).find(k=>$('panel-'+k).classList.contains('on'));
-  if(a)TABS[a]();
-  webPlot();scPlot();
+/* What each method is in a position to recover, kept separate because they
+   are different quantities. */
+const PE_TRUE         = (S) => PE_Z * sigD(S);
+const IU_HALF_TRUE    = (S) => SUBJ.CAUTION * sigD(S);
+const SET_SPREAD_TRUE = (S) => Math.sqrt(sigD(S) ** 2 + SUBJ.MOTOR ** 2);
+const SET_PE_TRUE     = (S) => PE_Z * SET_SPREAD_TRUE(S);
+const PSE_TRUE        = (S) => S + SUBJ.CE;
+
+/* does he feel a weight resting on the palm at all? */
+function feels(w) { return (w + gauss() * SUBJ.RL_SD) > SUBJ.RL; }
+/* two-way comparison: is the comparison heavier than the standard? */
+function heavier(comp, std) { return (comp - std - SUBJ.CE) + gauss() * sigD(std) > 0; }
+/* three-way comparison: less, equal or greater than the standard? */
+function compare(comp, std, caution) {
+  const c = (caution === undefined ? SUBJ.CAUTION : caution) * sigD(std);
+  const e = (comp - std - SUBJ.CE) + gauss() * sigD(std);
+  return e > c ? "greater" : (e < -c ? "less" : "equal");
+}
+/* where he leaves the dial, and a plausible path to get there */
+function setting(target, spread) { return target + gauss() * spread; }
+function settlePath(start, end, n) {
+  const p = [];
+  for (let i = 0; i < n; i++) {
+    const t = i / (n - 1), decay = Math.exp(-3.1 * t);
+    p.push(end + (start - end) * decay * Math.cos(5.4 * t) + gauss() * 0.5 * decay);
+  }
+  p[p.length - 1] = end;
+  return p;
+}
+
+/* ------------------------------------------------------------------ format */
+const f1 = (v) => fmt(v, 1), f2 = (v) => fmt(v, 2);
+const gram = (v) => fmt(v, 2) + " g";
+const signed = (v) => (v >= 0 ? "+" : "") + fmt(v, 2);
+
+/* ---------------------------------------------------------- protocol sheet
+   head: array of header strings. rows: [{cls, cells:[{t,cls}|string]}].     */
+function renderSheet(sel, head, rows, caption) {
+  const el = $(sel);
+  if (!el) return;
+  if (!rows.length) { el.innerHTML = `<div class="sheet-empty">${caption || "no data yet"}</div>`; return; }
+  let s = '<div class="sheet-wrap"><table class="sheet">';
+  if (head && head.length) s += "<tr>" + head.map((x) => `<th>${x}</th>`).join("") + "</tr>";
+  rows.forEach((r) => {
+    s += "<tr" + (r.cls ? ` class="${r.cls}"` : "") + ">";
+    r.cells.forEach((c) => {
+      const t = (typeof c === "string") ? c : c.t;
+      const cl = (typeof c === "string") ? "" : (c.cls || "");
+      s += "<td" + (cl ? ` class="${cl}"` : "") + ">" + t + "</td>";
+    });
+    s += "</tr>";
+  });
+  s += "</table>";
+  if (caption) s += `<div class="plot-cap">${caption}</div>`;
+  el.innerHTML = s + "</div>";
+}
+
+/* ------------------------------------------------------ worked calculation
+   lines: [{lbl, expr, res, k, sum}] — expr is the arithmetic with the actual
+   numbers in it, res the answer.                                            */
+function renderCalc(sel, lines) {
+  const el = $(sel);
+  if (!el) return;
+  el.innerHTML = '<div class="calc">' + lines.map((l) =>
+    `<div class="line${l.sum ? " sum" : ""}">` +
+    `<div class="lbl">${l.lbl || ""}</div>` +
+    `<div class="expr">${l.expr || ""}</div>` +
+    `<div class="res${l.k ? " " + l.k : ""}">${l.res || ""}</div></div>`).join("") + "</div>";
+}
+/* "( a + b + c ) / n" written out, shortened in the middle when long */
+function sumExpr(vals, dp) {
+  const d = dp === undefined ? 1 : dp;
+  const shown = vals.length <= 6
+    ? vals.map((v) => fmt(v, d)).join(" + ")
+    : vals.slice(0, 3).map((v) => fmt(v, d)).join(" + ") + " + … + " + fmt(vals[vals.length - 1], d);
+  return "( " + shown + " ) / " + vals.length;
+}
+
+/* --------------------------------------------------------------- the store */
+const STORE_KEY = "fechners-lab";
+function loadStore() {
+  try {
+    const s = localStorage.getItem(STORE_KEY), d = s ? JSON.parse(s) : null;
+    return (d && typeof d === "object") ? d : { sim: {}, you: {} };
+  } catch (e) { return { sim: {}, you: {} }; }
+}
+function saveSim(method, obj) {
+  const d = loadStore();
+  d.sim = d.sim || {}; d.sim[method] = obj;
+  /* what is actually in the subject, so the summary page can say what each
+     method was in a position to recover rather than pretending to one number */
+  d.truth = { RL: SUBJ.RL, sigma: sigD(100), PE: PE_TRUE(100),
+              iuHalf: IU_HALF_TRUE(100), setPE: SET_PE_TRUE(100),
+              PSE: PSE_TRUE(100), CE: SUBJ.CE };
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) { /* private mode */ }
+}
+function saveYou(method, obj) {
+  const d = loadStore();
+  d.you = d.you || {}; d.you[method] = obj;
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(d)); } catch (e) { /* private mode */ }
+}
+function clearStore() { try { localStorage.removeItem(STORE_KEY); } catch (e) { /* ignore */ } }
+
+/* a canvas dropped straight into a container, the common case here */
+function plotInto(sel, height, drawFn) {
+  const el = $(sel);
+  if (!el) return;
+  el.innerHTML = "";
+  el.appendChild(mkCanvas(height, drawFn));
+}
+
+/* -------------------------------------------------------------------- nav */
+const PAGES = [
+  ["index.html", "Introduction"],
+  ["right-and-wrong-cases.html", "Right and wrong cases"],
+  ["just-noticeable-differences.html", "Just noticeable differences"],
+  ["average-error.html", "Average error"],
+  ["results.html", "The three together"],
+  ["try-it-yourself.html", "Try it yourself"]
+];
+(function markNav() {
+  const page = document.body.getAttribute("data-page");
+  const links = $$("nav.top a");
+  let idx = -1;
+  links.forEach((a, i) => { if (a.getAttribute("data-p") === page) { a.classList.add("here"); idx = i; } });
+  const fn = $("#footnav");
+  if (fn && idx >= 0) {
+    const prev = idx > 0 ? PAGES[idx - 1] : null, next = idx < PAGES.length - 1 ? PAGES[idx + 1] : null;
+    fn.innerHTML =
+      (prev ? `<a href="${prev[0]}">&larr; ${prev[1]}</a>` : '<span class="sp"></span>') +
+      (next ? `<a href="${next[0]}">${next[1]} &rarr;</a>` : '<span class="sp"></span>');
+  }
+})();
+</script>
+<script>
+/* the subject's parameters, stated plainly */
+renderSheet('#subj-sheet',
+  ['', 'quantity', 'value', 'what it is'],
+  [
+    {cells:[{t:'senses',cls:'rowhead'},'absolute threshold',
+            {t:gram(SUBJ.RL),cls:'yes'},'the weight at which he begins to feel anything']},
+    {cells:[{t:'',cls:'rowhead'},'sensory spread at 100 g',
+            {t:gram(sigD(100)),cls:'yes'},'how much a felt comparison varies from trial to trial']},
+    {cls:'rule',cells:[{t:'habits',cls:'rowhead'},'constant error',
+            {t:gram(SUBJ.CE),cls:'gt'},'his "equal" sits this far above the standard']},
+    {cells:[{t:'',cls:'rowhead'},'caution',
+            {t:fmt(SUBJ.CAUTION,2)+' × spread',cls:'gt'},
+            'how sure he must be before saying "greater" rather than "equal"']},
+    {cells:[{t:'',cls:'rowhead'},'unsteady hand',
+            {t:gram(SUBJ.MOTOR),cls:'gt'},'extra scatter when he moves the weight himself']}
+  ],
+  'Only the first two are senses. Caution is a matter of instruction, and the unsteady hand only '+
+  'enters when he works the dial, so the three methods are not all measuring the same thing.');
+
+/* ---- his detection curve, with observed proportions on top ---- */
+const IN_W=[0.5,1,1.5,2,2.5,3,3.5,4,4.5,5,6];
+const IN={obs:{}};
+$('#in-plot').appendChild(mkCanvas(250,(pl)=>{
+  pl.setup({xlim:[0,6.4],ylim:[0,1],mar:[3.4,4,1.4,1.4]});
+  pl.axes({xat:[0,1,2,3,4,5,6],yat:[0,0.25,0.5,0.75,1]});
+  pl.axisLabels('weight on the palm, grams','chance he feels it');
+  pl.abline({h:0.5,col:PAL.inkFaint,lty:3});
+  const xs=[],ys=[];
+  for(let w=0;w<=6.4;w+=0.05){xs.push(w);ys.push(pnorm((w-SUBJ.RL)/SUBJ.RL_SD));}
+  pl.lines(xs,ys,{col:PAL.accent,lwd:2});
+  pl.abline({v:SUBJ.RL,col:PAL.accent3,lty:2});
+  pl.text(SUBJ.RL,1.04,'absolute threshold '+gram(SUBJ.RL),{col:PAL.accent3,cex:0.85});
+  const ks=Object.keys(IN.obs);
+  ks.forEach((w)=>{const o=IN.obs[w];
+    pl.points([+w],[o.k/o.n],{col:PAL.accent2,pch:21,cex:1.5});});
+  if(!ks.length)pl.text(3.2,0.14,'the curve is what he is; run some trials to see what that looks like',
+    {col:PAL.inkFaint,cex:0.9});
+}));
+$('#in-run').addEventListener('click',()=>{
+  IN_W.forEach(w=>{const k=rbinom(40,pnorm((w-SUBJ.RL)/SUBJ.RL_SD));
+    IN.obs[w]=IN.obs[w]||{n:0,k:0};IN.obs[w].n+=40;IN.obs[w].k+=k;});
+  redrawAll();
 });
+$('#in-clear').addEventListener('click',()=>{IN.obs={};redrawAll();});
 </script>
 </body>
 </html>

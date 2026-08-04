@@ -752,6 +752,7 @@ sup.fn a { text-decoration: none; color: var(--accent); }
   .k-O { color: var(--accent);   }
   .k-T { color: var(--accent-3); }
   .k-e { color: var(--accent-2); }
+  .k-est { color: var(--accent-4); }   /* the estimate, and the residual measured from it */
   .hl-text.hl-on.e { background-color: rgba(176, 86, 63, .16); }
 
   /* Peirce's expression, the modern one, and the same thing with the numbers
@@ -767,12 +768,13 @@ sup.fn a { text-decoration: none; color: var(--accent); }
     text-align: center;
   }
   .ex-ladder .lad-row { display: contents; }
-  .ex-ladder .lad-op { color: var(--ink-faint); }
+  .ex-ladder .lad-op { color: var(--ink-faint); min-width: 1ch; }
   .lad-words > span { font-size: .88em; line-height: 1.35; color: var(--ink-soft); }
   .lad-words > .k-O, .lad-words > .k-T, .lad-words > .k-e { color: inherit; }
   .lad-words > .k-O { color: var(--accent); }
   .lad-words > .k-T { color: var(--accent-3); }
   .lad-words > .k-e { color: var(--accent-2); }
+  .lad-words > .k-est { color: var(--accent-4); }
   .lad-sym > span {
     font-family: 'Times New Roman', Georgia, serif;
     font-size: 1.32em; font-style: italic;
@@ -781,11 +783,111 @@ sup.fn a { text-decoration: none; color: var(--accent); }
     font-family: 'Times New Roman', Georgia, serif;
     font-size: 1.16em; font-variant-numeric: tabular-nums;
   }
-  .lad-note { grid-column: 1 / -1; font-size: .85em; color: var(--ink-faint); margin-top: 6px; }
+  /* a two-sided statement: the relative number on the left, the law on the
+     right, with one operator between them */
+  .ex-ladder.cols-3 {
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  }
+  .ex-ladder .frac { font-size: .95em; }
+  /* Kept OUT of the grid. A grid item spanning every column contributes its
+     whole intrinsic width to the one track that is not flexible — the operator
+     column — which blows that column out to the width of the sentence. */
+  .lad-note {
+    font-size: .85em; color: var(--ink-faint);
+    text-align: center; max-width: 46em; margin: 2px auto 20px auto;
+  }
   @media (max-width: 720px) {
-    .ex-ladder { grid-template-columns: 1fr; gap: 2px; }
+    /* .cols-3 is more specific than .ex-ladder, so it has to be named here or
+       the narrow layout never reaches it */
+    .ex-ladder, .ex-ladder.cols-3 { grid-template-columns: 1fr; gap: 2px; }
     .ex-ladder .lad-op { display: none; }
   }
+
+
+  /* ------------------------------------------------------------------------
+     Peirce's data tables, pp. 138-158: nine column-pairs read downwards, the
+     leading digits printed only where they change. Set tight and small, as
+     they are on the page.
+     ----------------------------------------------------------------------*/
+  .table-scroll { overflow-x: auto; margin: 14px 0 6px 0; }
+  .peirce-data-table {
+    border-collapse: collapse; margin: 0 auto;
+    font-size: .68em; font-variant-numeric: tabular-nums;
+  }
+  .peirce-data-table caption {
+    caption-side: top; font-size: 1.25em; font-variant: small-caps;
+    letter-spacing: .08em; color: var(--ink-soft); padding-bottom: 8px;
+  }
+  .peirce-data-table th {
+    font-weight: 400; font-style: italic; font-size: .92em;
+    color: var(--ink-faint); padding: 2px 5px;
+    border-bottom: 1px solid var(--rule); line-height: 1.15;
+  }
+  .peirce-data-table td { padding: 0 5px; text-align: right; line-height: 1.35; }
+  .peirce-data-table td.pv { color: var(--ink); }
+  .peirce-data-table td.pc { color: var(--ink-soft); border-right: 1px solid var(--rule-soft); }
+  .peirce-data-table td:last-child { border-right: none; }
+
+
+  /* ------------------------------------------------------------------------
+     The twenty-four days, at the foot of the page. Not an example container:
+     it is always open, so it is set off by a rule rather than by a trigger.
+     ----------------------------------------------------------------------*/
+  .ex3-block {
+    position: relative;
+    margin: 46px 0 10px 0;
+    padding-top: 26px;
+    border-top: 1px solid var(--rule);
+  }
+  .ex3-head {
+    font-size: 1em; font-variant: small-caps; letter-spacing: .07em;
+    color: var(--ink-soft); margin: 0 0 8px 0;
+  }
+  .ex3-lead { font-size: .95em; color: var(--ink-soft); margin-bottom: 18px; }
+
+  /* --------------------------------------------------- the month, as a month */
+  .cal-wrap { display: flex; gap: 26px; flex-wrap: wrap; align-items: flex-start; margin-bottom: 16px; }
+  .cal-name {
+    font-size: .78em; font-variant: small-caps; letter-spacing: .08em;
+    color: var(--ink-faint); margin-bottom: 5px; text-align: center;
+  }
+  .cal-grid { display: grid; grid-template-columns: repeat(7, 1.85em); gap: 2px; }
+  .cal-dow {
+    font-size: .68em; color: var(--ink-faint); text-align: center;
+    padding-bottom: 2px;
+  }
+  .cal-day {
+    font-family: inherit; font-size: .8em;
+    height: 1.85em; line-height: 1;
+    display: flex; align-items: center; justify-content: center;
+    border: 1px solid transparent; border-radius: 2px;
+    background: none; padding: 0;
+    font-variant-numeric: tabular-nums;
+  }
+  .cal-day.off { color: var(--ink-faint); opacity: .45; }
+  .cal-day.blank { border: none; }
+  .cal-day.has {
+    cursor: pointer; color: var(--accent);
+    border-color: rgba(47, 111, 159, .35);
+    transition: background-color .15s, color .15s, border-color .15s;
+  }
+  .cal-day.has:hover { background-color: var(--tint); }
+  .cal-day.has.is-on {
+    background-color: var(--accent); border-color: var(--accent);
+    color: #fff; font-weight: 700;
+  }
+  /* a hairline between a pair of view buttons and the controls they govern */
+  .bar-sep {
+    display: inline-block; width: 1px; height: 1.4em;
+    background: var(--rule); margin: 0 6px;
+  }
+
+  /* the day's table sits under its plot, in the same column as it, so the
+     controls on the left stay beside both */
+  .ex3-day-table { max-height: 300px; overflow-y: auto; margin-top: 10px; }
+
+  .plate-orig { margin: 8px 0 0 0; }
+  .plate-orig img { max-width: 100%; border: 1px solid var(--rule-soft); }
 
   .footnotes { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--rule); font-size: .9em; color: var(--ink-soft); }
   .footnotes li { margin-bottom: 10px; }
@@ -897,13 +999,13 @@ sup.fn a { text-decoration: none; color: var(--accent); }
 
 <div id="example-ex1" class="example-container"></div>
 
-<p>These accidental variations are, however, in all cases subject to a statistical law, so that (observations of a certain kind forming the limited universe, X being the unknown quantity, &Xi; the quantity observed) the quantity,</p>
+<p><span class="example-trigger" data-toggle="example-ex2">These accidental variations are, however, in all cases subject to a statistical law, so that (observations of a certain kind forming the <span class="hl-text a" data-hl-for="example-ex2">limited universe</span>, X being the unknown quantity, &Xi; the quantity observed) the quantity,</span></p>
 
 <div class="formula">
   <span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><span class="inv-comma">,</span> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> d&xi;
 </div>
 
-<p>or the probability that if the unknown quantity X has a certain value x, then the observed quantity &Xi; will have a value between &xi; and &xi; + d&xi;, is a certain arithmetical function of the values &xi; and x. If we write &epsilon; for &xi; &minus; x, or the error of observation, then we may put &phi; for such a function that&mdash;</p>
+<p><span class="example-trigger" data-toggle="example-ex2">or the probability that if the unknown quantity X has a certain value x, then the observed quantity &Xi; will have a value between &xi; and &xi; + d&xi;, is a certain arithmetical function of the values &xi; and x. If we write &epsilon; for &xi; &minus; x, or the error of observation, then we may put &phi; for such a function that&mdash;</span></p>
 
 <div class="formula">
   <span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><span class="inv-comma">,</span> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> = &phi; (&epsilon;, x)
@@ -1554,14 +1656,10 @@ increasing, the probable error or range of errors was constantly de-
 creasing after the twelfth day. There was some variation in the per-</p>
 
 
-<figure>
-  <img src="Text/plate-27.png" alt="Plate 27: Diagrams illustrating Appendix No. 21, On the Theory of Errors of Observation">
-  <figcaption>Plate 27 &mdash; diagrams illustrating Appendix No. 21 (the observation-day curves referenced in the text above).</figcaption>
-</figure>
-
 <!-- p.137 -->
 <p>sonal equation, but not much, but the range of errors continually decreased as long as the observations lasted, and so remarkably that for the twenty-fourth day the probable error does not exceed one-eightieth of a second. I think that this clearly demonstrates the value of such practice in training the nerves for observation, for it can hardly be supposed that the best observer has so small a range of error as this, and I would therefore recommend that transit-observers be kept in constant training by means of some observations of an artificial event which can be repeated with rapidity, so that several hundred can be taken daily without great labor, and I do not think that it is essential that these observations should very closely imitate the transit of a star over wires, inasmuch as it is the general condition of the nerves which it is important to keep in training more than anything peculiar to this or that kind of observation.</p>
 
+<div id="ex3-block" class="ex3-block"></div>
 <script>
 /* ============================================================================
    Peirce, "The Probability of Induction" — interactive edition
@@ -2253,8 +2351,10 @@ function setSlider(id, v) {
    Example scaffolding: click a highlighted passage to open its demonstration.
    Content is built lazily the first time a container is opened.
 
-   Carried over unchanged in behaviour from the Probability of Induction page,
-   so an example written for one paper drops into the other.
+   Carried over unchanged from the Probability of Induction edition, so that
+   the two papers behave identically: the same trigger, the same growth, the
+   same rule that the text on the page is the authors' unless you are actively
+   driving it.
    ========================================================================*/
 
 const BUILDERS = {};
@@ -2263,13 +2363,13 @@ const BUILT = {};
 function registerExample(id, builder) { BUILDERS[id] = builder; }
 
 /* --------------------------------------------------------------------------
-   Live numbers in Peirce's own text.
+   Live numbers in the authors' own text.
 
    A figure in the prose carries data-live="<driver>:<key>", where <driver> is
    the id of the example whose controls move it. While that example is shut the
-   span shows exactly what Peirce printed; while it is open the span shows what
-   the sliders say, in the colour of the slider saying it. Closing the example
-   restores his text — the document is his unless you are actively driving it.
+   span shows exactly what was printed in 1885; while it is open the span shows
+   what the sliders say, in the colour of the slider saying it. Closing the
+   example restores the memoir.
    ------------------------------------------------------------------------*/
 const LIVE = {};
 const LIVE_OPEN = new Set();
@@ -2285,6 +2385,9 @@ function liveEngaged(driverId) {
   return rec.opts.engaged ? !!rec.opts.engaged() : LIVE_OPEN.has(driverId);
 }
 
+/* `also` lets one driver pull another along, for the case where two adjacent
+   demonstrations are working the same pair of numbers and either may be the
+   one being driven. The guard is because those relations are mutual. */
 const REFRESHING = new Set();
 
 function refreshLive(driverId) {
@@ -2299,14 +2402,14 @@ function refreshLiveInner(driverId, rec) {
   const on = liveEngaged(driverId);
   const prefix = driverId + ":";
   $$(`[data-live^="${prefix}"]`).forEach((el) => {
-    if (el.dataset.peirce === undefined) el.dataset.peirce = el.innerHTML;
+    if (el.dataset.printed === undefined) el.dataset.printed = el.innerHTML;
     const key = el.getAttribute("data-live").slice(prefix.length);
     let out = null;
     if (on && rec.get[key]) {
       try { out = rec.get[key](); } catch (e) { out = null; }
     }
     if (out === null || out === undefined) {
-      if (el.innerHTML !== el.dataset.peirce) el.innerHTML = el.dataset.peirce;
+      if (el.innerHTML !== el.dataset.printed) el.innerHTML = el.dataset.printed;
       el.classList.remove("is-live");
       return;
     }
@@ -2329,9 +2432,29 @@ function refreshLiveInner(driverId, rec) {
 });
 
 /* --------------------------------------------------------------------------
+   Clauses that own a stretch of a slider's travel. A paragraph marked up with
+   data-band-for="<driver>" and data-band="lo,hi" lights while the driver's
+   reported position is inside [lo, hi), so the prose reads as a running
+   commentary on where the control is. The driver reports its position by
+   calling bandPosition(id, x).
+   ------------------------------------------------------------------------*/
+function bandPosition(driverId, x) {
+  $$(`[data-band-for="${driverId}"]`).forEach((el) => {
+    const [lo, hi] = el.getAttribute("data-band").split(",").map(Number);
+    el.classList.toggle("band-on", x >= lo && x < hi);
+  });
+}
+
+function bandsOff(driverId) {
+  $$(`[data-band-for="${driverId}"]`).forEach((el) => el.classList.remove("band-on"));
+}
+
+/* --------------------------------------------------------------------------
    Opening an example. The container is a one-row grid whose row goes 0fr ->
    1fr, which animates to the content's own height without measuring anything;
-   .ex-inner does the clipping.
+   .ex-inner does the clipping. The prose below is pushed down by the growth
+   rather than being covered over, so the example takes its place in the column
+   instead of arriving on top of it.
    ------------------------------------------------------------------------*/
 function exInner(box) {
   let inner = box.querySelector(":scope > .ex-inner");
@@ -2361,7 +2484,7 @@ document.addEventListener("click", (ev) => {
   $$(`[data-hl-for="${id}"]`).forEach((el) => el.classList.toggle("hl-on", opening));
 
   if (opening) { LIVE_OPEN.add(id); requestAnimationFrame(redrawAll); }
-  else LIVE_OPEN.delete(id);
+  else { LIVE_OPEN.delete(id); bandsOff(id); }
   refreshLive(id);
 });
 
@@ -2384,9 +2507,14 @@ $$(".example-container").forEach((box) => box.setAttribute("inert", ""));
 
 /* Each example's number in the gutter beside the passage that opens it, taken
    from its own id so it matches the part files in src/. */
+const NUMBERED = new Set();
 $$("[data-toggle]").forEach((trg) => {
-  const m = /(\d+)$/.exec(trg.getAttribute("data-toggle") || "");
-  if (!m || $(".ex-num", trg)) return;
+  const id = trg.getAttribute("data-toggle") || "";
+  const m = /(\d+)$/.exec(id);
+  // an example may be opened from several passages in a row; only the first of
+  // them takes the number, or the gutter reads as several examples alike
+  if (!m || NUMBERED.has(id) || $(".ex-num", trg)) return;
+  NUMBERED.add(id);
   trg.insertBefore(h(`<span class="ex-num" aria-hidden="true">${m[1]}</span>`), trg.firstChild);
 });
 
@@ -2401,14 +2529,19 @@ function exHeader(title, contentId) {
   });
   return el;
 }
+</script>
+<script>
+/* ==========================================================================
+   The laws of facility used throughout this paper's examples.
 
-/* --------------------------------------------------------------------------
-   Shared through the paper: one draw of an error from a named law of facility.
-   The kinds are the ones Peirce himself names — transit observations, the
-   chronograph key on an occultation, a coarse instrument, two observers whose
-   series have been run together — and every later example that needs a law of
-   error takes it from here, so the same four shapes recur throughout.
-   ------------------------------------------------------------------------*/
+   Kept out of 04_scaffold.js, which is shared verbatim with the other papers
+   on this site: the scaffolding belongs to every edition, these four curves
+   belong only to this one. The kinds are the ones Peirce himself names —
+   transit observations, the chronograph key on an occultation, a coarse
+   instrument, two observers whose series have been run together — and every
+   example that needs a law of error takes it from here, so the same four
+   shapes recur throughout.
+   ========================================================================*/
 function rnorm1(mean = 0, sd = 1) {
   let u = 0, v = 0;
   while (u === 0) u = Math.random();
@@ -2459,22 +2592,30 @@ const ERROR_LAWS = {
    Peirce's sentence is the model itself: what is recorded depends partly on
    the quantity wanted and partly on circumstances that cannot be separately
    accounted for, so the record is the sum of the two. Written out that is
-   O = T + e, and the rest of the paper is about the second term.
+   O = T + e, and the rest of the paper is about the second term. That
+   statement sits at the top of the example and is filled in as observations
+   arrive.
 
-   The switch that matters here is "show the unknown quantity". With it on you
-   can see each observation split into its parts. With it off you have what the
-   observer actually has: a row of dots and nothing else. Nothing in the data
-   changes when it is turned off, which is the point — T and e are never
-   observed apart, only their sum.
+   Two switches do the arguing. Hide the unknown quantity and nothing in the
+   data changes — same dots, same places — which is the observer's actual
+   position: T and e are never observed apart, only their sum. Show the mean
+   instead and the third term becomes the residual, O - xbar, which is what is
+   actually available in place of the error nobody can see.
    ========================================================================*/
 registerExample("example-ex1", (box) => {
   box.appendChild(exHeader("Interactive Example: The Quantity Observed and the Quantity Wanted", "ex1-content"));
   const content = h(`<div id="ex1-content" class="example-content">
+    <!-- TO EDIT (Niall): this opening paragraph is a placeholder of mine, not
+         settled text. It carries the colour key — unknown quantity green,
+         accidental circumstances red, quantity observed blue — so a rewrite
+         should keep those three spans, but the wording and the choice of the
+         transit instrument as the running example are both open. -->
     <p>A star crosses the wire of a transit instrument at some definite moment. That moment is the
       <span class="k-T">unknown quantity</span>. What gets written down is the moment the observer
       pressed the key, which depends on when the star really crossed and also on the state of his
       nerves, the seeing, the instrument &mdash; the <span class="k-e">accidental circumstances</span>.
       The number written down is the <span class="k-O">quantity observed</span>.</p>
+    <div id="ex1-ladder"></div>
     <div class="row">
       <div class="col col-4">
         <div id="ex1-controls"></div>
@@ -2490,13 +2631,11 @@ registerExample("example-ex1", (box) => {
         <div class="plot-container" id="ex1-plot2"></div>
       </div>
     </div>
-    <div id="ex1-ladder"></div>
-    <div id="ex1-note"></div>
   </div>`);
   box.appendChild(content);
 
   const XLO = 4.4, XHI = 5.6;          // the fixed window, so the picture never jumps
-  let obs = [];                         // every quantity observed, in order
+  let obs = [];                        // every quantity observed, in order
 
   const ctl = $("#ex1-controls", content);
   ctl.appendChild(slider("ex1_T", "The unknown quantity, T (seconds):", 4.7, 5.3, 5.0, 0.005,
@@ -2504,19 +2643,25 @@ registerExample("example-ex1", (box) => {
   ctl.appendChild(slider("ex1_s", "The reach of the accidental circumstances:", 0.005, 0.15, 0.06, 0.005,
     (v) => "±" + v.toFixed(3) + " s", "k2"));
   ctl.appendChild(checkbox("ex1_showT", "Show the unknown quantity", true));
+  ctl.appendChild(checkbox("ex1_showM", "Show the estimate: the mean of the series", false));
 
-  const T = () => num("ex1_T"), S = () => num("ex1_s"), showT = () => chk("ex1_showT");
+  const T = () => num("ex1_T"), S = () => num("ex1_s");
+  const showT = () => chk("ex1_showT"), showM = () => chk("ex1_showM");
+  const meanOf = () => (obs.length ? obs.reduce((s, r) => s + r.o, 0) / obs.length : null);
 
   function observe(k) {
     for (let i = 0; i < k; i++) {
       const e = rnorm1(0, S());
-      obs.push({ e, o: T() + e, T: T() });
+      // y is kept with the observation so the cloud is cumulative: a point
+      // stays where it was put, and the pile darkens where they overlap
+      obs.push({ e, o: T() + e, T: T(), y: 0.28 + 0.34 * Math.random() });
     }
-    if (obs.length > 400) obs = obs.slice(-400);
+    if (obs.length > 4000) obs = obs.slice(-4000);
   }
 
   /* ---------------------------------------------------------- the line ---- */
-  const line = mkCanvas(168, (pl) => {
+  const line = mkCanvas(180, (pl) => {
+    const m = meanOf();
     pl.setup({ xlim: [XLO, XHI], ylim: [0, 1.12], mar: [2.6, 1.2, 2.2, 1.2], ext: false });
     pl.abline({ h: 0, col: PAL.inkFaint });
     const xt = [4.4, 4.6, 4.8, 5.0, 5.2, 5.4, 5.6];
@@ -2527,32 +2672,43 @@ registerExample("example-ex1", (box) => {
 
     if (showT()) {
       pl.abline({ v: T(), col: PAL.accent3, lwd: 2 });
-      pl.text(T(), 0.94, "T", { col: PAL.accent3, cex: 0.9, font: 2 });
+      pl.text(T(), 1.03, "T", { col: PAL.accent3, cex: 0.9, font: 2 });
+    }
+    if (showM() && m !== null) {
+      pl.abline({ v: m, col: PAL.accent4, lwd: 2, lty: 2 });
+      pl.text(m, 0.90, "x̄", { col: PAL.accent4, cex: 0.9, font: 2 });
     }
 
-    // every observation, most recent last and largest
-    const show = obs.slice(-160);
-    show.forEach((r, i) => {
-      const fresh = i === show.length - 1;
-      pl.points([r.o], [0.42 + 0.16 * Math.sin(i * 2.399)], {
-        col: fresh ? PAL.accent : "rgba(47,111,159,0.42)", cex: fresh ? 1.5 : 1.0
-      });
+    // the cloud: every observation kept, drawn faint, so it darkens where the
+    // observations pile up rather than being redrawn from the last few
+    obs.forEach((r) => {
+      pl.points([r.o], [r.y], { col: "rgba(47,111,159,0.20)", cex: 1.0 });
     });
-
-    // the newest one taken apart, if the truth is on show
     const last = obs[obs.length - 1];
+    if (last) pl.points([last.o], [last.y], { col: PAL.accent, cex: 1.5 });
+
+    // the newest observation taken apart, against whichever line is on show
     if (last && showT()) {
-      pl.segments(last.T, 0.20, last.o, 0.20, { col: PAL.accent2, lwd: 2 });
-      pl.segments(last.o, 0.16, last.o, 0.24, { col: PAL.accent2, lwd: 2 });
-      pl.segments(last.T, 0.16, last.T, 0.24, { col: PAL.accent2, lwd: 2 });
-      pl.text((last.T + last.o) / 2, 0.09, "ε = " + (last.e >= 0 ? "+" : "") + fmt(last.e, 3),
-        { col: PAL.accent2, cex: 0.78 });
+      bracket(pl, last.T, last.o, 0.18, 0.09, PAL.accent2,
+        "ε = " + (last.e < 0 ? "−" : "+") + fmt(Math.abs(last.e), 3));
+    }
+    if (last && showM() && m !== null) {
+      const r = last.o - m;
+      bracket(pl, m, last.o, 0.76, 0.87, PAL.accent4,
+        "r = " + (r < 0 ? "−" : "+") + fmt(Math.abs(r), 3));
     }
     pl.clip(false);
     pl.title(showT() ? "Each observation is the unknown quantity, displaced"
                      : "What the observer has: the record, and nothing else", { cex: 0.95 });
   });
   $("#ex1-plot1", content).appendChild(line);
+
+  function bracket(pl, x0, x1, yBar, yLab, col, label) {
+    pl.segments(x0, yBar, x1, yBar, { col, lwd: 2 });
+    pl.segments(x0, yBar - 0.04, x0, yBar + 0.04, { col, lwd: 2 });
+    pl.segments(x1, yBar - 0.04, x1, yBar + 0.04, { col, lwd: 2 });
+    pl.text((x0 + x1) / 2, yLab, label, { col, cex: 0.78 });
+  }
 
   /* ------------------------------------------------------ they pile up ---- */
   const hist = mkCanvas(210, (pl) => {
@@ -2574,77 +2730,75 @@ registerExample("example-ex1", (box) => {
         { col: "rgba(47,111,159,0.55)", border: "#24587d" });
     }
     if (showT()) pl.abline({ v: T(), col: PAL.accent3, lwd: 2 });
+    const m = meanOf();
+    if (showM() && m !== null) pl.abline({ v: m, col: PAL.accent4, lwd: 2, lty: 2 });
     pl.clip(false);
     pl.title("The series so far", { cex: 0.95 });
   });
   $("#ex1-plot2", content).appendChild(hist);
 
-  /* ------------------------------------------------------- the ladder ---- */
+  /* ------------------------------------------------------- the ladder ----
+     The operators belong to the statement, not to each way of writing it, so
+     they are set once in the top row and the rows beneath line up under them. */
   function ladder() {
-    const last = obs[obs.length - 1];
-    const seen = showT();
-    const oN = last ? fmt(last.o, 3) : "&mdash;";
-    const tN = last ? (seen ? fmt(last.T, 3) : "?") : "&mdash;";
-    const eN = last ? (seen ? (last.e < 0 ? "−" : "") + fmt(Math.abs(last.e), 3) : "?") : "&mdash;";
+    const last = obs[obs.length - 1], m = meanOf();
+    const residual = last && m !== null ? last.o - m : null;
+    // with the unknown quantity hidden, what stands in for it is the estimate,
+    // and what stands in for the error is the residual
+    const asResidual = !showT() && showM() && residual !== null;
+
+    const words = asResidual
+      ? [`<span class="k-O">the quantity observed</span>`,
+         `<span class="k-est">the estimate</span>`,
+         `<span class="k-est">the residual</span>`]
+      : [`<span class="k-O">the quantity observed</span>`,
+         `<span class="k-T">the unknown quantity</span>`,
+         `<span class="k-e">the accidental circumstances</span>`];
+    const syms = asResidual
+      ? [`<span class="k-O">O<sub>i</sub></span>`, `<span class="k-est">x̄</span>`,
+         `<span class="k-est">r<sub>i</sub></span>`]
+      : [`<span class="k-O">O<sub>i</sub></span>`, `<span class="k-T">T</span>`,
+         `<span class="k-e">&epsilon;<sub>i</sub></span>`];
+
+    let nums;
+    if (!last) nums = ["&mdash;", "&mdash;", "&mdash;"];
+    else if (asResidual)
+      nums = [fmt(last.o, 3), fmt(m, 3), (residual < 0 ? "−" : "") + fmt(Math.abs(residual), 3)];
+    else if (showT())
+      nums = [fmt(last.o, 3), fmt(last.T, 3), (last.e < 0 ? "−" : "") + fmt(Math.abs(last.e), 3)];
+    else nums = [fmt(last.o, 3), "?", "?"];
+
+    const kind = asResidual ? ["k-O", "k-est", "k-est"] : ["k-O", "k-T", "k-e"];
+    const numRow = nums.map((v, i) => `<span class="${kind[i]}">${v}</span>`);
+
     return `<div class="ex-ladder">
       <div class="lad-row lad-words">
-        <span class="k-O">the quantity observed</span>
-        <span class="lad-op">=</span>
-        <span class="k-T">the unknown quantity</span>
-        <span class="lad-op">+</span>
-        <span class="k-e">the accidental circumstances</span>
+        ${words[0]}<span class="lad-op">=</span>${words[1]}<span class="lad-op">+</span>${words[2]}
       </div>
       <div class="lad-row lad-sym">
-        <span class="k-O">O<sub>i</sub></span>
-        <span class="lad-op">=</span>
-        <span class="k-T">T</span>
-        <span class="lad-op">+</span>
-        <span class="k-e">&epsilon;<sub>i</sub></span>
+        ${syms[0]}<span class="lad-op"></span>${syms[1]}<span class="lad-op"></span>${syms[2]}
       </div>
       <div class="lad-row lad-num">
-        <span class="k-O">${oN}</span>
-        <span class="lad-op">=</span>
-        <span class="k-T">${tN}</span>
-        <span class="lad-op">+</span>
-        <span class="k-e">${eN}</span>
+        ${numRow[0]}<span class="lad-op"></span>${numRow[1]}<span class="lad-op"></span>${numRow[2]}
       </div>
     </div>`;
   }
 
   function update() {
-    const n = obs.length;
-    const mean = n ? obs.reduce((s, r) => s + r.o, 0) / n : null;
+    const n = obs.length, m = meanOf();
 
     $("#ex1-readout", content).innerHTML = n
       ? `<div class="key-insight" style="margin-top:0;">
            <p style="margin-bottom:6px;"><strong>${bigmark(n)}</strong>
              observation${n === 1 ? "" : "s"} taken.</p>
-           <p style="margin-bottom:0;">The mean of the series is <strong>${fmt(mean, 4)}</strong>.
+           <p style="margin-bottom:0;">The mean of the series is <strong>${fmt(m, 4)}</strong>.
              ${showT() ? `The unknown quantity is ${fmt(T(), 3)}, so the mean is out by
-               ${fmt(Math.abs(mean - T()), 4)}.`
+               ${fmt(Math.abs(m - T()), 4)}.`
               : `Whether that is close to the unknown quantity there is, at this point,
                  no way to say.`}</p></div>`
       : `<p class="help-text">Nothing observed yet.</p>`;
 
     $("#ex1-ladder", content).innerHTML = ladder();
-
-    $("#ex1-note", content).innerHTML = showT()
-      ? `<div class="note-block">
-           <p>The sentence is the model. What is recorded depends partly on the quantity wanted and
-           partly on circumstances that cannot be separately accounted for, so the record is the sum
-           of the two, and everything that follows in the paper is about the second term: what
-           distribution it has, when that distribution may be taken as the normal one, and what
-           follows for the mean of a series.</p>
-           <p>Take fifty observations and slide the reach of the accidental circumstances. The
-           unknown quantity does not move; the pile spreads around it. That is the only thing the
-           second term does.</p></div>`
-      : `<div class="note-block">
-           <p>Nothing about the data changed when the unknown quantity was hidden &mdash; the same
-           dots, in the same places. This is the observer's actual position. T and &epsilon; are never
-           observed apart, only added together, and no amount of staring at the dots separates them.</p>
-           <p>So the pile has to be made to speak some other way, and the only thing that can make it
-           speak is knowing what sort of errors this kind of observation produces. That is the law of
-           the facility of errors, which is what Peirce turns to next.</p></div>`;
 
     drawCanvas(line);
     drawCanvas(hist);
@@ -2816,37 +2970,45 @@ registerExample("example-ex2", (box) => {
   });
   $("#ex2-curve", content).appendChild(curve);
 
-  /* --------------------------------------------------------- the ladder --- */
+  /* --------------------------------------------------------- the ladder ---
+     Peirce reaches phi as a relative number: of all the cases in the limited
+     universe where the unknown quantity is x, the proportion in which the
+     quantity observed comes out about xi. The strip is that count, so the two
+     sides of this statement are a tally on the left and a law on the right. */
   function ladder() {
     const L = law(), s = S(), e = E();
-    const phi = L.dens(e, s);
-    const p = phi * DE;
-    return `<div class="ex-ladder">
+    const phi = L.dens(e, s), p = phi * DE;
+    const n = shots.length;
+    const inStrip = shots.filter((r) => Math.abs(r.e - e) <= DE / 2).length;
+    const seen = n ? fmt(inStrip / n, 4) : "&mdash;";
+
+    const relNum = `<span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><span class="inv-comma">,</span> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> d&xi;`;
+    const relCount = n
+      ? `<span class="frac"><span class="num">${bigmark(inStrip)}</span><span class="den">${bigmark(n)}</span></span> = ${seen}`
+      : "&mdash;";
+
+    return `<div class="ex-ladder cols-3">
       <div class="lad-row lad-words">
-        <span>the height of the law at that error</span>
-        <span class="lad-op">×</span>
-        <span>the width of the strip</span>
+        <span>the shots that fell in the strip, out of every shot fired</span>
         <span class="lad-op">=</span>
-        <span>how often an error falls in it</span>
+        <span>the height of the law there, times the width of the strip</span>
       </div>
       <div class="lad-row lad-sym">
-        <span class="k-e">φ(ε, x)</span>
-        <span class="lad-op">·</span>
-        <span>dε</span>
-        <span class="lad-op">=</span>
-        <span>P</span>
+        <span>${relNum}</span>
+        <span class="lad-op"></span>
+        <span><span class="k-e">φ(ε, x)</span> · dε</span>
       </div>
       <div class="lad-row lad-num">
-        <span class="k-e">${fmt(phi, 3)}</span>
-        <span class="lad-op">×</span>
-        <span>${fmt(DE, 2)}</span>
-        <span class="lad-op">=</span>
-        <span>${fmt(p, 4)}</span>
+        <span>${relCount}</span>
+        <span class="lad-op"></span>
+        <span><span class="k-e">${fmt(phi, 3)}</span> × ${fmt(DE, 2)} = ${fmt(p, 4)}</span>
       </div>
-      <div class="lad-note">In modern notation the same line is
-        <i>p</i>(ε) d<i>ε</i> &mdash; φ is a probability density, and Peirce's ε
-        is the error, ξ &minus; x.</div>
-    </div>`;
+    </div>
+    <div class="lad-note">The left side is a tally and nothing else: cases counted
+        out of the cases in the limited universe, which here is every shot fired by this
+        marksman. The right side is the law. Since ε = ξ &minus; x, dξ and dε are the same
+        width; in modern notation the line reads <i>p</i>(ε) d<i>ε</i>, or
+        <i>p</i>(ξ | x) d<i>ξ</i>.</div>`;
   }
 
   function update() {
@@ -2857,11 +3019,12 @@ registerExample("example-ex2", (box) => {
 
     $("#ex2-readout", content).innerHTML = `<div class="key-insight" style="margin-top:0;">
       <p style="margin-bottom:6px;"><em>${esc(L.name)}</em> &mdash; ${esc(L.gloss)}.</p>
-      ${n ? `<p style="margin-bottom:0;">The law says <strong>${fmt(p, 4)}</strong> of the shots
-              should fall in the shaded strip. Of the ${bigmark(n)} fired,
-              <strong>${bigmark(inStrip)}</strong> did &mdash; ${fmt(inStrip / n, 4)} of them.</p>`
+      ${n ? `<p style="margin-bottom:0;">On ${bigmark(n)} shots the tally comes to
+              <strong>${fmt(inStrip / n, 4)}</strong> against the law's
+              <strong>${fmt(p, 4)}</strong>. Fire more and the two close on each other;
+              that closing is the whole of what the law claims.</p>`
           : `<p style="margin-bottom:0;">The law says ${fmt(p, 4)} of the shots should fall in the
-              shaded strip. Fire some and see.</p>`}
+              shaded strip. Fire some and see whether they do.</p>`}
     </div>`;
 
     $("#ex2-ladder", content).innerHTML = ladder();
@@ -2915,6 +3078,394 @@ registerExample("example-ex2", (box) => {
   fire(200);
   update();
 });
+</script>
+<script>
+/* ==========================================================================
+   Peirce's twenty-four days of reaction times, from the tables printed at
+   pp. 138-158, as transcribed in Koenker's archive (Koenker's data/MiM/data).
+
+   Held in the shape it was printed in: nine column-pairs per day, each read
+   downwards, `per` rows to a column. A value smaller than the one above it is
+   Peirce's abbreviation for the hundreds carried down, and the carry has been
+   applied here. Within a column, a token is the count alone when the time
+   advances by one millisecond, and "+d.count" when it jumps by d.
+   ========================================================================*/
+const PEIRCE_DAYS = [{"n":"I","date":"July 1","per":41,"total":495,"k":["158.1,+82.1,+21.1,+16.1,+19.1,+16.1,0,0,1,1,0,0,0,0,2,0,1,1,2,0,0,0,0,0,0,1,0,0,0,0,2,0,1,0,0,1,1,2,2,0,3","348.0,1,0,0,0,1,2,2,0,1,2,1,0,3,3,2,1,0,2,3,1,1,1,1,1,0,1,1,0,2,1,1,1,1,0,0,1,0,4,2,1","389.1,3,2,3,4,2,1,4,2,0,3,1,3,0,0,3,2,2,2,3,3,2,3,3,1,4,3,6,2,2,2,2,1,0,3,2,4,3,0,4,2","430.0,2,0,3,2,1,5,1,2,0,2,3,1,1,1,3,3,5,2,1,1,1,1,2,2,3,3,2,2,1,3,6,1,3,1,1,3,6,4,4,4","471.1,4,4,2,1,2,1,3,1,5,2,1,0,4,2,2,0,1,6,2,0,6,2,0,1,2,3,2,2,0,3,3,5,0,2,4,6,4,1,2,0","512.1,2,2,3,2,1,0,2,1,0,0,1,0,3,1,1,2,1,2,2,1,2,0,3,0,1,1,2,3,3,1,1,1,0,1,0,2,2,1,1,2","553.0,1,1,2,2,0,1,3,1,1,0,0,2,0,2,0,1,1,1,2,0,1,0,1,1,1,2,1,2,0,3,2,0,2,1,0,1,1,2,2","593.1,1,0,0,1,0,1,1,0,2,0,0,0,1,0,1,1,0,1,0,0,0,0,1,0,0,0,1,1,1,2,0,1,1,0,2,0,0,1,2","633.2,1,1,3,1,1,0,0,0,0,0,0,0,1,0,0,0,0,0,2,0,0,0,0,0,0,1,1,0,0,0,1,+18.1,+10.1,+40.1,+16.1,+9.1,+143.1,+19.1,+59.1"]},{"n":"II","date":"July 5","per":27,"total":490,"k":["97.1,+9.1,+13.1,+5.1,+3.1,+2.1,+5.1,+2.1,+3.1,1,+4.1,+9.1,1,1,+4.1,+5.1,1,0,1,1,0,1,0,2,0,0,6","176.3,1,1,2,2,2,1,1,0,2,0,1,2,0,1,2,4,2,1,4,1,4,3,3,2,6,7","203.3,4,3,1,4,4,3,3,6,4,5,4,4,7,4,8,2,7,7,3,7,6,3,4,2,2,9","230.8,10,6,5,1,5,3,7,7,7,6,1,2,3,6,4,7,3,4,2,5,1,7,5,5,6,3","257.3,7,2,3,2,3,5,5,1,3,2,8,1,3,3,3,1,1,0,2,2,2,5,3,1,1","283.1,5,0,1,0,4,0,1,2,1,1,1,0,4,4,1,3,5,1,3,0,1,2,1,2,3","309.1,0,0,0,2,2,0,2,1,3,1,0,0,1,0,0,0,1,1,0,0,0,0,0,0,0","335.0,1,0,0,1,0,0,0,0,1,0,2,0,0,0,1,0,3,0,0,1,0,0,0,1,0","361.1,0,1,0,0,2,0,0,1,0,0,0,0,0,0,0,0,0,1,0,1,0,1,1,1,1"]},{"n":"III","date":"July 6","per":22,"total":489,"k":["90.2,+16.1,+5.1,+2.1,+11.2,2,2,2,2,0,1,0,2,0,1,0,2,0,1,1,3,1","142.1,1,3,1,3,5,5,2,4,7,2,0,3,1,1,5,1,3,4,6,1,3","164.2,3,3,5,2,5,4,8,1,3,4,6,2,3,6,2,6,5,2,2,8,2","186.4,4,2,2,2,6,4,5,10,10,1,4,5,10,8,3,4,4,4,8,4,5","208.5,4,3,4,3,1,9,9,5,1,2,7,3,4,7,5,3,2,5,8,3","229.3,2,6,4,2,3,2,2,1,4,3,2,1,3,1,0,3,4,2,1,1","250.0,1,2,5,1,2,2,2,2,4,1,2,1,2,1,3,0,0,1,1,0","271.1,2,0,2,1,1,0,1,0,1,1,3,1,0,1,0,1,0,1,0,1","292.1,1,0,1,0,0,0,0,0,0,0,1,+15.1,+5.1,+24.1,+9.1,+8.1,1,+16.1,+64.1,+7.1"]},{"n":"IV","date":"July 8","per":21,"total":499,"k":["65.1,+32.1,+14.2,+15.1,+5.1,0,0,1,1,0,0,1,0,0,1,0,1,1,0,1,1","148.1,1,0,1,2,2,1,2,0,3,0,5,2,3,2,1,3,2,3,3,2","169.2,4,7,5,4,5,3,6,10,4,4,2,1,8,13,10,5,4,3,6,6","190.6,9,9,4,7,9,5,6,5,5,10,12,8,6,10,6,6,3,6,6,8","211.10,6,9,8,6,1,6,1,5,5,5,5,4,8,3,4,3,3,5,4","231.3,5,3,3,3,3,2,3,2,3,1,1,1,1,0,1,3,0,1,0","251.1,2,2,1,1,2,0,0,2,1,2,0,4,3,0,0,1,1,0,0","271.2,1,2,0,0,0,1,0,1,0,0,0,1,0,0,0,1,0,0,0","291.0,0,0,1,0,0,2,0,2,+15.1,+5.1,+4.1,+4.1,+16.1,+4.1,+5.1,+3.1,+10.1,+16.1,+140.1"]},{"n":"V","date":"July 9","per":20,"total":490,"k":["62.1,0,0,2,0,1,1,0,0,0,1,1,1,0,1,2,2,1,2,0","82.0,1,0,0,2,0,0,0,2,1,3,3,0,3,2,2,0,0,3","101.7,5,2,3,4,0,1,3,2,3,2,2,0,3,4,6,4,4,1","120.3,3,4,5,1,4,2,4,4,1,6,6,5,4,7,7,8,6,9","139.8,7,5,8,8,11,4,8,6,4,3,5,4,5,8,4,7,10,5","158.2,8,6,9,7,3,4,3,3,3,4,2,7,6,5,8,6,3,3","177.6,3,6,5,3,5,3,5,3,4,4,3,2,2,1,4,3,1,1","196.1,0,0,0,1,0,1,2,2,0,0,1,2,2,2,2,3,0,0","215.0,1,0,1,0,1,0,0,0,0,1,+12.1,+10.1,+2.1,+7.1,+3.1,+11.1,+15.1,+25.1"]},{"n":"VI","date":"July 10","per":21,"total":489,"k":["66.1,+6.1,+3.1,+12.2,1,+13.2,0,0,1,1,1,1,1,2,0,1,2,2,0,1,3","117.0,1,1,1,1,3,2,2,1,0,0,1,2,1,4,2,0,5,4,1","137.2,0,5,5,3,6,3,4,1,6,8,3,4,5,4,7,4,7,4,5","157.5,6,7,7,7,3,10,6,12,2,4,5,6,9,5,9,5,5,5,7","177.4,3,7,3,4,11,9,7,6,8,9,2,7,7,6,7,5,6,2,7","197.3,3,1,5,1,8,2,4,0,2,1,2,1,4,3,3,1,4,3,3","217.1,3,2,3,1,1,1,1,2,1,0,1,3,1,0,0,1,0,0,0","237.1,1,2,0,0,1,0,3,1,1,0,0,0,0,0,0,0,0,0,0","257.0,0,1,1,0,0,0,1,+8.1,+5.1,+3.1,+5.1,+2.2,+3.1,+26.1,+11.1,+40.1,+9.1,+16.1,+19.1"]},{"n":"VII","date":"July 15","per":22,"total":496,"k":["65.1,+2.1,+9.1,+6.1,+7.1,1,0,0,0,0,0,1,0,0,0,1,0,2,0,1,0,1","107.0,1,2,1,0,1,0,4,3,2,3,0,0,0,1,0,0,0,0,1,2,1","129.2,6,1,2,2,1,0,1,1,2,2,1,1,2,3,2,3,2,7,4,2,1","151.5,4,6,5,2,5,4,5,2,3,4,5,4,2,7,4,14,4,2,7,3,5","173.6,3,0,5,4,2,6,6,9,13,6,8,7,6,7,4,5,4,7,1,7,5","195.4,4,7,4,6,2,4,1,5,5,2,4,7,4,6,4,5,4,8,2,5,0","217.3,5,4,1,4,2,4,3,1,5,3,4,4,1,5,1,3,2,2,1,3","238.1,0,1,1,0,2,1,2,3,2,2,0,2,1,1,0,0,1,0,1,0","259.0,0,1,0,1,0,1,0,0,1,+10.1,+4.1,+19.2,+13.1,+22.1,+21.1,+16.1,+3.1,+10.1,+73.1,+228.1"]},{"n":"VIII","date":"July 16","per":18,"total":490,"k":["61.1,+24.1,+20.1,+6.1,+8.1,0,0,1,1,0,0,1,0,0,0,0,1,1","133.0,0,0,0,2,2,1,0,0,0,3,1,0,4,2,2,2,1","151.2,2,1,4,5,3,2,4,1,3,2,2,4,0,3,4,4,3","169.5,7,3,3,5,7,4,4,8,3,5,6,9,5,6,10,4,11","187.9,10,3,11,6,8,11,8,8,8,7,8,8,6,4,13,7","204.9,10,3,8,5,5,4,3,10,7,9,3,3,6,5,2,10","221.5,7,2,1,4,1,2,3,5,4,2,3,1,1,3,0,1","238.1,1,0,2,1,1,1,0,0,1,0,0,0,1,0,2,0","255.1,0,1,0,0,1,0,1,0,1,1,+9.1,+14.2,+24.1,+6.1,+17.1,+25.1"]},{"n":"IX","date":"July 17","per":18,"total":495,"k":["71.1,+6.1,+11.1,+18.1,+8.1,1,+9.1,0,0,1,0,2,0,0,2,0,2,1","136.1,0,1,2,1,1,1,3,0,1,3,2,0,2,2,2,1,2","154.4,3,1,3,3,2,1,2,2,1,5,4,5,2,2,5,8,2","172.2,6,5,8,6,6,4,7,2,8,7,5,8,5,8,6,11","189.6,9,6,5,8,6,10,7,6,14,7,8,10,6,3,8,6","206.9,3,6,8,5,8,6,7,5,6,6,4,7,3,8,3,5","223.2,4,5,0,5,1,4,2,0,3,4,2,1,2,2,3,4","240.1,0,0,0,2,0,4,1,0,1,2,0,0,1,1,1,0","257.0,1,0,0,1,0,0,1,+12.1,+5.2,+5.1,+15.2,1,+5.1,+40.1,+21.1,+137.1"]},{"n":"X","date":"July 18","per":18,"total":498,"k":["81.1,+41.1,+8.1,+20.1,1,0,0,0,0,1,1,0,1,0,1,2,1,3","165.0,2,2,0,1,2,3,3,1,1,2,1,1,5,2,2,4,5","183.5,1,6,4,5,4,5,3,4,3,7,1,9,7,6,2,8","200.5,4,5,6,5,7,7,10,13,6,11,8,11,5,8,10,4","217.7,10,9,10,9,5,4,11,4,9,8,10,5,8,9,7,1","234.4,2,9,6,4,9,4,4,1,6,7,0,2,3,2,2,3","251.6,2,4,2,5,2,1,2,1,2,2,2,0,1,3,0,1","268.0,0,0,0,2,0,1,1,0,0,0,0,0,1,0,0,0","285.1,0,0,1,0,0,0,0,0,1,0,0,0,0,1,+3.1,+114.1"]},{"n":"XI","date":"July 19","per":21,"total":499,"k":["68.1,+46.1,+21.1,+6.2,2,0,1,1,1,0,0,1,0,1,0,0,2,2,2,0","158.1,3,1,1,3,1,0,1,3,0,2,3,0,2,0,0,2,2,3,3","178.1,0,3,1,4,2,2,2,3,6,3,5,3,5,12,9,10,10,5,4","198.7,8,7,9,5,4,7,4,5,9,6,7,12,12,5,5,7,5,7,5","218.11,5,10,7,3,3,9,11,2,8,4,2,5,3,7,4,5,4,4,3","238.8,5,2,7,5,3,1,6,2,3,3,6,4,5,2,2,2,2,0,4","258.1,1,3,1,2,0,1,1,2,0,1,0,2,1,0,1,3,1,0,1","278.2,0,0,1,0,0,0,0,0,1,0,0,0,0,3,1,0,0,0,0","298.0,0,1,0,0,1,0,1,0,1,0,0,0,0,3,+48.1,+19.1,+21.1,+37.1,+54.1"]},{"n":"XII","date":"July 20","per":18,"total":396,"k":["95.1,+14.1,+17.1,+15.1,+16.1,+5.1,0,1,0,0,0,0,0,1,0,2,1,0","175.1,0,0,0,1,0,1,1,0,0,0,0,1,0,0,0,3,0","193.2,2,0,5,0,4,1,3,2,2,1,1,2,4,5,3,4,2","211.1,2,6,5,5,7,5,8,6,12,8,11,4,4,6,5,5,13","229.6,8,4,3,9,6,6,5,4,4,6,11,4,7,6,5,5,6","247.3,1,2,2,7,3,3,3,5,6,5,1,3,2,4,3,1,1","265.5,3,5,1,4,4,2,1,1,3,1,1,1,0,1,0,3","282.0,2,3,0,1,0,0,2,0,0,1,0,0,0,1,1,1","299.0,1,0,0,0,1,1,+9.1,+2.1,+2.1,+4.1,+7.1,+25.1,+11.1,+9.1,+16.1,1"]},{"n":"XIII","date":"July 22","per":20,"total":489,"k":["133.1,+7.1,+8.1,1,0,0,0,0,0,0,0,1,1,0,0,0,0,0,1,0","166.0,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,1","185.0,0,0,1,0,0,0,0,0,1,2,0,0,2,0,1,0,0,2","204.0,1,3,3,4,2,2,6,4,1,3,2,3,2,4,4,5,10,5","223.8,5,9,5,5,9,4,8,13,7,6,13,8,6,3,10,5,5,7","242.8,11,8,9,7,9,7,9,5,9,8,8,5,13,2,7,4,7,5","261.14,8,4,7,2,6,4,5,6,5,6,3,2,5,5,3,2,2,3","280.3,0,3,6,2,1,0,4,0,0,1,1,0,1,1,2,3,1,2","299.0,0,0,0,0,1,0,1,0,0,0,1,1,1,0,0,0,1,+57.1"]},{"n":"XIV","date":"July 23","per":18,"total":500,"k":["63.1,+42.1,+14.1,+13.1,+25.1,1,+8.1,+8.1,0,0,0,0,1,1,1,0,0,3","185.0,0,4,2,2,0,3,1,1,0,2,4,3,2,1,4,4,1","203.4,2,3,5,2,1,8,5,8,1,5,4,3,2,4,7,3,4","221.6,9,5,10,9,6,6,11,14,10,11,5,8,6,9,8,11,12","239.13,6,10,9,11,8,9,11,5,8,3,5,7,9,9,8,7","256.12,1,6,2,6,6,2,5,3,1,4,2,1,0,1,3,4","273.2,0,3,0,0,2,1,1,1,1,1,0,0,1,0,0,1","290.2,0,0,0,0,0,0,1,0,0,0,0,0,0,1,1,2","307.0,0,0,0,0,0,0,0,0,0,2,0,1,+40.1,+111.1,+223.1,+12.1"]},{"n":"XV","date":"July 24","per":18,"total":498,"k":["73.1,+32.1,+5.1,+2.1,+28.1,+8.1,+10.1,+8.1,0,1,1,0,0,0,0,2,1,0","177.0,0,1,0,0,0,0,1,0,1,3,0,0,0,0,2,4,1","195.2,1,1,3,1,0,1,4,1,2,2,1,0,5,4,6,5,5","213.4,9,8,4,8,7,9,5,5,10,12,7,6,7,8,11,8,12","231.5,11,8,8,9,15,7,12,10,15,9,8,14,4,4,7,7,8","249.4,7,4,6,3,4,7,8,6,3,1,2,3,8,3,1,1,2","267.1,7,1,4,3,4,1,1,2,1,1,1,3,1,0,1,0,1","285.1,0,1,2,1,1,0,1,1,0,2,1,0,0,0,0,0","302.1,0,0,0,0,0,0,2,1,1,0,0,0,1,+91.1,+37.1,+24.2"]},{"n":"XVI","date":"July 25","per":17,"total":498,"k":["67.1,+19.1,+17.1,+11.1,+43.1,0,0,0,1,1,0,0,0,0,0,0,0","170.2,0,0,0,0,0,3,0,1,1,2,1,2,2,1,3","186.0,3,3,0,1,0,2,4,1,0,2,1,3,4,5,6","202.2,4,1,10,3,6,4,3,1,7,5,3,3,2,4,5","218.6,8,8,5,3,3,6,10,7,8,9,12,15,13,6,8","234.8,10,8,5,7,7,6,11,11,12,9,7,6,7,7,8","250.6,10,6,3,5,4,10,7,4,3,0,2,3,2,0,2","266.4,5,6,3,4,4,1,3,2,0,0,0,1,1,4,2","282.2,0,2,0,0,1,0,0,0,1,+12.1,+9.1,1,+20.1,+24.1,+427.1"]},{"n":"XVII","date":"July 26","per":21,"total":507,"k":["76.1,+28.1,+24.1,+19.1,+15.1,+4.1,+14.1,0,0,0,0,0,3,0,0,0,1,0,0,1,0","195.0,2,0,0,0,1,1,0,1,0,0,1,2,5,4,2,2,2,2,2,2","216.1,0,1,2,3,3,0,4,3,2,0,2,1,3,6,2,4,3,3,4,3","237.5,2,5,7,2,4,5,4,9,2,5,4,8,5,7,4,5,7,7,5,7","258.9,7,11,9,8,5,7,8,5,3,7,2,6,5,6,7,5,6,11,2,5","279.10,4,7,6,7,7,3,6,7,3,5,5,6,7,5,5,3,5,1,3,3","300.4,0,1,1,1,1,2,0,2,5,6,1,4,0,1,4,1,2,0,0,2","321.1,0,1,1,1,1,0,0,0,0,0,1,0,0,0,0,1,1,1,0,1","342.1,0,1,3,0,1,2,0,0,0,0,1,+13.1,+6.1,+8.1,+10.1,+2.1,+2.1,+54.1,+19.1"]},{"n":"XVIII","date":"July 27","per":17,"total":495,"k":["184.2,0,0,0,1,0,0,0,1,0,0,0,0,1,0,1,0","201.3,1,2,2,0,6,1,1,3,0,0,3,3,1,3,4,4","218.0,3,2,3,0,4,6,2,0,5,3,8,7,2,10,3,6","235.4,10,5,2,5,6,5,3,8,6,5,7,14,8,11,12,3","252.16,6,10,11,8,7,7,8,13,9,5,16,11,4,6,8,5","269.5,11,10,6,6,5,7,5,5,3,6,3,1,4,5,5,4","286.6,4,1,1,1,3,1,1,2,0,0,0,0,2,0,0","302.2,1,0,1,1,0,0,0,0,0,0,0,0,1,0,0","318.0,0,0,0,1,0,0,0,0,0,0,0,1,+11.1,+25.1,1"]},{"n":"XIX","date":"July 29","per":17,"total":500,"k":["119.1,+29.1,+4.1,+5.1,+30.1,0,0,1,1,0,0,0,0,0,0,1,1","200.0,0,0,1,0,1,0,2,0,0,2,0,1,0,1,1,1","217.0,1,2,3,3,3,0,1,0,2,7,0,3,3,4,3,6","234.5,2,7,7,9,4,11,8,7,8,7,10,11,8,11,13,7","251.11,10,13,15,11,12,7,11,6,11,8,11,4,4,4,8","267.8,6,11,6,10,12,9,10,4,5,5,4,2,7,5,4","283.2,1,3,5,4,4,5,1,0,1,2,1,1,1,0,1","299.1,1,2,1,0,0,0,0,0,2,1,1,1,0,0,0","315.0,0,0,1,0,0,1,0,0,1,+10.1,+25.1,+7.1,+225.1,+188.1,+72.1"]},{"n":"XX","date":"July 30","per":20,"total":494,"k":["130.1,+29.1,+18.0,0,0,0,0,0,1,0,0,1,1,0,0,0,0,0,0,0","195.0,0,0,1,2,0,0,1,2,2,0,1,0,2,0,2,2,1,0","214.2,3,1,5,2,2,9,6,2,2,4,3,4,4,3,2,4,4,4","233.10,4,8,6,9,5,6,13,12,9,4,6,7,8,7,9,3,12,9","252.12,9,4,7,9,8,8,6,8,9,8,14,7,11,6,8,7,6,12","271.1,8,7,5,3,8,6,2,4,5,2,7,2,0,1,1,3,2,3","290.1,1,3,1,0,1,2,3,0,1,0,2,0,1,0,0,1,0,1","309.1,0,0,1,0,0,0,0,0,0,0,1,0,0,0,1,0,0,1","328.0,1,1,0,0,0,0,0,0,1,0,0,0,0,1,+18.1,+126.1,+268.1,+63.1"]},{"n":"XXI","date":"July 31","per":16,"total":502,"k":["75.1,+62.1,+23.1,2,+20.1,0,1,0,1,0,0,0,2,0,2,1","193.0,0,0,1,1,2,0,1,3,2,0,2,2,3,0,2","209.0,1,3,1,3,0,3,5,5,2,2,9,4,6,5,3","225.7,7,7,6,9,8,10,6,10,4,8,8,11,9,10,10","241.10,7,10,8,3,10,11,11,9,7,8,8,9,7,10,10","257.8,7,10,5,11,6,8,6,7,3,7,5,3,4,1,3","273.1,4,2,3,1,3,4,4,1,2,1,0,4,1,5","288.0,3,1,2,2,2,0,0,0,1,1,1,0,0,1","303.0,0,0,0,0,0,0,0,0,1,1,+18.1,+17.1,1,+89.1"]},{"n":"XXII","date":"August 1","per":15,"total":499,"k":["139.1,+18.1,+14.1,+21.1,1,1,0,1,1,0,0,0,0,0,0","204.0,2,1,2,0,1,1,2,2,2,1,1,3,0,0","219.2,0,1,6,1,4,4,4,4,1,6,5,10,6","233.2,7,6,6,6,12,10,4,7,10,7,3,6,10","247.7,10,3,8,13,8,14,8,6,8,6,8,10,9","261.14,8,12,7,8,17,8,6,5,5,9,7,9,2","275.12,3,4,8,4,2,4,7,3,1,4,5,3,1","289.6,0,1,1,0,2,0,2,1,2,1,1,0,0","303.1,0,0,0,1,0,1,+16.1,+14.1,+3.1,+40.1,+24.1,+4.1,+279.1"]},{"n":"XXIII","date":"August 2","per":19,"total":498,"k":["142.1,+24.1,2,0,0,0,0,2,0,0,1,0,0,0,1,1,0,0,1","184.0,1,0,0,0,1,0,0,0,1,0,0,3,0,0,0,0,0","202.1,0,1,0,1,1,0,0,1,0,3,3,2,4,1,0,5,2","220.1,6,5,6,5,6,4,3,4,5,4,9,8,6,6,6,4,2","238.5,9,8,8,7,12,9,7,7,6,6,12,9,8,10,12,9,5","256.10,10,11,9,8,9,13,6,11,7,6,8,8,6,14,3,7,4","274.7,3,1,3,4,7,3,2,3,4,1,0,3,1,1,1,2,1","292.0,4,1,2,0,0,2,0,0,0,1,0,0,0,1,0,0,1","310.1,0,0,0,1,0,1,0,0,0,0,0,1,1,+17.1,+31.1,+35.1,+255.1"]},{"n":"XXIV","date":"August 3","per":15,"total":497,"k":["119.1,+15.1,+22.1,+16.1,+3.1,+13.2,0,1,0,1,0,0,0,0,0","198.2,1,2,1,0,0,1,1,1,1,2,6,3,3,3","213.3,4,1,1,4,7,5,3,6,3,1,4,8,6,5","228.9,4,7,11,12,18,5,7,11,10,8,8,6,9,8","243.12,10,16,9,7,11,13,13,14,14,12,12,6,8","257.12,5,8,6,9,2,6,4,1,1,2,2,3,3","271.3,1,4,1,5,0,2,0,0,3,2,1,1,0","285.1,4,0,1,0,2,0,4,0,3,0,0,1,0","299.0,0,0,1,0,0,0,0,2,0,1,+25.1,+6.1,+34.1"]}];
+/* one column of a day, as [time, count] pairs */
+function dayColumn(d, k) {
+  const out = [];
+  let x = 0;
+  d.k[k].split(",").forEach((tok, i) => {
+    if (i === 0) { const [a, b] = tok.split("."); x = +a; out.push([x, +b]); return; }
+    if (tok[0] === "+") { const [g, y] = tok.slice(1).split("."); x += +g; out.push([x, +y]); }
+    else { x += 1; out.push([x, +tok]); }
+  });
+  return out;
+}
+/* the whole day, in reading order */
+function dayRows(d) {
+  const out = [];
+  for (let k = 0; k < 9; k++) out.push(...dayColumn(d, k));
+  return out;
+}
+/* and as a dense run of milliseconds, for plotting */
+function dayCounts(d) {
+  const r = dayRows(d), lo = r[0][0], hi = r[r.length - 1][0];
+  const out = new Array(hi - lo + 1).fill(0);
+  r.forEach(([x, y]) => { out[x - lo] += y; });
+  return { lo, counts: out };
+}
+</script>
+<script>
+/* ==========================================================================
+   THE TWENTY-FOUR DAYS — the tables and the plate
+
+   Not behind a trigger. This is the apparatus for the whole experimental half
+   of the paper, so it sits open at the foot of the page.
+
+   Three views of the same data. The tables as Peirce set them, with his
+   abbreviation of the leading digits intact. The plate, either his own or
+   redrawn from the tables with the smoothing in your hands. And one day at a
+   time, larger.
+
+   The smoothing is his: "smoothed off by the addition of adjacent numbers in
+   the table eight times over". Adding adjacent entries is convolution with
+   [1,1]; doing it eight times is the eighth row of Pascal's triangle. The sums
+   are divided back by 2^passes so the vertical scale stays comparable — he
+   would have rescaled when drawing. The smoother curve on each of his figures
+   is not a fit of any kind: it is "a mean curve for every day drawn by eye".
+   ========================================================================*/
+(function () {
+  const host = document.getElementById("ex3-block");
+  if (!host) return;
+
+  let view = "table", di = 0, passes = 8, meanSd = 22, plateOriginal = false;
+  const overlay = { mean: true, gauss: false };
+
+  const D = () => PEIRCE_DAYS[di];
+
+  /* ------------------------------------------------------------ maths ---- */
+  function smooth(c, k) {
+    let a = c.slice();
+    for (let p = 0; p < k; p++) {
+      const b = new Array(a.length).fill(0);
+      for (let i = 0; i < a.length; i++) b[i] = a[i] + (i + 1 < a.length ? a[i + 1] : 0);
+      a = b;
+    }
+    const shift = Math.round(k / 2), out = new Array(a.length).fill(0);
+    for (let i = 0; i < a.length; i++) {
+      const j = i - shift;
+      if (j >= 0 && j < a.length) out[i] = a[j] / Math.pow(2, k);
+    }
+    return out;
+  }
+  // Peirce's "mean curve for every day drawn by eye". How much of the bounce a
+  // hand leaves in is a matter of the hand, so it is put on a slider.
+  function meanCurve(c, sd) {
+    const R = Math.ceil(sd * 3), w = [];
+    for (let i = -R; i <= R; i++) w.push(Math.exp(-0.5 * (i / sd) * (i / sd)));
+    const tot = w.reduce((s, v) => s + v, 0);
+    return c.map((_, i) => {
+      let s = 0;
+      for (let j = -R; j <= R; j++) if (c[i + j] !== undefined) s += c[i + j] * w[j + R];
+      return s / tot;
+    });
+  }
+  function moments(c, lo) {
+    let n = 0, s = 0;
+    c.forEach((v, i) => { n += v; s += v * (lo + i); });
+    const m = s / n;
+    let q = 0;
+    c.forEach((v, i) => { q += v * Math.pow(lo + i - m, 2); });
+    return { n, mean: m, sd: Math.sqrt(q / n) };
+  }
+  function medianOf(c, lo) {
+    const n = c.reduce((s, v) => s + v, 0);
+    let acc = 0;
+    for (let i = 0; i < c.length; i++) { acc += c[i]; if (acc >= n / 2) return lo + i; }
+    return lo;
+  }
+
+  /* --------------------------------------------------------- the month ---
+     July 1872 began on a Monday. Every Sunday is missing from the series, and
+     so are the 2nd to the 4th — Independence Day and the days about it — and
+     the 11th to the 13th. Setting the days out as a month shows the shape of
+     the month's work in a way a list of dates does not. */
+  const DOW = ["S", "M", "T", "W", "T", "F", "S"];
+  const MONTHS = [
+    { name: "July 1872", days: 31, firstDow: 1, month: "July" },
+    { name: "August 1872", days: 3, firstDow: 4, month: "August" },
+  ];
+  const dayIndex = (month, d) => PEIRCE_DAYS.findIndex((p) => p.date === `${month} ${d}`);
+
+  function calendarHTML() {
+    let out = `<div class="cal-wrap">`;
+    for (const m of MONTHS) {
+      out += `<div class="cal"><div class="cal-name">${esc(m.name)}</div><div class="cal-grid">`;
+      out += DOW.map((d) => `<div class="cal-dow">${d}</div>`).join("");
+      for (let i = 0; i < m.firstDow; i++) out += `<div class="cal-day blank"></div>`;
+      for (let d = 1; d <= m.days; d++) {
+        const i = dayIndex(m.month, d);
+        out += (i < 0)
+          ? `<div class="cal-day off">${d}</div>`
+          : `<button class="cal-day has${i === di ? " is-on" : ""}" data-day="${i}"
+              title="${esc(PEIRCE_DAYS[i].n)} — ${bigmark(PEIRCE_DAYS[i].total)} observations">${d}</button>`;
+      }
+      out += `</div></div>`;
+    }
+    return out + `</div>`;
+  }
+
+  /* ------------------------------------------------- Peirce's own table ---
+     Nine column-pairs, each read downwards, as at pp. 138-158, with his
+     abbreviation kept: the time is set in full at the head and the foot of a
+     column, wherever the run of milliseconds breaks, and at every multiple of
+     ten; elsewhere the last digit alone. */
+  function tableHTML(d) {
+    const cols = [];
+    for (let k = 0; k < 9; k++) cols.push(dayColumn(d, k));
+    let out = `<table class="peirce-data-table"><caption>${esc(d.n)}. ${esc(d.date)}, 1872</caption><tr>`;
+    for (let k = 0; k < 9; k++) out += `<th>Thousandths<br>of a second</th><th>Number of<br>observations</th>`;
+    out += `</tr>`;
+    for (let r = 0; r < d.per; r++) {
+      out += "<tr>";
+      for (let k = 0; k < 9; k++) {
+        const cell = cols[k][r];
+        if (!cell) { out += `<td></td><td class="pc"></td>`; continue; }
+        const [x, y] = cell;
+        const prev = r > 0 && cols[k][r - 1] ? cols[k][r - 1][0] : null;
+        const last = r === cols[k].length - 1;
+        const label = (prev === null || last || x !== prev + 1 || x % 10 === 0)
+          ? String(x) : String(x % 10);
+        out += `<td class="pv">${label}</td><td class="pc">${y}</td>`;
+      }
+      out += "</tr>";
+    }
+    return out + "</table>";
+  }
+
+  /* ---------------------------------------------------------- one day ---- */
+  const one = mkCanvas(340, (pl) => {
+    const d = D(), dc = dayCounts(d), c = dc.counts, lo = dc.lo;
+    const sm = smooth(c, passes), m = moments(c, lo);
+    const xlo = Math.max(lo, Math.round(m.mean - 4.2 * m.sd));
+    const xhi = Math.min(lo + c.length - 1, Math.round(m.mean + 4.2 * m.sd));
+    const top = niceMax(Math.max(...sm) * 1.25, 1);
+    pl.setup({ xlim: [xlo, xhi], ylim: [0, top], mar: [3.2, 3.6, 2.2, 1.2] });
+    pl.axes({ nx: 6 });
+    pl.box();
+    pl.axisLabels("Interval between the signal and the answer, in thousandths of a second",
+                  "Number of observations");
+    pl.title(`${d.n} — ${d.date}, 1872`, { cex: 1.0 });
+    pl.clip(true);
+    const xs = sm.map((_, i) => lo + i);
+    if (passes === 0) {
+      for (let i = 0; i < c.length; i++)
+        if (c[i]) pl.segments(lo + i, 0, lo + i, c[i], { col: "rgba(47,111,159,0.55)", lwd: 1 });
+    }
+    pl.lines(xs, sm, { col: PAL.accent, lwd: 1.6 });
+    if (overlay.mean) pl.lines(xs, meanCurve(c, meanSd), { col: PAL.ink, lwd: 2.2 });
+    if (overlay.gauss) pl.lines(xs, xs.map((x) => dnorm(x, m.mean, m.sd) * m.n),
+      { col: PAL.accent3, lwd: 2, lty: 2 });
+    pl.clip(false);
+    const leg = ["The figures, smoothed"], col = [PAL.accent];
+    if (overlay.mean) { leg.push("A mean curve, by eye"); col.push(PAL.ink); }
+    if (overlay.gauss) { leg.push("The Gaussian of the same mean and spread"); col.push(PAL.accent3); }
+    pl.legend("topright", { legend: leg, fill: col, cex: 0.68 });
+  });
+
+  /* ---------------------------------------------------------- the plate --
+     Twenty-four panels, two columns of twelve, as on Plate 27. Every panel is
+     drawn at the same smoothing, so the slider moves the whole month at once. */
+  const plate = mkCanvas(1420, (pl) => {
+    const W = pl.W, H = pl.H, rows = 12, colW = W / 2, panelH = (H - 26) / rows;
+    const LABGAP = 13;                       // room under each baseline for its scale
+    const ctx = pl.ctx;
+    ctx.clearRect(0, 0, W, H);
+    PEIRCE_DAYS.forEach((d, i) => {
+      const col = i < rows ? 0 : 1, r = i % rows;
+      const x0 = col * colW + 66, x1 = col * colW + colW - 14;
+      const yBase = 22 + r * panelH + panelH - 8 - LABGAP;
+      const dc = dayCounts(d), c = dc.counts, m = moments(c, dc.lo);
+      const sm = smooth(c, passes), mc = meanCurve(c, meanSd);
+      const lo = Math.round(m.mean - 3.6 * m.sd), hi = Math.round(m.mean + 3.6 * m.sd);
+      const top = Math.max(...sm) * 1.12 || 1;
+      const X = (v) => x0 + (v - lo) / (hi - lo) * (x1 - x0);
+      const Y = (v) => yBase - (v / top) * (panelH - 14);
+      ctx.strokeStyle = PAL.rule; ctx.lineWidth = 1; ctx.setLineDash([]);
+      ctx.beginPath(); ctx.moveTo(x0, yBase); ctx.lineTo(x1, yBase); ctx.stroke();
+      // the four verticals, each with the millisecond it stands at written under it
+      ctx.fillStyle = PAL.inkFaint; ctx.font = `9px ${PLOT_FACE}`;
+      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      for (let g = 1; g <= 4; g++) {
+        const gx = x0 + (x1 - x0) * g / 5;
+        ctx.beginPath(); ctx.moveTo(gx, yBase); ctx.lineTo(gx, yBase - panelH + 10 + LABGAP); ctx.stroke();
+        ctx.fillText(String(Math.round(lo + (hi - lo) * g / 5)), gx, yBase + 3);
+      }
+      ctx.fillStyle = PAL.ink; ctx.font = `10px ${PLOT_FACE}`;
+      ctx.textAlign = "right"; ctx.textBaseline = "middle";
+      ctx.fillText(`${d.n} ${d.date}`, x0 - 6, yBase - panelH / 2 + 4);
+      const draw = (arr, colr, lw) => {
+        ctx.strokeStyle = colr; ctx.lineWidth = lw; ctx.beginPath();
+        let started = false;
+        for (let j = 0; j < arr.length; j++) {
+          const xv = dc.lo + j;
+          if (xv < lo || xv > hi) continue;
+          const px = X(xv), py = Y(arr[j]);
+          if (!started) { ctx.moveTo(px, py); started = true; } else ctx.lineTo(px, py);
+        }
+        ctx.stroke();
+      };
+      draw(sm, PAL.accent, 1);
+      if (overlay.mean) draw(mc, PAL.ink, 1.6);
+    });
+    ctx.fillStyle = PAL.inkSoft; ctx.font = `italic 12px ${PLOT_FACE}`; ctx.textAlign = "center";
+    ctx.fillText("Redrawn from the tables — all twenty-four days at the same smoothing", W / 2, 12);
+  });
+
+  /* ---------------------------------------------------------- rendering -- */
+  const passSlider = (id) => slider(id, "Smoothing passes:", 0, 16, passes, 1,
+    (v) => (v === 0 ? "none — the raw figures" : v === 8 ? "8 — as Peirce had it" : String(v)));
+  const meanSlider = (id) => slider(id, "The mean curve, drawn by eye:", 4, 48, meanSd, 1,
+    (v) => (v <= 10 ? v + " — bouncy" : v >= 34 ? v + " — very smooth" : String(v)), "k4");
+
+  function render() {
+    const body = $("#ex3-body", host);
+    if (view === "table") {
+      const d = D(), dc = dayCounts(d), m = moments(dc.counts, dc.lo);
+      body.innerHTML = `
+        <div class="row">
+          <div class="col col-7">${calendarHTML()}</div>
+          <div class="col col-5"><div class="key-insight" style="margin-top:0;">
+            <p style="margin-bottom:0;">${esc(d.n)} &mdash; ${esc(d.date)}. This table sums to
+            <strong>${bigmark(d.total)}</strong> observations${d.total === 500 ? ""
+              : `, not the five hundred Peirce says he took each day`}.
+            Mean ${fmt(m.mean, 1)} ms, median ${bigmark(medianOf(dc.counts, dc.lo))} ms.</p>
+          </div></div>
+        </div>
+        <div class="table-scroll">${tableHTML(d)}</div>`;
+    } else if (view === "plate") {
+      body.innerHTML = `
+        <div class="ex-buttonbar">
+          <button class="btn btn-sm" data-act="plate-redraw">The redrawing</button>
+          <button class="btn btn-sm" data-act="plate-orig">Peirce&rsquo;s own plate</button>
+          ${plateOriginal ? "" : `<span class="bar-sep"></span>
+            <button class="btn btn-sm" data-act="mean">Mean curves</button>
+            <button class="btn btn-sm" data-act="peirce">Reset to Peirce&rsquo;s</button>`}
+        </div>
+        ${plateOriginal ? "" : `<div id="ex3-plate-ctl"></div>`}
+        <div id="ex3-plate-body"></div>`;
+      const pb = $("#ex3-plate-body", body);
+      if (plateOriginal) {
+        pb.innerHTML = `<figure class="plate-orig">
+          <img src="Text/plate-27.png" alt="Plate 27, diagrams illustrating Appendix No. 21">
+          <figcaption>Plate 27 as engraved for the Coast Survey Report for 1870.</figcaption></figure>`;
+      } else {
+        $("#ex3-plate-ctl", body).appendChild(passSlider("ex3_pass_p"));
+        $("#ex3-plate-ctl", body).appendChild(meanSlider("ex3_msd_p"));
+        pb.appendChild(plate);
+        drawCanvas(plate);
+      }
+    } else {
+      body.innerHTML = `
+        <div class="row">
+          <div class="col col-4">
+            ${calendarHTML()}
+            <div id="ex3-ctl"></div>
+            <div class="ex-buttonbar">
+              <button class="btn btn-sm" data-act="mean">Mean curve by eye</button>
+              <button class="btn btn-sm" data-act="gauss">Lay a Gaussian over it</button>
+              <button class="btn btn-sm" data-act="peirce">Reset to Peirce&rsquo;s</button>
+              <button class="btn btn-warning btn-sm" data-act="clear">Clear the overlays</button>
+            </div>
+            <div id="ex3-readout"></div>
+          </div>
+          <div class="col col-8">
+            <div class="plot-container" id="ex3-one"></div>
+            <div class="table-scroll ex3-day-table">${tableHTML(D())}</div>
+          </div>
+        </div>`;
+      $("#ex3-ctl", body).appendChild(passSlider("ex3_pass"));
+      $("#ex3-ctl", body).appendChild(meanSlider("ex3_msd"));
+      $("#ex3-one", body).appendChild(one);
+      $("#ex3-readout", body).innerHTML = readout();
+      drawCanvas(one);
+    }
+    syncButtons();
+  }
+
+  function readout() {
+    const d = D(), dc = dayCounts(d), m = moments(dc.counts, dc.lo);
+    return `<div class="key-insight" style="margin-top:0;">
+      <p style="margin-bottom:6px;"><strong>${esc(d.n)}</strong> &mdash; ${esc(d.date)}, 1872.</p>
+      <p style="margin-bottom:0;">${bigmark(d.total)} observations, from ${bigmark(dc.lo)} to
+      ${bigmark(dc.lo + dc.counts.length - 1)} ms. Mean ${fmt(m.mean, 1)},
+      median ${bigmark(medianOf(dc.counts, dc.lo))}, standard deviation ${fmt(m.sd, 1)} ms.</p></div>`;
+  }
+
+  function syncButtons() {
+    $$("[data-act]", host).forEach((b) => {
+      const a = b.getAttribute("data-act");
+      b.classList.toggle("is-active",
+        (a === "mean" && overlay.mean) || (a === "gauss" && overlay.gauss) ||
+        (a === "plate-redraw" && !plateOriginal) || (a === "plate-orig" && plateOriginal));
+    });
+  }
+
+  function redraw() {
+    if (view === "plate" && !plateOriginal) drawCanvas(plate);
+    else if (view === "day") drawCanvas(one);
+  }
+
+  /* ------------------------------------------------------------ events -- */
+  host.addEventListener("click", (ev) => {
+    const tab = ev.target.closest("[data-view]");
+    if (tab) {
+      view = tab.getAttribute("data-view");
+      $$("#ex3-tabs .mode-tab", host).forEach((t) => t.classList.toggle("active", t === tab));
+      render(); return;
+    }
+    const cell = ev.target.closest("[data-day]");
+    if (cell) { di = +cell.getAttribute("data-day"); render(); return; }
+    const b = ev.target.closest("[data-act]");
+    if (!b) return;
+    const a = b.getAttribute("data-act");
+    if (a === "plate-redraw" || a === "plate-orig") {
+      plateOriginal = a === "plate-orig"; render(); return;
+    }
+    if (a === "mean") overlay.mean = !overlay.mean;
+    else if (a === "gauss") overlay.gauss = !overlay.gauss;
+    else if (a === "peirce") {            // eight passes, a mean curve, nothing else
+      passes = 8; meanSd = 22; overlay.mean = true; overlay.gauss = false;
+      ["ex3_pass", "ex3_pass_p"].forEach((s) => { if (document.getElementById(s)) setSlider(s, 8); });
+      ["ex3_msd", "ex3_msd_p"].forEach((s) => { if (document.getElementById(s)) setSlider(s, 22); });
+    } else if (a === "clear") {
+      overlay.mean = false; overlay.gauss = false;
+    } else return;
+    syncButtons(); redraw();
+  });
+
+  host.addEventListener("input", (ev) => {
+    const id = ev.target.id;
+    if (id === "ex3_pass" || id === "ex3_pass_p") { passes = +ev.target.value; redraw(); }
+    else if (id === "ex3_msd" || id === "ex3_msd_p") { meanSd = +ev.target.value; redraw(); }
+  });
+
+  /* --------------------------------------------------------- the block --- */
+  host.innerHTML = `
+    <span class="ex-num" aria-hidden="true">3</span>
+    <h5 class="ex3-head">The twenty-four days &mdash; the tables and the plate</h5>
+    <p class="ex3-lead">Five hundred observations on every week-day for a month, recorded to the
+      millisecond on the Hipp chronoscope. The tables are set here as Peirce set them, and the plate
+      is redrawn from them, so the smoothing he describes can be taken apart.</p>
+    <div class="mode-tabs" id="ex3-tabs">
+      <button class="mode-tab active" data-view="table">The tables</button>
+      <button class="mode-tab" data-view="plate">The plate</button>
+      <button class="mode-tab" data-view="day">One day</button>
+    </div>
+    <div id="ex3-body"></div>`;
+  render();
+})();
 </script>
 </div>
 </body>

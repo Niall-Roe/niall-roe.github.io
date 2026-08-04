@@ -919,10 +919,15 @@ registerExample("example-ex32", (box) => {
       <button class="btn btn-primary" data-act="run">Run the tests</button>
       <button class="btn btn-warning btn-sm" data-act="fresh">New arguments</button>
     </div>
+    <!-- The weighted view is held back for now. Everything behind it is intact:
+         put the two lines below back inside the markup and it returns, tab,
+         shrinkage, table column and all. -->
+    <!--
     <div class="mode-tabs">
       <button class="mode-tab active" data-view="rule">The rule as stated</button>
       <button class="mode-tab" data-view="weighted">Weighted by how well each is known</button>
     </div>
+    -->
     <div class="row">
       <div class="col col-4" id="ex32-ctl-n"></div>
       <div class="col col-4" id="ex32-ctl-effort"></div>
@@ -1161,8 +1166,11 @@ registerExample("example-ex32", (box) => {
          <p style="margin-bottom:0;">As we have seen, each argument is determined by two numbers, a
           determination of its probability and its probable error. The method of balancing reasons only
           considers the determination of probability. We have let you set a threshold for how good an
-          argument must be for you to consider its value. Click <em>weighted by how well each is known</em>
-          to see why we can't simply weigh each argument according to its probable error.</p>`}</div>`;
+          argument must be for you to consider its value, and moving that threshold moves the answer.
+          The rule did not leave anything out; the line you drew did.</p>`}</div>`;
+    /* The last sentence used to send the reader to the weighted tab. That tab is
+       held back at the moment, so the pointer would be a door with nothing
+       behind it; restore it along with the tab. */
 
     const rows = st.rows.map((r) => `<tr${(st.mode === "weighted" ? r.w > 0.15 : r.inSum)
       ? "" : ' style="color:#a8adb4;"'}>

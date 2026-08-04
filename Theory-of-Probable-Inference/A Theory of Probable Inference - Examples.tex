@@ -3,9 +3,26 @@ A Theory of Probable Inference — Examples
 
 STATUS
 
-Nothing is built yet. This is the survey pass: every place in the paper where I
-think an interactive example earns its keep, numbered in the order it appears in
-the text, with the passage it would hang off and what it would do.
+Examples 1, 2 and 3 are built. The rest is the survey pass: every place in the
+paper where I think an interactive example earns its keep, numbered in the order
+it appears in the text, with the passage it would hang off and what it would do.
+
+BUILD NOTE
+
+The page is now assembled from parts, as the Probability of Induction page is:
+run ./build.sh in this folder to write index.html from src/. ./build.sh --check
+says whether index.html is behind src/.
+
+  src/01_head.html    <head>, all CSS, opens .article-container
+  src/02_article.html Peirce's text, triggers, example containers, footnotes
+  src/03_lib.js       maths, the canvas renderer, DOM helpers (from PoI, as-is)
+  src/04_scaffold.js  triggers, live numbers, margin numbers (from PoI, as-is)
+  src/05_ex123.js     examples 1-3
+  src/99_tail.html    closes </body></html>
+
+03 and 04 are the Probability of Induction's own files, unedited, so anything
+written for either paper runs in the other. One part file per group of examples
+from here on, so an example can be edited without touching the text.
 
 Numbers are assigned in reading order, not build order. (The Errors of
 Observation page numbered in build order and left gaps; here the paper is
@@ -77,6 +94,37 @@ The thing to make unmissable: nothing about the *form* changes as [rho] moves.
 Only the strength does. That is the claim of the section and it is made in one
 gesture.
 
+[great]
+
+--- BUILT: EXAMPLE 1 --------------------------------------------------------
+
+Margin number: 1.  Trigger: "THE following is an example of the simplest kind of
+probable inference:—".  Container: under Form II.  Source: src/05_ex123.js.
+
+What it does. One slider, rho, from 0 to 1, with Peirce's two figures marked on
+it as buttons (2% and 100%) plus an even chance and 98%. Left of the column, a
+hundred squares with rho of them scattered as P's; right of it, the argument
+twice over — the general form and the liver wound — three lines each, aligned,
+with the live figures in the slider's blue.
+
+At 100 the major premise turns into "Every M is a P", the conclusion loses its
+"with probability", the block's rule goes green, and the name above it reads
+Form I, Singular syllogism in Barbara. At 0 it does the same negatively. Between
+them it is Form II throughout. The two live spans in Peirce's own scheme at the
+head of the section move with it, so his sentence reads "About fifty per cent of
+persons wounded in the liver recover... there are fifty chances out of a
+hundred" while you drag.
+
+Underneath: draw this man / draw fifty, which tallies how often the argument
+came out true. That is the "strength" the slider is really moving — the form is
+the same whichever man you draw.
+
+Open questions for you:
+- The hundred squares are a fixed scatter, not a filling bar, so 2% reads as two
+  people here and there. Say if you would rather see it fill.
+- The tally resets whenever rho moves. Keeping it would let you compare rates
+  across settings, but it would also be comparing two different arguments.
+
 
 ## 2
 
@@ -98,6 +146,36 @@ This is the first appearance of a thing the paper keeps needing — a probabilit
 that is a set of values rather than one value — so it is worth spending a
 graphic on it early, and reusing that bar later (16, 22) rather than drawing a
 new one.
+
+[great]
+
+--- BUILT: EXAMPLE 2 --------------------------------------------------------
+
+Margin number: 2.  Trigger: the whole "It is to be observed that the ratio rho
+need not be exactly specified" passage.  Source: src/05_ex123.js.
+
+What it does. A 0-1 bar with a painted band, driven by two handles, from and to.
+Five buttons: exactly two per cent (the band collapses to a line), not more than
+two per cent, not less than…, no very large nor very small, and anything but
+middling. A checkbox turns the band into what the premise EXCLUDES, which is how
+the two-outer-bands cases are reached.
+
+Peirce's three phrasings are marked up in his own sentence and light in three
+colours as you pick the button that matches them — the same .hl-text treatment
+the other paper uses for antecedent / consequent / consequence.
+
+Below the bar, Form II with the ratio left indeterminate: both the premise and
+the conclusion read "between 0.15 and 0.85", so the conclusion is visibly a
+region of the same bar rather than a point on it. The note counts how many of
+the hundred ratios the premise admits and how many it excludes, and says so in
+his words. Push the band to the full width and the note says the premise now
+excludes nothing, which is to say there is no conclusion.
+
+Open questions for you:
+- Two sliders rather than one two-handled control. A real dual-range needs hand
+  -rolling; say if it is worth it.
+- The bar is the one I proposed reusing at 15 and 22. If you want it to look
+  different there, better to say now.
 
 
 ## 3
@@ -123,6 +201,48 @@ them: the drawing has to be random, and the conclusion has to be drawn in
 advance of any other knowledge. Worth colour-coding the two premises in his
 sentence to the two halves of the control.
 
+[great, lets also have a setting for making the cards discarded from a game, so they would appear as hands]
+
+--- BUILT: EXAMPLE 3 --------------------------------------------------------
+
+Margin number: 3.  Triggers: two — "Thus, there being four aces in a picquet
+pack…", where the example sits, and "But after we have looked at the card, we
+can no longer reason in that way" four paragraphs down, which opens the same
+one and scrolls to it.  Source: src/05_ex123.js.
+
+What it does. Three sources for one card, as buttons:
+
+ - the whole piquet pack: 32 cards drawn as cards, the four aces outlined.
+   Chance 4/32, and the live span in Peirce's sentence reads "one eighth".
+ - the cards discarded at piquet: two hands of twelve are dealt and each player
+   throws out five. Bright cards are the discards, dimmed ones are kept; the
+   pile of ten is drawn out below them. This is your "so they would appear as
+   hands".
+ - the cards discarded for euchre: the full 52 with the euchre pack dimmed, so
+   the pile to draw from is the twos to eights — and every ace is in the other
+   half.
+
+The piquet case got a knob rather than a fixed strategy: how far the players
+choose what to throw out. At 1 they always throw the five lowest and no ace ever
+reaches the pile; at 0 they discard at random and the pile is as good as the
+pack, an ace or so in ten. Dragging it walks the chance from one eighth down to
+nothing, which is the maxim as a dial rather than a switch — the will
+intermeddling by degree.
+
+Then the second condition. Draw a card (it comes face down, and the argument
+reads normally), then LOOK AT IT: the card flips, the conclusion line goes red
+and says the premises have nothing left to do, and the live figure in Peirce's
+sentence four paragraphs down changes with it. Deal again and the eighth
+returns.
+
+Open questions for you:
+- The euchre reading is that "the cards discarded by the players at euchre" are
+  the low cards thrown out of a full pack to make the 24-card euchre pack. The
+  other reading is the dealer's discard after turning up the trump, which is one
+  card and hard to draw from. Tell me if you meant the other one.
+- The care dial defaults to 1, so the first thing you see is the strongest
+  version of his point. It could default to something middling instead.
+
 
 ## 4
 
@@ -145,6 +265,7 @@ scales at once so the reader sees the same fact twice.
 If the reader has come from the other paper, say in a line that this is the same
 thermometer.
 
+[great]
 
 ============================================================================
 SECTION II — COMPLEX AND STATISTICAL DEDUCTION
@@ -168,6 +289,8 @@ Footnote 1's case (when (n+1)r is a whole number, two bars tie) should be
 reachable: at r = 1/2, n = 15 it happens, and the two equal bars are worth
 seeing rather than reading.
 
+
+[that sounds good, but we should visualize the n sets of Ms.  and the proportion (with colour) we shoudl show the sample and the drawing, so we see the Ss from the Ms. please double check the wording of this example in the html against the text]. 
 
 ## 6
 
@@ -752,4 +875,10 @@ PROGRESS LOG
 ============================================================================
 
 (One block per example as it is built, appended here, per the convention in the
-Errors of Observation notes. Nothing built yet.)
+Errors of Observation notes.)
+
+1  built.  Awaiting your read.
+2  built.  Awaiting your read.
+3  built.  Awaiting your read; two open questions above, on euchre and on the
+   default setting of the care dial.
+4-28  not built.

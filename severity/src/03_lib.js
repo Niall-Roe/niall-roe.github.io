@@ -69,6 +69,15 @@ function qnorm(p, mean = 0, sd = 1) {
   return mean + sd * x;
 }
 
+/* Inverse-CDF normal draw: reuses the qnorm above rather than a second
+   (Box-Muller) code path, so a simulated sample and the theoretical curve it
+   is drawn from share exactly one implementation of "what normal means". */
+function rnorm(n, mean = 0, sd = 1) {
+  const out = new Array(n);
+  for (let i = 0; i < n; i++) out[i] = qnorm(Math.random(), mean, sd);
+  return out;
+}
+
 /* ---------------------------------------------------------- FORMATTING --- */
 
 // R's round(x, d) then default printing: 0.5 -> "0.5", not "0.5000"
@@ -77,6 +86,9 @@ function rround(x, d) {
   const r = Number(x.toFixed(d));
   return String(r);
 }
+const esc = (s) => String(s).replace(/[&<>"]/g, (c) =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+
 /* ------------------------------------------------------------ PLOTTING --- */
 /* A minimal re-implementation of the parts of R base graphics the app uses:
    plot(NULL)/text/lines/points/segments/polygon/abline/axis/legend.
@@ -434,6 +446,17 @@ function slider(id, label, min, max, value, step, fmtFn) {
   inp.addEventListener("input", show);
   show();
   return d;
+}
+function checkbox(id, label, checked) {
+  return h(`<div class="ctl checkbox"><label><input type="checkbox" id="${id}"${
+    checked ? " checked" : ""}> ${label}</label></div>`);
+}
+function select(id, label, choices, selected) {
+  const opts = choices.map(([v, txt]) =>
+    `<option value="${esc(v)}"${String(v) === String(selected) ? " selected" : ""}>${
+      esc(txt)}</option>`).join("");
+  return h(`<div class="ctl"><label for="${id}">${label}</label>
+    <select id="${id}">${opts}</select></div>`);
 }
 function helpText(str) { return h(`<p class="help-text">${str}</p>`); }
 // update a slider's position and its printed value together

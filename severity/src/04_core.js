@@ -11,7 +11,19 @@ const State = {
   alpha: 0.025,
   n: 100,
   sigma: 10,
+  // which mean a simulated sample is drawn from: the null, or the claim
+  sampleFrom: 'null',
+  /* Whether the axes follow the sampling distribution or hold still. Following
+     it keeps the picture legible at any n; holding still is what makes the
+     effect OF n visible, because the curve then narrows and rises inside a
+     stationary frame instead of the frame shrinking to match it. */
+  rescale: true,
 };
+
+/* The endpoints of the sample-size slider. With the axes held still the frame
+   is sized for the widest distribution n can produce and the tallest, so that
+   the whole sweep of the slider stays on screen. */
+const N_MIN = 10, N_MAX = 500;
 
 const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
 

@@ -148,37 +148,45 @@ registerExample("example-ex2", (box) => {
   });
   $("#ex2-curve", content).appendChild(curve);
 
-  /* --------------------------------------------------------- the ladder --- */
+  /* --------------------------------------------------------- the ladder ---
+     Peirce reaches phi as a relative number: of all the cases in the limited
+     universe where the unknown quantity is x, the proportion in which the
+     quantity observed comes out about xi. The strip is that count, so the two
+     sides of this statement are a tally on the left and a law on the right. */
   function ladder() {
     const L = law(), s = S(), e = E();
-    const phi = L.dens(e, s);
-    const p = phi * DE;
-    return `<div class="ex-ladder">
+    const phi = L.dens(e, s), p = phi * DE;
+    const n = shots.length;
+    const inStrip = shots.filter((r) => Math.abs(r.e - e) <= DE / 2).length;
+    const seen = n ? fmt(inStrip / n, 4) : "&mdash;";
+
+    const relNum = `<span class="frac"><span class="num">[&xi;<sub>&Xi;</sub><span class="inv-comma">,</span> x<sub>x</sub>]</span><span class="den">[x<sub>x</sub>]</span></span> d&xi;`;
+    const relCount = n
+      ? `<span class="frac"><span class="num">${bigmark(inStrip)}</span><span class="den">${bigmark(n)}</span></span> = ${seen}`
+      : "&mdash;";
+
+    return `<div class="ex-ladder cols-3">
       <div class="lad-row lad-words">
-        <span>the height of the law at that error</span>
-        <span class="lad-op">×</span>
-        <span>the width of the strip</span>
+        <span>the shots that fell in the strip, out of every shot fired</span>
         <span class="lad-op">=</span>
-        <span>how often an error falls in it</span>
+        <span>the height of the law there, times the width of the strip</span>
       </div>
       <div class="lad-row lad-sym">
-        <span class="k-e">φ(ε, x)</span>
-        <span class="lad-op">·</span>
-        <span>dε</span>
-        <span class="lad-op">=</span>
-        <span>P</span>
+        <span>${relNum}</span>
+        <span class="lad-op"></span>
+        <span><span class="k-e">φ(ε, x)</span> · dε</span>
       </div>
       <div class="lad-row lad-num">
-        <span class="k-e">${fmt(phi, 3)}</span>
-        <span class="lad-op">×</span>
-        <span>${fmt(DE, 2)}</span>
-        <span class="lad-op">=</span>
-        <span>${fmt(p, 4)}</span>
+        <span>${relCount}</span>
+        <span class="lad-op"></span>
+        <span><span class="k-e">${fmt(phi, 3)}</span> × ${fmt(DE, 2)} = ${fmt(p, 4)}</span>
       </div>
-      <div class="lad-note">In modern notation the same line is
-        <i>p</i>(ε) d<i>ε</i> &mdash; φ is a probability density, and Peirce's ε
-        is the error, ξ &minus; x.</div>
-    </div>`;
+    </div>
+    <div class="lad-note">The left side is a tally and nothing else: cases counted
+        out of the cases in the limited universe, which here is every shot fired by this
+        marksman. The right side is the law. Since ε = ξ &minus; x, dξ and dε are the same
+        width; in modern notation the line reads <i>p</i>(ε) d<i>ε</i>, or
+        <i>p</i>(ξ | x) d<i>ξ</i>.</div>`;
   }
 
   function update() {
@@ -189,11 +197,12 @@ registerExample("example-ex2", (box) => {
 
     $("#ex2-readout", content).innerHTML = `<div class="key-insight" style="margin-top:0;">
       <p style="margin-bottom:6px;"><em>${esc(L.name)}</em> &mdash; ${esc(L.gloss)}.</p>
-      ${n ? `<p style="margin-bottom:0;">The law says <strong>${fmt(p, 4)}</strong> of the shots
-              should fall in the shaded strip. Of the ${bigmark(n)} fired,
-              <strong>${bigmark(inStrip)}</strong> did &mdash; ${fmt(inStrip / n, 4)} of them.</p>`
+      ${n ? `<p style="margin-bottom:0;">On ${bigmark(n)} shots the tally comes to
+              <strong>${fmt(inStrip / n, 4)}</strong> against the law's
+              <strong>${fmt(p, 4)}</strong>. Fire more and the two close on each other;
+              that closing is the whole of what the law claims.</p>`
           : `<p style="margin-bottom:0;">The law says ${fmt(p, 4)} of the shots should fall in the
-              shaded strip. Fire some and see.</p>`}
+              shaded strip. Fire some and see whether they do.</p>`}
     </div>`;
 
     $("#ex2-ladder", content).innerHTML = ladder();
