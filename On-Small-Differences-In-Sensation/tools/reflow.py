@@ -29,7 +29,7 @@ import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 ROOT = os.path.dirname(HERE)
-SRC = os.path.join(ROOT, "On Small Differences.html")
+SRC = os.path.join(ROOT, "source", "On Small Differences.html")
 OUT_DIR = os.path.join(ROOT, "build")
 OUT = os.path.join(OUT_DIR, "article.json")
 

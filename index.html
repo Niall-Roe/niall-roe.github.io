@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Niall Roe</title>
+<meta name="description" content="Niall Roe is a PhD candidate in History and Philosophy of Science at the University of Cambridge, working on the philosophy of experimentation, pragmatism, and the philosophy of statistics.">
+<meta name="author" content="Niall Roe">
+<meta property="og:type" content="profile">
+<meta property="og:site_name" content="Niall Roe">
+<meta property="og:title" content="Niall Roe">
+<meta property="og:description" content="Niall Roe is a PhD candidate in History and Philosophy of Science at the University of Cambridge, working on the philosophy of experimentation, pragmatism, and the philosophy of statistics.">
+<meta property="og:url" content="https://niallroe.com/">
+<meta name="twitter:card" content="summary">
+<link rel="canonical" href="https://niallroe.com/">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='4' fill='%232c7fb8'/><text x='16' y='23' font-family='Georgia,serif' font-size='19' fill='white' text-anchor='middle'>N</text></svg>">
+<style>
+  body {
+    font-family: 'Georgia', serif;
+    line-height: 1.7;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 20px;
+    font-size: 16px;
+    background-color: #fafafa;
+    color: #212529;
+  }
+
+  .article-container {
+    background-color: white;
+    padding: 40px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    border-radius: 4px;
+  }
+
+  /* ---- masthead and navigation ---- */
+  header.masthead {
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 14px;
+    margin-bottom: 30px;
+  }
+  header.masthead h1 {
+    font-variant: small-caps;
+    letter-spacing: 1px;
+    font-size: 1.9em;
+    margin: 0 0 10px 0;
+  }
+  header.masthead h1 a { color: inherit; text-decoration: none; }
+
+  nav.site {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.88em;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 22px;
+  }
+  nav.site a {
+    color: #555;
+    text-decoration: none;
+    font-weight: 600;
+    letter-spacing: 0.3px;
+    padding-bottom: 2px;
+    border-bottom: 2px solid transparent;
+  }
+  nav.site a:hover { color: #2c7fb8; }
+  nav.site a[aria-current="page"] {
+    color: #2c7fb8;
+    border-bottom-color: #2c7fb8;
+  }
+
+  /* ---- text ---- */
+  h2 {
+    text-align: center;
+    font-variant: small-caps;
+    letter-spacing: 1px;
+    margin-top: 42px;
+    margin-bottom: 20px;
+    font-size: 1.4em;
+  }
+  h3 {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 1em;
+    letter-spacing: 0.4px;
+    margin: 28px 0 10px 0;
+  }
+
+  p { text-align: justify; hyphens: auto; margin-bottom: 15px; }
+  p.lede { color: #444; }
+
+  a { color: #2c7fb8; }
+
+  ul { padding-left: 22px; }
+  li { margin-bottom: 8px; }
+
+  ul.plain { list-style: none; padding-left: 0; }
+  ul.plain > li {
+    margin-bottom: 16px;
+    padding-left: 16px;
+    border-left: 2px solid #e4e9ee;
+  }
+
+  .meta {
+    display: block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82em;
+    color: #666;
+    line-height: 1.5;
+  }
+  .award { color: #2c7fb8; font-weight: 600; }
+
+  hr { border: none; border-top: 1px solid #dee2e6; margin: 22px 0; }
+
+  /* ---- illustration cards ---- */
+  .cards { display: grid; gap: 22px; margin-top: 24px; }
+  .card {
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 22px 26px;
+    background: #fdfdfd;
+    transition: box-shadow 0.15s, border-color 0.15s;
+  }
+  .card:hover { box-shadow: 0 2px 10px rgba(0,0,0,0.08); border-color: #2c7fb8; }
+  .card h3 {
+    margin-top: 0;
+    font-family: 'Georgia', serif;
+    font-size: 1.2em;
+    font-variant: small-caps;
+    letter-spacing: 0.6px;
+  }
+  .card h3 a { text-decoration: none; }
+  .card p:last-child { margin-bottom: 0; }
+
+  /* ---- CV ---- */
+  .cv-contact {
+    text-align: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.86em;
+    color: #555;
+    line-height: 1.9;
+    margin: -8px 0 6px 0;
+  }
+  .cv-contact .sep { margin: 0 7px; color: #ccc; }
+
+  .cv-actions {
+    text-align: center;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.84em;
+    margin-bottom: 30px;
+  }
+  .cv-actions a {
+    display: inline-block;
+    padding: 6px 16px;
+    border: 1px solid #2c7fb8;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 600;
+  }
+  .cv-actions a:hover { background: #f4f8fb; }
+
+  .cv h3 {
+    font-variant: small-caps;
+    font-family: 'Georgia', serif;
+    font-size: 1.15em;
+    letter-spacing: 1px;
+    border-bottom: 1px solid #dee2e6;
+    padding-bottom: 5px;
+    margin: 36px 0 16px 0;
+  }
+  .cv h4 {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82em;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: #666;
+    margin: 22px 0 10px 0;
+  }
+
+  .entry {
+    display: grid;
+    grid-template-columns: 8.5em 1fr;
+    gap: 0 20px;
+    margin-bottom: 16px;
+  }
+  .entry .when {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82em;
+    font-weight: 600;
+    color: #2c7fb8;
+    line-height: 1.6;
+    padding-top: 2px;
+  }
+  .entry .what { margin: 0; }
+  .entry .what .title { font-weight: 600; }
+  .entry .what .where { display: block; }
+  .entry .what .note {
+    display: block;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.82em;
+    color: #666;
+    line-height: 1.6;
+  }
+  .entry .what p { margin: 0; text-align: left; }
+
+  ul.inline-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  ul.inline-list li { margin-bottom: 4px; }
+
+  @media print {
+    body { background: #fff; font-size: 11pt; max-width: none; padding: 0; }
+    .article-container { box-shadow: none; padding: 0; }
+    header.masthead, footer.site, .cv-actions { display: none; }
+    .cv h3 { margin-top: 20px; }
+    .entry { page-break-inside: avoid; }
+    a { color: #000; text-decoration: none; }
+  }
+
+  /* ---- footer ---- */
+  footer.site {
+    margin-top: 44px;
+    padding-top: 16px;
+    border-top: 1px solid #dee2e6;
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-size: 0.85em;
+    color: #666;
+    text-align: center;
+  }
+  footer.site a { color: #555; text-decoration: none; font-weight: 600; }
+  footer.site a:hover { color: #2c7fb8; }
+  footer.site .sep { margin: 0 8px; color: #ccc; }
+
+  @media (max-width: 640px) {
+    body { padding: 12px; font-size: 15px; }
+    .article-container { padding: 24px 20px; }
+    p { text-align: left; }
+    nav.site { gap: 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="article-container">
+<header class="masthead">
+  <h1><a href="">Niall Roe</a></h1>
+  <nav class="site">
+    <a href="" data-nav="home" aria-current="page">Home</a>
+    <a href="teaching/" data-nav="teaching">Teaching</a>
+    <a href="cv/" data-nav="cv">CV</a>
+    <a href="illustrations/" data-nav="illustrations">Illustrations</a>
+  </nav>
+</header>
+<p class="lede">I am a PhD candidate at the University of Cambridge, in the department of History
+and Philosophy of Science. I am supervised by Dr. Hasok Chang and Dr. Marta Halina.</p>
+
+<p>My main research areas are:</p>
+
+<ul>
+  <li>philosophy of experimentation,</li>
+  <li>pragmatist philosophy of science (esp. C.S. Peirce),</li>
+  <li>teleological explanations in science, and</li>
+  <li>philosophy of statistics.</li>
+</ul>
+
+<p>I am a team member of &ldquo;Using Material Models to Investigate Agency, Innovation, and
+Directionality in Evolution&rdquo;, an international, interdisciplinary research project, led
+by C. Kenneth Waters.</p>
+
+<p>Previously, I practised law at a global law firm in my hometown of Calgary, Alberta,
+Canada. I completed law school at Dalhousie University&rsquo;s Schulich School of Law, and
+hold masters and undergraduate degrees in philosophy from the University of Calgary.</p>
+
+<p>Please feel free to <a href="mailto:nrr32@cam.ac.uk">email me</a>, or find me online at
+my <a href="https://www.hps.cam.ac.uk/directory/roe">department profile</a> and on
+<a href="https://philpeople.org/profiles/niall-roe/publications">PhilPeople</a>. Please
+also see my <a href="teaching/">Teaching</a> page, a copy of my <a href="cv/">CV</a>, and
+my <a href="illustrations/">interactive illustrations</a>.</p>
+
+<h2>Publications</h2>
+
+<ul class="plain">
+  <li>
+    Charles Peirce and Experimental Science.
+    <span class="meta"><em>Transactions of the Charles S. Peirce Society</em>, 61 (1):22&ndash;51 (2025).<br>
+    <span class="award">Winner of the 2024 Charles S. Peirce Society Essay Prize.</span></span>
+  </li>
+  <li>
+    Learning by Trial and Error: The Roles for Purpose in Susan Haack&rsquo;s Legal Pragmatism.
+    <span class="meta">Invited contribution, forthcoming.</span>
+  </li>
+  <li>
+    Metatheoretical Linguistics: A Philosopher&rsquo;s Guide.
+    <span class="meta"><em>Biolinguistics</em> (with Konstantinos Voudouris). An extended review of
+    Nefdt, R., <em>The Philosophy of Theoretical Linguistics</em>.</span>
+  </li>
+</ul>
+
+<h2>Work in Progress</h2>
+
+<ul class="plain">
+  <li>Various projects on the use of statistics in 19th Century experimentation.</li>
+  <li>A paper on Aristotle&rsquo;s influence on Charles Peirce.</li>
+  <li>
+    &ldquo;Invisible Astronomy&rdquo;, a paper on astronomical practices and philosophical
+    questions related to the discovery of Neptune.
+    <span class="meta">With Janna M&uuml;ller.</span>
+  </li>
+  <li>
+    A paper on pursuitworthiness and artificial intelligence.
+    <span class="meta">With Andr&eacute; Curtis-Trudel and Konstantinos Voudouris. Under review.</span>
+  </li>
+  <li>A paper on Noam Chomsky&rsquo;s philosophy of science.</li>
+  <li>A review of <em>Evolution &lsquo;On Purpose&rsquo;: Teleonomy in Living Systems</em>.</li>
+</ul>
+<footer class="site">
+  <a href="mailto:nrr32@cam.ac.uk">Email</a><span class="sep">&middot;</span><a href="https://www.hps.cam.ac.uk/directory/roe">Department Profile</a><span class="sep">&middot;</span><a href="https://philpeople.org/profiles/niall-roe/publications">PhilPeople</a>
+</footer>
+</div>
+</body>
+</html>

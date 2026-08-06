@@ -37,4 +37,12 @@ if [[ "${1:-}" == "--check" ]]; then
 fi
 
 cat "${PARTS[@]}" > index.html
+# Belt as well as braces on the review overlay: it is injected at serve time and
+# must never reach a built page. --check would catch it, but this refuses to write
+# one in the first place.
+if grep -q "review-overlay:injected-at-serve-time" index.html 2>/dev/null; then
+  echo "REFUSING: review overlay code is in index.html" >&2
+  exit 1
+fi
+
 echo "wrote index.html ($(wc -c < index.html | tr -d ' ') bytes)"

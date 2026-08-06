@@ -92,7 +92,7 @@ PROJECTS = [
         "docs": [("math-check.md — 47 formulas verified against the PDF",
                   "Theory-of-Errors-of-Observation/math-check.md"),
                  ("Step Plan.tex — the three-step plan for this paper",
-                  "Theory-of-Errors-of-Observation/On the Theory of Errors of Observation - Step Plan.tex")],
+                  "Theory-of-Errors-of-Observation/source/On the Theory of Errors of Observation - Step Plan.tex")],
     },
     {
         "slug": "On-Small-Differences-In-Sensation",
@@ -197,7 +197,7 @@ def split_examples(text):
     the examples under it; papers without banners get one unnamed group."""
     lines = text.replace("\r\n", "\n").split("\n")
     preamble, groups = [], []
-    cur_group = {"title": None, "examples": []}
+    cur_group = {"title": None, "examples": [], "raw_title": None}
     cur_ex = None
     i = 0
 
@@ -215,14 +215,15 @@ def split_examples(text):
             flush_ex()
             if cur_group["examples"] or cur_group["title"]:
                 groups.append(cur_group)
-            cur_group = {"title": lines[i + 1].strip(), "examples": []}
+            cur_group = {"title": lines[i + 1].strip(), "examples": [],
+                         "raw_title": "\n".join(lines[i:i + 3])}
             i += 3
             continue
 
         m = EX_HEAD.match(line)
         if m:
             flush_ex()
-            cur_ex = {"heading": m.group(1).strip(), "body": []}
+            cur_ex = {"heading": m.group(1).strip(), "body": [], "raw_heading": line}
             i += 1
             continue
 
@@ -233,7 +234,8 @@ def split_examples(text):
             if cur_group["examples"] or cur_ex is not None:
                 flush_ex()
                 groups.append(cur_group)
-                cur_group = {"title": t.group(1).strip(), "examples": []}
+                cur_group = {"title": t.group(1).strip(), "examples": [],
+                             "raw_title": line}
                 i += 1
                 continue
 
@@ -337,6 +339,74 @@ def parse_notes(path):
     for g in groups:
         g["examples"] = [classify(e) for e in g["examples"]]
     return preamble, groups
+
+
+FRONT = re.compile(r"\A---\n(.*?)\n---\n?", re.S)
+
+
+def read_front(text):
+    """Split `---` frontmatter off the body. Values are scalars only — no nesting —
+    which is all these files need and keeps this free of a YAML dependency."""
+    m = FRONT.match(text)
+    if not m:
+        return {}, text
+    meta = {}
+    for line in m.group(1).split("\n"):
+        if ":" not in line:
+            continue
+        k, _, v = line.partition(":")
+        v = v.strip()
+        if len(v) > 1 and v[0] == v[-1] == '"':
+            v = v[1:-1]
+        meta[k.strip()] = v
+    return meta, text[m.end():]
+
+
+def parse_notes_dir(d):
+    """Same shape as parse_notes, read from one-file-per-entry. Order comes from the
+    numeric filename prefix, so the reading view matches the original sequence."""
+    preamble = ""
+    groups = [{"title": None, "examples": [], "raw_title": None}]
+
+    for f in sorted(Path(d).glob("*.md")):
+        meta, body = read_front(f.read_text(errors="replace"))
+        if meta.get("preamble") == "true":
+            preamble = body.strip()
+            continue
+        if meta.get("group_heading") == "true":
+            title = "\n".join(l for l in body.strip().split("\n")
+                              if l.strip() and not BANNER.match(l.strip()))
+            groups.append({"title": title.lstrip("# ").strip(), "examples": [],
+                           "raw_title": body.strip()})
+            continue
+
+        ex = {"heading": meta.get("heading", f.stem), "body": body.split("\n"),
+              "raw_heading": "", "file": str(f.relative_to(ROOT))}
+        classify(ex)
+        # Frontmatter is declared, so it wins over anything derived from the body.
+        if meta.get("number"):
+            ex["num"] = int(meta["number"])
+        if meta.get("title"):
+            ex["title"] = meta["title"]
+        if meta.get("status") in STATUS:
+            ex["status"] = meta["status"]
+        ex["container"] = meta.get("container")
+        ex["anchor"] = meta.get("anchor")
+        ex["position"] = meta.get("position")
+        groups[-1]["examples"].append(ex)
+
+    return preamble, [g for g in groups if g["examples"] or g["title"]]
+
+
+def load_notes(p):
+    """Prefer <paper>/notes/ when it exists; fall back to the single .tex."""
+    d = ROOT / p["slug"] / "notes"
+    if d.is_dir() and any(d.glob("*.md")):
+        return parse_notes_dir(d), str(d.relative_to(ROOT))
+    src = ROOT / p["notes"] if p.get("notes") else None
+    if src and src.exists():
+        return parse_notes(src), p["notes"]
+    return None, None
 
 
 # ---------------------------------------------------------------------------
@@ -520,7 +590,7 @@ def status_chip(st):
     return f'<span class="st st-{st}" title="{e(blurb)}">{e(label)}</span>'
 
 
-def notes_page(p, groups, preamble):
+def notes_page(p, groups, preamble, source):
     counts = tally(groups)
     total = sum(counts.values())
     attention = sum(counts.get(k, 0) for k in ("awaiting", "building", "early", "blank"))
@@ -553,8 +623,19 @@ def notes_page(p, groups, preamble):
                 head = f'<span class="exn">{ex["num"]}</span><span class="untitled">untitled</span>'
             else:
                 head = inline(ex["title"] or "untitled")
+            # Deep link to the example itself, so reading an entry and looking at
+            # the thing it describes is one click rather than a hunt down the page.
+            links = []
+            if ex.get("container"):
+                links.append(f'<a class="jump" target="_blank" rel="noopener" '
+                             f'href="../{e(p["slug"])}/index.html#{e(ex["container"])}">'
+                             f'open in page ↗</a>')
+            if ex.get("file"):
+                links.append(f'<a class="jump plain" target="_blank" rel="noopener" '
+                             f'href="../{e(ex["file"])}">edit note ↗</a>')
+
             body.append(f'''<article class="ex ex-{ex["status"]}" id="ex-{n}" data-s="{ex["status"]}">
-  <header><h3>{head}</h3>{status_chip(ex["status"])}</header>
+  <header><h3>{head}</h3><div class="ex-tools">{"".join(links)}{status_chip(ex["status"])}</div></header>
   <div class="notes-body">{render_body(ex["raw"])}</div>
 </article>''')
             n += 1
@@ -568,7 +649,7 @@ def notes_page(p, groups, preamble):
 <p class="crumb"><a href="index.html">← Status</a></p>
 <h1>{e(p["title"])}</h1>
 <p class="sub">{total} entries in
-  <a href="../{e(p["notes"])}">{e(Path(p["notes"]).name)}</a>.
+  <a href="../{e(source)}">{e(Path(source).name)}</a>.
   Written to the file's own format; see
   <a href="CONVENTIONS.md">CONVENTIONS.md</a> for the one to write new entries to.</p>
 <div class="strip">{strip}</div>
@@ -810,6 +891,16 @@ h2 a:hover { color:var(--accent); }
 a.leg:hover { border-bottom-color:var(--rule); }
 .leg i { width:9px; height:9px; }
 .leg b { color:var(--ink); font-weight:600; }
+.queue { margin:0 0 2.2rem; }
+.queue h3 { font-size:.72rem; letter-spacing:.07em; text-transform:uppercase;
+  color:var(--s-awaiting); margin:0 0 .55rem; font-weight:600; }
+.wait-list { display:flex; flex-wrap:wrap; gap:.55rem; }
+.wait-item { display:inline-block; background:var(--paper); text-decoration:none;
+  color:var(--ink); font-size:.88rem; padding:.45rem .85rem; border-radius:6px;
+  border:1px solid var(--rule); border-left:3px solid var(--s-awaiting); }
+.wait-item:hover { border-color:var(--s-awaiting); }
+.wait-paper { display:block; font-size:.68rem; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--ink-faint); margin-bottom:.1rem; }
 
 /* filter chips */
 .chips { display:flex; flex-wrap:wrap; gap:.4rem; margin:.9rem 0 .2rem; }
@@ -866,6 +957,12 @@ h2.group { font-size:.75rem; letter-spacing:.1em; text-transform:uppercase;
 .ex-blank{border-left-color:var(--s-blank)} .ex-parked{border-left-color:var(--s-parked)}
 .ex > header { display:flex; justify-content:space-between; align-items:baseline;
   gap:1rem; margin-bottom:.3rem; }
+.ex-tools { display:flex; align-items:center; gap:.6rem; flex:none; }
+.jump { font-size:.72rem; color:var(--accent); text-decoration:none; white-space:nowrap;
+  opacity:0; transition:opacity .12s; }
+.jump.plain { color:var(--ink-faint); }
+.ex:hover .jump, .jump:focus { opacity:1; }
+.jump:hover { text-decoration:underline; }
 .ex > header h3 { font-size:1.05rem; text-transform:none; letter-spacing:0;
   color:var(--ink); margin:0; font-weight:600; }
 .exn { display:inline-block; min-width:1.6em; color:var(--ink-faint); font-weight:400;
@@ -907,11 +1004,12 @@ def main():
 
     notes = {}
     for p in PROJECTS:
-        if p.get("notes") and (ROOT / p["notes"]).exists():
-            pre, groups = parse_notes(ROOT / p["notes"])
-            notes[p["slug"]] = {"preamble": pre, "groups": groups}
+        loaded, source = load_notes(p)
+        if loaded:
+            pre, groups = loaded
+            notes[p["slug"]] = {"preamble": pre, "groups": groups, "source": source}
             (HERE / f'notes-{p["slug"]}.html').write_text(
-                notes_page(p, groups, pre))
+                notes_page(p, groups, pre, source))
 
     order = {"polish": 0, "building": 1, "text-only": 2, "off-pipeline": 3, "stable": 4}
     projects = sorted(PROJECTS, key=lambda p: (order[p["stage"]], p["title"]))
@@ -946,6 +1044,27 @@ def main():
         f'<div><dt>Build problems</dt><dd>{build_note}</dd></div>',
     ])
 
+    # The queue: every entry awaiting sign-off, as a direct link that opens the
+    # paper with the review panel already on that example. This is the list the
+    # dashboard exists to answer — what is waiting on Niall.
+    waiting = []
+    for p in projects:
+        n = notes.get(p["slug"])
+        if not n:
+            continue
+        for ex in all_examples(n["groups"]):
+            if ex["status"] != "awaiting":
+                continue
+            frag = f'#{e(ex["container"])}' if ex.get("container") else ""
+            label = (f'{ex["num"]}. ' if ex.get("num") is not None else "") + \
+                    str(ex.get("title") or ex.get("heading") or "")
+            waiting.append(
+                f'<a class="wait-item" target="_blank" rel="noopener" '
+                f'href="../{e(p["slug"])}/index.html{frag}">'
+                f'<span class="wait-paper">{e(p["title"])}</span>{e(label)}</a>')
+    queue = (f'<section class="queue"><h3>Waiting on you</h3>'
+             f'<div class="wait-list">{"".join(waiting)}</div></section>') if waiting else ""
+
     (HERE / "index.html").write_text(shell(
         "Status — niall-roe.github.io",
         f'''
@@ -959,6 +1078,8 @@ Branch <code>{e(git("rev-parse", "--abbrev-ref", "HEAD"))}</code> at
  f'<p class="legend">' + "".join(
    f'<span class="leg"><i class="sq sq-{k}"></i>{STATUS[k][0]} <b>{counts[k]}</b></span>'
    for k in STATUS_ORDER if counts.get(k)) + '</p>' if tracked else ''}
+
+{queue}
 
 <div class="grid">{"".join(card(p, facts[p["slug"]], notes.get(p["slug"])) for p in projects)}</div>
 

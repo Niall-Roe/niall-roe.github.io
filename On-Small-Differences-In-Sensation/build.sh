@@ -7,9 +7,9 @@
 #
 # This memoir is set as text alone — no interactive examples — so unlike the
 # Probability of Induction edition there is no JavaScript in the page at all.
-# src/03_lib.js and src/04_scaffold.js are the plotting and example machinery,
-# carried over but deliberately NOT assembled; add them back before 99 if the
-# paper ever grows demonstrations.
+# The plotting and example machinery now lives in ../shared/ (lib.js, scaffold.js)
+# and is deliberately NOT assembled here; add both before 99 if the paper ever
+# grows demonstrations.
 #
 # src/02_article.html is GENERATED. Do not hand-edit it — the edits will be
 # overwritten. Change the pipeline instead:
@@ -53,4 +53,12 @@ if [[ "${1:-}" == "--check" ]]; then
 fi
 
 cat "${PARTS[@]}" > index.html
+# Belt as well as braces on the review overlay: it is injected at serve time and
+# must never reach a built page. --check would catch it, but this refuses to write
+# one in the first place.
+if grep -q "review-overlay:injected-at-serve-time" index.html 2>/dev/null; then
+  echo "REFUSING: review overlay code is in index.html" >&2
+  exit 1
+fi
+
 echo "wrote index.html ($(wc -c < index.html | tr -d ' ') bytes)"

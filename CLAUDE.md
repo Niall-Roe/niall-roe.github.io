@@ -4,6 +4,20 @@ Published, self-contained interactive editions of pre-1900 papers, plus a few co
 apps. This repository **owns the live files** — the copy here is the one that is
 served. If a page needs a change, change it here.
 
+## The site shell
+
+The public site at `niallroe.com` — home, `teaching/`, `cv/`, `illustrations/` and `404.html`
+— is generated from `_site/`:
+
+```bash
+./_site/build.sh          # writes the shell pages
+./_site/build.sh --check  # says whether they are behind _site/
+```
+
+Same rule as the papers: never hand-edit the generated `index.html`. Edit `_site/common/`
+(head, nav, footer) or `_site/pages/` and rebuild. `CNAME` sets the custom domain and must
+stay at the repository root.
+
 ## Building a page
 
 Every page is assembled from parts:
@@ -25,15 +39,22 @@ written for one page runs in another. Do not fork them per paper.
 
 ## Example notes
 
-Each paper has a `<Paper Name> - Examples.tex` beside it listing its examples. The
-format is specified in [`_status/CONVENTIONS.md`](_status/CONVENTIONS.md) — read it
-before editing one.
+Each paper keeps its examples in `<paper>/notes/`, **one file per example**, named
+`NN-slug.md` where NN is reading position. Each carries `---` frontmatter (`number`,
+`status`, `container`, `group`) followed by the entry's sections. The format is
+specified in [`_status/CONVENTIONS.md`](_status/CONVENTIONS.md) — read it before
+editing one.
+
+Edit the single file for the example you are working on; do not rewrite the directory.
+The old monolithic `<Paper Name> - Examples.tex` is kept as a backup of the state
+before the split and is no longer read — do not edit it, and do not treat it as
+current.
 
 **The approval rule.** When you finish implementing suggestions, do not record them as
-completed. Move them to `### Awaiting approval`, set the entry's `Status: awaiting
-approval`, and say so in your reply. They move to `### Completed` only after Niall has
-looked at the page and confirmed. The notes file must never claim his sign-off on his
-behalf.
+completed. Move them to `### Awaiting approval`, set that entry's frontmatter to
+`status: awaiting`, and say so in your reply. They move to `### Completed` only after
+Niall has looked at the page and confirmed. The notes file must never claim his
+sign-off on his behalf.
 
 Rejected work goes back to `### Suggestions` with a note on what was wrong, rather than
 being deleted — the next attempt should know what the last one got wrong.

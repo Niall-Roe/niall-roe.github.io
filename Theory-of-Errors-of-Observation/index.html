@@ -2331,6 +2331,33 @@ function radios(name, label, choices, selected, stacked) {
     `<label><input type="radio" name="${name}" value="${esc(v)}"${v === selected ? " checked" : ""}> ${esc(t)}</label>`).join("");
   return h(`<div class="ctl"><label>${label}</label><div class="radio-row${stacked ? " stacked" : ""}">${items}</div></div>`);
 }
+/* A row of preset buttons, one of them current. `items` are [value, label, class]
+   triples, the class being one of the btn-* colours. Returns the bar, carrying a
+   _set(value) that moves the highlight WITHOUT firing the callback — for when a
+   slider has been dragged past every preset, in which case nothing is highlighted
+   and the reader can see they have taken the controls over.
+
+   Labels are not escaped, so they may carry entities, as slider() labels do. */
+function btnGroup(items, selected, onPick) {
+  const bar = h(`<div class="ex-buttonbar">${items.map(([v, label, cls]) =>
+    `<button class="btn ${cls || "btn-secondary"}" data-val="${esc(v)}">${label}</button>`
+  ).join("")}</div>`);
+
+  const set = (v) => $$("[data-val]", bar).forEach((b) =>
+    b.classList.toggle("is-active", b.getAttribute("data-val") === String(v)));
+
+  bar.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-val]");
+    if (!b || !bar.contains(b)) return;
+    const v = b.getAttribute("data-val");
+    set(v);
+    if (onPick) onPick(v);
+  });
+
+  set(selected);
+  bar._set = set;
+  return bar;
+}
 function numberInput(id, label, value, min, max, step) {
   return h(`<div class="ctl"><label for="${id}">${label}</label>
     <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}"></div>`);
@@ -2351,10 +2378,15 @@ function setSlider(id, v) {
    Example scaffolding: click a highlighted passage to open its demonstration.
    Content is built lazily the first time a container is opened.
 
-   Carried over unchanged from the Probability of Induction edition, so that
-   the two papers behave identically: the same trigger, the same growth, the
-   same rule that the text on the page is the authors' unless you are actively
-   driving it.
+   SHARED. This file is assembled into every paper on the site from ../shared/,
+   so there is one copy and the papers cannot drift apart. Nothing here may know
+   about a particular example; anything paper-specific belongs in that paper's
+   own part files.
+
+   The one concession is #peirce-table-block in the live-number host selector:
+   the Probability of Induction's granary table drives live figures from outside
+   any example container. Other papers have no such element, so it costs them
+   nothing.
    ========================================================================*/
 
 const BUILDERS = {};
@@ -2426,7 +2458,7 @@ function refreshLiveInner(driverId, rec) {
   document.addEventListener(type, (ev) => {
     const t = ev.target;
     if (!t || !t.closest) return;
-    const host = t.closest(".example-container[id]");
+    const host = t.closest(".example-container[id], #peirce-table-block");
     if (host && LIVE[host.id]) refreshLive(host.id);
   });
 });
@@ -3358,7 +3390,7 @@ function dayCounts(d) {
       const pb = $("#ex3-plate-body", body);
       if (plateOriginal) {
         pb.innerHTML = `<figure class="plate-orig">
-          <img src="Text/plate-27.png" alt="Plate 27, diagrams illustrating Appendix No. 21">
+          <img src="images/plate-27.png" alt="Plate 27, diagrams illustrating Appendix No. 21">
           <figcaption>Plate 27 as engraved for the Coast Survey Report for 1870.</figcaption></figure>`;
       } else {
         $("#ex3-plate-ctl", body).appendChild(passSlider("ex3_pass_p"));

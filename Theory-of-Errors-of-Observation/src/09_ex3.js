@@ -240,7 +240,7 @@
       const pb = $("#ex3-plate-body", body);
       if (plateOriginal) {
         pb.innerHTML = `<figure class="plate-orig">
-          <img src="Text/plate-27.png" alt="Plate 27, diagrams illustrating Appendix No. 21">
+          <img src="images/plate-27.png" alt="Plate 27, diagrams illustrating Appendix No. 21">
           <figcaption>Plate 27 as engraved for the Coast Survey Report for 1870.</figcaption></figure>`;
       } else {
         $("#ex3-plate-ctl", body).appendChild(passSlider("ex3_pass_p"));

@@ -5,19 +5,29 @@ shape they should all take. It is the Probability of Induction file's shape, wit
 status line added and the built-record split in two so that work waiting on your
 approval is visibly separate from work you have signed off.
 
-## Where the file lives
+## Where the files live
 
-One per paper, beside the page it describes:
+One directory per paper, one file per example:
 
-    <paper>/<Paper Name> - Examples.tex
+    <paper>/notes/12-the-urn-with-finite-balls.md
+
+The `NN-` prefix is reading position, which is what fixes the order — it is not the
+example number, because Errors of Observation numbers in build order and has gaps.
+Section banners get their own `NN-group-*.md` file so they keep their place.
+
+The old `<Paper Name> - Examples.tex` is kept as a backup of the pre-split state and
+is no longer read.
 
 ## The entry
 
-Each example is one `##` heading, and nothing else in the file uses `##`.
-
 ```
-## 12 — The urn with a finite number of balls
-Status: awaiting approval
+---
+number: 12
+title: "The urn with a finite number of balls"
+status: awaiting
+group: "SECTION II — COMPLEX AND STATISTICAL DEDUCTION"
+container: example-ex12
+---
 
 ### Text
 "As we cannot have an urn with an infinite number of balls to represent the
@@ -36,10 +46,12 @@ What I built this pass and what it does. Stays here until you say it is right.
 What is built and signed off. Newest first.
 ```
 
-- **Heading.** Number, an em dash, a short title. The number is the margin numeral on
-  the page, so it must match the container id (`example-ex12`).
-- **Status.** One of the six below. If the line is absent it is derived from which
-  sections have content, but write it — derivation guesses.
+- **number / title.** The number is the margin numeral on the page.
+- **status.** One of the six below. If absent it is derived from which sections have
+  content, but write it — derivation guesses.
+- **container.** The example's id in the article. This is what the deep links and the
+  review overlay address by, so it is only set once the example actually exists — an
+  entry that is merely planned has no container, and a wrong one is worse than none.
 - **Text.** The anchor passage, quoted, exactly as it appears in the article. This is
   what the trigger attaches to.
 - **Suggestions.** Open items only. When one is done it moves down, it does not get
@@ -94,6 +106,9 @@ in one line per example if you want it changed.
 | Probability of Induction | `## N` | `### Suggestions` | `### Recently completed` | none |
 | A Theory of Probable Inference | `## N` | `Suggestion.` | `--- BUILT: EXAMPLE N ---` | `[great]` inline |
 | Errors of Observation | `## <slug>` | freeform prose | `--- BUILT ---` + `REVISION N` | none |
+
+Those bodies were carried into the split verbatim, so each paper still reads in its
+own idiom inside its per-example files. New entries should use the sections above.
 
 So: no, there is no single convention today. The three files agree on using `##` per
 entry and on quoting the anchor passage, and diverge on everything else — the spec

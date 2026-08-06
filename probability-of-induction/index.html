@@ -2028,6 +2028,33 @@ function radios(name, label, choices, selected, stacked) {
     `<label><input type="radio" name="${name}" value="${esc(v)}"${v === selected ? " checked" : ""}> ${esc(t)}</label>`).join("");
   return h(`<div class="ctl"><label>${label}</label><div class="radio-row${stacked ? " stacked" : ""}">${items}</div></div>`);
 }
+/* A row of preset buttons, one of them current. `items` are [value, label, class]
+   triples, the class being one of the btn-* colours. Returns the bar, carrying a
+   _set(value) that moves the highlight WITHOUT firing the callback — for when a
+   slider has been dragged past every preset, in which case nothing is highlighted
+   and the reader can see they have taken the controls over.
+
+   Labels are not escaped, so they may carry entities, as slider() labels do. */
+function btnGroup(items, selected, onPick) {
+  const bar = h(`<div class="ex-buttonbar">${items.map(([v, label, cls]) =>
+    `<button class="btn ${cls || "btn-secondary"}" data-val="${esc(v)}">${label}</button>`
+  ).join("")}</div>`);
+
+  const set = (v) => $$("[data-val]", bar).forEach((b) =>
+    b.classList.toggle("is-active", b.getAttribute("data-val") === String(v)));
+
+  bar.addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-val]");
+    if (!b || !bar.contains(b)) return;
+    const v = b.getAttribute("data-val");
+    set(v);
+    if (onPick) onPick(v);
+  });
+
+  set(selected);
+  bar._set = set;
+  return bar;
+}
 function numberInput(id, label, value, min, max, step) {
   return h(`<div class="ctl"><label for="${id}">${label}</label>
     <input type="number" id="${id}" value="${value}" min="${min}" max="${max}" step="${step}"></div>`);
@@ -2047,6 +2074,16 @@ function setSlider(id, v) {
 /* ==========================================================================
    Example scaffolding: click a highlighted passage to open its demonstration.
    Content is built lazily the first time a container is opened.
+
+   SHARED. This file is assembled into every paper on the site from ../shared/,
+   so there is one copy and the papers cannot drift apart. Nothing here may know
+   about a particular example; anything paper-specific belongs in that paper's
+   own part files.
+
+   The one concession is #peirce-table-block in the live-number host selector:
+   the Probability of Induction's granary table drives live figures from outside
+   any example container. Other papers have no such element, so it costs them
+   nothing.
    ========================================================================*/
 
 const BUILDERS = {};
@@ -2055,18 +2092,13 @@ const BUILT = {};
 function registerExample(id, builder) { BUILDERS[id] = builder; }
 
 /* --------------------------------------------------------------------------
-   Live numbers in Peirce's own text.
+   Live numbers in the authors' own text.
 
    A figure in the prose carries data-live="<driver>:<key>", where <driver> is
    the id of the example whose controls move it. While that example is shut the
-   span shows exactly what Peirce printed; while it is open the span shows what
-   the sliders say, in the colour of the slider saying it. Closing the example
-   restores his text — the document is his unless you are actively driving it.
-
-   Nothing here knows about any particular example: each one registers its own
-   set of getters, and any input/change/click inside its container re-reads
-   them. #peirce-table-block is always on the page, so it passes an engaged()
-   of its own (its sliders being off Peirce's figures) instead of open/shut.
+   span shows exactly what was printed in 1885; while it is open the span shows
+   what the sliders say, in the colour of the slider saying it. Closing the
+   example restores the memoir.
    ------------------------------------------------------------------------*/
 const LIVE = {};
 const LIVE_OPEN = new Set();
@@ -2099,14 +2131,14 @@ function refreshLiveInner(driverId, rec) {
   const on = liveEngaged(driverId);
   const prefix = driverId + ":";
   $$(`[data-live^="${prefix}"]`).forEach((el) => {
-    if (el.dataset.peirce === undefined) el.dataset.peirce = el.innerHTML;
+    if (el.dataset.printed === undefined) el.dataset.printed = el.innerHTML;
     const key = el.getAttribute("data-live").slice(prefix.length);
     let out = null;
     if (on && rec.get[key]) {
       try { out = rec.get[key](); } catch (e) { out = null; }
     }
     if (out === null || out === undefined) {
-      if (el.innerHTML !== el.dataset.peirce) el.innerHTML = el.dataset.peirce;
+      if (el.innerHTML !== el.dataset.printed) el.innerHTML = el.dataset.printed;
       el.classList.remove("is-live");
       return;
     }
@@ -2127,6 +2159,24 @@ function refreshLiveInner(driverId, rec) {
     if (host && LIVE[host.id]) refreshLive(host.id);
   });
 });
+
+/* --------------------------------------------------------------------------
+   Clauses that own a stretch of a slider's travel. A paragraph marked up with
+   data-band-for="<driver>" and data-band="lo,hi" lights while the driver's
+   reported position is inside [lo, hi), so the prose reads as a running
+   commentary on where the control is. The driver reports its position by
+   calling bandPosition(id, x).
+   ------------------------------------------------------------------------*/
+function bandPosition(driverId, x) {
+  $$(`[data-band-for="${driverId}"]`).forEach((el) => {
+    const [lo, hi] = el.getAttribute("data-band").split(",").map(Number);
+    el.classList.toggle("band-on", x >= lo && x < hi);
+  });
+}
+
+function bandsOff(driverId) {
+  $$(`[data-band-for="${driverId}"]`).forEach((el) => el.classList.remove("band-on"));
+}
 
 /* --------------------------------------------------------------------------
    Opening an example. The container is a one-row grid whose row goes 0fr ->
@@ -2163,7 +2213,7 @@ document.addEventListener("click", (ev) => {
   $$(`[data-hl-for="${id}"]`).forEach((el) => el.classList.toggle("hl-on", opening));
 
   if (opening) { LIVE_OPEN.add(id); requestAnimationFrame(redrawAll); }
-  else LIVE_OPEN.delete(id);
+  else { LIVE_OPEN.delete(id); bandsOff(id); }
   refreshLive(id);
 });
 
@@ -2185,21 +2235,19 @@ document.addEventListener("transitionend", (ev) => {
 $$(".example-container").forEach((box) => box.setAttribute("inert", ""));
 
 /* Each example's number in the gutter beside the passage that opens it, taken
-   from its own id so it matches the part files in src/. The granary table has
-   no trigger — it is always on the page — so it is labelled directly. */
+   from its own id so it matches the part files in src/. */
+const NUMBERED = new Set();
 $$("[data-toggle]").forEach((trg) => {
-  const m = /(\d+)$/.exec(trg.getAttribute("data-toggle") || "");
-  if (!m || $(".ex-num", trg)) return;
+  const id = trg.getAttribute("data-toggle") || "";
+  const m = /(\d+)$/.exec(id);
+  // an example may be opened from several passages in a row; only the first of
+  // them takes the number, or the gutter reads as several examples alike
+  if (!m || NUMBERED.has(id) || $(".ex-num", trg)) return;
+  NUMBERED.add(id);
   trg.insertBefore(h(`<span class="ex-num" aria-hidden="true">${m[1]}</span>`), trg.firstChild);
 });
-(function numberGranary() {
-  const host = document.getElementById("peirce-table-block");
-  if (host && !$(".ex-num", host)) {
-    host.insertBefore(h(`<span class="ex-num" aria-hidden="true">14</span>`), host.firstChild);
-  }
-})();
 
-/* collapsible inner header, as in the Shiny version */
+/* collapsible inner header */
 function exHeader(title, contentId) {
   const el = h(`<div class="example-header">${esc(title)}</div>`);
   el.addEventListener("click", () => {
@@ -2210,6 +2258,17 @@ function exHeader(title, contentId) {
   });
   return el;
 }
+</script>
+<script>
+/* The granary table carries example 14's numeral in the margin although it is
+   not an example container — it is always on the page. Kept here rather than in
+   the shared scaffold, which must not know about any particular example. */
+(function numberGranary() {
+  const host = document.getElementById("peirce-table-block");
+  if (host && !document.querySelector("#peirce-table-block .ex-num")) {
+    host.insertBefore(h(`<span class="ex-num" aria-hidden="true">14</span>`), host.firstChild);
+  }
+})();
 
 /* ==========================================================================
    Shared card-deck framework (create_grid / evaluate_consequent /

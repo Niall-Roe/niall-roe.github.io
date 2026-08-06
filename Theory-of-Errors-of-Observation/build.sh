@@ -19,9 +19,8 @@ cd "$(dirname "$0")"
 PARTS=(
   src/01_head.html     # <head>, all CSS, the peirce-swirl symbol, opens .article-container
   src/02_article.html  # Peirce's text, example containers, footnotes
-  src/03_lib.js        # dnorm/pnorm/qnorm, the canvas renderer, DOM helpers
-  src/04_scaffold.js   # example framework and live numbers — SHARED VERBATIM with
-                       #   the other papers on this site; do not fork it here
+  ../shared/lib.js       # SHARED maths, canvas renderer, DOM helpers
+  ../shared/scaffold.js  # SHARED example framework — see shared/scaffold.js
   src/05_laws.js       # this paper's four laws of facility, used by every example
   src/06_ex1.js        # example 1 (the quantity observed and the quantity wanted)
   src/07_ex2.js        # example 2 (the law of the facility of errors)
@@ -45,4 +44,12 @@ if [[ "${1:-}" == "--check" ]]; then
 fi
 
 cat "${PARTS[@]}" > index.html
+# Belt as well as braces on the review overlay: it is injected at serve time and
+# must never reach a built page. --check would catch it, but this refuses to write
+# one in the first place.
+if grep -q "review-overlay:injected-at-serve-time" index.html 2>/dev/null; then
+  echo "REFUSING: review overlay code is in index.html" >&2
+  exit 1
+fi
+
 echo "wrote index.html ($(wc -c < index.html | tr -d ' ') bytes)"
