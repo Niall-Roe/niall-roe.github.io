@@ -2,13 +2,12 @@
 position: 4
 number: 1
 title: "The quantity observed and the quantity wanted"
-status: awaiting
+status: done
 anchor: "We now pass to the theory of observations. An observation gives us the value of a certain quantity which is connected with an unknown quantity in such a way as to be partly dependent on the latter value, and partly on accidental circumstances, not capable of being separately taken account of"
 group: "The Theory of Observations"
 container: example-ex1
 heading: "1 — The quantity observed and the quantity wanted"
 ---
-
 Status: awaiting approval
 
 ### Text
@@ -34,7 +33,7 @@ circumstances, not capable of being separately taken account of."
   want keeping. The transit instrument as the running example is open too. It is
   marked with a TO EDIT comment at the top of src/06_ex1.js.
 
-### Awaiting approval
+### Completed
 
 #### the statement at the top, the cumulative cloud, the residual
 
@@ -63,7 +62,3 @@ shown, both brackets draw, and the gap between them is the difference between an
 error and a residual.
 
 All closing prose cut, at your instruction. The example ends at the plots.
-
-### Completed
-
-None yet.

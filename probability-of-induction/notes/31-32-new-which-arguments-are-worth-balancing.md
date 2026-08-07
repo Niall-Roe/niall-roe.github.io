@@ -1,9 +1,9 @@
 ---
+blocked: true
 position: 31
 status: building
 heading: "32 (new) — which arguments are worth balancing"
 ---
-
 ### Suggestions
 
 [from the build] Where it hangs. It is provisionally on a note of its own after
@@ -12,6 +12,10 @@ are waiting for. Easy to move once you have picked a home for it.
 
 [from the build] The placeholder on 32's first tab still says "example to come";
 it can be pointed at 34 whenever you want it wired up.
+
+---
+
+[from the build] Both open items here are questions for you, not work I can do: where the note should live in the text, and whether to wire its first tab to 34.
 
 ### Completed
 

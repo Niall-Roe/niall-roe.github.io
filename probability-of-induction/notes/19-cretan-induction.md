@@ -8,16 +8,58 @@ heading: "20 — cretan induction"
 ---
 ### Suggestions
 
-[from the build] The sample is capped at twenty rather than forty. Past that the
-hundred is too small a population for the bound to hold.
+connect the sentence "I do not in the least..." back up with the semicolon from the previous line. 
 
-when the previous example is open we cannot see the names. make the previous example open at the end of its anchor so that this one goes from the next bit onwards, so we can see the names. 
+make the "within 15 of a hundred" the same colour as "an error bound of ±0.1508."
 
-the prose that appears when you reveal the proportion is way too verbose. way too much. 
+### Awaiting approval
 
-instead, lets add in after the worst case sentence a "while in the best case, where nearly all cretans are liars, we would not be in error more than xxx. then we can continue: our last induction of [whatever, spell it out as you do] gave us xx, and  if we think that xx cretans are liars, we can expect not to be in error more than yy. [then the reveal] In fact, we see that zzz creates in 100 are liars, which is [not] within our prediction of  xx+- yy 
+#### the reveal cut to three clauses, and the best case stated
 
-or somethign liek that, as I may be missing something.
+**The prose.** Rewritten to your structure and nothing else. Before the reveal:
+"Our last induction from five gave us 0.600, and if we think that 60 Cretans in a
+hundred are liars, we can expect not to be in error by more than fifteen in a
+hundred." After it: "In fact, we see that 70 Cretans in 100 are liars, which is
+within our prediction of 0.600 +/- 0.148" — with "not" in bold when it falls
+outside.
+
+The bound quoted is worked at the proportion the sample actually gave, not at
+the worst case. The worst case is the only bound available before you have drawn
+anything, which is why Peirce's sentence states it; an inquirer holding a sample
+has a better one.
+
+What I cut and did not put back: the running tally of how often the bound held
+over many draws. It was most of the length, and the cascade chart's title
+already counts it ("N of these M catch the truth"). The two are also not the
+same quantity — the chart's tally is worked at the worst-case bound, which is
+what it draws, so printing both in one sentence invited a comparison that does
+not hold. Say the word and it comes back as its own short clause.
+
+**The best case.** A new sentence after your worst-case one, marked as the
+apparatus rather than as Peirce: "While in the best case, where nearly all
+Cretans are liars, it would not be in error by more than three in a hundred."
+Stated at ninety-nine in a hundred, since a hundred Cretans make that the
+nearest thing to "nearly all". At his own five instances the contrast is three
+in a hundred against his 1/6.
+
+**A flaw your rewrite exposed.** Working the bound at the estimate breaks when
+the sample comes out all one way: 0.477 root(2p(1-p)/s) at p = 1 is exactly
+zero, so it read "1.000 +/- 0.000" — a claim of certainty off five instances.
+His own unmixed five are all liars, so that was the opening state, not an edge
+case. At the ends it now falls back to his worst case and says so: "a sample all
+one way leaves that formula nothing to work with — so we fall back on Peirce's
+worst case". Which is itself the argument for why he states it that way.
+
+**The names.** Example 19 now opens at the end of its own sentence rather than
+after the next one, so the Cretan names sit between the two examples and stay in
+view while 20 is open. This splits one of Peirce's paragraphs in two at "But
+when I reason in the opposite direction" — the only way to put a container
+between the halves. Closed, the gap is taken back out so the two read as the one
+paragraph they are; open, 19's example sits in the break. Say if you would
+rather keep the paragraph whole and solve the visibility another way.
+
+The twenty-instance cap is unchanged — that note was mine explaining why it is
+twenty rather than forty, not something to act on.
 
 ### Completed
 

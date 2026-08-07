@@ -1,12 +1,12 @@
 ---
 position: 26
-status: building
+status: done
 anchor: "The kernel of it is that the conjoint probability of all the arguments in our possession"
 heading: "27 (new) — which way the connection runs"
 ---
 ### Suggestions
 
-hide the proportion of what sub-example. the trigger text should not be linked. that sub example is not well worked out.
+None open.
 
 ### Completed
 
@@ -82,3 +82,14 @@ Belief slider to see how much it impacts any worldly probability." has come out
 of the readout at the bottom and now sits on its own line at the end of the
 preamble, where it can be read before the sliders rather than after them. The
 readout keeps the two intensities and the gap between them.
+
+#### the sub-example hidden, and its trigger unlinked
+
+"34 (new) — a proportion of what?" is off the page. Its container is out of the
+article and the trigger inside 27's own note is now plain text: the sentence
+still reads "and cannot be used to determine any probability", but it is no
+longer a link and opens nothing.
+
+Nothing is deleted. The example's code is still in src/07_ex912.js, its notes
+entry is intact and still marked done, and a comment sits where the container
+was saying what to put back. Restoring it is two lines.

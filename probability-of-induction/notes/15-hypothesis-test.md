@@ -2,13 +2,13 @@
 position: 15
 number: 16
 title: "hypothesis test"
-status: building
+status: done
 container: example-ex16
 heading: "16 — hypothesis test"
 ---
 ### Suggestions
 
-This one is great. let's make the space between the perforated lines a little smaller.
+None open.
 
 ### Completed
 
@@ -103,3 +103,10 @@ rounding: the root is 1/1,414 rather than 1/1,400, the second probable error
 ten. The odds come out at 3.0e+13 rather than his 10,000,000,000, which is his
 table's last row rather than a computed figure — his conclusion holds with a
 good deal to spare.
+
+#### the perforations closed up
+
+The gap in the perforated rule was a tenth of each unit and is now under a
+sixteenth (0.10 to 0.06 of e1 + e2). The dashes still read as separate lengths
+so they can be counted, but they sit closer to a continuous rule, which is what
+they are measuring.

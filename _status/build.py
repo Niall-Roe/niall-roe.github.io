@@ -393,6 +393,12 @@ def parse_notes_dir(d):
         ex["container"] = meta.get("container")
         ex["anchor"] = meta.get("anchor")
         ex["position"] = meta.get("position")
+        # Orthogonal to status: status says how built the example is, blocked says
+        # the next move is Niall's — a question he has to answer before it can go
+        # further. Cleared automatically when he leaves a note.
+        ex["blocked"] = str(meta.get("blocked", "")).lower() == "true"
+        # ticked by Niall while reviewing: take this one on the next build run
+        ex["queued"] = str(meta.get("queued", "")).lower() == "true"
         groups[-1]["examples"].append(ex)
 
     return preamble, [g for g in groups if g["examples"] or g["title"]]
@@ -747,6 +753,69 @@ def since(datestr):
 # DASHBOARD
 # ---------------------------------------------------------------------------
 
+SUG_PLACEHOLDER = re.compile(r"^[ \t]*None (?:open|yet)\.?[ \t]*$\n?", re.M | re.I)
+
+
+def sections_of(raw):
+    """Split an entry body into its named sections. Anything before the first
+    heading is carried as an untitled lead so nothing is dropped."""
+    out, cur = [], {"title": None, "lines": []}
+    for line in raw.split("\n"):
+        s = line.strip()
+        h = SUB_HEAD.match(s)
+        b = BUILT_MARK.match(s)
+        if h or b:
+            if cur["lines"]:
+                out.append(cur)
+            cur = {"title": h.group(1).strip() if h else "Built", "lines": []}
+            continue
+        cur["lines"].append(line)
+    if cur["lines"]:
+        out.append(cur)
+    return [{"title": s["title"], "text": "\n".join(s["lines"]).strip()}
+            for s in out if "\n".join(s["lines"]).strip()]
+
+
+def text_quote(raw):
+    """The quoted passage in an entry's Text section, for anchoring entries whose
+    frontmatter carries no `anchor:`. By convention the Text section quotes the
+    article exactly, so it serves as the same hook."""
+    for s in sections_of(raw):
+        if (s["title"] or "").strip().lower() == "text":
+            q = s["text"].strip().strip('"“”').strip()
+            return q or None
+    return None
+
+
+def entry_key(ex):
+    """The id the review overlay addresses this entry by, or None if it has no
+    hook at all — no container and no passage to anchor to. Defined here rather
+    than in serve.py because the dashboard's deep links have to agree with it
+    exactly, and two copies of this rule would drift."""
+    if ex.get("container"):
+        return ex["container"]
+    if not (ex.get("anchor") or text_quote(ex.get("raw") or "")):
+        return None
+    pos = ex.get("position")
+    return "anchor:" + (str(pos) if pos is not None else Path(ex["file"]).stem)
+
+
+def has_instruction(ex):
+    """Whether this entry carries something still to build to. That is its
+    Suggestions section with actual content — the placeholder line does not
+    count, and neither does an entry already built and signed off, whose spec
+    is left in place by the older files rather than being cleared."""
+    raw = ex.get("raw") or ""
+    sug = ""
+    for m in re.finditer(r"^###(?!#)\s*(.+?)\s*$", raw, re.M):
+        if m.group(1).strip().lower() == "suggestions":
+            rest = raw[m.end():]
+            nxt = re.search(r"^###(?!#)", rest, re.M)
+            sug = rest[:nxt.start()] if nxt else rest
+            break
+    return bool(SUG_PLACEHOLDER.sub("", sug).strip())
+
+
 def card(p, f, notes):
     if not f.get("exists"):
         return (f'<article class="card"><h2>{e(p["title"])}</h2>'
@@ -756,7 +825,10 @@ def card(p, f, notes):
     built = f["built"]
 
     strip = counts_line = ""
-    if notes:
+    # A notes directory holding only a preamble has no entries yet — a paper set
+    # up to be commented on but not yet commented on. It takes the no-bar branch,
+    # since a progress bar over nothing is a division by zero.
+    if notes and all_examples(notes["groups"]):
         # The bar is the entries themselves, in the squares' own colours, so it
         # never reads 100% while anything is unfinished.
         exs = all_examples(notes["groups"])
@@ -892,6 +964,12 @@ a.leg:hover { border-bottom-color:var(--rule); }
 .leg i { width:9px; height:9px; }
 .leg b { color:var(--ink); font-weight:600; }
 .queue { margin:0 0 2.2rem; }
+.queue > summary.q-top { cursor:pointer; font-size:.72rem; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--s-awaiting); margin:0 0 .55rem; font-weight:600; }
+.qsub { margin:0 0 .5rem; }
+.qsub > summary { cursor:pointer; font-size:.72rem; letter-spacing:.05em;
+  text-transform:uppercase; color:var(--ink-faint); font-weight:600; margin:.7rem 0 .45rem; }
+.qsub > summary span { color:var(--ink); }
 .queue h3 { font-size:.72rem; letter-spacing:.07em; text-transform:uppercase;
   color:var(--s-awaiting); margin:0 0 .55rem; font-weight:600; }
 .wait-list { display:flex; flex-wrap:wrap; gap:.55rem; }
@@ -899,8 +977,50 @@ a.leg:hover { border-bottom-color:var(--rule); }
   color:var(--ink); font-size:.88rem; padding:.45rem .85rem; border-radius:6px;
   border:1px solid var(--rule); border-left:3px solid var(--s-awaiting); }
 .wait-item:hover { border-color:var(--s-awaiting); }
+.wait-item.ask { border-left-color:var(--accent); }
+.wait-item.ask:hover { border-color:var(--accent); }
+.queue h4.sub { font-size:.72rem; letter-spacing:.05em; text-transform:uppercase;
+  color:var(--ink-faint); font-weight:600; margin:.7rem 0 .45rem; }
+.queue h4.sub:first-child { margin-top:0; }
+.queue h4.sub span { color:var(--ink); }
 .wait-paper { display:block; font-size:.68rem; letter-spacing:.05em;
   text-transform:uppercase; color:var(--ink-faint); margin-bottom:.1rem; }
+.queue.todo { margin:-1.4rem 0 2.2rem; }
+.queue.todo summary { cursor:pointer; font-size:.72rem; letter-spacing:.07em;
+  text-transform:uppercase; color:var(--ink-faint); font-weight:600; }
+.queue.todo[open] summary { margin-bottom:.8rem; }
+.queue.todo summary .count { color:var(--ink); }
+.todo-group { margin-bottom:1rem; }
+.todo-group h4 { font-size:.76rem; color:var(--ink-soft); font-weight:600;
+  margin:0 0 .4rem; }
+.todo-group h4 span { color:var(--ink-faint); font-weight:400; }
+.todo-item { display:inline-flex; align-items:center; gap:.5rem; background:var(--paper);
+  color:var(--ink); font-size:.88rem; padding:.35rem .8rem .35rem .45rem; border-radius:6px;
+  border:1px solid var(--rule); border-left:3px solid var(--s-building); }
+.todo-item a { color:inherit; text-decoration:none; }
+.todo-item a:hover { text-decoration:underline; }
+.todo-item:hover { border-color:var(--s-building); }
+.todo-item.queued, .wait-item.queued { border-left-color:var(--ok); background:#f3f7f2; }
+.qtick { flex:none; width:20px; height:20px; line-height:1; padding:0; cursor:pointer;
+  border-radius:4px; border:1px solid var(--rule); background:var(--paper);
+  color:transparent; font-size:.72rem; font-family:inherit; }
+.qtick:hover { border-color:var(--ok); color:#b9c7b5; }
+.todo-item.queued .qtick { background:var(--ok); border-color:var(--ok); color:#fff; }
+.qtick:disabled { opacity:.5; cursor:default; }
+.runbar { display:flex; align-items:baseline; gap:.7rem; flex-wrap:wrap; margin:.1rem 0 .7rem; }
+#build-queued { font:inherit; font-size:.8rem; padding:.35rem .8rem; cursor:pointer;
+  border-radius:5px; border:1px solid var(--rule); background:var(--paper); color:var(--ink); }
+#build-queued:hover { border-color:var(--ok); }
+#build-queued:disabled { opacity:.45; cursor:default; }
+#build-queued-note { font-size:.76rem; }
+#build-queued-text { display:block; width:100%; max-width:34rem; height:5.5rem;
+  margin:0 0 .8rem; font:inherit; font-size:.78rem; padding:.5rem .6rem;
+  border:1px solid var(--rule); border-radius:5px; background:var(--paper);
+  color:var(--ink); resize:vertical; }
+.queue.todo summary .qn { color:var(--ok); font-weight:600; margin-left:.5rem;
+  text-transform:none; letter-spacing:0; }
+.assess-link { font-size:.82rem; margin:.2rem 0 .9rem; }
+.assess-link a { color:var(--accent); }
 
 /* filter chips */
 .chips { display:flex; flex-wrap:wrap; gap:.4rem; margin:.9rem 0 .2rem; }
@@ -992,6 +1112,94 @@ mark.nrr { background:#fbf0d4; color:#6b4c12; padding:.05rem .2rem; border-radiu
 """
 
 
+# The dashboard is regenerated on every request, so a fold would spring back
+# open each time the page is reloaded. Remember each one instead.
+QUEUE_JS = """<script>
+(function () {
+  document.querySelectorAll('details[id^="q-"]').forEach(function (d) {
+    var key = 'queue:' + d.id, saved = localStorage.getItem(key);
+    if (saved !== null) d.open = saved === '1';
+    d.addEventListener('toggle', function () {
+      localStorage.setItem(key, d.open ? '1' : '0');
+    });
+  });
+
+  /* Ticking from here writes the same `queued: true` the review panel writes.
+     Sent without an mtime: this page may have been generated minutes ago, and a
+     stale-file conflict would be a nuisance on a flag this small. */
+  var btn = document.getElementById('build-queued');
+  var note = document.getElementById('build-queued-note');
+
+  function queuedItems() {
+    return [].slice.call(document.querySelectorAll('.todo-item.queued'));
+  }
+  function refresh() {
+    var n = queuedItems().length;
+    var tag = document.querySelector('#q-claude .qn');
+    if (tag) { tag.textContent = n + ' queued'; tag.hidden = !n; }
+    if (btn) btn.disabled = !n;
+  }
+
+  document.querySelectorAll('.todo-item .qtick').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var item = b.closest('.todo-item');
+      var on = !item.classList.contains('queued');
+      b.disabled = true;
+      fetch('/_review/queue', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ file: item.dataset.file, queued: on })
+      }).then(function (r) { return r.json(); })
+        .then(function (j) {
+          if (!j.ok) throw new Error(j.error || 'could not save');
+          item.classList.toggle('queued', on);
+          b.setAttribute('aria-pressed', String(on));
+          refresh();
+        })
+        .catch(function (err) {
+          if (note) note.textContent = String(err.message || err);
+        })
+        .then(function () { b.disabled = false; });
+    });
+  });
+
+  /* A page cannot start a build — nothing here can summon Claude Code. What it
+     can do is hand over the exact instruction and the list it applies to. */
+  if (btn) {
+    btn.addEventListener('click', function () {
+      var names = queuedItems().map(function (i) {
+        return '- ' + i.querySelector('a').textContent.trim();
+      });
+      var text = 'do a build run\\n\\nQueued:\\n' + names.join('\\n');
+      /* The textarea is the reliable path — clipboard.writeText needs the
+         document focused and silently does nothing when it is not. Show the
+         text either way, so there is always something to copy by hand. */
+      var box = document.getElementById('build-queued-text');
+      if (!box) {
+        box = document.createElement('textarea');
+        box.id = 'build-queued-text';
+        box.readOnly = true;
+        btn.parentNode.parentNode.insertBefore(box, btn.parentNode.nextSibling);
+      }
+      box.value = text;
+      box.hidden = false;
+      box.focus();
+      box.select();
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () {
+          note.textContent = 'Copied — paste it into a Claude Code session in this repo.';
+        }, function () {
+          note.textContent = 'Select the text below and copy it.';
+        });
+      } else {
+        note.textContent = 'Select the text below and copy it.';
+      }
+    });
+  }
+  refresh();
+})();
+</script>"""
+
+
 def shell(title, body, cls=""):
     return (f'<!DOCTYPE html>\n<html lang="en"><head><meta charset="utf-8">'
             f'<meta name="viewport" content="width=device-width, initial-scale=1">'
@@ -1047,23 +1255,94 @@ def main():
     # The queue: every entry awaiting sign-off, as a direct link that opens the
     # paper with the review panel already on that example. This is the list the
     # dashboard exists to answer — what is waiting on Niall.
-    waiting = []
+    def wait_link(p, ex, cls, with_paper=True):
+        # Same key the review overlay addresses entries by, so the link opens the
+        # panel on this entry whether or not it has been built yet. An entry with
+        # no hook gets no fragment — the link still reaches the paper.
+        key = entry_key(ex)
+        frag = ("#" + e(key)) if key else ""
+        label = (f'{ex["num"]}. ' if ex.get("num") is not None else "") + \
+                str(ex.get("title") or ex.get("heading") or "")
+        # The paper name is worth repeating in a flat list, but not under a
+        # heading that already names it.
+        paper = f'<span class="wait-paper">{e(p["title"])}</span>' if with_paper else ""
+        return (f'<a class="{cls}" target="_blank" rel="noopener" '
+                f'href="../{e(p["slug"])}/index.html{frag}">{paper}{e(label)}</a>')
+
+    def todo_chip(p, ex):
+        """A chip with its own tick, so the queue can be set from here rather
+        than by opening each example in turn."""
+        key = entry_key(ex)
+        frag = ("#" + e(key)) if key else ""
+        label = (f'{ex["num"]}. ' if ex.get("num") is not None else "") + \
+                str(ex.get("title") or ex.get("heading") or "")
+        on = ex.get("queued")
+        return (f'<span class="todo-item{" queued" if on else ""}" '
+                f'data-file="{e(ex["file"])}">'
+                f'<button class="qtick" aria-pressed="{"true" if on else "false"}" '
+                f'title="Queue for the next build run">✓</button>'
+                f'<a target="_blank" rel="noopener" '
+                f'href="../{e(p["slug"])}/index.html{frag}">{e(label)}</a></span>')
+
+    # Two piles. Yours is what has been built and needs a yes or no. Mine is
+    # everything carrying an instruction that is not built to it yet — which is
+    # the far longer list, so it is folded away.
+    approve, answer, queued, todo = [], [], [], {}
     for p in projects:
         n = notes.get(p["slug"])
         if not n:
             continue
         for ex in all_examples(n["groups"]):
-            if ex["status"] != "awaiting":
-                continue
-            frag = f'#{e(ex["container"])}' if ex.get("container") else ""
-            label = (f'{ex["num"]}. ' if ex.get("num") is not None else "") + \
-                    str(ex.get("title") or ex.get("heading") or "")
-            waiting.append(
-                f'<a class="wait-item" target="_blank" rel="noopener" '
-                f'href="../{e(p["slug"])}/index.html{frag}">'
-                f'<span class="wait-paper">{e(p["title"])}</span>{e(label)}</a>')
-    queue = (f'<section class="queue"><h3>Waiting on you</h3>'
-             f'<div class="wait-list">{"".join(waiting)}</div></section>') if waiting else ""
+            # Blocked outranks status: whatever state the example is in, if the
+            # next move is a question only Niall can answer it belongs on his pile.
+            if ex.get("blocked"):
+                answer.append(wait_link(p, ex, "wait-item ask"))
+            elif ex["status"] == "awaiting":
+                approve.append(wait_link(p, ex, "wait-item"))
+            elif ex["status"] in ("building", "early", "blank") and has_instruction(ex):
+                todo.setdefault(p["title"], []).append(
+                    (bool(ex.get("queued")), todo_chip(p, ex)))
+                if ex.get("queued"):
+                    queued.append(ex)
+
+    # Two different asks, so they are not run together: one wants a yes or no on
+    # something built, the other wants an answer before anything can be built.
+    # Both fold, and remember whether they were folded — see QUEUE_JS.
+    parts = []
+    if approve:
+        parts.append(f'<details class="qsub" id="q-approve" open>'
+                     f'<summary>Ready for your approval <span>{len(approve)}</span></summary>'
+                     f'<div class="wait-list">{"".join(approve)}</div></details>')
+    if answer:
+        parts.append(f'<details class="qsub" id="q-answer">'
+                     f'<summary>Needs your answer <span>{len(answer)}</span></summary>'
+                     f'<div class="wait-list">{"".join(answer)}</div></details>')
+    queue = (f'<details class="queue" id="q-you" open>'
+             f'<summary class="q-top">Waiting on you</summary>'
+             f'{"".join(parts)}</details>') if parts else ""
+
+    # Ticked items float to the head of their paper's group, so a build run reads
+    # off the top of the list rather than hunting for the ones marked.
+    n_todo = sum(len(v) for v in todo.values())
+    todo_html = "".join(
+        f'<div class="todo-group"><h4>{e(title)} <span>{len(items)}</span></h4>'
+        f'<div class="wait-list">'
+        f'{"".join(html for _q, html in sorted(items, key=lambda t: not t[0]))}</div></div>'
+        for title, items in todo.items())
+    queue += (f'<details class="queue todo" id="q-claude"><summary>Waiting on Claude '
+              f'<span class="count">{n_todo}</span>'
+              # always present, so ticking from this page can fill it in
+              + f'<span class="qn"{"" if queued else " hidden"}>{len(queued)} queued</span>'
+              + f'</summary>'
+              f'<div class="runbar">'
+              f'<button id="build-queued">Copy the build-run prompt</button>'
+              f'<span id="build-queued-note" class="dim">'
+              f'Tick the ones you want, then paste this into a Claude Code session here. '
+              f'A page cannot start a build itself.</span></div>'
+              f'<p class="assess-link"><a target="_blank" rel="noopener" '
+              f'href="assessment.html">What to build next ↗</a> '
+              f'<span class="dim">— ranked by cheapness, freshness and batching</span></p>'
+              f'{todo_html}</details>') if todo else ""
 
     (HERE / "index.html").write_text(shell(
         "Status — niall-roe.github.io",
@@ -1102,6 +1381,7 @@ Branch <code>{e(git("rev-parse", "--abbrev-ref", "HEAD"))}</code> at
 <p class="foot">Generated {e(datetime.now().strftime("%-d %B %Y, %H:%M"))} by
 <code>_status/build.py</code>. Re-run after a session:
 <code>python3 _status/build.py</code></p>
+{QUEUE_JS}
 '''))
     print(f"wrote _status/index.html and {len(notes)} notes page(s)")
     if "--open" in sys.argv:

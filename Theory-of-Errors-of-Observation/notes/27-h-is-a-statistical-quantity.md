@@ -1,4 +1,5 @@
 ---
+anchor: "It must never be forgotten that h is a statistical quantity"
 position: 27
 status: blank
 group: "The Theory of Observations"

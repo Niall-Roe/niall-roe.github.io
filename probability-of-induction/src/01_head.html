@@ -84,6 +84,12 @@
     position: relative;      /* positioning context for .ex-num */
   }
 
+  /* One of Peirce's paragraphs carried on after an example container, so that
+     the example opens where its own sentence ends rather than after the next
+     one. Closed, the two halves should read as the single paragraph they are:
+     the container collapses to nothing and this takes away the gap. */
+  .example-container:not(.open) + p.runs-on { margin-top: -15px; }
+
   /* ------------------------------------------------------------------------
      Example numbers in the gutter, for referring to them elsewhere. The marker
      is inserted at the head of its trigger and positioned with `left` only, so

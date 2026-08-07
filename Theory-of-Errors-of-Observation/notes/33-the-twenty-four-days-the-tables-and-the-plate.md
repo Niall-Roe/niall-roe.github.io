@@ -2,11 +2,10 @@
 position: 33
 number: 3
 title: "The twenty-four days: the tables and the plate"
-status: awaiting
+status: done
 group: "Experiments"
 heading: "3 — The twenty-four days: the tables and the plate"
 ---
-
 Status: awaiting approval
 
 ### Text
@@ -29,7 +28,12 @@ table, and are also shown upon plate No. 27."
 - [from the build] Should the discrepancy note live in the example, or only in
   these notes? At the moment the tables tab says when a day does not sum to 500.
 
-### Awaiting approval
+### Completed
+
+#### the mean curve's default width
+
+22 is right. [22 seems good.] The slider stays, defaulting there, and "Reset to
+Peirce's" returns to it.
 
 #### REVISION 3 (your notes): the plate's two buttons, the legend cut
 
@@ -127,10 +131,3 @@ the same mean and spread, and clear.
 4. Koenker's Day01.txt has two stray periods, "1." on line 9 and ".0" on line
    15. R's scan() reads them as 1 and 0, so his analysis is unaffected, and the
    parser here does the same; they are transcription noise, not data.
-
-### Completed
-
-#### the mean curve's default width
-
-22 is right. [22 seems good.] The slider stays, defaulting there, and "Reset to
-Peirce's" returns to it.

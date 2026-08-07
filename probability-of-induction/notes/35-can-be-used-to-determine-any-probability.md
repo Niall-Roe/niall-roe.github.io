@@ -1,6 +1,6 @@
 ---
 position: 35
-status: blank
+status: parked
 group: "Unnumbered examples"
 heading: ""can be used to determine any probability""
 ---

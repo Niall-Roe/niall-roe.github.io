@@ -1,4 +1,5 @@
 ---
+anchor: "It has but one value for each set of values of its variables."
 position: 7
 status: early
 group: "The Theory of Observations"

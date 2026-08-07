@@ -1,11 +1,11 @@
 ---
+blocked: true
 position: 38
 status: building
 anchor: "When we draw a deductive or analytic conclusion, our rule of inference is that facts of a certain general character are either invariably or in a certain propor"
 group: "Unnumbered examples"
 heading: "Purple beans"
 ---
-
 ### Suggestions
 
 this text:
@@ -14,7 +14,6 @@ this text:
 But synthetic inference is founded upon a classification of facts, not according to their characters, but according to the manner of obtaining them. Its rule is, that a number of facts obtained in a given way will in general more or less resemble other facts obtained in the same way; or, experiences whose conditions are the same will have the same general characters.
 
 In the former case, we know that premises precisely similar in form to those of the given ones will yield true conclusions, just once in a calculable number of times. In the latter case, we only know that premises obtained under circumstances similar to the given ones (though perhaps themselves very different) will yield true conclusions, at least once in a calculable number of times. 25We may express this by saying that in the case of analytic inference we know the probability of our conclusion (if the premises are true), but in the case of synthetic inferences we only know the degree of trustworthiness of our proceeding. As all knowledge comes from synthetic inference, we must equally infer that all human certainty consists merely in our knowing that the processes by which our knowledge has been derived are such as must generally have led to true conclusions."
-
 
 Modes for analytic and synthetic. synthetic will then split into conceptualist and materialist.
 
@@ -37,6 +36,10 @@ not sure how to best do this...
 #### Synthetic (Materialist)
 
 (no note yet)
+
+---
+
+[from the build] Analytic is fully specced and I can build it as it stands. The other two modes are not: Synthetic Conceptualist says "not sure how to best do this" and Synthetic Materialist has no note. Do you want Analytic built on its own first, or the whole thing held until all three are settled?
 
 ### Completed
 

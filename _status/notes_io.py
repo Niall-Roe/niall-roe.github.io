@@ -25,9 +25,10 @@ from pathlib import Path
 
 CANON = ["Text", "Suggestions", "Awaiting approval", "Completed"]
 
-# The line a Suggestions section carries when there is nothing in it. A new note
-# replaces it rather than landing underneath it.
-PLACEHOLDER = re.compile(r"^[ \t]*None open\.?[ \t]*$\n?", re.M | re.I)
+# The line a section carries when there is nothing in it ("None open." in
+# Suggestions, "None yet." in Completed). Content arriving in a section replaces
+# its placeholder rather than landing underneath it.
+PLACEHOLDER = re.compile(r"^[ \t]*None (?:open|yet)\.?[ \t]*$\n?", re.M | re.I)
 
 FRONT = re.compile(r"\A(---\n.*?\n---\n)(.*)\Z", re.S)
 SEC = re.compile(r"^###(?!#)\s*(.+?)\s*$", re.M)
@@ -85,7 +86,14 @@ def append_to(body, title, text):
     secs = sections(body)
     for i, (t, s) in enumerate(secs):
         if t == title:
-            secs[i] = (t, (s.rstrip("\n") + "\n\n" + text).strip("\n"))
+            s = PLACEHOLDER.sub("", s)
+            # Suggestions accumulates in plain prose with no structural markers
+            # between one sitting and the next, so an old build question and a
+            # fresh note read as one unbroken paragraph. A bare rule between them
+            # gives the panel something to key "what's new" off, and reads as an
+            # ordinary section break to anyone opening the file directly.
+            sep = "\n\n---\n\n" if title == "Suggestions" and s.strip() else "\n\n"
+            secs[i] = (t, (s.rstrip("\n") + sep + text).strip("\n"))
             return render(secs)
     secs.insert(_insert_at(secs, title), (title, text))
     return render(secs)
@@ -112,6 +120,12 @@ def move_all(body, src, dst, note=None):
 def get_front(front, key):
     m = re.search(r"^%s:\s*(.*)$" % re.escape(key), front, re.M)
     return m.group(1).strip().strip('"') if m else None
+
+
+def drop_front(front, key):
+    """Remove a frontmatter line entirely. Absent is the falsy state for flags,
+    so clearing one means deleting the line rather than writing `false`."""
+    return re.sub(r"^%s:.*\n?" % re.escape(key), "", front, count=1, flags=re.M)
 
 
 def set_front(front, key, value):
@@ -157,18 +171,25 @@ def write_atomic(path, text, expect_mtime=None):
 def add_note(path, text, expect_mtime=None):
     raw = Path(path).read_text()
     front, body = split_front(raw)
-    secs = sections(body)
-    for i, (t, s) in enumerate(secs):
-        if t == "Suggestions" and PLACEHOLDER.search(s):
-            secs[i] = (t, PLACEHOLDER.sub("", s))
-            body = render(secs)
-            break
     body = append_to(body, "Suggestions", text)
-    # An open suggestion means the entry is no longer settled: done goes back to
-    # building so the marker reads yellow, not green. Other statuses already say
-    # work is open (or deliberately parked) and are left alone.
-    if get_front(front, "status") == "done":
+    # A note means the ball is back in the build's court, whatever it was doing
+    # before: done was settled and no longer is; awaiting was sitting on your
+    # desk for a sign-off you have now answered with more instructions instead.
+    # Early/blank/parked already say nothing is built, and stay as they are.
+    if get_front(front, "status") in ("done", "awaiting"):
         front = set_front(front, "status", "building")
+    # A question was put to Niall and he has just answered it, so the entry is no
+    # longer blocked on him — whatever he said is now mine to work to.
+    front = drop_front(front, "blocked")
+    return write_atomic(path, front + body, expect_mtime)
+
+
+def set_queued(path, on, expect_mtime=None):
+    """Tick or untick an entry for the next build run. A flag Niall sets while
+    reviewing, so a build run has an explicit list rather than my guess at one."""
+    raw = Path(path).read_text()
+    front, body = split_front(raw)
+    front = set_front(front, "queued", "true") if on else drop_front(front, "queued")
     return write_atomic(path, front + body, expect_mtime)
 
 
@@ -179,6 +200,7 @@ def approve(path, expect_mtime=None):
     if not moved:
         raise ValueError("nothing is awaiting approval")
     front = set_front(front, "status", "done")
+    front = drop_front(front, "queued")        # built and signed off; nothing queued
     return write_atomic(path, front + body, expect_mtime)
 
 
@@ -191,6 +213,41 @@ def reject(path, reason, expect_mtime=None):
         raise ValueError("nothing is awaiting approval")
     front = set_front(front, "status", "building")
     return write_atomic(path, front + body, expect_mtime)
+
+
+def create_entry(notes_dir, anchor, title="", note=""):
+    """A new example entry from a passage selected on the page. Named and shaped
+    per CONVENTIONS.md: next reading position, Text section quoting the anchor,
+    the note (if any) as the first suggestion. Returns the new file's Path."""
+    d = Path(notes_dir)
+    if not d.is_dir():
+        raise ValueError("no notes directory for this paper")
+    anchor = re.sub(r"\s+", " ", anchor).replace('"', "'").strip()
+    if len(anchor) < 25:
+        raise ValueError("select at least a full sentence to anchor on")
+    title = re.sub(r"\s+", " ", title).strip()
+    note = note.strip()
+
+    positions = [int(m.group(1)) for f in d.glob("*.md")
+                 if (m := re.match(r"^(\d+)", f.name))]
+    nn = (max(positions) + 1) if positions else 0
+    slug = re.sub(r"[^a-z0-9]+", "-", (title or anchor).lower()).strip("-")[:48] \
+        or "example"
+    path = d / ("%02d-new-example-%s.md" % (nn, slug))
+    if path.exists():
+        raise ValueError("an entry with that name already exists")
+
+    heading = "New example — " + (title or slug.replace("-", " "))
+    front = ['---', 'position: %d' % nn]
+    if title:
+        front.append('title: "%s"' % title.replace('"', "'"))
+    front += ['status: %s' % ("early" if note else "blank"),
+              'anchor: "%s"' % anchor,
+              'heading: "%s"' % heading.replace('"', "'"), '---']
+    body = "### Text\n\n\"%s\"\n\n### Suggestions\n\n%s\n" % (
+        anchor, note or "None open.")
+    write_atomic(path, "\n".join(front) + "\n" + body)
+    return path
 
 
 # ------------------------------------------------------------------- test
@@ -224,6 +281,11 @@ what was built this pass
     b2, moved = move_all(body, "Awaiting approval", "Completed")
     assert "what was built this pass" in moved
     assert "### Completed" in b2
+
+    # approving into a Completed that says "None yet." replaces the placeholder
+    b2b, _ = move_all("### Awaiting approval\n\nbuilt thing\n\n### Completed\n\nNone yet.\n",
+                      "Awaiting approval", "Completed")
+    assert "None yet" not in b2b and "built thing" in b2b
     assert b2.index("### Suggestions") < b2.index("### Completed")
     assert "what was built this pass" in b2
     assert "### Awaiting approval" not in b2
@@ -261,7 +323,70 @@ what was built this pass
     out = entry.read_text()
     assert out.index("a fresh suggestion") < out.index("a second thought")
     assert get_front(split_front(out)[0], "status") == "building"
+    # a bare rule separates it from what was already open, so it never reads as
+    # a continuation of the older text — but the very first note in an empty
+    # section gets no leading divider, since there is nothing to separate from
+    assert "\n\n---\n\n" in out
+    assert not out.split("### Suggestions", 1)[1].lstrip().startswith("---")
     shutil.rmtree(tmp.parent)
+
+    # a note on an awaiting entry also bumps it back to building — the ball is
+    # back in the build's court, not still sitting on the reviewer's desk
+    tmp3 = Path(tempfile.mkdtemp()) / "notes"
+    tmp3.mkdir()
+    entry3 = tmp3 / "00-test.md"
+    entry3.write_text("---\nstatus: awaiting\n---\n### Suggestions\n\nNone open.\n\n"
+                      "### Awaiting approval\n\nbuilt thing\n")
+    add_note(entry3, "actually, one more change")
+    assert get_front(split_front(entry3.read_text())[0], "status") == "building"
+    shutil.rmtree(tmp3.parent)
+
+    # answering a blocked entry unblocks it: the flag line goes entirely
+    tmp4 = Path(tempfile.mkdtemp()) / "notes"
+    tmp4.mkdir()
+    entry4 = tmp4 / "00-test.md"
+    entry4.write_text("---\nblocked: true\nstatus: early\n---\n### Suggestions\n\n"
+                      "[from the build] which passage is this?\n")
+    add_note(entry4, "the one about the tides")
+    out4 = entry4.read_text()
+    assert "blocked" not in out4.split("---")[1]
+    assert "the one about the tides" in out4
+    assert get_front(split_front(out4)[0], "status") == "early"
+
+    # queued ticks on and off, and approving clears it
+    set_queued(entry4, True)
+    assert get_front(split_front(entry4.read_text())[0], "queued") == "true"
+    set_queued(entry4, False)
+    assert "queued" not in split_front(entry4.read_text())[0]
+    entry4.write_text("---\nqueued: true\nstatus: awaiting\n---\n"
+                      "### Awaiting approval\n\nbuilt thing\n")
+    approve(entry4)
+    front4 = split_front(entry4.read_text())[0]
+    assert "queued" not in front4 and get_front(front4, "status") == "done"
+    shutil.rmtree(tmp4.parent)
+
+    # create_entry: numbered after the last, shaped per the convention
+    tmp2 = Path(tempfile.mkdtemp()) / "notes"
+    tmp2.mkdir()
+    (tmp2 / "07-existing.md").write_text("---\nstatus: done\n---\n")
+    p = create_entry(tmp2, 'A passage of "the article" long enough to anchor on.',
+                     title="The new one", note="show the thing")
+    assert p.name == "08-new-example-the-new-one.md"
+    raw = p.read_text()
+    front, body = split_front(raw)
+    assert get_front(front, "status") == "early"
+    assert get_front(front, "position") == "8"
+    assert "'the article'" in get_front(front, "anchor")
+    assert "### Text" in body and "### Suggestions" in body and "show the thing" in body
+    p2 = create_entry(tmp2, "Another passage long enough to anchor an entry on.")
+    assert p2.name.startswith("09-") and get_front(split_front(p2.read_text())[0],
+                                                   "status") == "blank"
+    try:
+        create_entry(tmp2, "too short")
+        assert False, "short anchor accepted"
+    except ValueError:
+        pass
+    shutil.rmtree(tmp2.parent)
 
     print("notes_io self-test: all assertions passed")
 

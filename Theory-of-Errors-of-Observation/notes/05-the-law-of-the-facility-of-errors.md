@@ -8,7 +8,6 @@ group: "The Theory of Observations"
 container: example-ex2
 heading: "2 — The law of the facility of errors"
 ---
-
 Status: awaiting approval
 
 ### Text
@@ -29,6 +28,16 @@ the errors."
 - [from the build] The limited universe is only implied — it is whatever kind of
   observation is selected, and changing the kind clears the shots. Worth making
   explicit in the graphic, or does the radio button carry it?
+
+This one is not quite showing what it should. the strip animation is neat, but is not the limited universe. 
+
+the point is that observations of a kind for a series, and that series is subject to a statistical law. 
+
+one thing this section really needs to do is bring the math to life. it should rewrite it in modern terms underneath, show both forms filled in with relevant numbers (taken from the example) and then hopefully show that they equal the same thing. 
+
+the example should be focused around a series of observations. I like what you have here now sort of, but the idea would be that even transit observations of the same star might different universes, if the telescopes or whatever are different enough. 
+
+the "subject to a statistical law" bit is good, as we have that pretty clearly, but this example should appear higher up so that we can see those things highlighted in the text to bring attention to what it means.
 
 ### Awaiting approval
 

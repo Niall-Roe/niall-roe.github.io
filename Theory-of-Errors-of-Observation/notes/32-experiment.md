@@ -1,4 +1,5 @@
 ---
+anchor: "It occurred to me that in the case of the emersion of a star from an occultation"
 position: 32
 status: early
 group: "Experiments"

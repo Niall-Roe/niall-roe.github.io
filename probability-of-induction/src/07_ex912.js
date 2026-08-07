@@ -376,8 +376,8 @@ registerExample("example-ex27", (box) => {
       independent arguments pertaining to <span class="math">C</span> are known, they can be
       combined to produce the proper (though unit-less) intensity of belief one ought to have in
       <span class="math">C</span>. However, one&rsquo;s current degree of belief never acts as an
-      input to this method, and <span class="example-trigger" data-toggle="example-ex34">cannot be used to determine any
-      probability</span>. Further, someone who
+      input to this method, and cannot be used to determine any
+      probability. Further, someone who
       is stubborn, sceptical, over enthusiastic, or otherwise biased, may not adjust their belief
       to that &ldquo;proper&rdquo; level.</p>
     <p class="help-text">Move the probability sliders to see how they impact the proper intensity of belief.

@@ -468,8 +468,14 @@ registerExample("example-ex15", (box) => {
      the sentence falls back to "out of 1,000", which is how the example's own
      click-readout already reports the same quantity.
      ------------------------------------------------------------------------*/
+  /* Seven of the live figures below are read off this, so a single drag of the
+     proportion slider was rebuilding and sorting the same s+1 element table
+     seven times over — at s = 500 that is what the stutter was. The inputs are
+     only ever the two sliders, so the last answer is worth keeping. */
+  let ex15Memo = null;
   const ex15Counts = () => {
     const p = num("ex15_p"), s = Math.round(num("ex15_s"));
+    if (ex15Memo && ex15Memo.p === p && ex15Memo.s === s) return ex15Memo.v;
     const pf = decimalToFraction(p);
     const w = pf.num, b = pf.den - pf.num;
     const total = Math.pow(w + b, s);
@@ -479,7 +485,9 @@ registerExample("example-ex15", (box) => {
       c: exact ? choose(s, k) * Math.pow(w, k) * Math.pow(b, s - k)
                : Math.round(dbinom(k, s, p) * 1000)
     })).sort((a, b2) => b2.c - a.c);
-    return { pf: pf, s: s, exact: exact, total: exact ? total : 1000, rank: rank };
+    const v = { pf: pf, s: s, exact: exact, total: exact ? total : 1000, rank: rank };
+    ex15Memo = { p: p, s: s, v: v };
+    return v;
   };
   const ex15Frac = (n, d) => { const g = (function gg(a, b2) { return b2 ? gg(b2, a % b2) : a; })(n, d) || 1;
     return `${n / g}&frasl;${d / g}`; };
@@ -704,12 +712,16 @@ registerExample("example-ex17", (box) => {
     const heat = new Map();
     history.forEach((d) => { if (d.s === s2) heat.set(d.k, (heat.get(d.k) || 0) + 1); });
     const heatMax = Math.max(1, ...heat.values());
-    const HEAT_COLD = [201, 204, 209], HEAT_LO = [193, 186, 209], HEAT_HI = [79, 66, 104];
+    const HEAT_COLD = [201, 204, 209], HEAT_LO = [206, 199, 226], HEAT_HI = [52, 38, 84];
     const heatCol = (k) => {
       const c = heat.get(k) || 0;
       if (!c) return `rgb(${HEAT_COLD.join(",")})`;
-      /* square root, so that one draw among a thousand still shows */
-      const t = Math.sqrt(c / heatMax);
+      /* A floor, so one draw among a thousand still registers, then a steep ramp
+         above it. A square root did the opposite — it lifted the rare results
+         towards the dark end, and by a couple of hundred draws every stem near
+         the middle was much the same violet, which is the one thing the shading
+         is there to distinguish. */
+      const t = 0.14 + 0.86 * Math.pow(c / heatMax, 1.7);
       return `rgb(${HEAT_LO.map((v, i) => Math.round(v + (HEAT_HI[i] - v) * t)).join(",")})`;
     };
 
@@ -1083,7 +1095,7 @@ registerExample("example-ex16", (box) => {
       const yb = ya * 0.74;
       const lo = Math.min(c.p1, c.p2), unit = c.sumErr;
       const whole = Math.floor(c.ratio + 1e-9);
-      const gap = unit * 0.10;               // the perforation, so the units count
+      const gap = unit * 0.06;               // the perforation, so the units count
       const drawUnit = (u0, frac) => {
         const b = Math.min(c.q1, unit * frac);            // group 1's share first
         if (b > 0) pl.segments(u0, yb, u0 + b, yb, { col: "#2f6f9f", lwd: 4 });
@@ -1131,8 +1143,9 @@ registerExample("example-ex18", (box) => {
         <div id="ex18-pred"></div>
         <div class="ex-buttonbar">
           <button class="btn btn-primary btn-sm" id="ex18_reset">Reset to Peirce's example</button>
-          <button class="btn btn-sm" id="ex18_even">Same sample, an even proportion</button>
+          <button class="btn btn-primary btn-sm" id="ex18_even">The same drawings with p at a half</button>
         </div>
+        <div id="ex18_secure_note"></div>
       </div>
       <div class="col col-8">
         <div id="ex18-plot"></div>
@@ -1143,6 +1156,9 @@ registerExample("example-ex18", (box) => {
   box.appendChild(content);
 
   let clicked = null;
+  /* the proportion the "at a half" button came from, kept so the note can say
+     what the same drawings were worth there */
+  let compare = null;
   const ctl = $("#ex18-controls", content);
   ctl.appendChild(slider("ex18_p", "True proportion (p):", 0.001, 0.999, 0.01, 0.001, (v) => v.toFixed(3), "k1"));
   ctl.appendChild(slider("ex18_s", "Sample size (s):", 5, 500, 100, 1, null, "k2"));
@@ -1173,33 +1189,38 @@ registerExample("example-ex18", (box) => {
   /* --------------------------------------------------------------------------
      What "tolerably certain" comes to.
 
-     Peirce's claim is a tolerance and a certainty together: an error of no more
-     than one ball in a hundred, and being tolerably certain of it. Only one of
-     the two can be the handle. The certainty is the handle here, because it is
-     the vaguer of the two words and the one worth pinning down, and the
-     tolerance is then read off — the smallest whole ball in a hundred that the
-     drawings cover that often.
+     Peirce's sentence is a tolerance and a certainty together: an error of no
+     more than one ball in a hundred, and being tolerably certain of it. Neither
+     is chosen — both fall out of the probable error, which is the quantity the
+     whole section has been about and the one example 17 gave the formula for.
 
-     Counted on the exact binomial, not on the normal curve, so the figure is
-     the same arithmetic he does in the paragraph: at one in a hundred with a
-     hundred drawings, no ball, one, or two covers 0.921 of the cases, and his
-     sentence comes back word for word. Push the proportion to a half and the
-     same certainty needs nine balls in a hundred, which is the whole of his
-     remark about extreme values.
+     At his own figures 0.477 root(2p(1-p)/s) is 0.0067, which is two thirds of
+     a ball in a hundred. You cannot be in error by two thirds of a ball, so the
+     statement is made in whole balls and rounds up to one — his "more than one
+     ball in 100". How often the drawings actually land inside that is then a
+     fact to be counted, not a level to be picked: no white ball, one, or two,
+     which is 366 + 370 + 185 in his own list, or 92.1 times in 100. That is
+     what "tolerably certain" is worth here.
+
+     An earlier pass had the certainty on a slider with the tolerance read off
+     it. That put the choosing in the wrong place — the tolerance could only
+     move in whole balls, so most of the slider's travel changed nothing, and it
+     invited a level to be picked when Peirce is not picking one.
      ------------------------------------------------------------------------*/
+  const probableError = () => {
+    const p = num("ex18_p"), s = Math.round(num("ex18_s"));
+    return 0.477 * Math.sqrt(2 * p * (1 - p) / s);
+  };
   function tolerance() {
-    const p = num("ex18_p"), s = Math.round(num("ex18_s")), want = num("ex18_pred_cl");
-    const cover = (m) => {
-      const d = m / 100;
-      let tot = 0;
-      for (let k = 0; k <= s; k++) if (Math.abs(k / s - p) <= d + 1e-12) tot += dbinom(k, s, p);
-      return tot;
-    };
-    for (let m = 0; m <= 100; m++) {
-      const c = cover(m);
-      if (c >= want - 1e-12) return { m: m, delta: m / 100, cover: c };
-    }
-    return { m: 100, delta: 1, cover: 1 };
+    const p = num("ex18_p"), s = Math.round(num("ex18_s"));
+    const e = probableError();
+    /* stated in whole balls in a hundred, so it rounds up: a tolerance of two
+       thirds of a ball is a tolerance of one ball */
+    const m = Math.max(1, Math.ceil(e * 100 - 1e-9));
+    const d = m / 100;
+    let cover = 0;
+    for (let k = 0; k <= s; k++) if (Math.abs(k / s - p) <= d + 1e-12) cover += dbinom(k, s, p);
+    return { m: m, delta: d, cover: cover, e: e };
   }
   const ballsPhrase = (m) => (m === 0 ? "not one ball"
     : m === 1 ? "one ball" : `${spellNumber(m)} balls`);
@@ -1232,14 +1253,7 @@ registerExample("example-ex18", (box) => {
   ctl.appendChild(checkbox("ex18_rescale", "Rescale chart (zoom)", true));
   ctl.appendChild(checkbox("ex18_xaxis_balls", "X-axis: Number of balls", false));
   const pred = $("#ex18-pred", content);
-  pred.appendChild(checkbox("ex18_show_prediction", "Show the error allowed", true));
-  /* The slider is what "tolerably certain" means, so it says so and reads as a
-     rate rather than as a decimal. It opens at nine times in ten, which is a
-     fair reading of the words and the one at which his own sentence comes out
-     as he printed it. */
-  const predSlider = slider("ex18_pred_cl", "Tolerably certain means:", 0.50, 0.99, 0.90, 0.01,
-    (v) => `${Math.round(v * 100)} times in 100`, "k3");
-  pred.appendChild(predSlider);
+  pred.appendChild(checkbox("ex18_show_prediction", "Show the probable error", true));
 
   content.addEventListener("input", (ev) => { if (ev.target.id === "ex18_p") stickySnap("ex18_p"); update(); });
   content.addEventListener("change", () => update());
@@ -1248,7 +1262,7 @@ registerExample("example-ex18", (box) => {
     document.getElementById("ex18_rescale").checked = true;
     document.getElementById("ex18_xaxis_balls").checked = false;
     document.getElementById("ex18_show_prediction").checked = true;
-    setSlider("ex18_pred_cl", 0.90);
+    clicked = null; compare = null;
     update();
   });
   /* The same drawings and the same certainty, moved to the middle of the range:
@@ -1256,6 +1270,9 @@ registerExample("example-ex18", (box) => {
      text that shows it. Unzoomed, so the comb underneath is on the whole number
      line where the two ends can be compared. */
   $("#ex18_even", content).addEventListener("click", () => {
+    /* what the same drawings bought at the proportion we are leaving, so the
+       note underneath can put the two side by side */
+    compare = { p: num("ex18_p"), t: tolerance() };
     setSlider("ex18_p", 0.5);
     document.getElementById("ex18_rescale").checked = false;
     document.getElementById("ex18_xaxis_balls").checked = false;
@@ -1263,12 +1280,14 @@ registerExample("example-ex18", (box) => {
     update();
   });
 
-  /* The band drawn on the chart is the tolerance in the sentence, not a second
-     interval of its own: p either side by the balls the sentence allows. */
+  /* The band is the probable error itself, at its own value — not rounded to
+     the whole ball the sentence states, and not snapped to the lattice. At an
+     extreme proportion it is narrower than the gap between two bars, and that
+     is the fact worth seeing rather than one to be tidied away. */
   const predInterval = () => {
     if (!chk("ex18_show_prediction")) return null;
-    const p = num("ex18_p"), d = tolerance().delta;
-    return [Math.max(0, p - d), Math.min(1, p + d)];
+    const p = num("ex18_p"), e = probableError();
+    return [Math.max(0, p - e), Math.min(1, p + e)];
   };
 
   const canvas = mkCanvas(450, (pl) => {
@@ -1287,9 +1306,29 @@ registerExample("example-ex18", (box) => {
   $("#ex18-plot", content).appendChild(canvas);
 
   function update() {
-    predSlider.style.display = chk("ex18_show_prediction") ? "" : "none";
     const p = num("ex18_p"), s = num("ex18_s");
     if (clicked !== null && clicked > s) clicked = null;
+
+    /* Peirce's remark at the head of the paragraph — that the reasoning is more
+       secure at a very large or very small proportion — is a claim about the
+       probable error, and the two settings the buttons offer are the two ends
+       of it. Having been at both, the note says what the same drawings bought
+       in each, and points at the comb where the whole range is drawn at once. */
+    const secure = $("#ex18_secure_note", content);
+    if (compare && Math.abs(compare.p - p) > 1e-9) {
+      const now = tolerance();
+      const ballsAt = (t) => `${fmt(t.e * 100, 2)} balls in 100`;
+      secure.innerHTML = `<div class="note-block" style="margin:10px 0 0;">
+        <p style="margin-bottom:0;">The same <strong>${bigmark(s)}</strong> drawings, moved from
+        <strong>${fmt(compare.p, 3)}</strong> to <strong>${fmt(p, 3)}</strong>. The probable error was
+        <strong>${ballsAt(compare.t)}</strong> there and is <strong>${ballsAt(now)}</strong> here, so the
+        statement they will support has gone from <strong>${ballsPhrase(compare.t.m)} in 100</strong> to
+        <strong>${ballsPhrase(now.m)} in 100</strong> &mdash; ${now.m > compare.t.m ? "a looser" : "a tighter"}
+        claim off the same evidence. That is Peirce's remark at the head of the paragraph: the reasoning is
+        more secure where the proportion is very large or very small. The comb under the chart is the same
+        fact for every proportion at once &mdash; longest teeth in the middle, shortest at the two ends.</p>
+      </div>`;
+    } else secure.innerHTML = "";
     /* Peirce's sentence in the text above is the readout now — the enumerated
        list, the certainty and the tolerance are all in it — so the panel says
        only what the text cannot: which bar has been clicked. */

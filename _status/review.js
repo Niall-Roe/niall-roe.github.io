@@ -34,7 +34,7 @@
     '<div class="nav"><button id="p-prev" title="Previous example">\u2039</button>' +
     '<button id="p-next" title="Next example">\u203a</button>' +
     '<button id="p-close" title="Close">\u00d7</button></div></header>' +
-    '<div id="p-body"></div>' +
+    '<div id="p-body-wrap"><div id="p-body"></div><div id="p-fade" hidden></div></div>' +
     '<div id="p-write">' +
     '  <div id="p-approve" hidden>' +
     '    <p class="hint">Built this pass, waiting on your sign-off. Approve moves the' +
@@ -49,6 +49,7 @@
     '      <button id="b-reject-cancel" class="act">Cancel</button></div>' +
     '    </div>' +
     '  </div>' +
+    '  <button id="b-queue" class="act queue" hidden></button>' +
     '  <textarea id="p-note" rows="3" placeholder="Leave a suggestion on this example…"></textarea>' +
     '  <div class="row"><button id="b-save" class="act">Save note</button>' +
     '  <span id="p-msg"></span></div>' +
@@ -57,7 +58,8 @@
     '<div id="badges">' +
     '  <a id="badge-home" href="/_status/index.html" title="Back to the dashboard">← All papers</a>' +
     '  <div id="badge">Review</div>' +
-    '</div>';
+    '</div>' +
+    '<button id="add-chip" hidden>+ Add example</button>';
   document.body.appendChild(host);
 
   var markersEl = root.getElementById("markers");
@@ -66,6 +68,18 @@
   var anchors = [];
   var BY_KEY = {};
   var ORDER = [];        // entry keys in reading order, for the prev/next arrows
+
+  /* Shows only while there is more of #p-body below the visible edge, and folds
+     away as you scroll into the last screenful — so it reads as "more below",
+     not as permanent chrome. */
+  function checkFade() {
+    var b = root.getElementById("p-body");
+    var fade = root.getElementById("p-fade");
+    var more = b.scrollHeight - b.scrollTop - b.clientHeight > 8;
+    fade.hidden = !more;
+  }
+  root.getElementById("p-body-wrap").addEventListener("scroll", checkFade, true);
+  addEventListener("resize", checkFade);
 
   root.getElementById("p-close").addEventListener("click", closePanel);
   root.getElementById("p-prev").addEventListener("click", function () { step(-1); });
@@ -80,8 +94,16 @@
                      : (i + dir + ORDER.length) % ORDER.length;
     openPanel(ORDER[next]);
   }
+  /* The badge opens and closes the panel. It opens on whatever is waiting for a
+     sign-off first, else where you last were, else the first example. */
+  var LAST = null;
   root.getElementById("badge").addEventListener("click", function () {
-    host.classList.toggle("hidden");
+    if (!panel.hidden) return closePanel();
+    var awaiting = ORDER.filter(function (k) {
+      return entries[k] && entries[k].status === "awaiting";
+    })[0];
+    var k = awaiting || LAST || ORDER[0];
+    if (k) openPanel(k);
   });
 
   fetch("/_review/notes/" + encodeURIComponent(slug))
@@ -157,7 +179,19 @@
         map.push([n, i]);
       }
     }
-    IDX = { text: text, map: map };
+    // The printed text carries line-break hyphenation ("observa- tions"); join
+    // those back into the word so a quote of the plain text still finds it.
+    var t2 = "", m2 = [];
+    for (var j = 0; j < text.length; j++) {
+      if (text[j] === "-" && text[j + 1] === " " &&
+          /[a-z]/.test(text[j - 1] || "") && /[a-z]/.test(text[j + 2] || "")) {
+        j++;                                   // skip the hyphen and its space
+        continue;
+      }
+      t2 += text[j];
+      m2.push(map[j]);
+    }
+    IDX = { text: t2, map: m2 };
     return IDX;
   }
 
@@ -165,7 +199,9 @@
     if (!anchor) return null;
     var idx = textIndex();
     var q = anchor.replace(/[\u2018\u2019\u201c\u201d\u2013\u2014\u2011\u00a0]/g, foldChar)
-                  .replace(/\s+/g, " ").trim();
+                  .replace(/\s+/g, " ")
+                  .replace(/([a-z])- ([a-z])/g, "$1$2")   // same hyphenation fold
+                  .trim();
     var at = -1, used = q;
     // Longest prefix that is actually present — notes quotes are often elided.
     var lens = [q.length, 160, 120, 90, 60, 40, 30];
@@ -213,8 +249,12 @@
       m.className = "marker s-" + e.status;
       m.textContent = e.number == null ? "·" : e.number;
       m.title = (e.number != null ? e.number + ". " : "") + e.title +
-                " — " + e.statusLabel;
+                " — " + e.statusLabel +
+                (e.hasSuggestion ? " · you have commented" : "");
       if (!container) m.classList.add("unbuilt");
+      // A dot on the corner of anything you have already written on, so cruising
+      // the page shows where you have been without opening each one.
+      if (e.hasSuggestion) m.classList.add("commented");
       m.addEventListener("click", function (ev) {
         ev.stopPropagation();
         openPanel(key);
@@ -266,6 +306,7 @@
     if (!e) return;
     CURRENT = key;
     root.getElementById("p-approve").hidden = e.status !== "awaiting";
+    root.getElementById("p-write").hidden = false;      // may be off from create mode
     if (!quiet) {
       msg("");
       root.getElementById("p-note").value = "";
@@ -275,8 +316,17 @@
     root.getElementById("p-title").textContent =
       (e.number != null ? e.number + ". " : "") + e.title;
     root.getElementById("p-sub").innerHTML =
-      '<span class="chip s-' + e.status + '">' + esc(e.statusLabel) + "</span>";
+      '<span class="chip s-' + e.status + '">' + esc(e.statusLabel) + "</span>" +
+      (e.blocked ? '<span class="chip ask">Needs your answer</span>' : "");
     root.getElementById("p-file").textContent = e.file || "";
+
+    /* The tick that says "take this one next time". Offered only where there is
+       something to build to — not on what is already awaiting your sign-off,
+       and not on what is waiting on an answer from you. */
+    var qb = root.getElementById("b-queue");
+    qb.hidden = !e.actionable;
+    qb.textContent = e.queued ? "✓ Queued for the next build run" : "Build next run";
+    qb.classList.toggle("on", !!e.queued);
 
     var body = root.getElementById("p-body");
     body.innerHTML = "";
@@ -284,6 +334,9 @@
       body.innerHTML = '<p class="empty">No notes written for this example yet.</p>';
     }
     e.sections.forEach(function (s) {
+      // The anchor passage is the text you are looking at on the page, so
+      // printing it in the panel too is a wasted screenful above your notes.
+      if ((s.title || "").toLowerCase() === "text") return;
       var d = document.createElement("div");
       d.className = "sec";
       d.innerHTML = para(s.text);
@@ -307,6 +360,7 @@
 
     panel.hidden = false;
     shiftArticle(true);
+    checkFade();
     if (quiet) return;
 
     // Bring the passage into view whether it is a built example or only a quote.
@@ -340,6 +394,130 @@
       (function (el) { setTimeout(function () { el.remove(); }, 1600); })(b);
     }
   }
+
+  /* ------------------------------------------------------------- new examples */
+
+  /* Select a passage in Peirce's prose and a chip offers to make an example of
+     it. The selection becomes the entry's anchor, so it must be in the article
+     text itself — not inside an existing example, whose content moves. */
+
+  var addChip = root.getElementById("add-chip");
+  var PENDING = null;
+
+  function selectionQuote() {
+    var s = document.getSelection();
+    if (!s || s.isCollapsed || !s.rangeCount) return null;
+    var n = s.anchorNode;
+    n = n && n.nodeType === 1 ? n : n && n.parentElement;
+    if (!n || !n.closest(".article-container")) return null;
+    if (n.closest(".example-container")) return null;
+    var q = s.toString().replace(/\s+/g, " ").trim();
+    return q.length >= 25 ? q : null;
+  }
+
+  document.addEventListener("mouseup", function () {
+    setTimeout(function () {
+      var q = selectionQuote();
+      if (!q) { addChip.hidden = true; return; }
+      PENDING = q;
+      var r = document.getSelection().getRangeAt(0).getBoundingClientRect();
+      addChip.style.top = Math.min(innerHeight - 40, r.bottom + 8) + "px";
+      addChip.style.left = Math.max(8, Math.min(innerWidth - 140, r.left)) + "px";
+      addChip.hidden = false;
+    }, 0);
+  });
+  document.addEventListener("selectionchange", function () {
+    var s = document.getSelection();
+    if (!s || s.isCollapsed) addChip.hidden = true;
+  });
+
+  addChip.addEventListener("click", function () {
+    addChip.hidden = true;
+    openCreate(PENDING);
+  });
+
+  function openCreate(quote) {
+    if (!quote) return;
+    CURRENT = null;
+    root.getElementById("p-approve").hidden = true;
+    root.getElementById("p-write").hidden = true;
+    root.getElementById("p-title").textContent = "New example";
+    root.getElementById("p-sub").innerHTML = '<span class="chip s-early">from your selection</span>';
+    root.getElementById("p-file").textContent = slug + "/notes/";
+
+    var body = root.getElementById("p-body");
+    body.innerHTML =
+      "<blockquote>" + esc(quote) + "</blockquote>" +
+      '<input id="c-title" placeholder="Title (optional)">' +
+      '<textarea id="c-note" rows="4" placeholder="What should this example show?"></textarea>' +
+      '<div class="row"><button id="c-go" class="act ok">Create example</button>' +
+      '<button id="c-cancel" class="act">Cancel</button>' +
+      '<span id="c-msg"></span></div>';
+
+    body.querySelector("#c-cancel").addEventListener("click", closePanel);
+    body.querySelector("#c-go").addEventListener("click", function () {
+      var cmsg = body.querySelector("#c-msg");
+      cmsg.textContent = "creating…";
+      fetch("/_review/add", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          slug: slug,
+          anchor: quote,
+          title: body.querySelector("#c-title").value.trim(),
+          note: body.querySelector("#c-note").value.trim()
+        })
+      }).then(function (r) {
+        return r.json().then(function (j) { return { ok: r.ok, j: j }; });
+      }).then(function (res) {
+        if (!res.ok) { cmsg.textContent = res.j.error || "failed"; return; }
+        rebuild(res.j.file);
+      }).catch(function () { cmsg.textContent = "could not reach the review server"; });
+    });
+
+    panel.hidden = false;
+    shiftArticle(true);
+    body.querySelector("#c-note").focus();
+  }
+
+  /* Re-fetch the entries and redraw every marker; then open `file`'s entry if
+     given — used after a create so the new example is on screen at once. If a
+     panel is already open on some other entry, it is quietly refreshed onto the
+     current file rather than left showing what was true when the tab loaded. */
+  function rebuild(openFile) {
+    fetch("/_review/notes/" + encodeURIComponent(slug))
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        entries = d.entries || {};
+        markersEl.innerHTML = "";
+        anchors.length = 0;
+        ORDER.length = 0;
+        Object.keys(BY_KEY).forEach(function (k) { delete BY_KEY[k]; });
+        IDX = null;
+        build();
+        place();
+        updateBadge();
+        if (openFile) {
+          var k = Object.keys(entries).filter(function (x) {
+            return entries[x].file === openFile;
+          })[0];
+          if (k) openPanel(k);
+        } else if (CURRENT && entries[CURRENT]) {
+          openPanel(CURRENT, true);
+        }
+      });
+  }
+
+  /* A tab left open across a server restart, a sleep, or just switching away and
+     back never re-fetches on its own — fetch() only ever ran once, at load. That
+     makes an old tab silently show what was true when it opened, which reads as
+     "my notes are gone" when they are actually sitting on disk untouched. Coming
+     back to the tab (pageshow covers the back-forward cache too, which a plain
+     visibilitychange can miss) re-syncs it, so what you see is never stale. */
+  addEventListener("pageshow", function () { rebuild(); });
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") rebuild();
+  });
 
   /* ------------------------------------------------------------------ writing */
 
@@ -391,6 +569,12 @@
     });
   });
 
+  root.getElementById("b-queue").addEventListener("click", function () {
+    var e = CURRENT && entries[CURRENT];
+    if (!e) return;
+    post("queue", { queued: !e.queued }, function () { refreshEntry(); });
+  });
+
   root.getElementById("b-approve").addEventListener("click", function () {
     post("approve", {}, function () { setStatus("done"); refreshEntry(); });
   });
@@ -436,8 +620,9 @@
         entries = d.entries || entries;
         Object.keys(BY_KEY).forEach(function (k) {
           if (entries[k]) {
-            BY_KEY[k].el.className =
-              BY_KEY[k].el.className.replace(/s-[a-z]+/, "s-" + entries[k].status);
+            var el = BY_KEY[k].el;
+            el.className = el.className.replace(/s-[a-z]+/, "s-" + entries[k].status);
+            el.classList.toggle("commented", !!entries[k].hasSuggestion);
           }
         });
         if (CURRENT && entries[CURRENT]) openPanel(CURRENT, true);
@@ -543,6 +728,7 @@
 
   function closePanel() {
     panel.hidden = true;
+    LAST = CURRENT;
     CURRENT = null;
     shiftArticle(false);
   }
@@ -564,16 +750,33 @@
     });
   }
 
+  /* A bare "---" line (notes_io's marker for "a note was appended here") splits
+     a section from what came before it. Everything after the LAST one — the
+     most recent sitting — is boxed and labelled, so a fresh note never reads as
+     a continuation of an old build question sitting just above it. */
   function para(text) {
-    return esc(text).split(/\n\s*\n/).map(function (p) {
-      p = p.trim();
-      if (!p) return "";
-      // The author's own square-bracket marks, kept visible as they are in the file.
+    var blocks = esc(text).split(/\n\s*\n/).map(function (p) { return p.trim(); })
+      .filter(function (p) { return p; });
+    var lastDivider = -1;
+    blocks.forEach(function (p, i) { if (/^-{3,}$/.test(p)) lastDivider = i; });
+
+    function render1(p) {
       p = p.replace(/\[([^\[\]]{1,300})\]/g, '<mark>[$1]</mark>');
       if (/^####\s/.test(p)) return "<h4>" + p.replace(/^####\s*/, "") + "</h4>";
       if (/^["“]/.test(p)) return "<blockquote>" + p + "</blockquote>";
       return "<p>" + p.replace(/\n/g, " ") + "</p>";
-    }).join("");
+    }
+
+    var out = "", latest = "";
+    blocks.forEach(function (p, i) {
+      if (/^-{3,}$/.test(p)) { out += '<hr class="added">'; return; }
+      if (lastDivider > -1 && i > lastDivider) latest += render1(p);
+      else out += render1(p);
+    });
+    if (latest) {
+      out += '<div class="latest"><div class="latest-label">Just added</div>' + latest + '</div>';
+    }
+    return out;
   }
 
   function CSS() {
@@ -596,6 +799,13 @@
       // What awaits sign-off is the reviewer's business: those markers get a halo
       // and full strength, so they read at a glance against the building ones.
       ".marker.s-awaiting{opacity:.95;box-shadow:0 0 0 3px rgba(201,138,46,.30)}",
+      // A note of yours on this entry: a dot on the corner, so a pass down the
+      // page shows what you have already been through.
+      ".marker.commented{opacity:.95}",
+      ".marker.commented:after{content:'';position:absolute;top:-3px;right:-3px;",
+      "  width:7px;height:7px;border-radius:50%;background:#1f2328;",
+      "  box-shadow:0 0 0 1.5px #fff}",
+      ".marker{position:absolute}",
       ".s-building{background:#b8873f}.s-early{background:#8fa3b8}",
       ".s-blank{background:#cdc7bb}.s-parked{background:#a89a8c}",
       // display:flex would otherwise override the hidden attribute's display:none,
@@ -615,7 +825,17 @@
       "#p-close{font-size:24px;margin-left:4px}",
       ".chip{display:inline-block;font-size:10px;letter-spacing:.06em;text-transform:uppercase;",
       "  padding:3px 8px;border-radius:99px;color:#fff}",
+      ".chip.ask{background:#7a4a2b;margin-left:5px}",
+      "#p-body-wrap{position:relative;flex:1;min-height:0;display:flex}",
       "#p-body{overflow-y:auto;padding:4px 20px 20px;flex:1;font-size:14px;line-height:1.55;color:#575d66}",
+      // A quiet cue that the panel scrolls: a fade at the foot of the content, gone
+      // once you have actually reached the end. The Suggestions/Awaiting/Completed
+      // split means the newest, most load-bearing text is often further down than
+      // it looks from the first screenful.
+      "#p-fade{display:block;position:absolute;left:0;right:0;bottom:0;height:32px;",
+      "  pointer-events:none;transition:opacity .15s;opacity:1;",
+      "  background:linear-gradient(to bottom, rgba(255,255,255,0), #fff)}",
+      "#p-fade[hidden]{opacity:0}",
       "#p-body h3{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#8a9099;",
       "  margin:20px 0 6px;font-weight:600}",
       "#p-body h4{font-size:13.5px;color:#1f2328;margin:14px 0 4px}",
@@ -624,6 +844,12 @@
       "  color:#1f2328;font-style:italic}",
       "#p-body mark{background:#fbf0d4;color:#6b4c12;padding:1px 3px;border-radius:2px}",
       "#p-body .empty{color:#8a9099;font-style:italic}",
+      "#p-body hr.added{border:0;border-top:1px dashed #dbd6cb;margin:18px 0}",
+      "#p-body .latest{background:#faf3e6;border:1px solid #e3d2ad;border-radius:6px;",
+      "  padding:12px 14px 2px;margin:0 0 10px}",
+      "#p-body .latest p:last-child{margin-bottom:10px}",
+      "#p-body .latest-label{font-size:10px;letter-spacing:.09em;text-transform:uppercase;",
+      "  color:#9a6b1e;font-weight:600;margin-bottom:6px}",
       "#p-body details.hist{margin:20px 0 6px}",
       "#p-body details.hist summary{cursor:pointer;font-size:10px;letter-spacing:.09em;",
       "  text-transform:uppercase;color:#8a9099;font-weight:600}",
@@ -646,6 +872,8 @@
       ".act.ok:hover{background:#6b8f5e;color:#fff}",
       ".act.no{border-color:#b0563f;color:#8f3a25}",
       ".act.no:hover{background:#b0563f;color:#fff}",
+      ".act.queue{display:block;width:100%;margin-bottom:8px;text-align:center}",
+      ".act.queue.on{border-color:#4a6b45;background:#eef3ec;color:#3f5c3a;font-weight:600}",
       "#p-msg{font-size:12px;color:#8a9099}",
       "#p-msg.good{color:#4a6b45}#p-msg.bad{color:#8f3a25}",
       "#panel footer{padding:10px 20px;border-top:1px solid #ece8df;font-size:11px;",
@@ -655,6 +883,16 @@
       "  letter-spacing:.07em;text-transform:uppercase;padding:6px 12px;border-radius:99px;",
       "  opacity:.75;text-decoration:none}",
       "#badge:hover,#badge-home:hover{opacity:1}",
+      "#add-chip{position:absolute;pointer-events:auto;cursor:pointer;background:#1f2328;",
+      "  color:#fff;font-size:12px;padding:5px 11px;border:0;border-radius:99px;",
+      "  box-shadow:0 2px 8px rgba(0,0,0,.25)}",
+      "#add-chip:hover{background:#3a3f46}",
+      "#p-body input,#p-body textarea{width:100%;font:inherit;font-size:13px;padding:8px 10px;",
+      "  border:1px solid #dbd6cb;border-radius:4px;background:#fff;color:#1f2328;margin:0 0 8px}",
+      "#p-body textarea{resize:vertical}",
+      "#p-body input:focus,#p-body textarea:focus{outline:none;border-color:#8a9099}",
+      "#p-body .row{display:flex;align-items:center;gap:10px}",
+      "#c-msg{font-size:12px;color:#8a9099}",
       ".flash{position:absolute;background:#fbf0d4;mix-blend-mode:multiply;",
       "  border-radius:2px;pointer-events:none;animation:fade 1.6s ease-out forwards}",
       "@keyframes fade{0%{opacity:0}12%{opacity:1}70%{opacity:1}100%{opacity:0}}",

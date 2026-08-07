@@ -84,6 +84,12 @@ class Handler(SimpleHTTPRequestHandler):
                 build.main()
             except Exception as exc:               # never let a build error 500 the page
                 sys.stderr.write(f"  ! dashboard rebuild failed: {exc}\n")
+        if path == "/_status/assessment.html":
+            try:
+                import assess
+                assess.main()
+            except Exception as exc:
+                sys.stderr.write(f"  ! assessment rebuild failed: {exc}\n")
 
         return super().do_GET()
 
@@ -98,6 +104,26 @@ class Handler(SimpleHTTPRequestHandler):
             return self.send_json({"error": "bad request body"}, 400)
 
         action = path.rsplit("/", 1)[-1]
+
+        # Creating an entry has no file yet, so it is handled before the lookup.
+        if action == "add":
+            slug = req.get("slug") or ""
+            if slug not in PAPERS:
+                return self.send_json({"error": "unknown paper"}, 404)
+            try:
+                p = notes_io.create_entry(ROOT / slug / "notes",
+                                          req.get("anchor") or "",
+                                          req.get("title") or "",
+                                          req.get("note") or "")
+            except ValueError as exc:
+                return self.send_json({"error": str(exc)}, 400)
+            except Exception as exc:
+                sys.stderr.write("  ! create failed: %r\n" % (exc,))
+                return self.send_json({"error": "create failed"}, 500)
+            sys.stderr.write("  created %s\n" % p.name)
+            return self.send_json({"ok": True,
+                                   "file": str(p.relative_to(ROOT))})
+
         try:
             target = notes_io.safe_path(ROOT, req.get("file", ""))
             mtime = req.get("mtime")
@@ -110,6 +136,8 @@ class Handler(SimpleHTTPRequestHandler):
                 new_mtime = notes_io.approve(target, mtime)
             elif action == "reject":
                 new_mtime = notes_io.reject(target, req.get("reason") or "", mtime)
+            elif action == "queue":
+                new_mtime = notes_io.set_queued(target, bool(req.get("queued")), mtime)
             else:
                 return self.send_json({"error": "unknown action"}, 404)
         except notes_io.Conflict as exc:
@@ -146,21 +174,30 @@ class Handler(SimpleHTTPRequestHandler):
         entries = {}
         for ex in build.all_examples(groups):
             # Addressable either by container id (exact, but only once the example is
-            # built) or by the anchor passage quoted in the entry (which most entries
-            # have, including the ones that are still only a spec).
-            if not ex.get("container") and not ex.get("anchor"):
+            # built) or by the anchor passage — the `anchor:` frontmatter where it is
+            # set, else the quote in the entry's Text section, which is the same
+            # passage by convention.
+            anchor = ex.get("anchor") or build.text_quote(ex["raw"])
+            key = build.entry_key(ex)
+            if not key:
                 continue
-            key = ex.get("container") or ("anchor:" + str(ex.get("position") or len(entries)))
             f = ROOT / ex["file"] if ex.get("file") else None
             entries[key] = {
                 "container": ex.get("container"),
                 "mtime": f.stat().st_mtime if f and f.exists() else None,
-                "anchor": ex.get("anchor"),
+                "anchor": anchor,
                 "number": ex.get("num"),
                 "title": ex.get("title") or ex.get("heading"),
                 "status": ex["status"],
                 "statusLabel": build.STATUS[ex["status"]][0],
-                "sections": sections_of(ex["raw"]),
+                "sections": build.sections_of(ex["raw"]),
+                "hasSuggestion": has_open_suggestion(ex["raw"]),
+                "blocked": bool(ex.get("blocked")),
+                "queued": bool(ex.get("queued")),
+                # only worth offering the tick where there is something to build
+                "actionable": (not ex.get("blocked")
+                               and ex["status"] in ("building", "early", "blank")
+                               and build.has_instruction(ex)),
                 "file": ex.get("file"),
             }
         return self.send_json({"entries": entries, "source": source,
@@ -204,24 +241,14 @@ class Handler(SimpleHTTPRequestHandler):
         return first in PAPERS
 
 
-def sections_of(raw):
-    """Split an entry body into its named sections for display. Anything before the
-    first heading is carried as an untitled lead so nothing is dropped."""
-    out, cur = [], {"title": None, "lines": []}
-    for line in raw.split("\n"):
-        s = line.strip()
-        h = build.SUB_HEAD.match(s)
-        b = build.BUILT_MARK.match(s)
-        if h or b:
-            if cur["lines"]:
-                out.append(cur)
-            cur = {"title": h.group(1).strip() if h else "Built", "lines": []}
-            continue
-        cur["lines"].append(line)
-    if cur["lines"]:
-        out.append(cur)
-    return [{"title": s["title"], "text": "\n".join(s["lines"]).strip()}
-            for s in out if "\n".join(s["lines"]).strip()]
+def has_open_suggestion(raw):
+    """Whether this entry has anything actually open in Suggestions — so the
+    margin marker can say "you have already commented here" while cruising, and
+    not merely "this is unfinished"."""
+    for s in build.sections_of(raw):
+        if (s["title"] or "").strip().lower() == "suggestions":
+            return bool(notes_io.PLACEHOLDER.sub("", s["text"]).strip())
+    return False
 
 
 def main():

@@ -5,12 +5,6 @@
 # or data are fetched at run time, so it works offline, over file://, and inside
 # a sandboxed iframe. The parts exist only so the thing stays editable.
 #
-# This memoir is set as text alone — no interactive examples — so unlike the
-# Probability of Induction edition there is no JavaScript in the page at all.
-# The plotting and example machinery now lives in ../shared/ (lib.js, scaffold.js)
-# and is deliberately NOT assembled here; add both before 99 if the paper ever
-# grows demonstrations.
-#
 # src/02_article.html is GENERATED. Do not hand-edit it — the edits will be
 # overwritten. Change the pipeline instead:
 #
@@ -18,6 +12,11 @@
 #   tools/corrections.py  -> build/article.fixed.json           (OCR repairs)
 #   tools/tables.py       the nine tables, as data              (figures)
 #   tools/render.py       -> src/02_article.html                (markup)
+#   tools/examples.py     triggers and containers, from ../notes/ anchors
+#
+# That last step is why an example's trigger is not typed into the article: the
+# article is rewritten on every build, so the triggers are re-inserted each time
+# from the `anchor:` and `container:` in each notes entry.
 #
 # Usage:  ./build.sh          (regenerates the article, writes index.html)
 #         ./build.sh --check  (verifies index.html is up to date, writes nothing)
@@ -29,6 +28,9 @@ cd "$(dirname "$0")"
 PARTS=(
   src/01_head.html     # <head>, all CSS, opens .article-container
   src/02_article.html  # GENERATED: the text, its tables, footnotes, colophon
+  ../shared/lib.js       # SHARED maths, canvas renderer, DOM helpers
+  ../shared/scaffold.js  # SHARED example framework — see shared/scaffold.js
+  src/10_examples.js   # this paper's examples
   src/99_close.html    # </body></html>
 )
 
@@ -36,6 +38,10 @@ if [[ "${1:-}" != "--skip-prose" && "${1:-}" != "--check" ]]; then
   python3 tools/reflow.py
   python3 tools/corrections.py
   python3 tools/render.py
+  # Triggers and containers, put back after every render from the anchors in
+  # ../notes/. See tools/examples.py — 02_article.html is generated, so they
+  # cannot live in it.
+  python3 tools/examples.py
 fi
 
 for p in "${PARTS[@]}"; do

@@ -137,14 +137,10 @@ registerExample("example-ex19", (box) => {
          <strong>${bigmark(right)}</strong> times, a proportion of <strong>${fmt(right / picks, 4)}</strong>. `
       : "";
     $("#ex19-verdict", content).innerHTML = `<div class="note-block">
-      <p>The proportion of liars is given in the premise. Picking a Cretan and calling him a liar is the same
-      kind of calculation as throwing a die: the rule is right as often as the proportion says, and no argument
-      about Epimenides in particular is needed. Nothing is known of him beyond his being a Cretan, so
-      <em>finding Epimenides is drawing a Cretan at random</em>, and the rate at which the rule carries truth
-      is his rate too.</p>
       <p style="margin-bottom:0;">${last}${tally}The rule &ldquo;call any Cretan a liar&rdquo; carries truth
       ${frac(String(liars), "100")} = <strong>${fmt(p, 2)}</strong> of the time. That number is known before
-      any Cretan is picked, and picking more of them only brings the tally towards it.</p></div>`;
+      any Cretan is picked, and as we apply the rule repeatedly we are sure to approach this proportion
+      (if the premises are true).</p></div>`;
     drawCanvas(runCanvas);
   }
 
@@ -361,80 +357,68 @@ registerExample("example-ex20", (box) => {
        thing to be looked up in a panel */
     bounded: () => `, meaning an error bound of &plusmn;${fmt(bound(), 4)}`,
 
+    /* The other end of "even in the worst case". His sentence gives the widest
+       the bound ever gets, at about half; the same instances at a proportion
+       near either extreme buy a far tighter one, and saying so is what makes
+       "worst case" mean anything. Stated at ninety-nine in a hundred, since a
+       hundred Cretans make that the nearest thing to "nearly all". */
+    bestCase: () => {
+      const s = Math.round(num("ex20_s")), conf = num("ex20_conf");
+      const e = boundAtP(conf, s, 0.99);
+      return `<span class="ex-reading">While in the best case, where nearly all Cretans are liars,
+        it would not be in error by more than
+        ${tint(K3, spellNumber(Math.max(1, Math.round(e * 100))))} in a hundred.</span>`;
+    },
+
     /* Where the run stands, in the sentence rather than in a box beside it.
-       Before the reveal it can only report the estimate and whether the draw
-       earned its bound; after it, how far out we were and how often the bound
-       held. */
+
+       Three clauses and no more: what the last induction gave, what bound that
+       estimate carries, and — once revealed — whether the truth fell inside it.
+       The bound quoted here is worked at the proportion the sample actually
+       gave, not at the worst case: the worst case is the only bound available
+       before you have drawn anything, which is why Peirce's sentence states it,
+       but an inquirer holding a sample has a better one and would use it.
+
+       How often the bound has held over many draws is left to the cascade
+       chart, whose title already counts it. Saying it here as well was most of
+       what made this sentence too long, and the two numbers are not the same
+       quantity — the chart's tally is worked at the worst-case bound, which is
+       what it draws.
+       ---------------------------------------------------------------------- */
     reading: () => {
       const st = state();
       if (!st.n) return null;
-      /* tinted, so a reader can see at a glance that this sentence is the
-         apparatus reporting and not Peirce carrying on */
       const said = (s) => `<span class="ex-reading">${s}</span>`;
       const from = tint(K2, spellNumber(st.s));
-      const one = `${tint(EST_COL, fmt(st.last, 3))} &plusmn; ${tint(K3, fmt(st.e, 4))}`;
-      const many = `${bigmark(st.n)} such ${st.n === 1 ? "induction" : "inductions"}`;
-      const avg = tint(EST_COL, fmt(st.mean, 3));
+      const est = tint(EST_COL, fmt(st.last, 3));
+      /* A sample that comes out all one way puts the estimate at 0 or 1, where
+         0.477 root(2p(1-p)/s) is exactly zero — a claim of certainty off five
+         instances, which is absurd and is the whole reason Peirce states his
+         bound at the worst case instead. So at the ends we fall back to his,
+         and say that that is what has happened. His own five liars land here
+         every time, so this is not an edge case but the opening state. */
+      const degenerate = st.last <= 0 || st.last >= 1;
+      const eHat = degenerate ? bound() : boundAtP(st.conf, st.s, st.last);
+      const inBalls = spellNumber(Math.max(1, Math.round(eHat * 100)));
 
       if (!revealed) {
-        const trust = st.fair
-          ? "and since the sample was drawn at random we can rely on that bound"
+        const caveat = st.fair ? ""
           : st.notRandom
-          ? `though the ${from} were taken as they came rather than drawn at random, so the bound has not
-             been earned`
-          : "though the hundred were only partly mixed, so the bound has not quite been earned";
-        return said(`Our last induction from ${from} gave ${one}, ${trust}. Over ${many} the estimates
-          average ${avg}.`);
+          ? ` The ${from} were taken as they came rather than drawn at random, so that bound has not been earned.`
+          : " The hundred were only partly mixed, so that bound has not quite been earned.";
+        const claim = degenerate
+          ? `Our last induction from ${from} gave us ${est}, and a sample all one way leaves that formula
+             nothing to work with &mdash; so we fall back on Peirce's worst case, and expect not to be in
+             error by more than ${tint(K3, inBalls)} in a hundred.`
+          : `Our last induction from ${from} gave us ${est}, and if we think that
+             ${tint(EST_COL, Math.round(st.last * 100))} Cretans in a hundred are liars, we can expect not to
+             be in error by more than ${tint(K3, inBalls)} in a hundred.`;
+        return said(claim + caveat);
       }
-      const d = Math.abs(st.last - truth);
-      const off = d < 0.0005 ? "which it hit exactly"
-        : `out by ${tint(EST_COL, fmt(d, 3))}, ${d <= st.e ? "inside the bound"
-          : d <= 2 * st.e ? "outside it" : "far outside it"}`;
-
-      /* Why a fair draw still misses the claimed rate, in the two ways it can.
-         First and usually larger: the bound is worked out at p = 1/2, where the
-         spread is widest, so at any other proportion the window is wider than
-         that proportion warrants and catches more often than claimed. The
-         bound that would be caught at the claimed rate is calculable — it is
-         the same formula at the real p — so both are given, and the difference
-         between the two rates is the price of not knowing p. Second: the
-         estimate has only s + 1 places to land, so the window catches one of
-         them at some proportions and two at others, which moves the rate
-         either way and is what is left once the first is accounted for. */
-      const eFit = boundAtP(st.conf, st.s, truth);
-      const slack = st.e > eFit * 1.02;
-      /* "Even in the worst case" cuts the other way too, and this is the half
-         of it his sentence leaves implicit: away from a half the same bound is
-         bought with fewer instances. Setting 0.477 root(2q(1-q)/n) equal to the
-         worst case at s gives n = 4 s q(1-q) — at nine liars in ten, two
-         Cretans do what five do at a half. */
-      const nEquiv = Math.max(1, Math.round(4 * st.s * truth * (1 - truth)));
-      const fewer = nEquiv < st.s
-        ? ` At that proportion ${tint(K2, spellNumber(nEquiv))}
-            ${nEquiv === 1 ? "instance" : "instances"} would buy the bound that
-            ${tint(K2, spellNumber(st.s))} do at a half, which is the other half of
-            &ldquo;even in the worst case&rdquo;.`
-        : "";
-      const why = st.fair
-        ? `A fair draw of ${from} from a hundred puts that rate at ${tint(K3, fmt(exactRate(st.e), 3))}. `
-          + (slack
-            ? `Peirce's bound is the worst case, p = &frac12;, so it is wider than this proportion warrants:
-               at ${tint(GOLD, fmt(truth, 2))} the probable error is ${tint(K3, "&plusmn;" + fmt(eFit, 4))},
-               and a bound that size would be caught ${tint(K3, fmt(exactRate(eFit) * 100, 1))} in 100.${fewer}
-               What is left over is the lattice &mdash; `
-            : `The bound already fits this proportion, so what moves the rate off the claim is the lattice
-               &mdash; `)
-          + `an induction from ${from} can land on only ${tint(K2, spellNumber(st.s + 1))} values, and the
-             window round the truth catches one of them at some proportions and two at others.`
-        : st.notRandom
-        ? `The ${from} were remembered rather than drawn, and the bound says nothing about a sample got that
-           way.`
-        : "The hundred were only partly mixed, so the draw was not fair and this rate is not the one the "
-          + "bound promises.";
-      return said(`Our last induction from ${from} gave ${one}, and the real proportion is
-        ${tint(GOLD, fmt(truth, 2))} &mdash; ${off}. Over ${many} the estimates average ${avg}, and the bound
-        caught the truth ${tint(K3, bigmark(st.nIn))} times in ${bigmark(st.n)}, or
-        ${tint(K3, fmt(st.rate * 100, 1))} in 100 where ${tint(K3, st.level)} was claimed. ${why}`);
+      const inside = Math.abs(truth - st.last) <= eHat + 1e-9;
+      return said(`In fact, we see that ${tint(GOLD, Math.round(truth * 100))} Cretans in 100 are liars,
+        which is ${inside ? "" : "<strong>not</strong> "}within our prediction of ${est} &plusmn;
+        ${tint(K3, fmt(eHat, 3))}.`);
     }
   });
 
