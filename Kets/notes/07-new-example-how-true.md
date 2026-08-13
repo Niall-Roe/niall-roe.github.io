@@ -4,7 +4,7 @@ number: 8
 title: "How true?"
 anchor: "but to decide how near my theory probably comes to the true theory or how it ought to be modified, would be a very intricate problem for the solution of which the data are probably insufficient."
 heading: "New example — How true?"
-status: building
+status: awaiting
 container: example-ex8
 ---
 ### Text
@@ -12,6 +12,18 @@ container: example-ex8
 "but to decide how near my theory probably comes to the true theory or how it ought to be modified, would be a very intricate problem for the solution of which the data are probably insufficient."
 
 ### Suggestions
+
+None open.
+
+### Awaiting approval
+
+#### sixth pass — the rest of the data, shown
+A fourth tab: "every standard at Naucratis" — all 514 units of Petrie's table on one axis, each
+standard a clump in its own colour (Arabic dirhem through the ket; the Phoenician shekel and Roman
+uncia lie beyond the axis and the caption says so). The ket is one natural class in a landscape of
+them, each merging at its edges. Non-ket rows are from the rough transcription, marked unverified.
+
+##### the notes this answers
 
 Your question "what does the rest of the data show?" — if you mean the register's other
 standards: the 1926 book continues past the qedet into Necef (152–169 grs), Khoirine, Beqa and
@@ -38,8 +50,6 @@ say something like, here there do appear to be 5 peaks, but [...[ but what? the 
 ---
 
 I mean, if you were to use CSP's method not he bigger data set, what standards would you find?
-
-### Awaiting approval
 
 #### fourth pass — distributions on the both view
 The both view now draws each dataset's smoothed curve, the class curves in their colours, and the

@@ -5,7 +5,7 @@ number: 7
 title: "Working out"
 anchor: "Now the whole interval here is fourteen and one-half grains; and between 136.8 grains to 151.3 grains there is no case of an interval of more than a third of a grain not represented by any weight among the 144."
 heading: "New example — Working out"
-status: building
+status: awaiting
 container: example-ex7
 ---
 ### Text
@@ -13,6 +13,18 @@ container: example-ex7
 "Now the whole interval here is fourteen and one-half grains; and between 136.8 grains to 151.3 grains there is no case of an interval of more than a third of a grain not represented by any weight among the 144."
 
 ### Suggestions
+
+None open.
+
+### Awaiting approval
+
+#### sixth pass — the manuscript page, in place
+The facsimile is set beside the walkthrough: the First Attempt page with the interval subtractions
+in the margin and the tally running down the sheet (the same page that holds the probable-error
+bisections), with a pointer to the first-attempt example that walks the whole page. Your dictated
+text about the two attempts lives in that example, where the tally itself is.
+
+##### the notes this answers
 
 The manuscript page image with the working is still wanted — the ket pages are in texts/427 - First Attempt (Ket pages).pdf and Second Attempt (Ket Pages).pdf; tell me which page shows the working you mean and I will set a facsimile beside the walkthrough (the Second Attempt's p. 17, with his corrected five-standards list, is a strong candidate).
 
@@ -37,8 +49,6 @@ He recorded these numbers in a table with headings  App[arent]. standard · No. 
 The smoothed column shows that he further cleaned the data, smoothing it by [describe the process]. The separated column then shows how Peirce separated that smoothed count into  shares of the supposed standards on either side. We would now call this mixture decomposition. Here Peirce is working the method by hand years before it had an official name 
 
 The page is dated 22 February 1902, with “Washington's birthday” noted in the margin.
-
-### Awaiting approval
 
 #### the check, walked and checked
 Built: his arithmetic confirmed first (151.3 − 136.8 = 14.5, exactly his fourteen and one-half), then every distinct ket value on an axis with a draggable ⅓-grain ruler reporting how many weights fall strictly inside it, and the unrepresented intervals wider than ⅓ grain marked in red. Against the printed table there are five such intervals (136.8→137.2, 137.2→137.6, 149.4→149.8, 150.0→150.4, 150.8→151.3), each 0.4–0.5 grains — so his no-gap claim does not quite survive the printed data, which the example says plainly while keeping his conclusion (the values carpet the interval too evenly for one standard).

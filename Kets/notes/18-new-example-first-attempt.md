@@ -3,7 +3,7 @@ queued: true
 position: 18
 number: 17
 title: "The first attempt, by hand"
-status: building
+status: awaiting
 anchor: "To a person thoroughly familiar with the theory of errors this shows that there must be four or five different standards to which different ones aim to conform."
 heading: "New example — The first attempt, by hand"
 container: example-ex17
@@ -13,6 +13,19 @@ container: example-ex17
 "To a person thoroughly familiar with the theory of errors this shows that there must be four or five different standards to which different ones aim to conform."
 
 ### Suggestions
+
+Still for the MS transcription: the concentric-circle constructions' exact purpose; which
+neighbouring standard owns which Separated share; whether he says why 0.7/0.3 and why the
+lighter neighbour.
+
+### Awaiting approval
+
+#### sixth pass — cross-references settled
+The working-out example (no-gap ruler) now shows the First Attempt page with the interval
+arithmetic beside its walkthrough, pointing here; the probable-error example (new, margin 18)
+draws on the same pages' bisections. This example remains the home of the full walk.
+
+##### the notes this answers
 
 Open for the MS transcription: (a) what exactly the concentric-circle constructions on the
 rough page are doing — my best reading is that they test symmetric fall-off about candidate
@@ -29,8 +42,6 @@ I think you are right about the symmetric fall off.
 it sounds like you worked it all out in the fifth pass. so... build it please. the his working drawn still displays noting. and its a bad title. it shoudl be called smoothing. it shoudl presumably come before or along side the histogram building, as that is how he apparently did it? 
 
 when you are working on an example do not move on to the next example until you are finished.
-
-### Awaiting approval
 
 #### fifth pass — the smoothing rule, found and corrected
 You asked me to consider pages 3–6 of the First Attempt carefully, and they settle it. The

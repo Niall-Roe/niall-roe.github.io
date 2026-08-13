@@ -5,7 +5,7 @@ number: 2
 title: "Petrie"
 anchor: "Prof. [W. M.] Flinders Petrie, whose reasoning powers I had admired long before his other great scientific qualities had been proved, among which his great exactitude and circumspection as a metrologist concerns us here, exhumed, at the ancient trading town of Naucratis, no less than 158 balance-weights having the Egyptian ket as their unit."
 heading: "New example — Petrie"
-status: building
+status: awaiting
 container: example-ex2
 ---
 ### Text
@@ -13,6 +13,17 @@ container: example-ex2
 "Prof. [W. M.] Flinders Petrie, whose reasoning powers I had admired long before his other great scientific qualities had been proved, among which his great exactitude and circumspection as a metrologist concerns us here, exhumed, at the ancient trading town of Naucratis, no less than 158 balance-weights having the Egyptian ket as their unit."
 
 ### Suggestions
+
+None open.
+
+### Awaiting approval
+
+#### sixth pass — the exactitude aside, in
+The note under the map now carries the aside: five misprints surfaced in Petrie's own 1926
+register during verification, each caught only because his redundant columns must agree — the
+exact metrologist's own error curve, findable because of the exactitude.
+
+##### the notes this answers
 
 If the Aabeni weight isn't the blue you meant, drop a preferred image in Images/ and it swaps in.
 
@@ -37,8 +48,6 @@ this visualization works... but I wish it made the point more clearly or more...
 This is the qedet picture. 
 
 '/Users/niallroe/Documents/GitHub/niall-roe.github.io/Kets/Images/Screenshot 2026-08-13 at 5.25.45 PM.png'
-
-### Awaiting approval
 
 #### fourth pass — your map back, and a ket at last
 Reverted to the drawn schematic map as you asked (the wiki image is out of the page). Fetched the

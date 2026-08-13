@@ -5,7 +5,7 @@ number: 13
 title: "Probability Curve"
 anchor: "As for my assumption that the departures of the single weights from their virtual standards conform to the probability curve, it was only adopted as a ready way of imparting definiteness to the problem. Rich as is the store of data given by Petrie, it is insufficient, apparently, for determining the true law of those departures."
 heading: "New example — Probability Curve"
-status: building
+status: awaiting
 container: example-ex13
 ---
 ### Text
@@ -14,13 +14,23 @@ container: example-ex13
 
 ### Suggestions
 
+None open.
+
+### Awaiting approval
+
+#### sixth pass — the data asked which law
+The second half is built: "ask the data which law" scores the probability curve, the flat
+tolerance, and the sharp cutoff on the 142 kets about Peirce's five standards by log-likelihood,
+prints the three totals, and notes that the margins are a handful of log-units on 142 weights —
+his "insufficient, apparently," made quantitative.
+
+##### the notes this answers
+
 Second half (whether the true law can be determined from the data) still open.
 
 ---
 
 the yellow obviously should not climb up the green curve either. yellow bit stays under yellow there.
-
-### Awaiting approval
 
 #### fifth pass — the column obeys the wager
 The activation column is now coloured uniformly by the wager at the ket itself, so a 0% wager

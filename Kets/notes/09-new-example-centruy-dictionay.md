@@ -4,7 +4,7 @@ number: 10
 title: "Centruy Dictionay"
 anchor: "See the article “pound” in the Century Dictionary,"
 heading: "New example — Centruy Dictionay"
-status: done
+status: awaiting
 container: example-ex10
 ---
 ### Text
@@ -12,6 +12,22 @@ container: example-ex10
 "See the article “pound” in the Century Dictionary,"
 
 ### Suggestions
+
+The two dates (1884–85 OWM charge; 1885 testimony) and the meter anecdote still rest on your
+draft's authority — please check them when convenient.
+
+### Awaiting approval
+
+#### sixth pass — the entry written out in full
+The century-pound page now carries the complete pound-noun entry, transcribed: the etymology
+bracket, the whole of sense 1 (the English standards history — Elizabeth's worn standards, the
+hollow Philadelphia pound "such as no European nation would be content to take for a prototype,"
+Edward III, the fair of Troyes — and all eight classes of European pounds with their three tables,
+the French mark-weight pound, and the Charlemagne/Haroun al-Raschid source-criticism), sense 2
+(the money of account, with the American colonies' values), sense 3 and the phrases. The verb and
+pound-the-enclosure remain in facsimile, and the transcription sits in the blue-ruled block.
+
+##### the notes this answers
 
 Full transcription of the remaining senses still open; dates and the meter anecdote still to
 verify against your sources.
@@ -83,3 +99,4 @@ Built: a panel noting that Peirce wrote the Century Dictionary's weights-and-mea
 ##### the original suggestion, for reference
 
 This coudl either open that article up or link to it on another page, depending on size. we have the article so find it and decide.
+

@@ -5,7 +5,7 @@ number: 4
 title: "Copies of a standard"
 anchor: "it is evident that the weights were intended to be copies of several different standards, probably four or five; for there would be no use of a balance, if one could detect the errors of the balance-weights by simply “hefting” them, and comparing them with one's memory of the standard weight. Considering that these weights are small, and were therefore used for weighing costly or even precious matter, our knowledge of the practice of weighing among the ancients gives us ground for thinking it likely that about half the weights would depart from their virtual standards by more, and about half by less, than, say, four or five tenths of one per cent, which, upon a ket, would be from half to two-thirds of a grain."
 heading: "New example — Copies of a standard"
-status: building
+status: awaiting
 container: example-ex4
 ---
 ### Text
@@ -13,6 +13,17 @@ container: example-ex4
 "it is evident that the weights were intended to be copies of several different standards, probably four or five; for there would be no use of a balance, if one could detect the errors of the balance-weights by simply “hefting” them, and comparing them with one's memory of the standard weight. Considering that these weights are small, and were therefore used for weighing costly or even precious matter, our knowledge of the practice of weighing among the ancients gives us ground for thinking it likely that about half the weights would depart from their virtual standards by more, and about half by less, than, say, four or five tenths of one per cent, which, upon a ket, would be from half to two-thirds of a grain."
 
 ### Suggestions
+
+None open.
+
+### Awaiting approval
+
+#### sixth pass — spreads in hand
+Under "gaussian, own spread each," a spread slider now appears for every candidate standard, so
+the spreads can be shaped by hand before (or instead of) snapping; snap still fits them, and
+dragging a dome takes over from the fit.
+
+##### the notes this answers
 
 Adjustable per-standard spreads before snapping (when "gaussian, own spread each" is chosen)
 are not in yet — snap fits them, but there is no hand control. Proposal: a small spread slider
@@ -79,8 +90,6 @@ yes do that please. also, please carefully read my previous set of suggestions. 
 I feel like I am taking crazy pills with the gradient point. this is the screenshot. '/Users/niallroe/Documents/GitHub/niall-roe.github.io/Kets/Images/Screenshot 2026-08-13 at 5.30.57 PM.png'
 
 note my other notes about the colour pallet.
-
-### Awaiting approval
 
 #### fourth pass — colour restored, the game named
 The gradient is back in figuring-out mode: the area under the guess curves is blended slice by
