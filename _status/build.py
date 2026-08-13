@@ -95,6 +95,36 @@ PROJECTS = [
                   "Theory-of-Errors-of-Observation/source/On the Theory of Errors of Observation - Step Plan.tex")],
     },
     {
+        "slug": "Kets",
+        "title": "The Kets of Naucratis",
+        "year": "1902",
+        "stage": "building",
+        "planned": 17,
+        "notes": None,
+        "next": [
+            "First build pass done 13 Aug: 15 examples built and awaiting "
+                "approval; entry 4 (alternative view) parked on Niall's details.",
+            "Open asks for Niall: Petrie/ket photos, the MS page for ex7, "
+                "the Century facsimile choice, Peirce's sketches for ex14.",
+            "Data: data/naukratis1888-kat.csv is the verified 1888 table; "
+                "data/kets-peirce.csv the tenth-precision subset. See data/README.md.",
+        ],
+        "docs": [],
+    },
+    {
+        "slug": "century-pound",
+        "title": "The Century Dictionary — pound",
+        "year": "1889–91",
+        "stage": "text-only",
+        "planned": None,
+        "notes": None,
+        "next": [
+            "Facsimile reference page (pages 4657–8), linked from the Kets "
+                "edition's Century Dictionary example.",
+        ],
+        "docs": [],
+    },
+    {
         "slug": "On-Small-Differences-In-Sensation",
         "title": "On Small Differences in Sensation",
         "year": "1884",
