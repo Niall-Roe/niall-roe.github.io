@@ -5,7 +5,7 @@ number: 16
 title: "Final Causes"
 anchor: "If we are to conserve the truth of that statement, we must understand by final causation that mode of bringing facts about according to which a general description of result is made to come about, quite irrespective of any compulsion for it to come about in this or that particular way; although the means may be adapted to the end. The general result may be brought about at one time in one way, and at another time in another way. Final causation does not determine in what particular way it is to be brought about, but only that the result shall have a certain general character."
 heading: "New example — Final Causes"
-status: building
+status: awaiting
 container: example-ex16
 ---
 ### Text
@@ -14,9 +14,22 @@ container: example-ex16
 
 ### Suggestions
 
-are you gonna do this one?
+None open.
 
 ### Awaiting approval
+
+#### seventh pass — the directions example, built
+The gauge sim is retired for the reason you gave (nobody made a distribution of track gauges).
+In its place, the fake map from your Haack paper: efficient-causation mode gives every walker the
+same compulsions — two north, one east, one south, one east — from scattered starts, and they end
+scattered, the obedience satisfied wherever it lands; final-causation mode marks only the address
+(click the map to move it), and each walker finds its own route — one down the avenues, one
+wandering, one a staircase of corners, and one a bird on the diagonal — converging nowhere but the
+end. Play, scatter, reset.
+
+##### the notes this answers
+
+are you gonna do this one?
 
 #### fifth pass — explainer indented
 Covered by the global explainer rule.

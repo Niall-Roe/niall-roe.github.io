@@ -5,7 +5,7 @@ number: 11
 title: "Towns"
 anchor: "It is, therefore, probable that the five standards were those of five towns with which Naucratis carried on trade."
 heading: "New example — Towns"
-status: building
+status: awaiting
 container: example-ex11
 ---
 ### Text
@@ -14,11 +14,21 @@ container: example-ex11
 
 ### Suggestions
 
+None open.
+
+### Awaiting approval
+
+#### seventh pass — read, and done properly
+Bars: the smooth gradient across bins, as in your screenshot, in this palette. Circles: each town's
+circle now wears the blended colour under the curves at its own standard's position — a cleanly
+separated standard shows its own hue, a merged one shows visibly mixed paint, without the circles
+having to overlap.
+
+##### the notes this answers
+
 re. read. my. comments. this is all SO close. its great. but come on please. 
 
 "the bars should be on a gradient. the circles shoudl reflect the colour under the curve of their standard. ok? look at the screenshot to see what I mean about graduation. I like this colour pallet, do not use the gaudy colours from the screenshot, but adopt the gradiation, here and everywhere else I have asked for it please."
-
-### Awaiting approval
 
 #### fifth pass — the full grammar
 The plot above the map now uses the block columns and gradient-under-curves look, and the

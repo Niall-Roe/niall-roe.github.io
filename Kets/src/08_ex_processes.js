@@ -27,8 +27,17 @@ registerExample("example-ex9", (box) => {
     pl.setup({ xlim: [142.5, 149.2], ylim: [0, ymax], mar: [3, 1.2, 0.8, 0.8] });
     pl.axes({ xat: seqBy(143, 149, 1), yat: [] });
     pl.axisLabels("grains", "");
-    pl.polygon(xs.concat(xs.slice().reverse()), fA.concat(xs.map(() => 0)), { col: "rgba(74,124,89,.14)" });
-    pl.polygon(xs.concat(xs.slice().reverse()), fB.concat(xs.map(() => 0)), { col: "rgba(154,123,63,.16)" });
+    /* gradient fills that stay under their own curves: up to the lower curve
+       the two blend by their shares; from there to the taller curve only the
+       taller one's colour continues */
+    for (let k = 0; k < xs.length - 1; k++) {
+      const x = xs[k], a = fA[k], b = fB[k];
+      if (a <= 0 && b <= 0) continue;
+      const lo = Math.min(a, b), hi = Math.max(a, b);
+      if (lo > 0) pl.rect(x, 0, xs[k + 1], lo, { col: mixCol([KCOL[1], KCOL[2]], [a, b], 0.30), border: null });
+      if (hi > lo) pl.rect(x, lo, xs[k + 1], hi,
+        { col: a > b ? "rgba(74,124,89,.22)" : "rgba(154,123,63,.24)", border: null });
+    }
     pl.lines(xs, fA, { col: KCOL[1], lwd: 1.8 });
     pl.lines(xs, fB, { col: KCOL[2], lwd: 1.8 });
     [[A, KCOL[1]], [B, KCOL[2]]].forEach(([m, c]) => drawKetGlyph(pl, m, 0, c, 8));
@@ -182,9 +191,14 @@ registerExample("example-ex14", (box) => {
       spread of errors we would expect given the process that produced them. The Gaussian law is the
       standard because it is known that when errors are due to many small independent influences,
       their overall distribution will be normal. Here Peirce is describing how the kets would be
-      distributed given different processes of manufacture. Each button is one of his stories, in
-      its own colour &mdash; and his description of that curve lights up in the paragraph above.</p>
-    <div class="ex-buttonbar" id="ex14-btns"></div>
+      distributed given different processes of manufacture. Each button below generates the curve
+      described above. Different manufacturing processes would tend to produce different kinds of
+      errors, and different distributions. When a button is selected, the corresponding account is
+      highlighted above. See if you can fit the data with these different distributions.</p>
+    <div style="display:flex;align-items:flex-start;gap:14px;">
+      <div class="ex-buttonbar" id="ex14-btns" style="flex:1;"></div>
+      <img id="ex14-sketch" alt="Peirce's manuscript sketch of this curve" style="display:none;max-height:52px;margin-top:2px;border:1px solid var(--rule-soft);">
+    </div>
     <div class="ex-buttonbar">
       <button class="btn btn-sm" id="ex14-add">add a standard</button>
       <button class="btn btn-sm" id="ex14-one">back to one</button>
@@ -222,27 +236,31 @@ registerExample("example-ex14", (box) => {
   }
   const nCtl = ctlSlider("copies of each standard", "k1", 2, 4.9, 0.05, 2.48,
                          (v) => String(Math.round(Math.pow(10, v))));
+  const sCtl = ctlSlider("spread (probable error, grains)", "k4", 0.2, 1.5, 0.025, PEIRCE_PE,
+                         (v) => v.toFixed(3));
   const aCtl = ctlSlider("beta &alpha;", "k2", 0.6, 8, 0.2, 2, (v) => v.toFixed(1));
   const bCtl = ctlSlider("beta &beta;", "k3", 0.6, 8, 0.2, 2, (v) => v.toFixed(1));
   $("#ex14-nrow", content).appendChild(nCtl.row);
+  $("#ex14-nrow", content).appendChild(sCtl.row);
+  sCtl.input.addEventListener("input", () => { recast(); drawCanvas(cv); });
   $("#ex14-arow", content).appendChild(aCtl.row);
   $("#ex14-brow", content).appendChild(bCtl.row);
   const NC = () => Math.round(Math.pow(10, nCtl.get()));
   const drawOne = (m) => proc === "beta"
     ? (() => { /* rejection-sample the reshaped beta */
-        const half = 2.5 * PEIRCE_PE, cap = 4 / (2 * half);
+        const half = 2.5 * sCtl.get(), cap = 4 / (2 * half);
         for (let i = 0; i < 400; i++) {
           const x = m - half + 2 * half * Math.random();
-          if (Math.random() * cap < lawDens("beta", x, m, PEIRCE_PE, { a: aCtl.get(), b: bCtl.get() })) return x;
+          if (Math.random() * cap < lawDens("beta", x, m, sCtl.get(), { a: aCtl.get(), b: bCtl.get() })) return x;
         }
         return m;
       })()
-    : PROCESSES[proc].draw(m, PEIRCE_PE);
+    : PROCESSES[proc].draw(m, sCtl.get());
   const curveOf = (m, n) => proc === "beta"
     ? (() => { const xs = seqBy(m - 4, m + 4, 0.05);
-        return { xs, ys: xs.map((x) => n * BIN_W * lawDens("beta", x, m, PEIRCE_PE, { a: aCtl.get(), b: bCtl.get() })) }; })()
-    : processCurve(proc, m, PEIRCE_PE, n);
-  const drawOneAs = (m, pk) => PROCESSES[pk].draw(m, PEIRCE_PE);
+        return { xs, ys: xs.map((x) => n * BIN_W * lawDens("beta", x, m, sCtl.get(), { a: aCtl.get(), b: bCtl.get() })) }; })()
+    : processCurve(proc, m, sCtl.get(), n);
+  const drawOneAs = (m, pk) => PROCESSES[pk].draw(m, sCtl.get());
   const recast = () => {
     copies = []; curves = [];
     stds.forEach((m, si) => {
@@ -250,12 +268,20 @@ registerExample("example-ex14", (box) => {
       const c = [];
       for (let i = 0; i < NC(); i++) c.push(pk ? drawOneAs(m, pk) : drawOne(m));
       copies.push(c);
-      curves.push(pk ? processCurve(pk, m, PEIRCE_PE, NC()) : curveOf(m, NC()));
+      curves.push(pk ? processCurve(pk, m, sCtl.get(), NC()) : curveOf(m, NC()));
     });
   };
   recast();
   const PCOl = (k) => (k === "beta" ? "#5f7d8c" : KCOL[PKEYS.indexOf(k) % KCOL.length]);
+  const SK = { topheavy: "IMG_SK_RECT", topheavyVar: "IMG_SK_FLEX" };
+  const showSketch = () => {
+    const el = $("#ex14-sketch", content);
+    if (!el) return;
+    if (SK[proc]) { el.src = window[SK[proc]] || (SK[proc] === "IMG_SK_RECT" ? IMG_SK_RECT : IMG_SK_FLEX); el.style.display = ""; }
+    else el.style.display = "none";
+  };
   const hl = () => {
+    showSketch();
     PKEYS.forEach((k) => {
       const el = $("#ex14-hl-" + k);
       if (el) el.style.backgroundColor = (k === proc && box.closest(".example-container").classList.contains("open"))
@@ -353,8 +379,11 @@ registerExample("example-ex14", (box) => {
     drawCanvas(cv);
   });
   $("#ex14-snap", content).addEventListener("click", () => {
-    const fit = lawFit(KETS142, stds.length, "gauss", PEIRCE_PE, { init: stds });
-    stds = fit.mu.slice(); recast(); drawCanvas(cv);
+    const fit = emFit(KETS142, stds.length, { init: stds });   /* free spread */
+    stds = fit.mu.slice();
+    sCtl.input.value = Math.max(0.2, Math.min(1.5, +(fit.sd * 0.6745).toFixed(3)));
+    sCtl.input.dispatchEvent(new Event("input"));
+    recast(); drawCanvas(cv);
   });
   $("#ex14-add", content).addEventListener("click", () => {
     if (stds.length >= 4) return;
@@ -377,123 +406,175 @@ registerExample("example-ex14", (box) => {
 });
 
 registerExample("example-ex16", (box) => {
-  box.appendChild(exHeader("Interactive Example: Converging on a gauge", "ex16-content"));
-  /* a historical convergence in the O-and-0 spirit: early railways each built
-     to their own track gauge; interchange pressure pulled new construction
-     toward one standard. Schematic, with the famous gauges labelled. */
-  const REGIONS = [
-    { name: "Great Western (Brunel)", start: 84.25, rate: 0.10 },   /* 7'0¼" */
-    { name: "colliery lines (Stephenson)", start: 56.5, rate: 0.5 },/* 4'8½" */
-    { name: "southern US roads", start: 60, rate: 0.16 },           /* 5'0" */
-    { name: "Scotch gauge", start: 54, rate: 0.22 },                /* 4'6" */
-  ];
+  box.appendChild(exHeader("Interactive Example: Directions and destinations", "ex16-content"));
+  /* the directions example: efficient causation follows the instructions
+     wherever they lead; final causation reaches the address however it can */
+  const GRID = 11, CELL = 1;
   const content = h(`<div id="ex16-content" class="example-content">
-    <p>The early railways each built to their own track gauge &mdash; Brunel's Great Western at
-      7&thinsp;ft&thinsp;0&frac14;&thinsp;in, the colliery lines at 4&thinsp;ft&thinsp;8&frac12;,
-      the Scotch lines at 4&thinsp;ft&thinsp;6, the American South at 5&thinsp;ft. Wagons cannot
-      cross a break of gauge, so every junction rewarded whichever gauge the neighbours already
-      had. The gold ring marks the gauge the network settled on: not decreed first and obeyed
-      after (Parliament's Gauge Act of 1846 followed the traffic), but the <em>general description
-      of result</em> that interchange kept selecting, by different routes in different regions.
-      Press play; then <span class="click-cue">drag the ring</span> to see the same mechanisms
-      find a different settlement &mdash; the mechanisms do not care which gauge wins, only that
-      one does.</p>
+    <p>A fake map, and the difference between the two kinds of causation. Under <em>efficient
+      causation</em>, every walker is given the same compulsions &mdash; two blocks north, one
+      east, one south, one east &mdash; and obeys them from wherever it happens to start. What
+      matters is that each does what it is told; where it ends up is no part of the story, so
+      scattered starts give scattered ends. Under <em>final causation</em>, the walkers get no
+      route at all &mdash; only the address marked in gold. Each finds its own way: one hugs the
+      avenues, one wanders, one cuts corners, one is a bird and flies straight. The routes differ
+      and even converge only near the end; the destination alone is fixed. <em>The general result
+      may be brought about at one time in one way, and at another time in another.</em></p>
+    <div class="mode-tabs">
+      <button class="mode-tab active" data-m="eff">efficient causation</button>
+      <button class="mode-tab" data-m="fin">final causation</button>
+    </div>
     <div class="ex-buttonbar">
       <button class="btn btn-primary" id="ex16-play">play</button>
-      <button class="btn" id="ex16-step">step</button>
+      <button class="btn" id="ex16-scatter">scatter the starting points</button>
       <button class="btn" id="ex16-reset">reset</button>
-      <span class="ex27-lead" id="ex16-gen"></span>
     </div>
     <div class="plot-container"></div>
     <div class="result-box" id="ex16-read"></div>
   </div>`);
   box.appendChild(content);
 
-  let target = 56.5, gen = 0;
-  const N = 90;
-  const z = [];
-  for (let i = 0; i < REGIONS.length * N; i++) z.push(randn());
-  let means = REGIONS.map((r) => r.start);
-  let trails = means.map((m) => [m]);
-  const reset = () => { gen = 0; means = REGIONS.map((r) => r.start); trails = means.map((m) => [m]); };
-  const step = () => {
-    gen++;
-    means = means.map((m, i) => {
-      const nm = m + REGIONS[i].rate * (target - m) + 0.35 * randn();
-      trails[i].push(nm);
-      return nm;
+  const DIRS = [[0, 1], [0, 1], [1, 0], [0, -1], [1, 0]];   /* 2 N, 1 E, 1 S, 1 E */
+  const DIRWORDS = "two blocks north, one east, one south, one east";
+  let mode = "eff";
+  let target = [8, 7];
+  let starts = [[1, 1], [2, 6], [5, 2], [8, 1]];
+  let walkers = [], step = 0, timer = null;
+  const STYLES = ["avenue", "wander", "corner", "bird"];
+
+  function reset() {
+    step = 0;
+    walkers = starts.map((s, i) => ({ pos: s.slice(), trail: [s.slice()], style: STYLES[i % 4], done: false }));
+    drawCanvas(cv); read();
+  }
+  function scatter() {
+    starts = starts.map(() => [1 + Math.floor(Math.random() * (GRID - 2)), 1 + Math.floor(Math.random() * (GRID - 2))]);
+    reset();
+  }
+  function advance() {
+    step++;
+    walkers.forEach((wk, i) => {
+      if (mode === "eff") {
+        if (step <= DIRS.length) {
+          wk.pos = [wk.pos[0] + DIRS[step - 1][0], wk.pos[1] + DIRS[step - 1][1]];
+          wk.trail.push(wk.pos.slice());
+        } else wk.done = true;
+        return;
+      }
+      if (wk.done) return;
+      const [tx, ty] = target, [x, y] = wk.pos;
+      if (x === tx && y === ty) { wk.done = true; return; }
+      let nx = x, ny = y;
+      if (wk.style === "bird") {
+        /* straight over the rooftops, a fraction of the diagonal per step */
+        const dx = tx - x, dy = ty - y, L = Math.hypot(dx, dy);
+        const stepLen = Math.min(1.4, L);
+        nx = x + dx / L * stepLen; ny = y + dy / L * stepLen;
+        if (Math.hypot(tx - nx, ty - ny) < 0.4) { nx = tx; ny = ty; }
+      } else if (wk.style === "avenue") {
+        /* all the easting first, then the northing */
+        if (x !== tx) nx = x + Math.sign(tx - x);
+        else ny = y + Math.sign(ty - y);
+      } else if (wk.style === "corner") {
+        /* alternate: a staircase toward the address */
+        if ((step % 2 === 0 && x !== tx) || y === ty) nx = x + Math.sign(tx - x);
+        else ny = y + Math.sign(ty - y);
+      } else {
+        /* wander: usually toward, sometimes astray */
+        if (Math.random() < 0.3) {
+          if (Math.random() < 0.5 && x > 0 && x < GRID - 1) nx = x + (Math.random() < 0.5 ? 1 : -1);
+          else if (y > 0 && y < GRID - 1) ny = y + (Math.random() < 0.5 ? 1 : -1);
+        } else if (Math.abs(tx - x) > Math.abs(ty - y)) nx = x + Math.sign(tx - x);
+        else if (y !== ty) ny = y + Math.sign(ty - y);
+        else nx = x + Math.sign(tx - x);
+      }
+      wk.pos = [nx, ny];
+      wk.trail.push(wk.pos.slice());
+      if (Math.abs(nx - target[0]) < 0.01 && Math.abs(ny - target[1]) < 0.01) wk.done = true;
     });
-  };
-  const inchLab = (v) => {
-    const ft = Math.floor(v / 12), inch = v - ft * 12;
-    return ft + "\u2032" + (Math.abs(inch) < 0.05 ? "" : Math.round(inch * 2) / 2 + "\u2033");
-  };
-  const cv = mkCanvas(330, (pl, W, H) => {
-    const xlim = [50, 90];
-    const sd = 1.1;
-    /* each region's spread of lines as they stand this decade — messy, like the
-       market example: histogram of frozen draws about the moving mean */
-    const binw = 1;
-    const counts = REGIONS.map((r, i) => {
-      const vals = [];
-      for (let j = 0; j < N; j++) vals.push(means[i] + sd * z[i * N + j]);
-      return histCounts(vals, xlim[0], xlim[1], binw);
+    drawCanvas(cv); read();
+    if (walkers.every((wk) => wk.done) && timer) {
+      clearInterval(timer); timer = null;
+      $("#ex16-play", content).textContent = "play";
+    }
+  }
+  const cv = mkCanvas(340, (pl, W, H) => {
+    pl.setup({ xlim: [-0.7, GRID - 0.3], ylim: [-0.7, GRID - 0.3], mar: [0.5, 0.5, 0.5, 0.5], ext: false });
+    /* the streets */
+    for (let i = 0; i < GRID; i++) {
+      pl.segments(i, 0, i, GRID - 1, { col: PAL.ruleSoft, lwd: 1 });
+      pl.segments(0, i, GRID - 1, i, { col: PAL.ruleSoft, lwd: 1 });
+    }
+    if (mode === "fin") {
+      /* the address: a gold ring on its block */
+      const c = pl.ctx, TX = pl.X(target[0]), TY = pl.Y(target[1]);
+      c.save(); c.strokeStyle = PAL.accent4; c.lineWidth = 3;
+      c.beginPath(); c.arc(TX, TY, 11, 0, 2 * Math.PI); c.stroke(); c.restore();
+      pl.text(target[0], target[1] + 0.55, "the address", { col: PAL.accent4, cex: 0.85 });
+    }
+    walkers.forEach((wk, i) => {
+      const col = KCOL[i % KCOL.length];
+      pl.lines(wk.trail.map((p) => p[0]), wk.trail.map((p) => p[1]),
+               { col, lwd: 1.7, lty: wk.style === "bird" ? 2 : 1 });
+      pl.points([wk.trail[0][0]], [wk.trail[0][1]], { col, cex: 1, pch: 21 });
+      pl.points([wk.pos[0]], [wk.pos[1]], { col, cex: 1.6 });
+      if (wk.style === "bird" && mode === "fin") pl.text(wk.pos[0], wk.pos[1] + 0.45, "the bird", { col, cex: 0.72 });
     });
-    const ymax = Math.max(...counts.flat()) * 1.35;
-    pl.setup({ xlim, ylim: [0, ymax], mar: [3, 1, 0.8, 0.8] });
-    pl.axes({ xat: [54, 56.5, 60, 63, 66, 72, 78, 84], xlabels: ["4\u20326", "4\u20328\u00bd", "5\u2032", "5\u20323", "5\u20326", "6\u2032", "6\u20326", "7\u2032"], yat: [] });
-    pl.axisLabels("track gauge", "");
-    counts.forEach((c, i) => {
-      c.forEach((n, b) => {
-        if (n) pl.rect(xlim[0] + b * binw, 0, xlim[0] + (b + 1) * binw, n,
-                       { col: KTINT[i % KTINT.length], border: null });
-      });
-      const xs = seqBy(xlim[0], xlim[1], 0.2);
-      pl.lines(xs, xs.map((x) => N * binw * dnorm(x, means[i], sd)), { col: KCOL[i % KCOL.length], lwd: 1.5 });
-      drawKetGlyph(pl, means[i], 0, KCOL[i % KCOL.length], 7);
-      trails[i].forEach((m, t) => pl.points([m], [ymax * (0.82 + 0.035 * i)],
-        { col: KCOL[i % KCOL.length], cex: 0.3 + 0.4 * t / Math.max(trails[i].length, 1) }));
-    });
-    const c = pl.ctx, TX = pl.X(target), TY = pl.Y(0);
-    c.save(); c.strokeStyle = PAL.accent4; c.lineWidth = 3;
-    c.beginPath(); c.arc(TX, TY - 6, 11, 0, 2 * Math.PI); c.stroke(); c.restore();
-    pl.segments(target, 0, target, ymax * 0.78, { col: PAL.accent4, lwd: 1, lty: 3 });
-    pl.text(target, ymax * 0.97, "the settlement: " + inchLab(target), { col: PAL.accent4, cex: 0.85 });
-    pl.legend("topright", { legend: REGIONS.map((r) => r.name),
-      col: REGIONS.map((_, i) => KCOL[i % KCOL.length]),
-      lwd: REGIONS.map(() => 2), cex: 0.72 });
-    $("#ex16-gen", content).textContent = "year " + (1830 + gen * 4);
-    const near = means.every((m) => Math.abs(m - target) < 1.6);
-    const read = $("#ex16-read");
-    if (read) read.innerHTML = gen === 0
-      ? `<p>Four practices, four gauges, four mechanisms of correction &mdash; conversion costs,
-         through-traffic, rolling-stock markets, statute.</p>`
-      : near
-      ? `<p>All four now cluster about the ring. The particular ways differed &mdash; the Great
-         Western fought for decades, the collieries never had to move &mdash; and the general
-         character of the result is the same. Drag the ring and play again: the same mechanisms
-         settle on whatever gauge the network happens to reward, which is what makes the cause
-         final rather than efficient.</p>`
-      : `<p>${1830 + gen * 4}: conversion under way, each region on its own path.</p>`;
   });
   $(".plot-container", content).appendChild(cv);
-  /* dragging the ring changes the settlement only — the regions keep their
-     histories and start converging toward the new target from where they are */
-  attachDrag(cv, () => 0, (i, x) => { target = Math.max(51, Math.min(88, +x.toFixed(1))); drawCanvas(cv); });
-  let timer = null;
-  const playBtn = $("#ex16-play", content);
-  playBtn.addEventListener("click", () => {
-    if (timer) { clearInterval(timer); timer = null; playBtn.textContent = "play"; return; }
-    playBtn.textContent = "pause";
-    timer = setInterval(() => {
-      if (gen > 24) { clearInterval(timer); timer = null; playBtn.textContent = "play"; return; }
-      step(); drawCanvas(cv);
-    }, 240);
+  /* in final mode the address can be dragged anywhere on the map */
+  attachDrag(cv, () => (mode === "fin" ? 0 : null), (i, x) => {
+    /* invY needed too: use the canvas's plot to recover both coordinates */
+    const pl = cv._pl;
+    if (!pl) return;
+    target = [Math.max(0, Math.min(GRID - 1, Math.round(x))), target[1]];
+    drawCanvas(cv);
   });
-  $("#ex16-step", content).addEventListener("click", () => { step(); drawCanvas(cv); });
+  cv.addEventListener("pointerdown", (ev) => {
+    if (mode !== "fin") return;
+    const r = cv.getBoundingClientRect(), pl = cv._pl;
+    if (!pl) return;
+    const gx = Math.round(pl.invX(ev.clientX - r.left)), gy = Math.round(pl.invY(ev.clientY - r.top));
+    if (gx >= 0 && gx < GRID && gy >= 0 && gy < GRID) { target = [gx, gy]; walkers.forEach((wk) => { wk.done = false; }); drawCanvas(cv); }
+  });
+  function read() {
+    const done = walkers.filter((wk) => wk.done).length;
+    const el = $("#ex16-read", content);
+    if (!el) return;
+    if (mode === "eff") {
+      el.innerHTML = step === 0
+        ? `<p>Four walkers, four starting corners, one set of compulsions: ${DIRWORDS}. Press play.</p>`
+        : step >= DIRS.length
+        ? `<p>Every walker obeyed the same compulsions perfectly &mdash; and they stand in four
+           different places. Efficient causation is satisfied by the obedience, wherever it lands.</p>`
+        : `<p>Step ${step} of ${DIRS.length}: each is following the instructions.</p>`;
+    } else {
+      el.innerHTML = step === 0
+        ? `<p>The same scattered starts, no route given &mdash; only the address. Click anywhere on
+           the map to move the address; press play.</p>`
+        : done === walkers.length
+        ? `<p>All four are at the address, by four routes that agree nowhere except the end. The
+           result's general character was fixed; the particular way was not &mdash; that is final
+           causation, and it is why the class of things at the address is a natural one.</p>`
+        : `<p>${done} of ${walkers.length} arrived; the routes converge only as they close in.</p>`;
+    }
+  }
+  $("#ex16-play", content).addEventListener("click", (e) => {
+    if (timer) { clearInterval(timer); timer = null; e.target.textContent = "play"; return; }
+    e.target.textContent = "pause";
+    timer = setInterval(advance, 340);
+  });
+  $("#ex16-scatter", content).addEventListener("click", scatter);
   $("#ex16-reset", content).addEventListener("click", () => {
-    if (timer) { clearInterval(timer); timer = null; playBtn.textContent = "play"; }
-    reset(); drawCanvas(cv);
+    if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
+    reset();
   });
+  $$(".mode-tab", content).forEach((b) => b.addEventListener("click", () => {
+    $$(".mode-tab", content).forEach((x) => x.classList.remove("active"));
+    b.classList.add("active"); mode = b.dataset.m;
+    if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
+    reset();
+  }));
+  reset();
 });
 </script>

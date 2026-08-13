@@ -125,6 +125,7 @@ function drawMixture(pl, W, H, o) {
       if (b >= 0 && b < nb) per[si][b]++;
     };
     if (o.copies) o.copies.forEach((c, si) => c.forEach((v) => put(v, si)));
+    const graded = !o.copies;   /* data: the colour graduates smoothly bin to bin */
     (o.data || []).forEach((v) => {
       const r = responsibilities(v, stds, wts, sd);
       let bi = 0; r.forEach((q, j) => { if (q > r[bi]) bi = j; });
@@ -133,9 +134,12 @@ function drawMixture(pl, W, H, o) {
     for (let b = 0; b < nb; b++) {
       let y = 0;
       const x0 = BIN_0 + b * BIN_W;
+      const rMid = graded ? responsibilities(x0 + BIN_W / 2, stds, wts, sd) : null;
       for (let si = 0; si < stds.length; si++) {
         for (let u = 0; u < per[si][b]; u++) {
-          pl.rect(x0, y, x0 + BIN_W, y + 1, { col: KTINT[si % KTINT.length], border: PAL.paper });
+          pl.rect(x0, y, x0 + BIN_W, y + 1,
+                  { col: graded ? mixCol(KCOL, rMid, 0.55) : KTINT[si % KTINT.length],
+                    border: PAL.paper });
           y += 1;
         }
       }
@@ -147,9 +151,7 @@ function drawMixture(pl, W, H, o) {
       let fill = "rgba(87,93,102,.35)";
       if (o.binTint && o.binTint[i]) fill = o.binTint[i];
       else if (o.blend && stds.length) {
-        const r = responsibilities(mid, stds, wts, sd);
-        let bi = 0; r.forEach((v, j) => { if (v > r[bi]) bi = j; });
-        fill = KTINT[bi % KTINT.length];
+        fill = mixCol(KCOL, responsibilities(mid, stds, wts, sd), 0.55);
       }
       pl.rect(b0, 0, b0 + BIN_W, counts[i], { col: fill, border: PAL.paper });
     }

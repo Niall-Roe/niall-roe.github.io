@@ -239,6 +239,7 @@ registerExample("example-ex6", (box) => {
     </div>
     <div class="ex-buttonbar">
       <button class="btn" id="ex6-first">his first attempt (four standards)</button>
+      <button class="btn" id="ex6-second">his second attempt (five standards)</button>
       <button class="btn btn-success" id="ex6-fit">best fit for this many standards</button>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex6-fixsd" checked> hold the spread at &#8541; grain</label></label>
@@ -378,6 +379,12 @@ registerExample("example-ex6", (box) => {
   $("#ex6-first", content).addEventListener("click", () => {
     kCtl.input.value = 4; kCtl.input.dispatchEvent(new Event("input"));
     stds = FIRST_ATTEMPT.slice(); poke();
+  });
+  $("#ex6-second", content).addEventListener("click", () => {
+    kCtl.input.value = 5; kCtl.input.dispatchEvent(new Event("input"));
+    stds = PEIRCE_STANDARDS.slice();
+    peCtl.input.value = PEIRCE_PE; peCtl.input.dispatchEvent(new Event("input"));
+    poke();
   });
   $("#ex6-fit", content).addEventListener("click", () => {
     const fixed = $("#ex6-fixsd", content).checked;

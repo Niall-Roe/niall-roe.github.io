@@ -14,9 +14,25 @@ container: example-ex2
 
 ### Suggestions
 
-None open.
+Choose: the balance mini-interactive, the wall-painting pair, or leave the panel as it stands.
+A source credit for your qedet photograph would also be good to record.
 
 ### Awaiting approval
+
+#### seventh pass — your qedet photo, and the clause
+Your photograph of the seven domed qedets is in, replacing the faience weight, and "as Petrie
+never uses 'ket'" follows "elsewhere" as asked. On your two questions: for "how does he work this
+out in the first attempt?" — if you mean the corrections for wear, Petrie supplies them (present
+vs. ancient columns) and Peirce takes them ready-made; the first attempt's own working starts at
+the tally. For making this panel's point more directly: my best idea is to replace the static
+shelf with a single draggable balance — a ket on one pan, grain pouring onto the other, the beam
+tipping — so the reader feels what a weight is FOR before the statistics start; a second option is
+a photo pair (weight + balance from an Egyptian wall painting, public domain). Say which and it
+goes in.
+
+##### the notes this answers
+
+None open.
 
 #### sixth pass — the exactitude aside, in
 The note under the map now carries the aside: five misprints surfaced in Petrie's own 1926

@@ -190,15 +190,14 @@ registerExample("example-ex2", (box) => {
         <p>On the unit's name: the Egyptian is <em>qdt</em> (Coptic &#x2C99;&#x2C93;&#x3EF;), and
         the literature transliterates it Qedet, Kedet, Kite, Kat, or Ket. Petrie wrote <em>kat</em>
         in 1886 and corrected himself to <em>qedet</em> by 1926; Peirce's <em>ket</em> must come
-        from elsewhere. This edition keeps to &ldquo;ket,&rdquo; Peirce's spelling.</p></div>
+        from elsewhere, as Petrie never uses &ldquo;ket.&rdquo; This edition keeps to &ldquo;ket,&rdquo; Peirce's spelling.</p></div>
     </div>
     <div class="row" style="margin-top:14px;">
       <div class="col col-8"><div class="plot-container" style="margin:0;"></div></div>
-      <div class="col col-4"><img src="${IMG_QEDET}" alt="Green-glazed faience weight of the high steward Aabeni, marked 50 qedet"
+      <div class="col col-4"><img src="${IMG_QEDET}" alt="Seven bronze qedet weights, domed, with red catalogue numbers"
         style="max-width:100%;border:1px solid var(--rule);">
-        <div style="font-size:.78em;color:var(--ink-faint);margin-top:4px;">A ket in the flesh:
-        green-glazed faience weight of the high steward Aabeni, marked 50 qedet. Petrie Museum;
-        photo Osama S. M. Amin, CC BY-SA 4.0.</div></div>
+        <div style="font-size:.78em;color:var(--ink-faint);margin-top:4px;">Kets in the flesh:
+        domed qedet weights with their catalogue numbers.</div></div>
     </div>
     <p class="note-block">The map is drawn, and schematic. On the exactitude itself: in verifying
       the data behind this page, five misprints surfaced in Petrie's own 1926 register &mdash; a

@@ -18,6 +18,16 @@ None open.
 
 ### Awaiting approval
 
+#### seventh pass — colours keep to their own curves
+The fill now runs blended up to the lower curve only; above that, the taller curve's own colour
+alone continues — the amber never climbs the green slope, and with the sharp-cutoff law the green
+shading ends exactly where green's possibility ends, which also keeps the earlier 0%-wager fix
+honest rather than a patch.
+
+##### the notes this answers
+
+None open.
+
 #### sixth pass — the data asked which law
 The second half is built: "ask the data which law" scores the probability curve, the flat
 tolerance, and the sharp cutoff on the 142 kets about Peirce's five standards by log-likelihood,

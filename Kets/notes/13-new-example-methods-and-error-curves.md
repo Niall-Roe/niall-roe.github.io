@@ -18,6 +18,18 @@ None open.
 
 ### Awaiting approval
 
+#### seventh pass — your text, the spread, and Peirce's own sketches
+The explainer is your wording verbatim. A spread slider now governs every process (and snap-to-fit
+adjusts it too, fitting the spread along with the standards). And the sketches from your screenshot
+— which are Peirce's actual pen drawings of the cut-off rectangle and the contrary-flexure curves —
+now appear beside the buttons when the matching button is pressed, and are restored INTO the
+article text itself at the two places where the editors' omission note used to stand, with
+footnote 2 recording the restoration.
+
+##### the notes this answers
+
+None open.
+
 #### sixth pass — each town its own method
 An "each standard its own method" toggle adds a process picker per standard, so different towns
 manufacture differently and the summed histogram shows what their mixture prints — combined with

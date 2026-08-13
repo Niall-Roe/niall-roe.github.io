@@ -76,7 +76,9 @@ registerExample("example-ex11", (box) => {
       const c = pl.ctx, X = pl.X(x), Y = pl.Y(y);
       const pxr = Math.abs(pl.X(x + r) - X);
       c.save();
-      c.fillStyle = mixCol([KCOL[i], "#8a9099"], [1 - amb[i] * 1.6, amb[i] * 1.6], 0.35);
+      /* the circle wears the blended colour under the curves at its own
+         standard — merged standards show visibly mixed circles */
+      c.fillStyle = mixCol(KCOL, responsibilities(stds[i], stds, wts, sd), 0.45);
       c.beginPath(); c.arc(X, Y, pxr, 0, 2 * Math.PI); c.fill();
       c.restore();
       pl.text(x, y + 0.55, wts[i] + " kets", { col: KCOL[i], cex: 0.75 });
@@ -139,13 +141,15 @@ registerExample("example-ex13", (box) => {
     pl.axes({ xat: seqBy(142, 149.5, 1), yat: [] });
     pl.axisLabels("grains", "");
     if (law !== "none") {
-      /* the colour climbs the curves: each sliver under the taller curve is
-         filled with the blend of who would own a ket found there */
+      /* gradient fills that keep to their own curves: the blend runs up to the
+         lower curve; above it only the taller curve's own colour continues */
       for (let x = 141.8; x < 149.8; x += 0.05) {
         const dA = 26 * dens(law, x + 0.025, A, pe), dB = 23 * dens(law, x + 0.025, B, pe);
-        const hgt = Math.max(dA, dB);
-        if (dA + dB <= 0 || hgt < ymax * 0.004) continue;
-        pl.rect(x, 0, x + 0.05, hgt, { col: mixCol([CA, CB], [dA, dB], 0.30), border: null });
+        if (dA + dB <= 0) continue;
+        const lo = Math.min(dA, dB), hi = Math.max(dA, dB);
+        if (lo > ymax * 0.003) pl.rect(x, 0, x + 0.05, lo, { col: mixCol([CA, CB], [dA, dB], 0.30), border: null });
+        if (hi > lo) pl.rect(x, lo, x + 0.05, hi,
+          { col: dA > dB ? "rgba(74,124,89,.22)" : "rgba(154,123,63,.24)", border: null });
       }
       pl.lines(xs, fA, { col: CA, lwd: 1.8 });
       pl.lines(xs, fB, { col: CB, lwd: 1.8 });

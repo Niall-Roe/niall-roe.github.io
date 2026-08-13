@@ -5,7 +5,7 @@ number: 9
 title: "Merge"
 anchor: "our object being merely to make it clear that truly natural classes may, and undoubtedly often do merge into one another inextricably."
 heading: "New example — Merge"
-status: building
+status: awaiting
 container: example-ex9
 ---
 ### Text
@@ -14,9 +14,18 @@ container: example-ex9
 
 ### Suggestions
 
-data and curves mode needs to have gradient. see the screenshot. I feel like my comments are getting deleted or something.
+None open.
 
 ### Awaiting approval
+
+#### seventh pass — gradient, own curves only
+The area fills now grade continuously and keep to their own curves: the blend runs up to the
+lower curve; above it only the taller curve's own colour continues, so neither colour ever climbs
+the other's slope.
+
+##### the notes this answers
+
+data and curves mode needs to have gradient. see the screenshot. I feel like my comments are getting deleted or something.
 
 #### third pass — the column, corrected
 You were right that I misread: the area fills stay as they were, and the marker over the black ket

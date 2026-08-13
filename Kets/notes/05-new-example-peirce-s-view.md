@@ -4,7 +4,7 @@ number: 6
 title: "Peirce's view"
 anchor: "I have assumed that there were five different standards; that the weights depart from their standards according to the probability curve; and that the probable error of a single weight is five-eighths of a grain. I assume that of the 144 weights"
 heading: "New example — Peirce's view"
-status: building
+status: awaiting
 container: example-ex6
 ---
 ### Text
@@ -13,11 +13,24 @@ container: example-ex6
 
 ### Suggestions
 
+None open.
+
+### Awaiting approval
+
+#### seventh pass — the gradient, at last, and the second attempt
+You were right and I finally saw it: I had been reading "gradient" as the wash under the curves,
+while your screenshot shows the BARS themselves shading smoothly across the axis. Fixed at the
+engine level: every data bar on the page is now filled with the blended colour at its own bin —
+the blend shifting bin to bin, so the bars run blue into green into gold into rust as the
+standards trade ownership, saturated like your reference, in this palette. It applies here, in
+Merge, in Towns, in the 1926 example, everywhere. And the "his second attempt (five standards)"
+button now sits beside the first-attempt one. I apologise for the repeats it took.
+
+##### the notes this answers
+
 in data and curves the blocks sohudl be gradiated like int he screenshot. this is like the 10th time I am asking for this global change why are you ignoring me. 
 
 if we have a first attempt button we should also have a second attempt button.
-
-### Awaiting approval
 
 #### fourth pass — colour back, the aim stated, the chart smoothed
 The main view's bars are mixed blocks again with the gradient under the class curves; the smoothed
