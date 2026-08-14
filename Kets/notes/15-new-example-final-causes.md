@@ -4,7 +4,7 @@ number: 16
 title: "Final Causes"
 anchor: "If we are to conserve the truth of that statement, we must understand by final causation that mode of bringing facts about according to which a general description of result is made to come about, quite irrespective of any compulsion for it to come about in this or that particular way; although the means may be adapted to the end. The general result may be brought about at one time in one way, and at another time in another way. Final causation does not determine in what particular way it is to be brought about, but only that the result shall have a certain general character."
 heading: "New example — Final Causes"
-status: awaiting
+status: done
 container: example-ex16
 ---
 ### Text
@@ -15,7 +15,7 @@ container: example-ex16
 
 None open.
 
-### Awaiting approval
+### Completed
 
 #### eleventh pass — they set out again from where they stopped
 Corrected: play now sends them on from wherever they walked to, not back to their starting points

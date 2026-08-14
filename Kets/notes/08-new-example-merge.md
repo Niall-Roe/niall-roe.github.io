@@ -4,7 +4,7 @@ number: 9
 title: "Merge"
 anchor: "our object being merely to make it clear that truly natural classes may, and undoubtedly often do merge into one another inextricably."
 heading: "New example — Merge"
-status: awaiting
+status: done
 container: example-ex9
 ---
 ### Text
@@ -15,7 +15,7 @@ container: example-ex9
 
 None open.
 
-### Awaiting approval
+### Completed
 
 #### eighth pass — a gradient column, with the blocks on a toggle
 The column over the black ket is a gradient now: the two colours change over at the share itself,
