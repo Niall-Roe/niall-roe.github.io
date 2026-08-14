@@ -81,7 +81,7 @@ registerExample("example-ex8", (box) => {
         <input type="checkbox" id="ex8-fixsd" checked> hold the spread at &#8541; grain</label></label>
     </div>
     <div class="plot-container"></div>
-    <div class="result-box" id="ex8-read"></div>
+    <div class="note-block" id="ex8-read"></div>
   </div>`);
   box.appendChild(content);
 
@@ -135,7 +135,7 @@ registerExample("example-ex8", (box) => {
     const read = $("#ex8-read");
     if (read) read.style.display = mode === "both" ? "none" : "";
     if (read) read.innerHTML = mode === "register"
-      ? `<p>There do appear to be five peaks, and fitting five standards to the register finds them
+      ? `There do appear to be five peaks, and fitting five standards to the register finds them
          at <span style="font-variant-numeric:tabular-nums">139.1 / 141.9 / 144.6 / 147.1 / 150.4</span>
          grains &mdash; within a fraction of a grain of Peirce's five, only the heaviest drifting
          upward. The classes are looser here (the fitted probable error is near 0.73 grains against
@@ -143,10 +143,10 @@ registerExample("example-ex8", (box) => {
          data still cannot settle is the <em>number</em>: by the information criterion four broad
          standards cover the heap slightly better than five, the margin two or three units, and
          seven follow the bin noise and are charged for it. Press <em>best fit over all</em> to
-         watch the criterion choose.</p>`
+         watch the criterion choose.`
       : mode === "naucratis"
-      ? `<p>The one-town hoard: clumping visible, and five standards fit it comfortably. Drag the
-         domes or press best-fit and compare with Peirce's five.</p>`
+      ? `The one-town hoard: clumping visible, and five standards fit it comfortably. Drag the
+         domes or press best-fit and compare with Peirce's five.`
       : "";
   });
   $(".plot-container", content).appendChild(cv);

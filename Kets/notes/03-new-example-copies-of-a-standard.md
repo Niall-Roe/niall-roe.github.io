@@ -4,7 +4,7 @@ number: 4
 title: "Copies of a standard"
 anchor: "it is evident that the weights were intended to be copies of several different standards, probably four or five; for there would be no use of a balance, if one could detect the errors of the balance-weights by simply “hefting” them, and comparing them with one's memory of the standard weight. Considering that these weights are small, and were therefore used for weighing costly or even precious matter, our knowledge of the practice of weighing among the ancients gives us ground for thinking it likely that about half the weights would depart from their virtual standards by more, and about half by less, than, say, four or five tenths of one per cent, which, upon a ket, would be from half to two-thirds of a grain."
 heading: "New example — Copies of a standard"
-status: awaiting
+status: done
 container: example-ex4
 ---
 ### Text
@@ -15,7 +15,7 @@ container: example-ex4
 
 None open.
 
-### Awaiting approval
+### Completed
 
 #### ninth pass — the readout indented
 The readout under the plot now sits in the same indented, ruled block as the other added text, so

@@ -14,11 +14,15 @@ registerExample("example-ex9", (box) => {
       with its 26 weights and <strong style="color:${KCOL[2]}">146.95 grs.</strong> with its 23 &mdash;
       and the probability curve either class prints. The black ket below has been dug up between them.
       <span class="click-cue">Drag it along the axis.</span></p>
+    <div class="ex-buttonbar">
+      <button class="btn btn-sm is-active" id="ex9-grad">gradient</button>
+      <button class="btn btn-sm" id="ex9-blocks">blocks</button>
+    </div>
     <div class="plot-container"></div>
-    <div class="result-box" id="ex9-read"></div>
+    <div class="note-block" id="ex9-read"></div>
   </div>`);
   box.appendChild(content);
-  let q = 145.8;
+  let q = 145.8, colMode = "grad";
   const sd = PEIRCE_PE * PE_TO_SD;
   const cv = mkCanvas(280, (pl, W, H) => {
     const xs = seqBy(142.5, 149.2, 0.03);
@@ -41,26 +45,46 @@ registerExample("example-ex9", (box) => {
     pl.lines(xs, fA, { col: KCOL[1], lwd: 1.8 });
     pl.lines(xs, fB, { col: KCOL[2], lwd: 1.8 });
     [[A, KCOL[1]], [B, KCOL[2]]].forEach(([m, c]) => drawKetGlyph(pl, m, 0, c, 8));
-    /* a column one probable error wide over the found ket, built of ten
-       blocks split by each standard's share */
+    /* a column one probable error wide over the found ket, carrying the two
+       standards' shares: either as ten blocks, or as a gradient whose colours
+       change over at the share itself */
     const r = responsibilities(q, [A, B], [WA, WB], sd);
-    const cw = PEIRCE_PE, top9 = ymax * 0.78, nb9 = 10, gA = Math.round(r[0] * nb9);
-    for (let u = 0; u < nb9; u++) {
-      pl.rect(q - cw / 2, top9 * u / nb9, q + cw / 2, top9 * (u + 1) / nb9,
-              { col: u < gA ? "rgba(74,124,89,.55)" : "rgba(154,123,63,.55)", border: PAL.paper });
+    const cw = PEIRCE_PE, top9 = ymax * 0.78;
+    if (colMode === "blocks") {
+      const nb9 = 10, gA = Math.round(r[0] * nb9);
+      for (let u = 0; u < nb9; u++) {
+        pl.rect(q - cw / 2, top9 * u / nb9, q + cw / 2, top9 * (u + 1) / nb9,
+                { col: u < gA ? "rgba(74,124,89,.55)" : "rgba(154,123,63,.55)", border: PAL.paper });
+      }
+    } else {
+      const N9 = 90, band = 0.22;
+      for (let u = 0; u < N9; u++) {
+        const f = (u + 0.5) / N9;                       /* height up the column */
+        const wA = Math.max(0, Math.min(1, (r[0] - f) / band + 0.5));
+        pl.rect(q - cw / 2, top9 * u / N9, q + cw / 2, top9 * (u + 1) / N9,
+                { col: mixCol([KCOL[1], KCOL[2]], [wA, 1 - wA], 0.62), border: null });
+      }
     }
     drawKetGlyph(pl, q, 0, PAL.ink, 8);
     pl.text(q, ymax * 0.88, q.toFixed(1) + " grs.", { col: PAL.ink, cex: 0.85 });
     const read = $("#ex9-read");
-    if (read) read.innerHTML = `<p>Of kets weighing ${q.toFixed(1)} grains,
+    if (read) read.innerHTML = `Of kets weighing ${q.toFixed(1)} grains,
       <strong style="color:${KCOL[1]}">${Math.round(r[0] * 100)}%</strong> served the 144.7 standard and
       <strong style="color:${KCOL[2]}">${Math.round(r[1] * 100)}%</strong> the 146.95.
       ${Math.min(r[0], r[1]) > 0.25
         ? "The proportions are known exactly, and there is no telling which individual kets served which standard. Both classes are real, and they are merged."
-        : "Out here the answer is nearly certain — the classes only merge in the middle country between the standards."}</p>`;
+        : "Out here the answer is nearly certain — the classes only merge in the middle country between the standards."}`;
   });
   $(".plot-container", content).appendChild(cv);
   attachDrag(cv, () => 0, (i, x) => { q = Math.max(142.7, Math.min(149.0, x)); drawCanvas(cv); });
+  [["ex9-grad", "grad"], ["ex9-blocks", "blocks"]].forEach(([id, m]) => {
+    $("#" + id, content).addEventListener("click", () => {
+      colMode = m;
+      $("#ex9-grad", content).classList.toggle("is-active", m === "grad");
+      $("#ex9-blocks", content).classList.toggle("is-active", m === "blocks");
+      drawCanvas(cv);
+    });
+  });
 });
 
 registerExample("example-ex12", (box) => {
@@ -77,7 +101,7 @@ registerExample("example-ex12", (box) => {
       <span class="ex27-lead" id="ex12-gen"></span>
     </div>
     <div class="plot-container"></div>
-    <div class="result-box" id="ex12-read"></div>
+    <div class="note-block" id="ex12-read"></div>
   </div>`);
   box.appendChild(content);
   const STD = 144.7, N = 220;
@@ -133,15 +157,15 @@ registerExample("example-ex12", (box) => {
     $("#ex12-gen", content).textContent = "generation " + g;
     const read = $("#ex12-read");
     if (read) read.innerHTML = g === 0
-      ? "<p>Generation 0: a single class about a single standard.</p>"
-      : `<p>Generation ${g}: the black ket was always a <span style="color:${PAL.accent}">buyers'
+      ? "Generation 0: a single class about a single standard."
+      : `Generation ${g}: the black ket was always a <span style="color:${PAL.accent}">buyers'
          ket</span> and a <span style="color:${PAL.accent2}">sellers' ket</span> lying on top of one
          another; they ride out with their classes to
          <strong style="color:${PAL.accent}">${muB.toFixed(1)}</strong> and
          <strong style="color:${PAL.accent2}">${muS.toFixed(1)}</strong> grains, the grey ghost
          holding the weighted middle. ${2 * off > D * 0.85
            ? "The norms have stabilized: a weight further out would be refused in the market, so they hover at the largest tolerated discrepancy."
-           : "Nobody decreed either norm; the purposes of the copyists are doing it."}</p>`;
+           : "Nobody decreed either norm; the purposes of the copyists are doing it."}`;
   });
   $(".plot-container", content).appendChild(cv);
   [gCtl, bCtl, dCtl].forEach((c) => c.input.addEventListener("input", () => drawCanvas(cv)));
@@ -506,9 +530,21 @@ registerExample("example-ex16", (box) => {
                                b.y0 + Math.floor(Math.random() * Math.max(1, b.y1 - b.y0 + 1))]);
     reset();
   }
+  /* play again sends them out afresh from wherever they walked to */
+  function relaunch() {
+    step = 0;
+    walkers.forEach((wk) => {
+      if (wk.gone) return;
+      wk.done = false;
+      wk.trail = [wk.pos.slice()];
+    });
+    drawCanvas(cv); read();
+  }
+  const offMap = (p) => p[0] < 0 || p[0] > GRID - 1 || p[1] < 0 || p[1] > GRID - 1;
   function advance() {
     step++;
     walkers.forEach((wk, i) => {
+      if (wk.gone) return;
       if (mode === "eff") {
         if (step > DIRS.length) { wk.done = true; return; }
         if (wk.style === "bird") {
@@ -520,6 +556,8 @@ registerExample("example-ex16", (box) => {
         } else {
           wk.pos = [wk.pos[0] + DIRS[step - 1][0], wk.pos[1] + DIRS[step - 1][1]];
         }
+        /* a walker whose orders carry it past the edge simply goes */
+        if (offMap(wk.pos)) { wk.gone = true; wk.done = true; return; }
         wk.trail.push(wk.pos.slice());
         if (step >= DIRS.length) wk.done = true;
         return;
@@ -576,6 +614,7 @@ registerExample("example-ex16", (box) => {
       pl.text(target[0], target[1] + 0.55, "the address", { col: PAL.accent4, cex: 0.85 });
     }
     walkers.forEach((wk, i) => {
+      if (wk.gone) return;
       const col = KCOL[i % KCOL.length];
       pl.lines(wk.trail.map((p) => p[0]), wk.trail.map((p) => p[1]),
                { col, lwd: 1.7, lty: wk.style === "bird" ? 2 : 1 });
@@ -595,6 +634,10 @@ registerExample("example-ex16", (box) => {
   });
   function read() {
     const done = walkers.filter((wk) => wk.done).length;
+    const gone = walkers.filter((wk) => wk.gone).length;
+    const goneNote = gone
+      ? ` ${gone === 1 ? "One walker has" : gone + " walkers have"} walked off the map.`
+      : "";
     const el = $("#ex16-read", content);
     if (!el) return;
     if (mode === "eff") {
@@ -604,8 +647,8 @@ registerExample("example-ex16", (box) => {
         : step >= DIRS.length
         ? `The walkers obeyed the directions. Having started in different places they have ended up
            in different places. The bird ended up in the same place they would have gone had they
-           followed the directions&hellip; but they did not.`
-        : `Step ${step} of ${DIRS.length}: each is following the instructions.`;
+           followed the directions&hellip; but they did not.${goneNote}`
+        : `Step ${step} of ${DIRS.length}: each is following the instructions.${goneNote}`;
     } else {
       el.innerHTML = step === 0
         ? `When you press play, each agent makes their way to the indicated address. Click
@@ -619,7 +662,7 @@ registerExample("example-ex16", (box) => {
   $("#ex16-play", content).addEventListener("click", (e) => {
     if (timer) { clearInterval(timer); timer = null; e.target.textContent = "play"; return; }
     /* pressing play once the walk is over sends them out again from their starts */
-    if (walkers.length && walkers.every((wk) => wk.done)) reset();
+    if (walkers.length && walkers.every((wk) => wk.done)) relaunch();
     e.target.textContent = "pause";
     timer = setInterval(advance, 340);
   });

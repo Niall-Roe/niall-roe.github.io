@@ -17,6 +17,27 @@ None open.
 
 ### Awaiting approval
 
+#### eighth pass — a gradient column, with the blocks on a toggle
+The column over the black ket is a gradient now: the two colours change over at the share itself,
+so where the crossover sits is the proportion. The ten blocks are still there on a toggle beside
+the plot, since they read the wager off more exactly. And the bottom text is in the indented
+block — I took that as the global comment it was and swept the whole page: the readouts under
+Two classes, Copies of a standard, Asking a bigger dataset, this example, Buyers and sellers, The
+law of error, the calculations and Directions and destinations were the last un-indented ones,
+and all of them are set in the ruled block now. Nothing else on the page is left outside it.
+
+##### the notes this answers
+
+this should be a gradient column, not a block, sorry.
+
+---
+
+or lets have a toggle to go between gradient and blocks.
+
+---
+
+and indent that bottom text gosh. that is a GLOBAL comment. check it for ALL builds.
+
 #### seventh pass — gradient, own curves only
 The area fills now grade continuously and keep to their own curves: the blend runs up to the
 lower curve; above it only the taller curve's own colour continues, so neither colour ever climbs

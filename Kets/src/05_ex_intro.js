@@ -15,7 +15,7 @@ registerExample("example-ex1", (box) => {
     <div class="plot-container"></div>
     <div class="ex1-glyphs" style="display:flex;justify-content:space-between;align-items:flex-end;
          margin:0 40px 10px 45px;"></div>
-    <div class="result-box" id="ex1-read"><span class="help-text">No mark interrogated yet.</span></div>
+    <div class="note-block" id="ex1-read"><span class="help-text">No mark interrogated yet.</span></div>
   </div>`);
   box.appendChild(content);
 

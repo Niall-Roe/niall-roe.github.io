@@ -4,7 +4,7 @@ number: 13
 title: "Probability Curve"
 anchor: "As for my assumption that the departures of the single weights from their virtual standards conform to the probability curve, it was only adopted as a ready way of imparting definiteness to the problem. Rich as is the store of data given by Petrie, it is insufficient, apparently, for determining the true law of those departures."
 heading: "New example — Probability Curve"
-status: awaiting
+status: done
 container: example-ex13
 ---
 ### Text
@@ -15,7 +15,7 @@ container: example-ex13
 
 None open.
 
-### Awaiting approval
+### Completed
 
 #### ninth pass — your sentence
 The assume-nothing readout is now just your line: “Without a law of error you cannot say anything

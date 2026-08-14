@@ -17,6 +17,17 @@ None open.
 
 ### Awaiting approval
 
+#### eleventh pass — they set out again from where they stopped
+Corrected: play now sends them on from wherever they walked to, not back to their starting points
+— the same directions applied again from their current positions, with the bird flying to where
+this new run of the directions would put it. Any walker whose orders carry it past the edge of
+the map disappears, and the line below says how many have gone, so the reader is not left
+wondering where they went.
+
+##### the notes this answers
+
+thanks, I wanted play to send them out again from where they walked to. my bad for miscommunication. (if they walk off the map just have them disappear).
+
 #### tenth pass — the bird, the texts, and replay
 The bottom text is in the indented block. In efficient mode the bird no longer obeys: it flies
 straight to the point where the directions would have brought it, arriving as the others finish,
