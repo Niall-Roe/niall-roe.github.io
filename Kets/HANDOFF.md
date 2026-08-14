@@ -1,6 +1,6 @@
 # Kets — session handoff
 
-Paste this to start a fresh session. Everything below is current as of commit `1e43cc8`
+Paste this to start a fresh session. Everything below is current as of commit `9332dfd`
 (pushed to `main`). Nothing is uncommitted.
 
 ## What this is
@@ -43,9 +43,8 @@ only Niall moves things to Completed).
 ## The page now
 
 18 examples, margin numerals 1–18, all opening clean with zero console errors. Notes:
-4 done, 8 awaiting approval, 7 building (i.e. carrying his newest comments), 1 parked
-(entry 04's *historical* half — Peirce's alternative approach — genuinely needs his details;
-its computable half is built as example 5).
+6 done, 13 awaiting approval, 0 building. Entry 04's *historical* half (Peirce's alternative
+approach) still genuinely needs his details; its computable half is built as example 5.
 
 Key examples: 1 letterforms (O/0, I/1, u/v) · 2 Petrie + map + his qedet photo · 3 the 158-row
 table with grid→histogram · 4 copies of a standard (known-standards ⇄ figuring-out, law buttons,
@@ -77,12 +76,33 @@ by hand · 18 figuring out the probable error.
   two actual pen sketches (rectangle, contrary flexure) from MS 427.
 - **BIC on the 142 weights prefers 2 standards, not 5** — five are licensed by outside knowledge
   (the practice of weighing fixing the PE near half a grain), not by parsimony.
+- **The 1926 register (821 qedets) does not dissolve his five.** Fitting five to it lands at
+  139.1 / 141.9 / 144.6 / 147.1 / 150.4 grains — within a fraction of a grain of Peirce's,
+  only the heaviest drifting up — with a looser fitted PE near 0.73. What the extra data cannot
+  settle is the *number*: BIC edges four over five by 2–3 units, and seven follows bin noise.
+  (An earlier draft's "five standards crowd the middle" claim was wrong and is gone.)
+- **Petrie's rival hypothesis, cited**: *Ancient Weights and Measures* (1926), ch. vi §32
+  "History", pp. 14–15 — the qedet read historically, Old Kingdom weights in two families near
+  144 and 149, merged past tracing by the xviii<sup>th</sup> dynasty, a late fixed 140 at
+  Heliopolis. Peirce does not consider it; the Towns example now says so with the citation.
+- **The order of his working**: he tallies first, in one sitting (the remarks about numbers
+  falling off belong to the tally), and the Smoothed column belongs to the ruled table drawn up
+  afterwards, standards read off only at the end. Example 17 walks it in that order.
 
 ## Open, needing Niall
 
 - Entry 04: his details of Peirce's alternative historical approach.
-- Entry 01: choose between a draggable-balance mini-interactive, a wall-painting photo pair, or
-  leaving the Petrie panel as is; also a source credit for his qedet photograph.
 - Entry 09: verify the 1884–85 OWM dates and the meter-testimony anecdote.
 - Entry 18: MS transcription will settle the concentric-circle constructions, which neighbour owns
   which Separated share, and why 0.7/0.3 leans to the lighter neighbour.
+- Three small wording calls flagged in the ninth-pass notes: entry 05's "proving"/"providing the
+  counts"; entry 15's default route (his sentence ends 1N, the kept default ends 1E); entry 10's
+  added word "soil" in "Naucratis' soil".
+
+## Note on tooling
+
+The Browser pane's `screenshot` returns blank frames in this project (it reports the pane as
+hidden), so **verify drawings by probing canvas pixels** via the JS tool — get `cv._pl` for the
+data↔pixel mapping and `getImageData` to test what is actually painted. That is how the ex13
+column rule was proved: sample the band under one curve inside vs outside the lit column and
+compare. Interaction state can be driven the same way, by clicking the real controls in JS.
