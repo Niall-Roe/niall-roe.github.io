@@ -17,6 +17,28 @@ None open.
 
 ### Awaiting approval
 
+#### tenth pass — the bird, the texts, and replay
+The bottom text is in the indented block. In efficient mode the bird no longer obeys: it flies
+straight to the point where the directions would have brought it, arriving as the others finish,
+and the closing line is yours — “The walkers obeyed the directions. Having started in different
+places they have ended up in different places. The bird ended up in the same place they would have
+gone had they followed the directions… but they did not.” The final-causation arrival line is
+yours too: “All four have arrived at the address. Some of their routes may have merged, but the
+routes themselves not really important.” And pressing play after a walk has finished sends them
+out again from their starting points.
+
+##### the notes this answers
+
+text at bottom should be indented. 
+
+change this so it reads: All four have arrived at the address. Some of their routes may have merged, but the routes themselves not really important. 
+
+for the efficient one, make it so that the bird just flies to the end point, and note in the text:
+
+The walkers obeyed the directions. Having started in different places they have ended up in different places. The bird ended up in the same place they would have gone had they followed the directions... but they did not. 
+
+if I hit play again, have the people do the action again.
+
 #### ninth pass — the compass, and your texts
 Compass buttons sit beside the directions box: N↑ E→ S↓ W← each append a one-block leg (“, 1N”
 and so on) and the walk restarts on the new route; clear empties the box to build a route from

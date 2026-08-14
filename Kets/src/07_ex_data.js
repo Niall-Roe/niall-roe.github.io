@@ -40,7 +40,12 @@ registerExample("example-ex7", (box) => {
     pl.axisLabels("grains", "");
     pl.abline({ h: 1, col: PAL.inkFaint, lwd: 1 });
     gaps.forEach((g) => pl.rect(g[0], 0.86, g[1], 1.14, { col: "rgba(176,86,63,.25)", border: PAL.accent2 }));
-    vals.forEach((v) => pl.segments(v, 0.72, v, 1.28, { col: PAL.accent, lwd: 1.2 }));
+    /* every distinct value, the ones caught inside the ruler wearing green */
+    vals.forEach((v) => {
+      const caught = v > ruler + 1e-9 && v < ruler + 1 / 3 - 1e-9;
+      pl.segments(v, caught ? 0.62 : 0.72, v, caught ? 1.38 : 1.28,
+                  { col: caught ? PAL.accent3 : PAL.accent, lwd: caught ? 2 : 1.2 });
+    });
     /* the third-of-a-grain ruler */
     pl.rect(ruler, 1.7, ruler + 1 / 3, 2.05, { col: "rgba(154,123,63,.30)", border: PAL.accent4 });
     pl.text(ruler + 1 / 6, 2.35, "⅓ grain", { col: PAL.accent4, cex: 0.85 });

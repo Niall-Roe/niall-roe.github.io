@@ -321,9 +321,10 @@ registerExample("example-ex18", (box) => {
   box.appendChild(exHeader("Interactive Example: Figuring out the probable error", "ex18-content"));
   const content = h(`<div id="ex18-content" class="example-content">
     <p>The probable error is defined by the halving in Peirce's sentence: it is the distance from
-      the standard within which half the copies fall, and beyond which the other half stray. His
-      rough pages work it out by bisection; here is that route, step by step &mdash; and then the
-      halving on the data itself.</p>
+      the standard within which half the copies fall, and beyond which the other half stray. The
+      first attempt works it out from the two ends of the range, where a class has no neighbour
+      beyond it to muddle the count; here is that route, step by step &mdash; and then the same
+      halving run against all five standards at once.</p>
     <div class="ex-buttonbar">
       <button class="btn btn-sm" id="ex18-back">back</button>
       <button class="btn btn-sm btn-primary" id="ex18-next">next step</button>
@@ -336,9 +337,11 @@ registerExample("example-ex18", (box) => {
     <div class="plot-container" id="ex18-hist"></div>
     <div class="note-block">The band below each standard shows the allowance; each ket wears its
       colour when it is within the allowance of its standard, and fades when it strays beyond.
-      Against his five standards the halving allowance of the data is 0.700 grains exactly (the
-      median departure) &mdash; the manuscript's own figure &mdash; while the published
-      <span class="math">&#8541;</span> is a shade tighter, holding 59 of the 142.</div>
+      Measured against all five standards at once the halving allowance is 0.700 grains &mdash;
+      larger than the published <span class="math">&#8541;</span>, which is a shade tight and holds
+      59 of the 142. The same procedure run on the outer ends of the five gives 0.80 grains, and on
+      the first attempt's three gives about a grain: the more standards you infer, the tighter each
+      class, and the smaller the probable error comes out.</div>
   </div>`);
   box.appendChild(content);
 
@@ -346,61 +349,104 @@ registerExample("example-ex18", (box) => {
                           0.1, 2.0, 0.025, 1.0, (v) => v.toFixed(3));
   $$(".col", content)[0].appendChild(peCtl.row);
 
-  /* ---- his route: the bisections of the rough pages, with the two inferred
-     standards draggable so the arithmetic can be watched changing ---- */
-  const LIGHT = 136.8, HEAVY = 151.3;   /* his range; the table's two heavier strays put aside */
-  let sLo = 139.0, sHi = 149.5, step18 = 0;
+  /* ---- his route, as the manuscript states it: "bisecting the NUMBER of
+     weights between the lightest weight and lightest inferred standard, as
+     well as that between the heaviest weight and the heaviest inferred
+     standard". That is a median, not a midpoint: out at either end no
+     neighbouring standard lies beyond, so the weights between the extreme
+     weight and the extreme standard are one clean half of that standard's
+     error curve — and the median of half a symmetric distribution is its
+     quartile, which is what the probable error is. The two outer standards
+     are draggable so the count and the median move with them. ---- */
+  const SORTED = KETS142.slice().sort((a, b) => a - b);
+  const LIGHT = SORTED[0], HEAVY = SORTED[SORTED.length - 1];
+  let sLo = 140, sHi = 149, step18 = 0;      /* his first attempt's outer two */
   const CLO = KCOL[0], CHI = KCOL[4];
-  const halfLo = () => (sLo - LIGHT) / 2, halfHi = () => (HEAVY - sHi) / 2;
-  const rcv = mkCanvas(190, (pl, W, H) => {
-    const xlim = [136, 152.3];
+  const median = (xs) => (xs.length % 2 ? xs[(xs.length - 1) / 2]
+                                        : (xs[xs.length / 2 - 1] + xs[xs.length / 2]) / 2);
+  const lowGroup = () => SORTED.filter((v) => v <= sLo);
+  const highGroup = () => SORTED.filter((v) => v >= sHi);
+  const peLo = () => sLo - median(lowGroup());
+  const peHi = () => median(highGroup()) - sHi;
+  const rcv = mkCanvas(230, (pl, W, H) => {
+    const xlim = [136, 153.2];
     pl.setup({ xlim, ylim: [0, 3], mar: [3, 0.6, 0.6, 0.6] });
-    pl.axes({ xat: seqBy(137, 152, 2), yat: [] });
+    pl.axes({ xat: seqBy(137, 153, 2), yat: [] });
     pl.axisLabels("grains", "");
     pl.abline({ h: 1, col: PAL.inkFaint, lwd: 1 });
-    KETS142.forEach((v) => pl.segments(v, 0.88, v, 1.12, { col: "rgba(87,93,102,.35)", lwd: 1 }));
-    [[LIGHT, "lightest weight"], [HEAVY, "heaviest weight"]].forEach(([v, lab]) => {
-      pl.segments(v, 0.72, v, 1.28, { col: PAL.ink, lwd: 1.8 });
-      pl.text(v, 0.5, v.toFixed(1), { col: PAL.ink, cex: 0.8 });
+    const lo = lowGroup(), hi = highGroup();
+    const inLo = (v) => step18 >= 1 && v <= sLo, inHi = (v) => step18 >= 2 && v >= sHi;
+    /* every weight, the two end groups picked out */
+    SORTED.forEach((v) => {
+      const c = inLo(v) ? CLO : inHi(v) ? CHI : "rgba(87,93,102,.35)";
+      const tall = inLo(v) || inHi(v);
+      pl.segments(v, tall ? 0.8 : 0.88, v, tall ? 1.2 : 1.12, { col: c, lwd: tall ? 1.4 : 1 });
     });
+    /* the extreme weights */
+    [LIGHT, HEAVY].forEach((v) => {
+      pl.segments(v, 0.7, v, 1.3, { col: PAL.ink, lwd: 1.8 });
+      pl.text(v, 0.48, v.toFixed(1), { col: PAL.ink, cex: 0.78 });
+    });
+    /* the inferred standards */
     [[sLo, CLO], [sHi, CHI]].forEach(([m, c]) => {
-      pl.segments(m, 0.72, m, 1.6, { col: c, lwd: 1.2, lty: 3 });
-      drawKetGlyph(pl, m, 1.28, c, 8);
-      pl.text(m, 0.5, m.toFixed(1), { col: c, cex: 0.8 });
+      pl.segments(m, 0.7, m, 2.35, { col: c, lwd: 1.2, lty: 3 });
+      drawKetGlyph(pl, m, 1.3, c, 8);
+      pl.text(m, 0.48, m.toFixed(1), { col: c, cex: 0.78 });
     });
-    const bracket = (a, b, c, y) => {
-      pl.segments(a, y, b, y, { col: c, lwd: 1.6 });
-      pl.segments(a, y - 0.08, a, y + 0.08, { col: c, lwd: 1.6 });
-      pl.segments(b, y - 0.08, b, y + 0.08, { col: c, lwd: 1.6 });
-      const mid = (a + b) / 2;
-      pl.segments(mid, y - 0.12, mid, y + 0.12, { col: c, lwd: 2 });
-      pl.text(mid, y + 0.42, ((b - a) / 2).toFixed(2) + " grs.", { col: c, cex: 0.85 });
+    /* the bisecting weight, and the span from it to the standard */
+    const showEnd = (group, std, col, sign) => {
+      const med = median(group), half = group.length / 2;
+      pl.segments(med, 0.55, med, 1.95, { col, lwd: 2.4 });
+      pl.text(med, 2.08, med.toFixed(1), { col, cex: 0.8 });
+      pl.text((med + std) / 2, 2.6, Math.abs(std - med).toFixed(2) + " grs.", { col, cex: 0.9 });
+      pl.segments(med, 2.42, std, 2.42, { col, lwd: 1.6 });
+      [med, std].forEach((x) => pl.segments(x, 2.34, x, 2.5, { col, lwd: 1.6 }));
+      /* how the count splits either side of the bisecting weight */
+      const mid = sign < 0 ? (LIGHT + med) / 2 : (med + HEAVY) / 2;
+      pl.text(mid, 0.2, Math.floor(half) + " weights", { col, cex: 0.75 });
+      const mid2 = sign < 0 ? (med + std) / 2 : (std + med) / 2;
+      pl.text(mid2, 0.2, Math.ceil(half) + " weights", { col, cex: 0.75 });
     };
-    if (step18 >= 1) bracket(LIGHT, sLo, CLO, 2.0);
-    if (step18 >= 2) bracket(sHi, HEAVY, CHI, 2.0);
+    if (step18 >= 1) showEnd(lo, sLo, CLO, -1);
+    if (step18 >= 2) showEnd(hi, sHi, CHI, +1);
     const read = $("#ex18-routeread");
     if (!read) return;
-    const mean = (halfLo() + halfHi()) / 2;
+    const mean = (peLo() + peHi()) / 2;
     const texts = [
-      `His route, from the rough pages. Press <em>next step</em>; the two inferred standards
-       <span class="click-cue">can be dragged</span> at any point to see the arithmetic move.`,
-      `The light end: from the lightest weight (${LIGHT}) to the lightest inferred standard
-       (<span style="color:${CLO}">${sLo.toFixed(1)}</span>), the gap is
-       ${(sLo - LIGHT).toFixed(2)} grains. No weight strays farther below its standard than that
-       whole gap, so bisecting it gives the typical departure:
-       <strong style="color:${CLO}">${halfLo().toFixed(2)} grains</strong>.`,
-      `The heavy end, the same way: from the heaviest standard
-       (<span style="color:${CHI}">${sHi.toFixed(1)}</span>) to the heaviest weight (${HEAVY}),
-       the gap is ${(HEAVY - sHi).toFixed(2)}; bisected,
-       <strong style="color:${CHI}">${halfHi().toFixed(2)} grains</strong>.`,
-      `The two halves &mdash; <span style="color:${CLO}">${halfLo().toFixed(2)}</span> and
-       <span style="color:${CHI}">${halfHi().toFixed(2)}</span> &mdash; agree on about
-       <strong>${mean.toFixed(1)} grain${Math.abs(mean - 1) < 0.05 ? "" : "s"}</strong>, which is
-       ${(100 * mean / 144.7).toFixed(1)} of one per cent of a ket &mdash; the manuscript's
-       &ldquo;0.7 of one per cent, which should be the probable error of a simple weight.&rdquo;`,
-      `The published text rounds the story to &ldquo;four or five tenths of one per cent &hellip;
-       from half to two-thirds of a grain,&rdquo; settling on &#8541; = 0.625. Below, the data's
-       own halving: slide the allowance to 0.700 and the halves balance.`,
+      `His route, from the rough pages: <em>&ldquo;bisecting the number of weights between the
+       lightest weight and lightest inferred standard, as well as that between the heaviest weight
+       and the heaviest inferred standard.&rdquo;</em> Press <em>next step</em>; the two inferred
+       standards <span class="click-cue">can be dragged</span> to see the count and the bisection
+       move with them.`,
+      `The light end. Below the lightest inferred standard
+       (<span style="color:${CLO}">${sLo.toFixed(1)}</span>) lie
+       <strong style="color:${CLO}">${lo.length}</strong> weights, and nothing lighter than
+       ${LIGHT} to confuse them: with no standard beyond, they are one clean half of that
+       standard's error curve. Bisect their <em>number</em> &mdash;
+       ${Math.floor(lo.length / 2)} on either side &mdash; and the weight in the middle is
+       <strong style="color:${CLO}">${median(lo).toFixed(1)}</strong>, which differs from the
+       standard by <strong style="color:${CLO}">${peLo().toFixed(2)} grains</strong>.`,
+      `The heavy end, the same way: <strong style="color:${CHI}">${hi.length}</strong> weights above
+       <span style="color:${CHI}">${sHi.toFixed(1)}</span>, bisected by
+       <strong style="color:${CHI}">${median(hi).toFixed(1)}</strong> &mdash;
+       <strong style="color:${CHI}">${peHi().toFixed(2)} grains</strong> from the standard.`,
+      `Why that <em>is</em> the probable error: half a symmetric error curve, bisected by count,
+       is bisected at its quartile &mdash; and the probable error is just the distance from the
+       standard to the quartile, the departure that half the copies beat and half do not. No
+       Gaussian is assumed; only that the copies fall about as often above as below. His two ends
+       give <span style="color:${CLO}">${peLo().toFixed(2)}</span> and
+       <span style="color:${CHI}">${peHi().toFixed(2)}</span> grains &mdash; he writes
+       <span class="math">1.1</span> and <span class="math">0.9</span>, reading the light end off
+       his own half-grain tally &mdash; or about
+       <strong>${(100 * mean / 144.7).toFixed(1)} of one per cent</strong> of a ket, his
+       &ldquo;0.7 of one per cent, which should be the probable error of a single weight.&rdquo;`,
+      `That was the first attempt, with only its outer standards
+       (<span style="color:${CLO}">${sLo.toFixed(1)}</span>,
+       <span style="color:${CHI}">${sHi.toFixed(1)}</span>) to work from. The published text has
+       five standards, so each class is tighter, and it rounds the story down to &ldquo;four or
+       five tenths of one per cent &hellip; from half to two-thirds of a grain,&rdquo; settling on
+       <span class="math">&#8541;</span> = 0.625. Below, the same halving run against all five at
+       once.`,
     ];
     read.innerHTML = texts[step18];
     const n = $("#ex18-stepn");
@@ -414,8 +460,8 @@ registerExample("example-ex18", (box) => {
       return bi;
     },
     (i, x) => {
-      if (i === 0) sLo = Math.max(LIGHT + 0.4, Math.min(143, +x.toFixed(1)));
-      else sHi = Math.max(145, Math.min(HEAVY - 0.4, +x.toFixed(1)));
+      if (i === 0) sLo = Math.max(LIGHT + 0.6, Math.min(143, +x.toFixed(1)));
+      else sHi = Math.max(145, Math.min(HEAVY - 0.6, +x.toFixed(1)));
       drawCanvas(rcv);
     });
   $("#ex18-next", content).addEventListener("click", () => {

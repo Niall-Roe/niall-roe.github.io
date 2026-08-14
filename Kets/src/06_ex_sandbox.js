@@ -39,7 +39,7 @@ registerExample("example-ex4", (box) => {
     </div>
     <div class="row" id="ex4-sdrow" style="display:none"></div>
     <div class="plot-container"></div>
-    <div class="result-box" id="ex4-read"></div>
+    <div class="note-block" id="ex4-read"></div>
   </div>`);
   box.appendChild(content);
 
@@ -146,15 +146,15 @@ registerExample("example-ex4", (box) => {
     });
     const read = $("#ex4-read");
     if (read) read.innerHTML = !vals.length
-      ? `<p>No data yet: cast copies in the first mode, or press <em>randomize</em> for a heap
-         whose standards you were not shown.</p>`
-      : `<p>The solid black curve is a smoothed out summary of the histogram (more on how Peirce
+      ? `No data yet: cast copies in the first mode, or press <em>randomize</em> for a heap
+         whose standards you were not shown.`
+      : `The solid black curve is a smoothed out summary of the histogram (more on how Peirce
       smoothed his data below). The red dashed curve is the sum of your
       <strong>${mu.length}</strong> candidate standards. Average miss:
       <strong>${(miss / (n || 1)).toFixed(2)}</strong> weights per class.
       ${fit ? "Snapped to the best fit under your settings &mdash; drag any dome to take over from it."
             : '<span class="click-cue">Drag the standards to bring the dashed curve onto the black one.</span>'}
-      ${reveal ? " The dotted curves are the actual distributions the data were generated from." : ""}</p>`;
+      ${reveal ? " The dotted curves are the actual distributions the data were generated from." : ""}`;
   });
   $(".plot-container", content).appendChild(cv);
 
@@ -177,11 +177,11 @@ registerExample("example-ex4", (box) => {
     if (!read || blind) return;
     const t = copies.reduce((a, c) => a + c.length, 0);
     read.innerHTML = dataMode
-      ? `<p>The 142 real kets, stacked as blocks and coloured by their likeliest standard under the
-         current placement. The second mode hands you this same heap without the standards.</p>`
-      : `<p>The copies you cast here are the data the second mode will ask you to fit. Each
+      ? `The 142 real kets, stacked as blocks and coloured by their likeliest standard under the
+         current placement. The second mode hands you this same heap without the standards.`
+      : `The copies you cast here are the data the second mode will ask you to fit. Each
          standard's thin curve is what its copies would print with endlessly many castings.${
-         t ? ` <strong>${t}</strong> copies cast so far.` : ""}</p>`;
+         t ? ` <strong>${t}</strong> copies cast so far.` : ""}`;
   }
   function poke() { drawCanvas(cv); if (!blind) know(); }
   $("#ex4-copy25", content).addEventListener("click", () => {

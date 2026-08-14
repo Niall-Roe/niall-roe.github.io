@@ -17,6 +17,16 @@ None open.
 
 ### Awaiting approval
 
+#### ninth pass — the readout indented
+The readout under the plot now sits in the same indented, ruled block as the other added text, so
+it cannot be read as part of the paper.
+
+##### the notes this answers
+
+indent this "The copies you cast here are the data the second mode will ask you to fit. Each standard's thin curve is what its copies would print with endlessly many castings. 300 copies cast so far."
+
+then we are done this one.
+
 #### eighth pass — buttons that hold still
 The cast button no longer moves: the copies count has come out of the button bar (it is reported
 in the readout under the plot instead), so nothing shifts when it appears, and both bars are set

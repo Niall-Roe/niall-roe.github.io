@@ -17,6 +17,20 @@ None open.
 
 ### Awaiting approval
 
+#### ninth pass — your sentence
+The assume-nothing readout is now just your line: “Without a law of error you cannot say anything
+about the new ket (aside from how much it weighs).”
+
+##### the notes this answers
+
+just fix this:
+
+With nothing assumed: the standards sit there, the ket sits there, and there is no proportion to report — not an unknown number, no number. Definiteness has to be bought, and some law of error is the coin.
+
+make it:
+
+Without a law of error you cannot say anything about the new ket (aside from how much it weighs).
+
 #### eighth pass — possibility, not height, lights the column
 I had the rule wrong: the column was lit by whichever curve stood tallest over it, so a standard
 that could not have thrown the ket still showed its colour. Now the column lights only the curves

@@ -191,9 +191,8 @@ registerExample("example-ex13", (box) => {
     const read = $("#ex13-read");
     if (!read) return;
     if (law === "none") {
-      read.innerHTML = `With nothing assumed: the standards sit there, the ket sits there, and
-        there is <strong>no proportion to report</strong> &mdash; not an unknown number, no number.
-        Definiteness has to be bought, and some law of error is the coin.`;
+      read.innerHTML = `Without a law of error you cannot say anything about the new ket (aside
+        from how much it weighs).`;
     } else {
       const dA = 26 * dens(law, q, A, pe), dB = 23 * dens(law, q, B, pe);
       const pA = dA + dB > 0 ? dA / (dA + dB) : null;

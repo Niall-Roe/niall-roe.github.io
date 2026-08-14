@@ -454,7 +454,7 @@ registerExample("example-ex16", (box) => {
         </span></label>
     </div>
     <div class="plot-container"></div>
-    <div class="result-box" id="ex16-read"></div>
+    <div class="note-block" id="ex16-read"></div>
   </div>`);
   box.appendChild(content);
 
@@ -510,10 +510,18 @@ registerExample("example-ex16", (box) => {
     step++;
     walkers.forEach((wk, i) => {
       if (mode === "eff") {
-        if (step <= DIRS.length) {
+        if (step > DIRS.length) { wk.done = true; return; }
+        if (wk.style === "bird") {
+          /* the bird does not obey: it flies straight to where the directions
+             would have brought it, arriving with the rest */
+          const net = DIRS.reduce((a, d) => [a[0] + d[0], a[1] + d[1]], [0, 0]);
+          const s0 = wk.trail[0], t = step / DIRS.length;
+          wk.pos = [s0[0] + net[0] * t, s0[1] + net[1] * t];
+        } else {
           wk.pos = [wk.pos[0] + DIRS[step - 1][0], wk.pos[1] + DIRS[step - 1][1]];
-          wk.trail.push(wk.pos.slice());
-        } else wk.done = true;
+        }
+        wk.trail.push(wk.pos.slice());
+        if (step >= DIRS.length) wk.done = true;
         return;
       }
       if (wk.done) return;
@@ -573,7 +581,7 @@ registerExample("example-ex16", (box) => {
                { col, lwd: 1.7, lty: wk.style === "bird" ? 2 : 1 });
       pl.points([wk.trail[0][0]], [wk.trail[0][1]], { col, cex: 1, pch: 21 });
       pl.points([wk.pos[0]], [wk.pos[1]], { col, cex: 1.6 });
-      if (wk.style === "bird" && mode === "fin") pl.text(wk.pos[0], wk.pos[1] + 0.45, "the bird", { col, cex: 0.72 });
+      if (wk.style === "bird") pl.text(wk.pos[0], wk.pos[1] + 0.45, "the bird", { col, cex: 0.72 });
     });
   });
   $(".plot-container", content).appendChild(cv);
@@ -591,25 +599,27 @@ registerExample("example-ex16", (box) => {
     if (!el) return;
     if (mode === "eff") {
       el.innerHTML = step === 0
-        ? `<p>When you press play each walker will follow the directions &mdash; ${DIRWORDS} &mdash;
-           from its own starting point.</p>`
+        ? `When you press play each walker will follow the directions &mdash; ${DIRWORDS} &mdash;
+           from its own starting point.`
         : step >= DIRS.length
-        ? `<p>Every walker obeyed the same compulsions perfectly &mdash; and they stand in four
-           different places. Efficient causation is satisfied by the obedience, wherever it lands.</p>`
-        : `<p>Step ${step} of ${DIRS.length}: each is following the instructions.</p>`;
+        ? `The walkers obeyed the directions. Having started in different places they have ended up
+           in different places. The bird ended up in the same place they would have gone had they
+           followed the directions&hellip; but they did not.`
+        : `Step ${step} of ${DIRS.length}: each is following the instructions.`;
     } else {
       el.innerHTML = step === 0
-        ? `<p>When you press play, each agent makes their way to the indicated address. Click
-           anywhere on the map to move the address.</p>`
+        ? `When you press play, each agent makes their way to the indicated address. Click
+           anywhere on the map to move the address.`
         : done === walkers.length
-        ? `<p>All four are at the address, by four routes that agree nowhere except the end. The
-           result's general character was fixed; the particular way was not &mdash; that is final
-           causation, and it is why the class of things at the address is a natural one.</p>`
-        : `<p>${done} of ${walkers.length} arrived; the routes converge only as they close in.</p>`;
+        ? `All four have arrived at the address. Some of their routes may have merged, but the
+           routes themselves not really important.`
+        : `${done} of ${walkers.length} arrived; the routes converge only as they close in.`;
     }
   }
   $("#ex16-play", content).addEventListener("click", (e) => {
     if (timer) { clearInterval(timer); timer = null; e.target.textContent = "play"; return; }
+    /* pressing play once the walk is over sends them out again from their starts */
+    if (walkers.length && walkers.every((wk) => wk.done)) reset();
     e.target.textContent = "pause";
     timer = setInterval(advance, 340);
   });

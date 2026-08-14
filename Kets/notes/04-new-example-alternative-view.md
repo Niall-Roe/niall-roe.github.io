@@ -4,7 +4,7 @@ number: 5
 title: "Alternative view"
 anchor: "n order to represent these observations, I have adopted the following rough-and-ready theory; for to make elaborate calculations would, from every point of view, be a waste of time"
 heading: "New example — Alternative view"
-status: awaiting
+status: done
 ---
 ### Text
 
@@ -15,7 +15,7 @@ status: awaiting
 Your details of Peirce's alternative approach, when ready — the historical half of this entry
 is the one thing on the page I cannot build without you.
 
-### Awaiting approval
+### Completed
 
 #### seventh pass — the calculations, in the picture you know
 Your recollection is right, and the example now says so plainly: the modern name for Peirce's

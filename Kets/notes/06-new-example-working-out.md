@@ -17,6 +17,14 @@ None open.
 
 ### Awaiting approval
 
+#### seventh pass — the caught weights go green
+Every weight the ruler covers now turns green and stands slightly taller while it is inside, so
+the count in the line below has something to point at. Everything outside keeps the blue.
+
+##### the notes this answers
+
+lets just have the weights "inside" the boundary change to green or something? then I will fix the copy text.
+
 #### sixth pass — the manuscript page, in place
 The facsimile is set beside the walkthrough: the First Attempt page with the interval subtractions
 in the margin and the tally running down the sheet (the same page that holds the probable-error

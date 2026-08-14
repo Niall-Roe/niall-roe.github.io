@@ -16,6 +16,43 @@ None open.
 
 ### Awaiting approval
 
+#### ninth pass — his actual procedure, found and built
+You were right to push on this, and the walk I had built was wrong. His sentence on MS p. 6 (frame
+00427_0344) is: “bisecting the **number** of weights between the lightest weight and lightest
+inferred standard, as well as that between the heaviest weight and the heaviest inferred standard,
+we get in the two cases weights differing [from] those inferred standards by 1.1 and 0.9 grains,
+or 0.7 of one per cent, which should be the probable error of a single weight.” Bisecting the
+*number* is a median, not a midpoint — I had built the midpoint, halving the distance, which is a
+different thing and only matched his figures because I had chosen the standards to make it.
+
+The numbers settle it. Take his first attempt's outer standards, 140 and 149. Below 140 lie 32
+weights; their median is 139.0, which is 1.00 grain from the standard — and read off his own
+half-grain tally, where the bisecting weight falls in the 138.7–139.1 class, it is 1.1, his
+figure exactly. Above 149 lie 18 weights; their median is 149.9, which is 0.90 from the standard
+— again his figure exactly. The two average 0.95 grains, which is 0.66 per cent of a ket: his
+“0.7 of one per cent.”
+
+To your question — yes, he defines it against the standards, and yes, he had already found them.
+It is not circular: the standards come from the *positions* of the peaks (tally, smooth, read off
+the clusterings), while the probable error comes from the *spread* about the two outermost peaks.
+He uses the outer ends precisely because out there each class has one clean flank, with no
+neighbouring standard beyond to mix into the count. And the reason a median does the job: the
+weights between the extreme weight and the extreme standard are one half of a symmetric error
+curve, so their median is the curve's quartile — and the probable error just *is* the distance
+from the standard to the quartile, the departure half the copies beat and half do not. No
+Gaussian is assumed anywhere; only rough symmetry.
+
+Rebuilt to that: the stepper now shows the group of weights at each end, its count, the weight
+that bisects the count, and the span from it to the standard, with both standards draggable so
+the count and the median move with them. A fourth step states why the median is the probable
+error. The last step notes what the second attempt changed — five standards make each class
+tighter, so the same procedure gives 0.80 grains against the outer two of his five, against about
+a grain in the first attempt, and the published ⅝ is tighter still.
+
+##### the notes this answers
+
+I still dont really get what youre. supposed to be doing here. In the chat, walk me through his procedure. I dont think he can be defining the PE against the standards, can he? or is it because he had already figured them out before? walk me through this in the chat, looking at the MS pages to figure it out. probably in first pass.
+
 #### eighth pass — the route shown, not told
 The paragraph is a walk now. A stepper runs his derivation on the axis itself: the light end first
 — from the lightest weight at 136.8 to the lightest inferred standard, that whole gap bisected,

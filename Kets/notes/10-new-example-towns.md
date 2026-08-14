@@ -4,7 +4,7 @@ number: 11
 title: "Towns"
 anchor: "It is, therefore, probable that the five standards were those of five towns with which Naucratis carried on trade."
 heading: "New example — Towns"
-status: awaiting
+status: done
 container: example-ex11
 ---
 ### Text
@@ -14,42 +14,6 @@ container: example-ex11
 ### Suggestions
 
 None open.
-
-### Awaiting approval
-
-#### ninth pass — your opening, and Petrie's hypothesis cited
-Your opening text is in, with the four-partners-and-a-home-standard parenthesis, and the
-illustrative-only note is cut. One word added, which you can strike: “Naucratis' soil”, so the
-possessive has something to own. The Petrie hypothesis is cited from the book itself — I read the
-qedet chapter of *Ancient Weights and Measures* (1926), and it is ch. vi §32, “History”, pp.
-14–15, where he reads the spread historically: Old Kingdom qedets falling into two families near
-144 and 149 grains, the families merged past tracing by the xviiith dynasty, and a late fixed
-standard of 140 grains at Heliopolis. The note under the map states the hypothesis with that
-citation.
-
-##### the notes this answers
-
-IN previous notes I suggested different opening text... can you find it an implement it? I found ti because I dont knwo why you are bad at this:
-
-"Here, Peirce is putting forth hypotheses that would explain the number of standards. He suggests they could reflect standard weights from 5 different towns. If each  of five trading partners kept its own ket, as every European city kept its own pound, the heap of kets found in Naucratis' could have come from its trade partners.(or perhaps four trade partners and a home standard.) Here, the size of the circles reflects the number of kets supposed to come from that town, while its colour reflects the standard they were supposedly following. standards that are so close as to be substantially merged reflect his with a mixed colour.
-
-(Note, Peirce does not consider the hypothesis Petrie puts forward in his book [XXX], namely that the standards changed over time. [cite this if you can find it it might be in my paper or maybe you could skim the book.]"
-
-cut: The towns are real; the assignment of standards to towns is illustrative only — Peirce says probable, and neither he nor Petrie names the five.
-
-#### eighth pass — the fill keeps to its own curves, everywhere
-Fixed at the engine level, so this plot and every other gradient-under-curves plot obey it: up to
-the lower curve the shading blends the owners by their shares; above that height only the curves
-that actually reach higher continue, each in its own colour — the yellow never climbs the green
-slope again. Because each colour now fills exactly the region under its own curve, the amount of
-each colour on the page is the probability of a copied ket landing there: a mostly-yellow stretch
-is mostly yellow because a ket found there mostly is one.
-
-##### the notes this answers
-
-'/Users/niallroe/Documents/GitHub/niall-roe.github.io/Kets/Images/Image 2026-08-14 at 5.54 AM.png'
-
-the yellow should not go up the green curve here. the shaded area should reflect the probabilities of a copied ket landing in one of the areas. the reason it is mostly yellow in our nearly case should reflect the fact that its .... totally shading yellow bits. just think through this one and do what you think I am asking for please.
 
 ### Completed
 
@@ -109,3 +73,37 @@ Built: the Delta map from the Petrie example reused (per house style), now with 
 ##### the original suggestion, for reference
 
 Could show a map with five surrounding towns, each with its own standard.
+
+#### ninth pass — your opening, and Petrie's hypothesis cited
+Your opening text is in, with the four-partners-and-a-home-standard parenthesis, and the
+illustrative-only note is cut. One word added, which you can strike: “Naucratis' soil”, so the
+possessive has something to own. The Petrie hypothesis is cited from the book itself — I read the
+qedet chapter of *Ancient Weights and Measures* (1926), and it is ch. vi §32, “History”, pp.
+14–15, where he reads the spread historically: Old Kingdom qedets falling into two families near
+144 and 149 grains, the families merged past tracing by the xviiith dynasty, and a late fixed
+standard of 140 grains at Heliopolis. The note under the map states the hypothesis with that
+citation.
+
+##### the notes this answers
+
+IN previous notes I suggested different opening text... can you find it an implement it? I found ti because I dont knwo why you are bad at this:
+
+"Here, Peirce is putting forth hypotheses that would explain the number of standards. He suggests they could reflect standard weights from 5 different towns. If each  of five trading partners kept its own ket, as every European city kept its own pound, the heap of kets found in Naucratis' could have come from its trade partners.(or perhaps four trade partners and a home standard.) Here, the size of the circles reflects the number of kets supposed to come from that town, while its colour reflects the standard they were supposedly following. standards that are so close as to be substantially merged reflect his with a mixed colour.
+
+(Note, Peirce does not consider the hypothesis Petrie puts forward in his book [XXX], namely that the standards changed over time. [cite this if you can find it it might be in my paper or maybe you could skim the book.]"
+
+cut: The towns are real; the assignment of standards to towns is illustrative only — Peirce says probable, and neither he nor Petrie names the five.
+
+#### eighth pass — the fill keeps to its own curves, everywhere
+Fixed at the engine level, so this plot and every other gradient-under-curves plot obey it: up to
+the lower curve the shading blends the owners by their shares; above that height only the curves
+that actually reach higher continue, each in its own colour — the yellow never climbs the green
+slope again. Because each colour now fills exactly the region under its own curve, the amount of
+each colour on the page is the probability of a copied ket landing there: a mostly-yellow stretch
+is mostly yellow because a ket found there mostly is one.
+
+##### the notes this answers
+
+'/Users/niallroe/Documents/GitHub/niall-roe.github.io/Kets/Images/Image 2026-08-14 at 5.54 AM.png'
+
+the yellow should not go up the green curve here. the shaded area should reflect the probabilities of a copied ket landing in one of the areas. the reason it is mostly yellow in our nearly case should reflect the fact that its .... totally shading yellow bits. just think through this one and do what you think I am asking for please.

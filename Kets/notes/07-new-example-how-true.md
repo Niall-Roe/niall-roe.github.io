@@ -4,7 +4,7 @@ number: 8
 title: "How true?"
 anchor: "but to decide how near my theory probably comes to the true theory or how it ought to be modified, would be a very intricate problem for the solution of which the data are probably insufficient."
 heading: "New example — How true?"
-status: awaiting
+status: done
 container: example-ex8
 ---
 ### Text
@@ -15,7 +15,7 @@ container: example-ex8
 
 None open.
 
-### Awaiting approval
+### Completed
 
 #### eighth pass — the paragraph cut
 Cut. The both screen carries no readout at all now; the summed heap and its curve are left to

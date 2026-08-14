@@ -4,7 +4,7 @@ number: 6
 title: "Peirce's view"
 anchor: "I have assumed that there were five different standards; that the weights depart from their standards according to the probability curve; and that the probable error of a single weight is five-eighths of a grain. I assume that of the 144 weights"
 heading: "New example — Peirce's view"
-status: awaiting
+status: done
 container: example-ex6
 ---
 ### Text
@@ -15,7 +15,7 @@ container: example-ex6
 
 None open.
 
-### Awaiting approval
+### Completed
 
 #### ninth pass — your note text, and the live restatement
 The mis-posted block is disregarded, as you say — it is answered on example 5. The note under the

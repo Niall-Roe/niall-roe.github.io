@@ -4,7 +4,7 @@ number: 10
 title: "Centruy Dictionay"
 anchor: "See the article “pound” in the Century Dictionary,"
 heading: "New example — Centruy Dictionay"
-status: awaiting
+status: done
 container: example-ex10
 ---
 ### Text
@@ -15,34 +15,6 @@ container: example-ex10
 
 The two dates (1884–85 OWM charge; 1885 testimony) and the meter anecdote still rest on your
 draft's authority — please check them when convenient.
-
-### Awaiting approval
-
-#### seventh pass — the link moved into the sentence
-The sentence “Here is the dictionary entry he wrote on the pound” is itself the link to the
-century-pound page now, and the separate facsimile line under the paragraph is gone. The paragraph
-is otherwise set to your wording exactly, including “which he later recalled as a proud
-achievement” and “a list he says is kept at the Astor Library.”
-
-##### the notes this answers
-
-Peirce wrote over 5,000 entries for the Century Dictionary, and in 1884–85 was in charge of the Office of Weights and Measures of the United States. (Testifying to Congress in that capacity in 1885, he dissuaded the United States from adopting the meter as its standard, which he later recalled as a proud achievement.) <Here is the dictionary entry he wrote on the pound.> In it he draws on his own manuscript list of some three hundred local pounds, a list he says is kept at the Astor Library. Before the metric system, the pound was not unlike the ket: the pound of Amsterdam, of Cologne, of Toulouse, of Vienna were all different weights.
-
-[just move the link up to the <sentence in these things>]
-
-#### sixth pass — the entry written out in full
-The century-pound page now carries the complete pound-noun entry, transcribed: the etymology
-bracket, the whole of sense 1 (the English standards history — Elizabeth's worn standards, the
-hollow Philadelphia pound "such as no European nation would be content to take for a prototype,"
-Edward III, the fair of Troyes — and all eight classes of European pounds with their three tables,
-the French mark-weight pound, and the Charlemagne/Haroun al-Raschid source-criticism), sense 2
-(the money of account, with the American colonies' values), sense 3 and the phrases. The verb and
-pound-the-enclosure remain in facsimile, and the transcription sits in the blue-ruled block.
-
-##### the notes this answers
-
-Full transcription of the remaining senses still open; dates and the meter anecdote still to
-verify against your sources.
 
 ### Completed
 
@@ -111,3 +83,29 @@ Built: a panel noting that Peirce wrote the Century Dictionary's weights-and-mea
 ##### the original suggestion, for reference
 
 This coudl either open that article up or link to it on another page, depending on size. we have the article so find it and decide.
+
+#### seventh pass — the link moved into the sentence
+The sentence “Here is the dictionary entry he wrote on the pound” is itself the link to the
+century-pound page now, and the separate facsimile line under the paragraph is gone. The paragraph
+is otherwise set to your wording exactly, including “which he later recalled as a proud
+achievement” and “a list he says is kept at the Astor Library.”
+
+##### the notes this answers
+
+Peirce wrote over 5,000 entries for the Century Dictionary, and in 1884–85 was in charge of the Office of Weights and Measures of the United States. (Testifying to Congress in that capacity in 1885, he dissuaded the United States from adopting the meter as its standard, which he later recalled as a proud achievement.) <Here is the dictionary entry he wrote on the pound.> In it he draws on his own manuscript list of some three hundred local pounds, a list he says is kept at the Astor Library. Before the metric system, the pound was not unlike the ket: the pound of Amsterdam, of Cologne, of Toulouse, of Vienna were all different weights.
+
+[just move the link up to the <sentence in these things>]
+
+#### sixth pass — the entry written out in full
+The century-pound page now carries the complete pound-noun entry, transcribed: the etymology
+bracket, the whole of sense 1 (the English standards history — Elizabeth's worn standards, the
+hollow Philadelphia pound "such as no European nation would be content to take for a prototype,"
+Edward III, the fair of Troyes — and all eight classes of European pounds with their three tables,
+the French mark-weight pound, and the Charlemagne/Haroun al-Raschid source-criticism), sense 2
+(the money of account, with the American colonies' values), sense 3 and the phrases. The verb and
+pound-the-enclosure remain in facsimile, and the transcription sits in the blue-ruled block.
+
+##### the notes this answers
+
+Full transcription of the remaining senses still open; dates and the meter anecdote still to
+verify against your sources.
