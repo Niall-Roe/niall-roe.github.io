@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 3
 number: 4
 title: "Copies of a standard"
@@ -17,6 +16,44 @@ container: example-ex4
 None open.
 
 ### Awaiting approval
+
+#### seventh pass — your comments, item by item
+Each line of your paste, as pasted. The intro is your text ("If you knew the standards and you
+knew how well standards would be copied…"); the old "Two directions through one picture" is cut.
+In figuring-out mode the cast button is gone: the bar there is *randomize* (a hidden truth —
+two to five standards at a spread you are not shown, 100 copies of each), *snap to best fit*
+(does the best under your toggles), and *reveal the actual* (overlays, dotted, the
+distributions from the assuming-known page). The bars in figuring mode are no longer exact blocks:
+they shade smoothly bin to bin in the candidates' colours, this palette not the screenshot's. The
+readout is your text — "The solid black curve is a smoothed out summary of the histogram (more on
+how Peirce smoothed his data below). The red dashed curve is the sum of your [n] candidate
+standards. Average miss: [x] weights per class. Drag the standards to bring the dashed curve onto
+the black one." — with the law sentence cut. The laws are gaussian only: a "hold the probable
+error at the slider" toggle and a "same spread for each" toggle (per-standard spread sliders
+appear when the latter is off). And the bars are regrouped: resets on the left, cast+clear
+together on the right; in figuring mode, toggles left, actions right.
+
+##### the notes this answers
+
+seriously, please read and implement my comments! here I am literally just copy pasting:
+
+cut this "Two directions through one picture. Assuming known standards goes the easy way: place standards, cast copies, and see the distribution they print — every copy one block in its standard's colour. Figuring out the standards is Peirce's actual task, run in reverse: you are given only the heaped-up data, you choose a law of error, you place candidate standards, and you compare the curve your guesses imply with the curve the data draw."
+
+write."If you knew the standards and you know how well standards would be copied, you could predict how many weights would cluster around each standard. However, if you just had the data, you would have to instead try to select the values of standard and probable error that would, if correct, be most likely to have produced the data. Use the below to explore both circumstances. In the first mode, set the standards and generate kets. In the second, pretend you do not know the standards, and try to fit them."
+
+we need to make it clear that the data is generated according to the first. mode and the point of the second mode is to try and fit that data. maybe on that second mode the cast Botton shoudl be replaced with the fit button. also, in the figuring out mode there should be a randomize button, that sets a random number of standards at a random PE and draws 100 copies of each. then there should be a snap to best fit button (which does the best with the settings you have decided), but also a reveal actual button, which just shows the distributions from the assumed known page.
+
+.when we switch from known to figuring, the bars should no longer be exact blocks, but be gradients.
+
+I put a screenshot in at around 531. the colours here are too bright and the lines too bold, but this is the general I deal I mean with the gradient. do something liek that. (for the figuring out mode)
+
+Write: the solid black curve is a smoothed out summary of the histogram (more on how Peirce smoothed his dat below). The red dashed curve is the sum of your [] candidate standards. Average miss: 8.44 weights per class. Drag the standards to bring the dashed curve onto the black one.
+
+cut:"Without a law restricting each curve, any placement could be excused; the law is what gives the comparison force."
+
+for this example, lets only have the gaussian with a toggle for fixing the probable error on and off, and one for same spread each. (no flat or sharp dist.s)
+
+have the cast and clear buttons be grouped together. same for the resettings. maybe settings on left and action buttons on right.
 
 #### sixth pass — spreads in hand
 Under "gaussian, own spread each," a spread slider now appears for every candidate standard, so

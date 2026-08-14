@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 8
 number: 9
 title: "Merge"

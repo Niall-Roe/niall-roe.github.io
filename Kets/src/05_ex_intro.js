@@ -196,15 +196,9 @@ registerExample("example-ex2", (box) => {
       <div class="col col-8"><div class="plot-container" style="margin:0;"></div></div>
       <div class="col col-4"><img src="${IMG_QEDET}" alt="Seven bronze qedet weights, domed, with red catalogue numbers"
         style="max-width:100%;border:1px solid var(--rule);">
-        <div style="font-size:.78em;color:var(--ink-faint);margin-top:4px;">Kets in the flesh:
-        domed qedet weights with their catalogue numbers.</div></div>
+        <div style="font-size:.78em;color:var(--ink-faint);margin-top:4px;">Here are five kets
+        from University College London's Petrie Museum of Egyptian Archaeology.</div></div>
     </div>
-    <p class="note-block">The map is drawn, and schematic. On the exactitude itself: in verifying
-      the data behind this page, five misprints surfaced in Petrie's own 1926 register &mdash; a
-      wrong multiplier at three catalogue numbers, a slipped digit at two more &mdash; each caught
-      only because his tables print redundant columns whose arithmetic must agree. Even the exact
-      metrologist's table has an error curve; the redundancy he built in is what makes the errors
-      findable.</p>
   </div>`);
   box.appendChild(content);
   $(".plot-container", content).appendChild(mkCanvas(280, (pl, W, H) =>

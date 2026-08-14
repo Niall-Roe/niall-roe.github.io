@@ -7,6 +7,12 @@ Peirce's earlier draft. Frames 343-344 are two openings of the same first page; 
 Transcribed by THE PEIRCEPTRON (round 8). Unedited machine output —
 see README for what that is worth.
 
+**Confidence marks** — round 7 and round 8 read every line
+independently. `⚠` = they agree less than 80% (these lines read ~2.7x
+worse in testing); `⚠⚠` = under 50%. Where they disagree, round 7's
+alternative reading is shown in brackets, so you can see the ambiguity
+rather than trust one guess.
+
 ---
 
 ## 371.pdf p.5  ·  frame 00427_0343
@@ -16,20 +22,20 @@ mention an incontatible instance of it; · incomteible, I mean
 any fair mind competent to weigh the evidence. That
 admirable genius, Mr. Flinders Petrie, found at the ancient
 town of Naucratis 158 weights on the standard or
-tondards of Egyptian ket
+tondards of Egyptian ket  ⚠         [round7 read: towards of Egyptian bet. This]
 The great majority of them are of the most unchangedable
 material, basalt or syknife; and to only 20 of them was
 it necessary to apply any correction to get their original
 amounts; and these few corrections are mostly small
-Now it is not likely that the same way we will originally in error by
+Now it is not likely that the same way we will originally in error by  ⚠         [round7 read: Now it is not likely that they are originally in error by]
 more than about a per cent and this
-at time like the word is supported by
+at time like the word is supported by  ⚠         [round7 read: of time. likelihood is supported by the]
 ten percent of them, or sixteen are on the basis of from
 136.8 to i390 grains to the ket. Therefore, they must
 have been designed to be upon a standard of about
 s; and this is supported by the fact that they
 t numerous the nearer they are to that standard. Namely
-the same number of the
+the same number of the  ⚠         [round7 read: the same of the same]
 ```
 
 ## 371.pdf p.6  ·  frame 00427_0344
@@ -52,99 +58,99 @@ those inferred standards by 1st and 0.9 grains, or 0. 7 of one perce
 which should be the probable error of a single weight. I shall notice below
 possible objection to this inference. Now notice the distribution of the
 values as shown in the following table
-the
+the  ⚠⚠         [round7 read: the same of the same of the]
 ```
 
 ## 371.pdf p.7  ·  frame 00427_0345
 
 ```
-Longing from 197 to 138.1, there are 7 ways
-. 132.2 to 136. The
-is the first of the
-1883
-25. 22
-35. §5) §9. 9
-in one
-is
-the
-2nd
-the
-the
+Longing from 197 to 138.1, there are 7 ways  ⚠         [round7 read: e. Playing from 1879 to 1881, there are y rays]
+. 132.2 to 136. The  ⚠⚠         [round7 read: a is a 2nd, to (3-b]
+is the first of the  ⚠⚠         [round7 read: is of the psychological]
+1883  ⚠⚠         [round7 read: 1883 1857-1866]
+25. 22  ⚠⚠         [round7 read: 25 years 22. 2nd]
+35. §5) §9. 9  ⚠⚠         [round7 read: 13. 35, 1892, 1857]
+in one  ⚠         [round7 read: in the]
+is  ⚠⚠         [round7 read: the]
+the  ⚠⚠         [round7 read: the same of the]
+2nd  ⚠⚠         [round7 read: e of the same way of the]
+the  ⚠⚠         [round7 read: the same way of the]
+the  ⚠⚠         [round7 read: the same of the]
 ```
 
 ## 371.pdf p.8  ·  frame 00427_0346
 
 ```
-2. 2. 0. 8
-24. The
-24 3. 6
-2. 5th, 8° 8, 18
-42. 48th 10. 0. 0
-42. The
-4  9  8  7  1
-3. 13
-6th T. 1. 1. 1
-42. 53
-2nd, 2, 18
-is 27 24
-x 4°b, 1. 1. 1. 2. 2
-5. 5, 5, 18
-2. "2. "< "<<<<<<<<, =<, =, =, =, and
-x = 6 y 7, 3, 3, 3
-Two in the
-3rd, 20, 27
-is the same number of the
-s. The first number of the
-s. 6 + b + b  5
-5 9^6. The
-9^ 0^< vy. 9
-e. (b)b (b)<c (b)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<y
-e. The first of the
-the same number of the
-4^4 <<4  7  2  y  is
-y = y and b y.<, is
+2. 2. 0. 8  ⚠⚠         [round7 read: 2nd, and the number]
+24. The  ⚠⚠         [round7 read: 24° 1st, 1st, 1st, 1. 2, 1]
+24 3. 6  ⚠⚠         [round7 read: the same of 3rd, 3rd y]
+2. 5th, 8° 8, 18  ⚠⚠         [round7 read: 2nd, 3rd, 3rd, 3rd, 3. 4. 4]
+42. 48th 10. 0. 0  ⚠⚠         [round7 read: e. 4th +4-4-4-9-9. 5]
+42. The  ⚠⚠         [round7 read: ng 21st, 4th]
+4  9  8  7  1  ⚠⚠         [round7 read: 4- 6- 6-9-7-4-7]
+3. 13  ⚠⚠         [round7 read: e, and 2nd, 1857-18]
+6th T. 1. 1. 1  ⚠⚠         [round7 read: x-Tension (4]
+42. 53  ⚠⚠         [round7 read: 42nd Bs. It is a]
+2nd, 2, 18  ⚠⚠         [round7 read: and 1st, 1878-18 WR M]
+is 27 24  ⚠⚠         [round7 read: s. The same number of the]
+x 4°b, 1. 1. 1. 2. 2  ⚠⚠         [round7 read: x-x-4-7-4-4-2. 4]
+5. 5, 5, 18  ⚠⚠         [round7 read: is the number of the same]
+2. "2. "< "<<<<<<<<, =<, =, =, =, and  ⚠⚠         [round7 read: b, and B, B, B, B, B, B, B]
+x = 6 y 7, 3, 3, 3  ⚠         [round7 read: x = 6- 4- 7, 18]
+Two in the  ⚠⚠         [round7 read: The same number of the]
+3rd, 20, 27  ⚠⚠         [round7 read: is, 1857 20, 37 37-57]
+is the same number of the  ⚠         [round7 read: as a number of the]
+s. The first number of the  ⚠⚠         [round7 read: is the same of the same number]
+s. 6 + b + b  5  ⚠⚠         [round7 read: 86-6-1885]
+5 9^6. The  ⚠⚠         [round7 read: 85-0-09th]
+9^ 0^< vy. 9  ⚠⚠         [round7 read: e. G. 1857-1857-1866]
+e. (b)b (b)<c (b)<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<y  ⚠⚠         [round7 read: g + 0-^ 3- 3- 3-< 1-4]
+e. The first of the  ⚠⚠         [round7 read: x- 0-4-4-4-x- 1-4]
+the same number of the  ⚠⚠         [round7 read: x = 4- 4th of the]
+4^4 <<4  7  2  y  is  ⚠⚠         [round7 read: ng-4-4-4-4? 4? 2-4-b]
+y = y and b y.<, is  ⚠⚠         [round7 read: x = y and y and y and y is the]
 the same number of the
 ```
 
 ## 371.pdf p.9  ·  frame 00427_0347
 
 ```
-A
+A  ⚠⚠         [round7 read: the]
 the
-2  1  8 3
-5. 2. 905
-1. The Essential Peirce, of the
-2. 2. 2. 2. 2. 2. 2. 4
-3. 49° 6. 6TO
-4 9° and
-5. 6. 6. 6. 6. 3. 31
-7. 23
-2. 7
-40. 4. 4-817
-1. 2. 2. 2. 2. 2
-2. 50 12. 1825
-the same number of the
+2  1  8 3  ⚠⚠         [round7 read: 2nd 1883]
+5. 2. 905  ⚠⚠         [round7 read: e, 2nd 2nd 90 5]
+1. The Essential Peirce, of the  ⚠⚠         [round7 read: e, and the same of the same]
+2. 2. 2. 2. 2. 2. 2. 4  ⚠⚠         [round7 read: 2nd, 2nd, and the]
+3. 49° 6. 6TO  ⚠⚠         [round7 read: 3 "9° and the 6- 6th]
+4 9° and  ⚠⚠         [round7 read: e 9th of the]
+5. 6. 6. 6. 6. 3. 31  ⚠⚠         [round7 read: 6th B, B, B, 1857-18]
+7. 23  ⚠⚠         [round7 read: 2nd 3rd, and 3rd, 3rd]
+2. 7  ⚠⚠         [round7 read: 2. The number of the number]
+40. 4. 4-817  ⚠⚠         [round7 read: 4-4-817, 7° 5]
+1. 2. 2. 2. 2. 2  ⚠⚠         [round7 read: Two years of the same number]
+2. 50 12. 1825  ⚠⚠         [round7 read: 2nd 12. 1825-57-66]
+the same number of the  ⚠         [round7 read: the same number of the same number]
 ```
 
 ## 371.pdf p.10  ·  frame 00427_0348
 
 ```
-Logic Plan of apparent
-is a g-l-l
-372 -1878
-ITU-1351. 4
-82-1386
-88?" -1891
-392-1396
-397-100 11  9  5
-1402 1466
-i. 7-1911
-1412 1416 4
+Logic Plan of apparent  ⚠⚠         [round7 read: Logue of the same of argument]
+is a g-l-l  ⚠⚠         [round7 read: is a given of the]
+372 -1878  ⚠⚠         [round7 read: 92-18°2, 2]
+ITU-1351. 4  ⚠⚠         [round7 read: ery-1381-18]
+82-1386  ⚠         [round7 read: 1821-1386]
+88?" -1891  ⚠         [round7 read: 18? 7-1891]
+392-1396  ⚠         [round7 read: 392-1366-6-6]
+397-100 11  9  5  ⚠⚠         [round7 read: 397-1857-1857-1857-18]
+1402 1466  ⚠⚠         [round7 read: more—1466-4]
+i. 7-1911  ⚠⚠         [round7 read: in the same of the same]
+1412 1416 4  ⚠⚠         [round7 read: u2 u. 4th 4th 4th]
 is plain that these cluster about, say, 140 grains as the
 standard aimed at. But now we come to at least one
 more maximum, as shown by the following continuat
 of the table
-the
+the  ⚠⚠         [round7 read: the same of the same number]
 ```
 
 ## 371.pdf p.11  ·  frame 00427_0349
@@ -155,11 +161,11 @@ or precious matter, our knowledge of ancient metrol
 enables us to guess with some confidence that
 about half the weights would differ from
 virtual standards by more and about half by less than
-per cent or say about a given on a bet. Now these weights
+per cent or say about a given on a bet. Now these weights  ⚠         [round7 read: per cent. or say about a given on a k]
 very over 15 grains in such a way that there is the
-in the whole interval
-no weight among the first be
-that five different bets, according the standard
+in the whole interval  ⚠         [round7 read: in the whole interval which]
+no weight among the first be  ⚠         [round7 read: no weight among the three point be]
+that five different bets, according the standard  ⚠         [round7 read: that five different bets, and]
 of different towns,—are represented here. They thus belong
 to five different natural classes,—certainly to several
 yet it is in many cases impossible to say which one
@@ -167,60 +173,60 @@ of two or even three standards a given balance-weight
 was intended to copy; that is, to which of the natural
 classes it belongs. These classes then are merged into
 one another, without in the least ceasing to be distinct
-the same
+the same  ⚠⚠         [round7 read: the same of the same of the]
 ```
 
 ## 371.pdf p.12  ·  frame 00427_0350
 
 ```
-in an important standing say to 1971 grains, there is 1 weight
-is a sufficiently possible sense of the
-1389 to 136
-is itself to say a
+in an important standing say to 1971 grains, there is 1 weight  ⚠⚠         [round7 read: In the moment of No. 7 to very grains, then]
+is a sufficiently possible sense of the  ⚠⚠         [round7 read: is the proposition of the]
+1389 to 136  ⚠         [round7 read: is a 1383 to 1386]
+is itself to say a  ⚠⚠         [round7 read: is a number of the same]
 The numbers begin to fall off. But not so fast as they should
-for now we are wholly approaching another standard. Namely
-the apparent stands of itself to 140. 1 grains, there are 11 weight
+for now we are wholly approaching another standard. Namely  ⚠         [round7 read: 20. 20 "for now we are actually a proceeding another standard. Name]
+the apparent stands of itself to 140. 1 grains, there are 11 weight  ⚠⚠         [round7 read: e a amount of very to Morgan, then 11 weight]
 We have, at any rate, passed one standard. But now we approach
-on the first of the first years, the
-may 5. As
-the
+on the first of the first years, the  ⚠⚠         [round7 read: t of the number of the same, that it]
+may 5. As  ⚠⚠         [round7 read: in the same of the same way to use]
+the  ⚠⚠         [round7 read: the same of the same of the]
 ```
 
 ## 371.pdf p.13  ·  frame 00427_0351
 
 ```
-x = = 0. 2
-y - 4. 9
-y-z = = 4-6
-24  x 26°
-x +y =10.5
-y-22^9.5. 86
-2. 0. 3  2  5  5
-is the same number of the
+x = = 0. 2  ⚠⚠         [round7 read: x- 1- 0° 0]
+y - 4. 9  ⚠⚠         [round7 read: x + y = 4-9]
+y-z = = 4-6  ⚠⚠         [round7 read: y and a "4-b]
+24  x 26°  ⚠⚠         [round7 read: 2nd 4th and the number]
+x +y =10.5  ⚠⚠         [round7 read: 2nd -<<4-4-4]
+y-22^9.5. 86  ⚠⚠         [round7 read: x R y + z = 9th]
+2. 0. 3  2  5  5  ⚠⚠         [round7 read: 20. 2nd 3rd, and 3rd, and]
+is the same number of the  ⚠⚠         [round7 read: s. The same point of the number]
 ```
 
 ## 371.pdf p.14  ·  frame 00427_0352
 
 ```
-Logic APPENDENTITY (15) No. weights divided
-1417 1421
-1422 1.26
-42 7-1431
-1432-1436
-1437-1440
-14.2 —14. 6 4
-7-1451 12
-1452-1454
-145. 7 14bol
-1462-1466
-sub-7-1471. 4. 4. 4. The
-There must have been a standing clustering at the
+Logic APPENDENTITY (15) No. weights divided  ⚠⚠         [round7 read: Logic. APPENDENDENDENDENDICES. We might be]
+1417 1421  ⚠⚠         [round7 read: n + 7- 1. 6 - 4- 2- 4]
+1422 1.26  ⚠⚠         [round7 read: 1442-1866-1866-60- 60 + 20 + 470]
+42 7-1431  ⚠⚠         [round7 read: may-u3rd-4-9 "9]
+1432-1436  ⚠⚠         [round7 read: u R z = M3-6-3]
+1437-1440  ⚠⚠         [round7 read: u-3rd-1884-1857-1857]
+14.2 —14. 6 4  ⚠⚠         [round7 read: e-u. 4. 4. 4th]
+7-1451 12  ⚠⚠         [round7 read: u- 1- 1- 1. 2 -9-b]
+1452-1454  ⚠⚠         [round7 read: us. 2-u. 5-4° 7]
+145. 7 14bol  ⚠         [round7 read: 145. 7-14-1- 5]
+1462-1466  ⚠⚠         [round7 read: is 6-1466-1857 50]
+sub-7-1471. 4. 4. 4. The  ⚠⚠         [round7 read: toward, "supplies" and it is not in the]
+There must have been a standing clustering at the  ⚠         [round7 read: There must have been a studentary or contrary or about 14 5 gras]
 now we come to another
-1472 1478  5  47
-14. 7  1481
-is the subject of the
-ing. 2 = i.e.e.e.e.e.e.e.e.e.e.e.e
-1. 49. 7 i. 2. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.
+1472 1478  5  47  ⚠⚠         [round7 read: u 72 -u-7-b - 5- 47]
+14. 7  1481  ⚠⚠         [round7 read: 1471-1481-17-17° 5. 6]
+is the subject of the  ⚠⚠         [round7 read: u-2-ins. 6th of]
+ing. 2 = i.e.e.e.e.e.e.e.e.e.e.e.e  ⚠⚠         [round7 read: t. 2 = 1. 6- 6-]
+1. 49. 7 i. 2. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1. 1.  ⚠⚠         [round7 read: u-8. 7-is a + 4- 6- 4]
 ```
 
 ## 371.pdf p.15  ·  frame 00427_0353
@@ -234,7 +240,7 @@ there is another at about 142° grains. But it is utterly
 impossible to say, without additional information
 at which standards the intermediate weights were aiming
 I mentioned above that some exceptions might be taken to
-my manner of the same principle departures of the
+my manner of the same principle departures of the  ⚠         [round7 read: my manner of the probable departures of the]
 from their their kinds. It will be a slight turning aside
 our path to stop to consider these at all; for this illustrate
 on is only intended to show how real classes very often may
@@ -266,13 +272,13 @@ the process of making the weights was. I will then show
 that there would be certain criteria by which we
 could distinguish whether such a phenomenon were
 or not; and finally, by applying those trivia, I will
-the same number of the
+the same number of the  ⚠         [round7 read: the same of the same]
 ```
 
 ## 371.pdf p.17  ·  frame 00427_0355
 
 ```
-the first it is, in fact, not present. To begin with, then, there
+the first it is, in fact, not present. To begin with, then, there  ⚠         [round7 read: logic space that it is, in fact, not present. To begin with, there]
 are three conceivable processes whereby, the weights might have
 been made. Namely, we may first now suppose that the workmen
 were so expert at their trade that they finished the weights
@@ -289,7 +295,7 @@ ide down until a greater weight was put into the opposite
 pan when they would turn until stopped, and
 with the other side down. These latter balances only tell whether
 the thing weighed is heavier or lightly than the weight tried against
-the same
+the same  ⚠⚠         [round7 read: the same number of the]
 ```
 
 ## 371.pdf p.18  ·  frame 00427_0356
@@ -308,11 +314,11 @@ whether it would throw over the lightest allowable weight
 I not if it would have to be thrown away. The third was
 theory and conceivable way of making a weight would be for the workian
 anmediately is to have an oscillating balance at hand, and to try from time
-the mind and that the time how much the weight he was making needed to be
+the mind and that the time how much the weight he was making needed to be  ⚠         [round7 read: distinguished into the time how much the weight he was making needed to be]
 ground down. Whatever method were employed, if
 the workmen had the skill requisite to render that method
 convenient, the subsequent examination would result
-the
+the  ⚠⚠         [round7 read: the same of the same of the]
 ```
 
 ## 371.pdf p.19  ·  frame 00427_0357
@@ -320,9 +326,9 @@ the
 ```
 Logic in the rejection of but a small percentage of the weights, and
 this would not sensibly effect the calculated probable error
-the workmen were unskillful and a considerable
+the workmen were unskillful and a considerable  ⚠         [round7 read: e, however, the workmen were unskillful and a considerable]
 in of the weights were repeated, the light ones would
-have to be thrown away for the truth of the heavy numbers of which
+have to be thrown away for the truth of the heavy numbers of which  ⚠         [round7 read: have to be thrown away for the same thing is not]
 down again, and the result would be that very different pro
 table errors would be calculated from the heavy weights and
 the light ones, the latter being much larger. Now
@@ -332,10 +338,10 @@ method was used. This is the modern method of coinage, except
 that machinery is now used, of course. If the second
 method were employed and this unskillfulness of
 the workmen took the form of timidity, the probable error
-calculated from the small weights would claim a
+calculated from the small weights would claim a  ⚠         [round7 read: calculated from the small weights would be any much greater than]
 that from the great ones, while if it took the form of over-foldness
 the reverse might be the case. It is possible that there might be
-the
+the  ⚠⚠         [round7 read: the same number of the]
 ```
 
 ## 371.pdf p.20  ·  frame 00427_0358
@@ -350,30 +356,30 @@ one little and another at another, and thus there would be
 an appearance on the whole of different standards being
 employed. There would in fact be different virtual standards
 and the only mathematical conclusion is as to the virtual stand
-and what the dare of their origination was question. But different virtual
+and what the dare of their origination was question. But different virtual  ⚠         [round7 read: and what the same other argument to answer question. But different virtual]
 standards produce different natural classes; so that that
 would not affect my argument. If the third method of man
 ature were used, it is quite incredible that any considerable
 proposition of the weights could have been rejected at a subsequent
 inspection; and therefore my method of calculation could not
 In this argument, I could not use as a premiss my con
-are the first kind ofclusion that there were several virtual standards. Otherwise, there
+are the first kind ofclusion that there were several virtual standards. Otherwise, there  ⚠         [round7 read: e, and and the question that there were several standards. Otherwise, there]
 before me. Airsteine would at once show that there was no government
-the same number of the
+the same number of the  ⚠         [round7 read: s. The number of the]
 ```
 
 ## 371.pdf p.21  ·  frame 00427_0359
 
 ```
-spic. Supervisor, unless it were so intelligent that it would be
+spic. Supervisor, unless it were so intelligent that it would be  ⚠         [round7 read: logic expression, unless it were so in judgment that it would be]
 without effect on my real calculation of probable errors
 e no know that, before the adoption of the math of system, every
-the contingent of Europe had its own pound, and since
-in the first kind of the same way. Eight was an entire loosely bound together, it is al
-and such the other probable that the different sets found in Man
-pounded, and in the centre were intended to conform to the standards of different
+the contingent of Europe had its own pound, and since  ⚠⚠         [round7 read: the continuum of the constituent number]
+in the first kind of the same way. Eight was an entire loosely bound together, it is al  ⚠         [round7 read: intentioning. Egypt was an entire loosely bound together, it is al]
+and such the other probable that the different sets found in Man  ⚠         [round7 read: t of such a gother probable that different bets found in Man]
+pounded, and in the centre were intended to conform to the standards of different  ⚠⚠         [round7 read: grounds, and the]
 the form of terms. But none of these bets carry any mark which might
-all there are. A warrant their honesty; and therefore we can hardly avoid sup
+all there are. A warrant their honesty; and therefore we can hardly avoid sup  ⚠         [round7 read: all therefore. Now honesty; and therefore we can hardly avoid]
 posing that the buyer must have brought his own weights
 t also his own balance. In this case, it seems likely that some
 weights would be manufactured for the use of buyers and others
@@ -382,7 +388,7 @@ perhaps where had their origin in that. This is somewhat borne
 out by a set of weights found by Petrie of which the standard
 is about 80 grains. There is no documentary mention of
 such a standard; so that its use must have been restricted
-the same number of the
+the same number of the  ⚠         [round7 read: the same of the same of the]
 ```
 
 ## 371.pdf p.22  ·  frame 00427_0360
@@ -394,10 +400,10 @@ d grounds known to me, with their values, which list I dep
 sited in the Astor Library. It is, therefore, altogether probable, since
 Egypt was a loosely connected empire, that every town in Egypt
 had its own standard of might; and the kate found at Naucratis
-probably representative of the standards of five important towns
+probably representative of the standards of five important towns  ⚠         [round7 read: probably concentrated the standard line important to]
 Virtual standards may, however, originate otherwise. None of
-the same way may mark
-the
+the same way may mark  ⚠⚠         [round7 read: dull carry much]
+the  ⚠⚠         [round7 read: the same number of the]
 ```
 
 ## 371.pdf p.23  ·  frame 00427_0361
@@ -420,5 +426,5 @@ real," class to mean a class the existence of whose members
 is due to a common and peculiar final cause. I had
 remarked that it is a wide-spread error to suppose that
 a final cause is necessarily a purpose. A purpose is
-the same
+the same  ⚠⚠         [round7 read: the same of the same of the]
 ```

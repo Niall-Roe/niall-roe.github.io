@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 19
 number: 18
 title: "Figuring out the probable error"

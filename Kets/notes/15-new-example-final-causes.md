@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 15
 number: 16
 title: "Final Causes"
@@ -17,6 +16,29 @@ container: example-ex16
 None open.
 
 ### Awaiting approval
+
+#### eighth pass — your words, your controls
+(Your four comments on this example arrived in the Methods panel; applied here.) The two flagged
+passages are cut — the "fake map, and the difference between the two kinds of causation" intro
+and the "four walkers, four starting corners" line — and the explainer is now a minimally
+modified version of what you said: efficient causation is compulsion regardless of end, through
+to the bird that flies straight there. Starting points can no longer trace a path off the map:
+scattering (and any custom directions) keeps every start where the whole instructed route stays
+on the grid. And the directions are yours to set — a text box on the button bar takes forms like
+"2N, 1E, 1S, 1E" or "3N 2E" (the default kept) — while the address is set by clicking anywhere on
+the map in final-causation mode, as before.
+
+##### the notes this answers
+
+cut this AI crap language, "Four walkers, four starting corners, one set of compulsions: two blocks north, one east, one south, one east. Press play."
+
+cut this "A fake map, and the difference between the two kinds of causation. [...] The general result may be brought about at one time in one way, and at another time in another."
+
+have the explainer just be a minimally modified version of what. I said to you. 
+
+fix the fact that starting points still trace out a path when they are off map. 
+
+give the user a way to set the directions and the address, though keep the defaults as they are.
 
 #### seventh pass — the directions example, built
 The gauge sim is retired for the reason you gave (nobody made a distribution of track gauges).

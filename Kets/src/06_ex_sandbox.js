@@ -7,31 +7,34 @@
 registerExample("example-ex4", (box) => {
   box.appendChild(exHeader("Interactive Example: Copies of a standard", "ex4-content"));
   const content = h(`<div id="ex4-content" class="example-content">
-    <p>Two directions through one picture. <em>Assuming known standards</em> goes the easy way:
-      place standards, cast copies, and see the distribution they print &mdash; every copy one block
-      in its standard's colour. <em>Figuring out the standards</em> is Peirce's actual task, run in
-      reverse: you are given only the heaped-up data, you choose a law of error, you place candidate
-      standards, and you compare the curve your guesses imply with the curve the data draw.</p>
-    <div class="row"><div class="col col-6"></div><div class="col col-6"></div></div>
-    <div class="ex-buttonbar">
-      <button class="btn" id="ex4-two">two standards</button>
-      <button class="btn" id="ex4-clusters">two clusters (3 low + 2 high)</button>
-      <button class="btn btn-warning" id="ex4-petrie">Petrie's data, as Peirce cleaned it</button>
-      <button class="btn btn-primary" id="ex4-copy25">cast 25 of each</button>
-      <button class="btn" id="ex4-clear">clear the copies</button>
-      <span class="ex27-lead" id="ex4-tally"></span>
-    </div>
+    <p>If you knew the standards and you knew how well standards would be copied, you could predict
+      how many weights would cluster around each standard. However, if you just had the data, you
+      would have to instead try to select the values of standard and probable error that would, if
+      correct, be most likely to have produced the data. Use the below to explore both
+      circumstances. In the first mode, set the standards and generate kets. In the second, pretend
+      you do not know the standards, and try to fit them.</p>
     <div class="mode-tabs">
       <button class="mode-tab active" id="ex4-know">assuming known standards</button>
       <button class="mode-tab" id="ex4-blind">figuring out the standards</button>
     </div>
-    <div class="ex-buttonbar" id="ex4-lawbar" style="display:none">
-      <span class="ex27-lead">law of error:</span>
-      <button class="btn btn-sm is-active" data-law="gauss">probability curve</button>
-      <button class="btn btn-sm" data-law="gaussPer">gaussian, own spread each</button>
-      <button class="btn btn-sm" data-law="uniform">flat tolerance</button>
-      <button class="btn btn-sm" data-law="cutR">sharp cutoff right</button>
-      <button class="btn btn-success btn-sm" id="ex4-snap">snap to best fit</button>
+    <div class="row"><div class="col col-6"></div><div class="col col-6"></div></div>
+    <div class="ex-buttonbar" id="ex4-bar-know">
+      <button class="btn" id="ex4-two">two standards</button>
+      <button class="btn" id="ex4-clusters">two clusters (3 low + 2 high)</button>
+      <button class="btn btn-warning" id="ex4-petrie">Petrie's data, as Peirce cleaned it</button>
+      <span style="margin-left:auto" id="ex4-tally" class="ex27-lead"></span>
+      <button class="btn btn-primary" id="ex4-copy25">cast 25 of each</button>
+      <button class="btn" id="ex4-clear">clear the copies</button>
+    </div>
+    <div class="ex-buttonbar" id="ex4-bar-blind" style="display:none">
+      <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
+        <input type="checkbox" id="ex4-fixpe" checked> hold the probable error at the slider</label></label>
+      <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
+        <input type="checkbox" id="ex4-samesd" checked> same spread for each</label></label>
+      <span style="margin-left:auto"></span>
+      <button class="btn btn-warning" id="ex4-rand">randomize</button>
+      <button class="btn btn-success" id="ex4-snap">snap to best fit</button>
+      <button class="btn" id="ex4-reveal">reveal the actual</button>
     </div>
     <div class="row" id="ex4-sdrow" style="display:none"></div>
     <div class="plot-container"></div>
@@ -41,15 +44,18 @@ registerExample("example-ex4", (box) => {
 
   let stds = [143.8, 145.6];
   let copies = stds.map(() => []);
+  let castPE = 0.625;                 /* the PE the copies were actually cast with */
   let dataMode = false, blind = false;
-  let law = "gauss", fit = null;      /* {mu, w, sds} once snapped */
+  let fixPE = true, sameSd = true;
+  let fit = null;                     /* {mu, w, sds} once snapped */
+  let reveal = false;
   let guesses = [140, 148];
-  let gSds = [];                      /* hand-set spreads under gaussPer */
+  let gSds = [];                      /* hand-set spreads when each has its own */
   function rebuildSdRow() {
     const row = $("#ex4-sdrow", content);
     row.innerHTML = "";
-    row.style.display = (blind && law === "gaussPer") ? "" : "none";
-    if (!(blind && law === "gaussPer")) return;
+    row.style.display = (blind && !sameSd) ? "" : "none";
+    if (!(blind && !sameSd)) return;
     while (gSds.length < guesses.length) gSds.push(PEIRCE_PE * PE_TO_SD);
     gSds.length = guesses.length;
     guesses.forEach((m, i) => {
@@ -70,11 +76,11 @@ registerExample("example-ex4", (box) => {
   const spreadGuesses = (k) => Array.from({ length: k }, (_, i) => +(138 + (i + 0.5) * 13 / k).toFixed(1));
 
   function preset(newStds, asData) {
-    dataMode = !!asData; fit = null;
+    dataMode = !!asData; fit = null; reveal = false;
     stds = newStds.slice();
     copies = stds.map(() => []);
     kCtl.input.value = stds.length; kCtl.input.dispatchEvent(new Event("input"));
-    if (asData) { peCtl.input.value = PEIRCE_PE; peCtl.input.dispatchEvent(new Event("input")); }
+    if (asData) { peCtl.input.value = PEIRCE_PE; peCtl.input.dispatchEvent(new Event("input")); castPE = PEIRCE_PE; }
     guesses = spreadGuesses(stds.length);
     poke();
   }
@@ -92,48 +98,59 @@ registerExample("example-ex4", (box) => {
     const vals = allCopies();
     const xlim = [136, 153.5];
     const dc = dataCurve(vals, xlim, 1);
-    const ymax = Math.max(4, ...dc.ys, ...histCounts(vals, BIN_0, xlim[1], BIN_W)) * 1.3;
+    const counts = histCounts(vals, BIN_0, xlim[1], BIN_W);
+    const ymax = Math.max(4, ...dc.ys, ...counts) * 1.3;
     pl.setup({ xlim, ylim: [0, ymax], mar: [3, 3, 0.8, 0.8] });
     pl.axes({ xat: seqBy(138, 153, 2), yat: pretty0(ymax) });
     pl.axisLabels("grains", "weights per half-grain");
-    histCounts(vals, BIN_0, xlim[1], BIN_W).forEach((n, i) => {
-      if (n) pl.rect(BIN_0 + i * BIN_W, 0, BIN_0 + (i + 1) * BIN_W, n, { col: "rgba(87,93,102,.18)", border: PAL.paper });
-    });
-    /* gradient under the guess curves — the mixture grammar, in the guesses' colours */
-    {
-      const gmu = fit ? fit.mu : guesses;
-      const gw = fit ? fit.w.map((x) => x * vals.length) : guesses.map(() => vals.length / guesses.length);
-      for (let x = xlim[0]; x < xlim[1]; x += 0.08) {
-        const ds = gmu.map((m, i) => gw[i] * BIN_W * lawDens(law === "gaussPer" ? "gauss" : law, x + 0.04, m, peCtl.get(), { sd: fit && fit.sds ? fit.sds[i] : (law === "gaussPer" ? gSds[i] : undefined) }));
-        const y = Math.max(...ds);
-        if (y < 0.05) continue;
-        pl.rect(x, 0, x + 0.08, y, { col: mixCol(KCOL, ds, 0.20), border: null });
-      }
-    }
-    pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 2 });
     const mu = fit ? fit.mu : guesses;
     const w = fit ? fit.w.map((x) => x * vals.length) : guesses.map(() => vals.length / guesses.length);
-    const sds = fit ? fit.sds : (law === "gaussPer" ? gSds : null);
+    const sds = fit ? fit.sds : (sameSd ? null : gSds);
+    const dOf = (x, m, i) => dnorm(x, m, (sds && sds[i]) || pe * PE_TO_SD);
+    /* the bars themselves shade smoothly across the axis, bin to bin, in the
+       guesses' colours — the house gradient */
+    counts.forEach((n, i) => {
+      if (!n) return;
+      const x0 = BIN_0 + i * BIN_W;
+      const r = mu.map((m, j) => w[j] * dOf(x0 + BIN_W / 2, m, j));
+      for (let u = 0; u < n; u++)
+        pl.rect(x0, u, x0 + BIN_W, u + 1, { col: mixCol(KCOL, r, 0.55), border: PAL.paper });
+    });
+    pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 2 });
     const xs = seqBy(xlim[0], xlim[1], 0.05);
-    const dOf = (x, m, i) => lawDens(law === "gaussPer" ? "gauss" : law, x, m, pe,
-                                     { sd: sds ? sds[i] : undefined });
     mu.forEach((m, i) => {
       pl.lines(xs, xs.map((x) => w[i] * BIN_W * dOf(x, m, i)), { col: KCOL[i % KCOL.length], lwd: 1.3 });
       drawKetGlyph(pl, m, 0, KCOL[i % KCOL.length], 9);
     });
     pl.lines(xs, xs.map((x) => mu.reduce((a, m, i) => a + w[i] * BIN_W * dOf(x, m, i), 0)),
              { col: PAL.accent2, lwd: 1.7, lty: 2 });
+    /* the actual, revealed: the distributions of the assuming-known page */
+    if (reveal) {
+      const tStds = stds, tW = dataMode ? nearestCounts(KETS142, stds) : copies.map((c) => c.length);
+      const tSd = castPE * PE_TO_SD;
+      tStds.forEach((m, i) => {
+        pl.lines(xs, xs.map((x) => tW[i] * BIN_W * dnorm(x, m, tSd)),
+                 { col: KCOL[i % KCOL.length], lwd: 1.8, lty: 3 });
+        pl.segments(m, 0, m, ymax * 0.9, { col: KCOL[i % KCOL.length], lwd: 1, lty: 3 });
+        drawKetGlyph(pl, m, 0, KCOL[i % KCOL.length], 6);
+      });
+    }
     let miss = 0, n = 0;
     dc.xs.forEach((x, i) => {
       if (dc.ys[i] < 0.3) return;
       miss += Math.abs(mu.reduce((a, m, k) => a + w[k] * BIN_W * dOf(x, m, k), 0) - dc.ys[i]); n++;
     });
     const read = $("#ex4-read");
-    if (read) read.innerHTML = `<p>The solid black curve is the data; the dashed red one is what your
-      ${mu.length} candidate standards imply under the chosen law. Average miss:
+    if (read) read.innerHTML = !vals.length
+      ? `<p>No data yet: cast copies in the first mode, or press <em>randomize</em> for a heap
+         whose standards you were not shown.</p>`
+      : `<p>The solid black curve is a smoothed out summary of the histogram (more on how Peirce
+      smoothed his data below). The red dashed curve is the sum of your
+      <strong>${mu.length}</strong> candidate standards. Average miss:
       <strong>${(miss / (n || 1)).toFixed(2)}</strong> weights per class.
-      ${fit ? "Snapped to the best fit under this law &mdash; drag any dome to take over from it."
-            : '<span class="click-cue">Drag the standards to bring the dashed curve onto the black one.</span> Without a law restricting each curve, any placement could be excused; the law is what gives the comparison force.'}</p>`;
+      ${fit ? "Snapped to the best fit under your settings &mdash; drag any dome to take over from it."
+            : '<span class="click-cue">Drag the standards to bring the dashed curve onto the black one.</span>'}
+      ${reveal ? " The dotted curves are the actual distributions the data were generated from." : ""}</p>`;
   });
   $(".plot-container", content).appendChild(cv);
 
@@ -159,25 +176,44 @@ registerExample("example-ex4", (box) => {
     const read = $("#ex4-read");
     if (read && !blind) read.innerHTML = dataMode
       ? `<p>The real kets, stacked as blocks and coloured by their likeliest standard under the
-         current placement. From here, switch to <em>figuring out the standards</em> and pretend
-         you never saw where the domes stood.</p>`
-      : `<p>Each standard's thin curve is what its copies would print with endlessly many castings.
-         Cast enough copies, then switch tabs: the second mode hands you only the heap and asks
-         Peirce's question backwards.</p>`;
+         current placement. The second mode hands you this same heap without the standards.</p>`
+      : `<p>The copies you cast here are the data the second mode will ask you to fit. Each
+         standard's thin curve is what its copies would print with endlessly many castings.</p>`;
   }
   function poke() { drawCanvas(cv); tally(); if (!blind) know(); }
   $("#ex4-copy25", content).addEventListener("click", () => {
     if (dataMode) return;
     stds.forEach((m, i) => { for (let j = 0; j < 25; j++) copies[i].push(PROCESSES.skillful.draw(m, peCtl.get())); });
+    castPE = peCtl.get();
     fit = null; poke();
   });
   $("#ex4-clear", content).addEventListener("click", () => {
     if (!dataMode) copies = stds.map(() => []);
-    fit = null; poke();
+    fit = null; reveal = false; poke();
   });
   $("#ex4-two", content).addEventListener("click", () => preset([143.8, 145.6]));
   $("#ex4-clusters", content).addEventListener("click", () => preset([139.4, 140.6, 141.8, 147.6, 149.4]));
   $("#ex4-petrie", content).addEventListener("click", () => preset(PEIRCE_STANDARDS, true));
+  $("#ex4-rand", content).addEventListener("click", () => {
+    /* a hidden truth: some standards at some spread, 100 copies of each */
+    const k = 2 + Math.floor(Math.random() * 4);
+    let tries = 0, next;
+    do {
+      next = Array.from({ length: k }, () => +(138 + Math.random() * 13).toFixed(1)).sort((a, b) => a - b);
+      tries++;
+    } while (tries < 200 && next.some((m, i) => i && m - next[i - 1] < 1.6));
+    stds = next;
+    dataMode = false;
+    castPE = +(0.35 + Math.random() * 0.65).toFixed(3);
+    copies = stds.map((m) => Array.from({ length: 100 }, () => PROCESSES.skillful.draw(m, castPE)));
+    fit = null; reveal = false;
+    poke();
+  });
+  $("#ex4-reveal", content).addEventListener("click", (e) => {
+    reveal = !reveal;
+    e.target.classList.toggle("is-active", reveal);
+    drawCanvas(cv);
+  });
   kCtl.input.addEventListener("input", () => {
     const k = kCtl.get();
     if (blind) { guesses = spreadGuesses(k); fit = null; rebuildSdRow(); }
@@ -188,23 +224,32 @@ registerExample("example-ex4", (box) => {
   $("#ex4-know", content).addEventListener("click", (e) => {
     blind = false;
     e.target.classList.add("active"); $("#ex4-blind", content).classList.remove("active");
-    $("#ex4-lawbar", content).style.display = "none";
+    $("#ex4-bar-know", content).style.display = "";
+    $("#ex4-bar-blind", content).style.display = "none";
     rebuildSdRow(); poke();
   });
   $("#ex4-blind", content).addEventListener("click", (e) => {
     blind = true;
     e.target.classList.add("active"); $("#ex4-know", content).classList.remove("active");
-    $("#ex4-lawbar", content).style.display = "";
+    $("#ex4-bar-know", content).style.display = "none";
+    $("#ex4-bar-blind", content).style.display = "";
     rebuildSdRow(); drawCanvas(cv);
   });
-  $$("#ex4-lawbar [data-law]", content).forEach((b) => b.addEventListener("click", () => {
-    law = b.dataset.law; fit = null;
-    $$("#ex4-lawbar [data-law]", content).forEach((x) => x.classList.toggle("is-active", x === b));
-    rebuildSdRow(); drawCanvas(cv);
-  }));
+  $("#ex4-fixpe", content).addEventListener("input", (e) => { fixPE = e.target.checked; fit = null; drawCanvas(cv); });
+  $("#ex4-samesd", content).addEventListener("input", (e) => {
+    sameSd = e.target.checked; fit = null; rebuildSdRow(); drawCanvas(cv);
+  });
   $("#ex4-snap", content).addEventListener("click", () => {
-    fit = lawFit(allCopies(), guesses.length, law === "gaussPer" ? "gauss" : law, peCtl.get(),
-                 { init: guesses, perSd: law === "gaussPer" });
+    const vals = allCopies();
+    if (!vals.length) return;
+    if (!sameSd) {
+      fit = lawFit(vals, guesses.length, "gauss", peCtl.get(), { init: guesses, perSd: true });
+    } else {
+      const f = emFit(vals, guesses.length, { init: guesses,
+        sd: fixPE ? peCtl.get() * PE_TO_SD : null });
+      fit = { mu: f.mu, w: f.w, sds: f.mu.map(() => f.sd) };
+      if (!fixPE) { peCtl.input.value = Math.max(0.2, Math.min(1.5, +(f.sd * 0.6745).toFixed(3))); peCtl.val.textContent = peCtl.get().toFixed(3); }
+    }
     drawCanvas(cv);
   });
   poke();
@@ -231,7 +276,7 @@ registerExample("example-ex6", (box) => {
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex6-showdata" checked> the data</label></label>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
-        <input type="checkbox" id="ex6-showsmooth"> smoothed curve of the data</label></label>
+        <input type="checkbox" id="ex6-showsmooth" checked> smoothed curve of the data</label></label>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex6-showcomp" checked> the class curves</label></label>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
@@ -301,8 +346,14 @@ registerExample("example-ex6", (box) => {
       }
       stds.forEach((m) => drawKetGlyph(pl, m, 0, "#2f5f9f", 8));
     } else if (mode === "blocks") {
+      /* individually coloured blocks, each in its likeliest standard's own
+         tint — no gradient here — with the smoothed curve still on call */
       drawMixture(pl, W, H, { stds, data: KETS142, pe: peCtl.get(), blocks: true,
-                              weights: wts, bigStd: true, xlim });
+                              solidBlocks: true, weights: wts, bigStd: true, xlim });
+      if (show6.smooth) {
+        const dc = dataCurve(KETS142, xlim, 1);
+        pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 2 });
+      }
     } else {
       /* the mixture look: blocks in the bars, gradient under the curves */
       if (show6.data) {

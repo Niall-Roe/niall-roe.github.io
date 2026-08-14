@@ -7,18 +7,24 @@ The revised draft, headed 'The Kets of Naucratis' in the margin. This is the ver
 Transcribed by THE PEIRCEPTRON (round 8). Unedited machine output —
 see README for what that is worth.
 
+**Confidence marks** — round 7 and round 8 read every line
+independently. `⚠` = they agree less than 80% (these lines read ~2.7x
+worse in testing); `⚠⚠` = under 50%. Where they disagree, round 7's
+alternative reading is shown in brackets, so you can see the ambiguity
+rather than trust one guess.
+
 ---
 
 ## 338.pdf p.15  ·  frame 00427_0015
 
 ```
-tion an incontestable instance of A; · inconthetible, at least
-any fair-nine competent to deal with the problem. Prof
+tion an incontestable instance of A; · inconthetible, at least  ⚠         [round7 read: logic mention an incontestable instance of A; incontototable, at that]
+any fair-nine competent to deal with the problem. Prof  ⚠         [round7 read: any fair, a given point to deal with the problem. Po]
 The tests of Thirdest Potre, whose reasoning powers I had admitted long
-the subject is. The first scientific scientific qualities had been proved, among which
+the subject is. The first scientific scientific qualities had been proved, among which  ⚠         [round7 read: N accurately been a higher scientific qualities had been proved, among which]
 his great exactitude and circumspection as a metrologist con
-here, ashamed, at the ancient trading to
-less that 1583 when weights having the Egyptian but as their unit
+here, ashamed, at the ancient trading to  ⚠         [round7 read: is here, examined, at the ancient trading term of Naueratis]
+less that 1583 when weights having the Egyptian but as their unit  ⚠         [round7 read: taphysics. less that 1883, weights having the Egyptian has as their unit]
 e. The great majority of them are of basalt and syenite, material so
 unchangable that the convictions needed to bring them to their original
 values are small. I shall deal only with 14th of them from
@@ -26,7 +32,7 @@ Mr. Petre has calculated the value of the best to a tenth of a
 rain. Since these values range all the way from 137 to 15
 grains, it is evident that the
 tendards, probably four or five; for there is no use of
-if one detect the errors of the same thing is the
+if one detect the errors of the same thing is the  ⚠⚠         [round7 read: the errors of the same way to the way]
 heﬁng them, and comparing them with one
 of the standard weight. Considering that there
 the same number of the
@@ -35,17 +41,17 @@ the same number of the
 ## 338.pdf p.16  ·  frame 00427_0016
 
 ```
-the way of the objects are small, and were therefore used for nothing costly
-or even precious matter, our knowledge of the
+the way of the objects are small, and were therefore used for nothing costly  ⚠⚠         [round7 read: The same way of the weight of the way of the]
+or even precious matter, our knowledge of the  ⚠         [round7 read: or own premissmatter, our knowledge of]
 gicians ground for thinking it likely
 ng the moments
 the heights would depart from their virtual standards by more
 and about half by less, than say, or 5 tenths of one per cent
-which upon a bet, would be from two methods of a grain
+which upon a bet, would be from two methods of a grain  ⚠         [round7 read: which upon a hot, would be from as two things of a gram]
 Now the whole interval here is a
 grains to 1513 grains, there is no case of an interval of
 more than a third of a grain not represented by any
-We, but among the 1 + 4. To a person thoroughly familiar with
+We, but among the 1 + 4. To a person thoroughly familiar with  ⚠         [round7 read: We get not say the 144. To a person thoroughly familiar with]
 the theory of errors this shows that there must be four
 five different standards to which different ones aim to con
 form. In order that every reader may see that this is
@@ -53,7 +59,7 @@ case, I give a diagram upon which the abscissas
 grains while the ordinates represent the numbers of weights
 the 1614 which are either exactly of the weight repre
 by the abscissas of the points plotted or exceed that
-the same number of the
+the same number of the  ⚠         [round7 read: the same of the same of the]
 ```
 
 ## 338.pdf p.17  ·  frame 00427_0017
@@ -68,14 +74,14 @@ waste of time. I have assumed that there were five different
 dards; and that the weights depart from their stan
 s according to the probability curve (which will be explained
 in a subsequent chapter), and that the probable error of a single
-weight is 5 again. I assume that of the 14th weights. The
+weight is 5 again. I assume that of the 14th weights. The  ⚠         [round7 read: might is 5, grain. I assume that of the 14-psychit]
 36 was designed to conform to a standard of
-2. The Essential Peirce of the
-23
-34° = 1. 1. 1. 1. 1. 1. 9. 7 grains
+2. The Essential Peirce of the  ⚠⚠         [round7 read: 2nd, and the same number of the]
+23  ⚠⚠         [round7 read: 23. In the same number of the number]
+34° = 1. 1. 1. 1. 1. 1. 9. 7 grains  ⚠⚠         [round7 read: 34th of the same number of the]
 I have been drawn on the diagram curves in blue, which cut
 the ordinates of the red dots in points whose ordinates show
-the
+the  ⚠⚠         [round7 read: the same number of the]
 ```
 
 ## 338.pdf p.18  ·  frame 00427_0018
@@ -98,7 +104,7 @@ merge into one another inevcibly
 It is, I think, pretty certain that there were as many as five
 Before the adoption of the metric system, every
 city throughout the greater part, if not all, the contingent of Europe
-the
+the  ⚠⚠         [round7 read: the same number of the]
 ```
 
 ## 338.pdf p.19  ·  frame 00427_0019
@@ -106,7 +112,7 @@ the
 ```
 logic had its own pound, like its own patrols. See the whole
 "pound" in the Century Dictionary, which was based on a list of
-one three hundred of such rounds of each places which were true
+one three hundred of such rounds of each places which were true  ⚠         [round7 read: one three hundred of such points and more ideas were true]
 a list now kept in MS. in the Astor Library. That the same
 of things must have been true in ancient Egypt may
 be in red from the looseness of the the lie which bound the
@@ -119,7 +125,7 @@ those of five towns with which Nancratis carried on trade
 Yet virtual standards may be created in other ways. For example
 where government does not insure uniformity in weights, it
 is usual for buyers to bring their own weights. For would this
-naturally happen that some balance ought would be manifested for the
+naturally happen that some balance ought would be manifested for the  ⚠         [round7 read: actually happen that values some thoughts would be manufactured for the]
 use of buyers, and others for the use of sellers; and thus there
 the same number of the
 ```
@@ -128,7 +134,7 @@ the same number of the
 
 ```
 is naturally be a tendency to the crystallization of
-a he infer and a lightly better nor in
+a he infer and a lightly better nor in  ⚠         [round7 read: a hewier and a lighter norin]
 As for my assumption that the departures of the
 weights from their virtual standards conform to
 the probability curve, it was only adopted as a ready way
@@ -167,7 +173,7 @@ curve would depend upon the construction of the balance
 it were like a modern balance, seems to show, not only that
 one mass is greater than another, but also whether it is
 much or little greater, the workman would be keep in one par
-the
+the  ⚠⚠         [round7 read: the same number of the]
 ```
 
 ## 338.pdf p.22  ·  frame 00427_0022
@@ -182,10 +188,10 @@ form easily manageable by a slight modification of the
 the third of least squares. I have drawn the curve in the upper
 left hand corner of the plate. But most of the balances shown
 upon the Egyptian monuments are provided with stops or other
-contrivances which would be needless if the balances were not
+contrivances which would be needless if the balances were not  ⚠         [round7 read: dications which would be redders if the balances were not]
 the first theory. Now a top-heavy balance will not show that two
-which the rights are equal, otherwise than by remaining with either
-s. The Essential Peirce, and down which may be down. It only shows when
+which the rights are equal, otherwise than by remaining with either  ⚠         [round7 read: e, which is a single, the same than by remaining with either]
+s. The Essential Peirce, and down which may be down. It only shows when  ⚠         [round7 read: s their mind and down which may be down. It only shows when]
 might being already in one pan, a decidedly
 heavier weight is placed in the other. The workman using
 such a balance would have no warning that he was
@@ -197,7 +203,7 @@ the same number of the
 
 ```
 any definite value, but would have to grind away blindly
-lying his weight every time he had ground off about as much
+lying his weight every time he had ground off about as much  ⚠         [round7 read: tly, it is, it is, it is, it every time he had ground off about as much]
 the whole range of variation which he proposed to allow
 If he always ground off precisely the same an
 between successive tryinges of his weight, he would be I just as
@@ -206,9 +212,9 @@ the amount taken off at a grinding as by any other; so that
 has error curve would be a horizontal line cut off by
 vertical ordinates; thus, I. But since there would be
 a variability in the amount taken off between the trials, the
-It must be
-s. The Essential Peirce, a contrary pleasure, thus
-the same time long digression, (which will be referred to with
+It must be  ⚠         [round7 read: It may be]
+s. The Essential Peirce, a contrary pleasure, thus  ⚠⚠         [round7 read: s, and the same of the same of]
+the same time long digression, (which will be referred to with  ⚠⚠         [round7 read: he proposition of the same thing of the same]
 of this sort of some interest when we come to study the theory of errors) will not
 is the same caused the reader to forget that we were engaged in tracing out so me
 the consequences of understanding the term "natural" or "real class to mean
@@ -220,7 +226,7 @@ a "final cause" is necessarily a
 ## 338.pdf p.24  ·  frame 00427_0024
 
 ```
-merely that form of final sense which is most familiar
+merely that form of final sense which is most familiar  ⚠         [round7 read: logic nearly that form of final cause which is most fall]
 to our experience. The signification of the phrase
 cause" must be determined by its use in
 of Aristotle that all causation divides into two grand
@@ -237,5 +243,5 @@ in what particular way it is to be brought about, but
 only that the result shall have a certain
 general character. Efficient causation, on the other
 hand, is a compulsion determined by the particular
-the
+the  ⚠⚠         [round7 read: the same of the same]
 ```

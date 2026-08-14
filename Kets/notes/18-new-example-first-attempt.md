@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 18
 number: 17
 title: "The first attempt, by hand"
@@ -19,6 +18,30 @@ neighbouring standard owns which Separated share; whether he says why 0.7/0.3 an
 lighter neighbour.
 
 ### Awaiting approval
+
+#### seventh pass — the empty view, explained and fixed
+Why "his working, drawn" displayed nothing: the view's canvas was built but never attached to the
+page — a one-line omission, now fixed, and the fifth-pass content (the α-slider rule
+demonstration, his smoothed values, the Separated stacks) draws as written. The tab is renamed
+*smoothing*, kept beside the walk. And the smoothing now also runs alongside the histogram
+building, as he apparently worked: in "work through it", every tallied bin gets its red smoothed
+dot as it lands (the 0.7-this + 0.3-previous rule can be worked bin by bin as the tally
+proceeds), with the opening line saying what the dot is. All three added paragraphs of the intro
+now carry the blue-ruled indent, not just the first.
+
+##### the notes this answers
+
+another place you have blatantly ignored me. pasting: 
+
+obviously all the added text should be indented with the blue line please please please please please just read what I ask and try to do it.
+
+I think you are right about the symmetric fall off.
+
+it sounds like you worked it all out in the fifth pass. so... build it please. the his working drawn still displays noting. and its a bad title. it shoudl be called smoothing. it shoudl presumably come before or along side the histogram building, as that is how he apparently did it?
+
+when you are working on an example do not move on to the next example until you are finished.
+
+### Completed
 
 #### sixth pass — cross-references settled
 The working-out example (no-gap ruler) now shows the First Attempt page with the interval

@@ -2279,7 +2279,8 @@ function drawMixture(pl, W, H, o) {
       if (b >= 0 && b < nb) per[si][b]++;
     };
     if (o.copies) o.copies.forEach((c, si) => c.forEach((v) => put(v, si)));
-    const graded = !o.copies;   /* data: the colour graduates smoothly bin to bin */
+    /* data: the colour graduates smoothly bin to bin, unless solid blocks are asked for */
+    const graded = !o.copies && !o.solidBlocks;
     (o.data || []).forEach((v) => {
       const r = responsibilities(v, stds, wts, sd);
       let bi = 0; r.forEach((q, j) => { if (q > r[bi]) bi = j; });
@@ -2310,16 +2311,34 @@ function drawMixture(pl, W, H, o) {
       pl.rect(b0, 0, b0 + BIN_W, counts[i], { col: fill, border: PAL.paper });
     }
   }
-  /* gradient fill under the sum curve: each slice blends the standards' colours
-     by their share at that abscissa */
+  /* gradient fill under the curves. Colours keep to their own curves: up to the
+     lower curves the shades blend by the curves' own heights; above that, only
+     the curves that reach higher continue, each band blending just the colours
+     whose curves still cover it — so no colour ever climbs another's slope,
+     and the amount of each colour reflects the chance of a copy landing there */
   if (o.gradientSum && stds.length) {
+    const alpha = o.mixture ? 0.22 : 0.35;
     for (let x = xlim[0]; x < xlim[1]; x += 0.08) {
-      const y = o.sumOnly
-        ? stds.reduce((a, m, i) => a + wts[i] * BIN_W * dnorm(x + 0.04, m, sd), 0)
-        : Math.max(...stds.map((m, i) => wts[i] * BIN_W * dnorm(x + 0.04, m, sd)));
-      if (y < ymax * 0.004) continue;
-      const r = responsibilities(x + 0.04, stds, wts, sd);
-      pl.rect(x, 0, x + 0.08, y, { col: mixCol(KCOL, r, o.mixture ? 0.22 : 0.35), border: null });
+      const mid = x + 0.04;
+      if (o.sumOnly) {
+        const y = stds.reduce((a, m, i) => a + wts[i] * BIN_W * dnorm(mid, m, sd), 0);
+        if (y < ymax * 0.004) continue;
+        pl.rect(x, 0, x + 0.08, y,
+                { col: mixCol(KCOL, responsibilities(mid, stds, wts, sd), alpha), border: null });
+        continue;
+      }
+      const hs = stds.map((m, i) => wts[i] * BIN_W * dnorm(mid, m, sd));
+      const ord = hs.map((_, i) => i).sort((a, b) => hs[a] - hs[b]);
+      let y0 = 0;
+      ord.forEach((oi, j) => {
+        const y1 = hs[oi];
+        if (y1 <= y0) return;
+        if (y1 - y0 > ymax * 0.002) {
+          const wt = hs.map((hh, i) => (ord.indexOf(i) >= j ? hh : 0));
+          pl.rect(x, y0, x + 0.08, y1, { col: mixCol(KCOL, wt, alpha), border: null });
+        }
+        y0 = y1;
+      });
     }
   }
   /* component curves and their sum, scaled to expected bin counts */
@@ -2703,15 +2722,9 @@ registerExample("example-ex2", (box) => {
       <div class="col col-8"><div class="plot-container" style="margin:0;"></div></div>
       <div class="col col-4"><img src="${IMG_QEDET}" alt="Seven bronze qedet weights, domed, with red catalogue numbers"
         style="max-width:100%;border:1px solid var(--rule);">
-        <div style="font-size:.78em;color:var(--ink-faint);margin-top:4px;">Kets in the flesh:
-        domed qedet weights with their catalogue numbers.</div></div>
+        <div style="font-size:.78em;color:var(--ink-faint);margin-top:4px;">Here are five kets
+        from University College London's Petrie Museum of Egyptian Archaeology.</div></div>
     </div>
-    <p class="note-block">The map is drawn, and schematic. On the exactitude itself: in verifying
-      the data behind this page, five misprints surfaced in Petrie's own 1926 register &mdash; a
-      wrong multiplier at three catalogue numbers, a slipped digit at two more &mdash; each caught
-      only because his tables print redundant columns whose arithmetic must agree. Even the exact
-      metrologist's table has an error curve; the redundancy he built in is what makes the errors
-      findable.</p>
   </div>`);
   box.appendChild(content);
   $(".plot-container", content).appendChild(mkCanvas(280, (pl, W, H) =>
@@ -2868,31 +2881,34 @@ registerExample("example-ex3", (box) => {
 registerExample("example-ex4", (box) => {
   box.appendChild(exHeader("Interactive Example: Copies of a standard", "ex4-content"));
   const content = h(`<div id="ex4-content" class="example-content">
-    <p>Two directions through one picture. <em>Assuming known standards</em> goes the easy way:
-      place standards, cast copies, and see the distribution they print &mdash; every copy one block
-      in its standard's colour. <em>Figuring out the standards</em> is Peirce's actual task, run in
-      reverse: you are given only the heaped-up data, you choose a law of error, you place candidate
-      standards, and you compare the curve your guesses imply with the curve the data draw.</p>
-    <div class="row"><div class="col col-6"></div><div class="col col-6"></div></div>
-    <div class="ex-buttonbar">
-      <button class="btn" id="ex4-two">two standards</button>
-      <button class="btn" id="ex4-clusters">two clusters (3 low + 2 high)</button>
-      <button class="btn btn-warning" id="ex4-petrie">Petrie's data, as Peirce cleaned it</button>
-      <button class="btn btn-primary" id="ex4-copy25">cast 25 of each</button>
-      <button class="btn" id="ex4-clear">clear the copies</button>
-      <span class="ex27-lead" id="ex4-tally"></span>
-    </div>
+    <p>If you knew the standards and you knew how well standards would be copied, you could predict
+      how many weights would cluster around each standard. However, if you just had the data, you
+      would have to instead try to select the values of standard and probable error that would, if
+      correct, be most likely to have produced the data. Use the below to explore both
+      circumstances. In the first mode, set the standards and generate kets. In the second, pretend
+      you do not know the standards, and try to fit them.</p>
     <div class="mode-tabs">
       <button class="mode-tab active" id="ex4-know">assuming known standards</button>
       <button class="mode-tab" id="ex4-blind">figuring out the standards</button>
     </div>
-    <div class="ex-buttonbar" id="ex4-lawbar" style="display:none">
-      <span class="ex27-lead">law of error:</span>
-      <button class="btn btn-sm is-active" data-law="gauss">probability curve</button>
-      <button class="btn btn-sm" data-law="gaussPer">gaussian, own spread each</button>
-      <button class="btn btn-sm" data-law="uniform">flat tolerance</button>
-      <button class="btn btn-sm" data-law="cutR">sharp cutoff right</button>
-      <button class="btn btn-success btn-sm" id="ex4-snap">snap to best fit</button>
+    <div class="row"><div class="col col-6"></div><div class="col col-6"></div></div>
+    <div class="ex-buttonbar" id="ex4-bar-know">
+      <button class="btn" id="ex4-two">two standards</button>
+      <button class="btn" id="ex4-clusters">two clusters (3 low + 2 high)</button>
+      <button class="btn btn-warning" id="ex4-petrie">Petrie's data, as Peirce cleaned it</button>
+      <span style="margin-left:auto" id="ex4-tally" class="ex27-lead"></span>
+      <button class="btn btn-primary" id="ex4-copy25">cast 25 of each</button>
+      <button class="btn" id="ex4-clear">clear the copies</button>
+    </div>
+    <div class="ex-buttonbar" id="ex4-bar-blind" style="display:none">
+      <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
+        <input type="checkbox" id="ex4-fixpe" checked> hold the probable error at the slider</label></label>
+      <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
+        <input type="checkbox" id="ex4-samesd" checked> same spread for each</label></label>
+      <span style="margin-left:auto"></span>
+      <button class="btn btn-warning" id="ex4-rand">randomize</button>
+      <button class="btn btn-success" id="ex4-snap">snap to best fit</button>
+      <button class="btn" id="ex4-reveal">reveal the actual</button>
     </div>
     <div class="row" id="ex4-sdrow" style="display:none"></div>
     <div class="plot-container"></div>
@@ -2902,15 +2918,18 @@ registerExample("example-ex4", (box) => {
 
   let stds = [143.8, 145.6];
   let copies = stds.map(() => []);
+  let castPE = 0.625;                 /* the PE the copies were actually cast with */
   let dataMode = false, blind = false;
-  let law = "gauss", fit = null;      /* {mu, w, sds} once snapped */
+  let fixPE = true, sameSd = true;
+  let fit = null;                     /* {mu, w, sds} once snapped */
+  let reveal = false;
   let guesses = [140, 148];
-  let gSds = [];                      /* hand-set spreads under gaussPer */
+  let gSds = [];                      /* hand-set spreads when each has its own */
   function rebuildSdRow() {
     const row = $("#ex4-sdrow", content);
     row.innerHTML = "";
-    row.style.display = (blind && law === "gaussPer") ? "" : "none";
-    if (!(blind && law === "gaussPer")) return;
+    row.style.display = (blind && !sameSd) ? "" : "none";
+    if (!(blind && !sameSd)) return;
     while (gSds.length < guesses.length) gSds.push(PEIRCE_PE * PE_TO_SD);
     gSds.length = guesses.length;
     guesses.forEach((m, i) => {
@@ -2931,11 +2950,11 @@ registerExample("example-ex4", (box) => {
   const spreadGuesses = (k) => Array.from({ length: k }, (_, i) => +(138 + (i + 0.5) * 13 / k).toFixed(1));
 
   function preset(newStds, asData) {
-    dataMode = !!asData; fit = null;
+    dataMode = !!asData; fit = null; reveal = false;
     stds = newStds.slice();
     copies = stds.map(() => []);
     kCtl.input.value = stds.length; kCtl.input.dispatchEvent(new Event("input"));
-    if (asData) { peCtl.input.value = PEIRCE_PE; peCtl.input.dispatchEvent(new Event("input")); }
+    if (asData) { peCtl.input.value = PEIRCE_PE; peCtl.input.dispatchEvent(new Event("input")); castPE = PEIRCE_PE; }
     guesses = spreadGuesses(stds.length);
     poke();
   }
@@ -2953,48 +2972,59 @@ registerExample("example-ex4", (box) => {
     const vals = allCopies();
     const xlim = [136, 153.5];
     const dc = dataCurve(vals, xlim, 1);
-    const ymax = Math.max(4, ...dc.ys, ...histCounts(vals, BIN_0, xlim[1], BIN_W)) * 1.3;
+    const counts = histCounts(vals, BIN_0, xlim[1], BIN_W);
+    const ymax = Math.max(4, ...dc.ys, ...counts) * 1.3;
     pl.setup({ xlim, ylim: [0, ymax], mar: [3, 3, 0.8, 0.8] });
     pl.axes({ xat: seqBy(138, 153, 2), yat: pretty0(ymax) });
     pl.axisLabels("grains", "weights per half-grain");
-    histCounts(vals, BIN_0, xlim[1], BIN_W).forEach((n, i) => {
-      if (n) pl.rect(BIN_0 + i * BIN_W, 0, BIN_0 + (i + 1) * BIN_W, n, { col: "rgba(87,93,102,.18)", border: PAL.paper });
-    });
-    /* gradient under the guess curves — the mixture grammar, in the guesses' colours */
-    {
-      const gmu = fit ? fit.mu : guesses;
-      const gw = fit ? fit.w.map((x) => x * vals.length) : guesses.map(() => vals.length / guesses.length);
-      for (let x = xlim[0]; x < xlim[1]; x += 0.08) {
-        const ds = gmu.map((m, i) => gw[i] * BIN_W * lawDens(law === "gaussPer" ? "gauss" : law, x + 0.04, m, peCtl.get(), { sd: fit && fit.sds ? fit.sds[i] : (law === "gaussPer" ? gSds[i] : undefined) }));
-        const y = Math.max(...ds);
-        if (y < 0.05) continue;
-        pl.rect(x, 0, x + 0.08, y, { col: mixCol(KCOL, ds, 0.20), border: null });
-      }
-    }
-    pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 2 });
     const mu = fit ? fit.mu : guesses;
     const w = fit ? fit.w.map((x) => x * vals.length) : guesses.map(() => vals.length / guesses.length);
-    const sds = fit ? fit.sds : (law === "gaussPer" ? gSds : null);
+    const sds = fit ? fit.sds : (sameSd ? null : gSds);
+    const dOf = (x, m, i) => dnorm(x, m, (sds && sds[i]) || pe * PE_TO_SD);
+    /* the bars themselves shade smoothly across the axis, bin to bin, in the
+       guesses' colours — the house gradient */
+    counts.forEach((n, i) => {
+      if (!n) return;
+      const x0 = BIN_0 + i * BIN_W;
+      const r = mu.map((m, j) => w[j] * dOf(x0 + BIN_W / 2, m, j));
+      for (let u = 0; u < n; u++)
+        pl.rect(x0, u, x0 + BIN_W, u + 1, { col: mixCol(KCOL, r, 0.55), border: PAL.paper });
+    });
+    pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 2 });
     const xs = seqBy(xlim[0], xlim[1], 0.05);
-    const dOf = (x, m, i) => lawDens(law === "gaussPer" ? "gauss" : law, x, m, pe,
-                                     { sd: sds ? sds[i] : undefined });
     mu.forEach((m, i) => {
       pl.lines(xs, xs.map((x) => w[i] * BIN_W * dOf(x, m, i)), { col: KCOL[i % KCOL.length], lwd: 1.3 });
       drawKetGlyph(pl, m, 0, KCOL[i % KCOL.length], 9);
     });
     pl.lines(xs, xs.map((x) => mu.reduce((a, m, i) => a + w[i] * BIN_W * dOf(x, m, i), 0)),
              { col: PAL.accent2, lwd: 1.7, lty: 2 });
+    /* the actual, revealed: the distributions of the assuming-known page */
+    if (reveal) {
+      const tStds = stds, tW = dataMode ? nearestCounts(KETS142, stds) : copies.map((c) => c.length);
+      const tSd = castPE * PE_TO_SD;
+      tStds.forEach((m, i) => {
+        pl.lines(xs, xs.map((x) => tW[i] * BIN_W * dnorm(x, m, tSd)),
+                 { col: KCOL[i % KCOL.length], lwd: 1.8, lty: 3 });
+        pl.segments(m, 0, m, ymax * 0.9, { col: KCOL[i % KCOL.length], lwd: 1, lty: 3 });
+        drawKetGlyph(pl, m, 0, KCOL[i % KCOL.length], 6);
+      });
+    }
     let miss = 0, n = 0;
     dc.xs.forEach((x, i) => {
       if (dc.ys[i] < 0.3) return;
       miss += Math.abs(mu.reduce((a, m, k) => a + w[k] * BIN_W * dOf(x, m, k), 0) - dc.ys[i]); n++;
     });
     const read = $("#ex4-read");
-    if (read) read.innerHTML = `<p>The solid black curve is the data; the dashed red one is what your
-      ${mu.length} candidate standards imply under the chosen law. Average miss:
+    if (read) read.innerHTML = !vals.length
+      ? `<p>No data yet: cast copies in the first mode, or press <em>randomize</em> for a heap
+         whose standards you were not shown.</p>`
+      : `<p>The solid black curve is a smoothed out summary of the histogram (more on how Peirce
+      smoothed his data below). The red dashed curve is the sum of your
+      <strong>${mu.length}</strong> candidate standards. Average miss:
       <strong>${(miss / (n || 1)).toFixed(2)}</strong> weights per class.
-      ${fit ? "Snapped to the best fit under this law &mdash; drag any dome to take over from it."
-            : '<span class="click-cue">Drag the standards to bring the dashed curve onto the black one.</span> Without a law restricting each curve, any placement could be excused; the law is what gives the comparison force.'}</p>`;
+      ${fit ? "Snapped to the best fit under your settings &mdash; drag any dome to take over from it."
+            : '<span class="click-cue">Drag the standards to bring the dashed curve onto the black one.</span>'}
+      ${reveal ? " The dotted curves are the actual distributions the data were generated from." : ""}</p>`;
   });
   $(".plot-container", content).appendChild(cv);
 
@@ -3020,25 +3050,44 @@ registerExample("example-ex4", (box) => {
     const read = $("#ex4-read");
     if (read && !blind) read.innerHTML = dataMode
       ? `<p>The real kets, stacked as blocks and coloured by their likeliest standard under the
-         current placement. From here, switch to <em>figuring out the standards</em> and pretend
-         you never saw where the domes stood.</p>`
-      : `<p>Each standard's thin curve is what its copies would print with endlessly many castings.
-         Cast enough copies, then switch tabs: the second mode hands you only the heap and asks
-         Peirce's question backwards.</p>`;
+         current placement. The second mode hands you this same heap without the standards.</p>`
+      : `<p>The copies you cast here are the data the second mode will ask you to fit. Each
+         standard's thin curve is what its copies would print with endlessly many castings.</p>`;
   }
   function poke() { drawCanvas(cv); tally(); if (!blind) know(); }
   $("#ex4-copy25", content).addEventListener("click", () => {
     if (dataMode) return;
     stds.forEach((m, i) => { for (let j = 0; j < 25; j++) copies[i].push(PROCESSES.skillful.draw(m, peCtl.get())); });
+    castPE = peCtl.get();
     fit = null; poke();
   });
   $("#ex4-clear", content).addEventListener("click", () => {
     if (!dataMode) copies = stds.map(() => []);
-    fit = null; poke();
+    fit = null; reveal = false; poke();
   });
   $("#ex4-two", content).addEventListener("click", () => preset([143.8, 145.6]));
   $("#ex4-clusters", content).addEventListener("click", () => preset([139.4, 140.6, 141.8, 147.6, 149.4]));
   $("#ex4-petrie", content).addEventListener("click", () => preset(PEIRCE_STANDARDS, true));
+  $("#ex4-rand", content).addEventListener("click", () => {
+    /* a hidden truth: some standards at some spread, 100 copies of each */
+    const k = 2 + Math.floor(Math.random() * 4);
+    let tries = 0, next;
+    do {
+      next = Array.from({ length: k }, () => +(138 + Math.random() * 13).toFixed(1)).sort((a, b) => a - b);
+      tries++;
+    } while (tries < 200 && next.some((m, i) => i && m - next[i - 1] < 1.6));
+    stds = next;
+    dataMode = false;
+    castPE = +(0.35 + Math.random() * 0.65).toFixed(3);
+    copies = stds.map((m) => Array.from({ length: 100 }, () => PROCESSES.skillful.draw(m, castPE)));
+    fit = null; reveal = false;
+    poke();
+  });
+  $("#ex4-reveal", content).addEventListener("click", (e) => {
+    reveal = !reveal;
+    e.target.classList.toggle("is-active", reveal);
+    drawCanvas(cv);
+  });
   kCtl.input.addEventListener("input", () => {
     const k = kCtl.get();
     if (blind) { guesses = spreadGuesses(k); fit = null; rebuildSdRow(); }
@@ -3049,23 +3098,32 @@ registerExample("example-ex4", (box) => {
   $("#ex4-know", content).addEventListener("click", (e) => {
     blind = false;
     e.target.classList.add("active"); $("#ex4-blind", content).classList.remove("active");
-    $("#ex4-lawbar", content).style.display = "none";
+    $("#ex4-bar-know", content).style.display = "";
+    $("#ex4-bar-blind", content).style.display = "none";
     rebuildSdRow(); poke();
   });
   $("#ex4-blind", content).addEventListener("click", (e) => {
     blind = true;
     e.target.classList.add("active"); $("#ex4-know", content).classList.remove("active");
-    $("#ex4-lawbar", content).style.display = "";
+    $("#ex4-bar-know", content).style.display = "none";
+    $("#ex4-bar-blind", content).style.display = "";
     rebuildSdRow(); drawCanvas(cv);
   });
-  $$("#ex4-lawbar [data-law]", content).forEach((b) => b.addEventListener("click", () => {
-    law = b.dataset.law; fit = null;
-    $$("#ex4-lawbar [data-law]", content).forEach((x) => x.classList.toggle("is-active", x === b));
-    rebuildSdRow(); drawCanvas(cv);
-  }));
+  $("#ex4-fixpe", content).addEventListener("input", (e) => { fixPE = e.target.checked; fit = null; drawCanvas(cv); });
+  $("#ex4-samesd", content).addEventListener("input", (e) => {
+    sameSd = e.target.checked; fit = null; rebuildSdRow(); drawCanvas(cv);
+  });
   $("#ex4-snap", content).addEventListener("click", () => {
-    fit = lawFit(allCopies(), guesses.length, law === "gaussPer" ? "gauss" : law, peCtl.get(),
-                 { init: guesses, perSd: law === "gaussPer" });
+    const vals = allCopies();
+    if (!vals.length) return;
+    if (!sameSd) {
+      fit = lawFit(vals, guesses.length, "gauss", peCtl.get(), { init: guesses, perSd: true });
+    } else {
+      const f = emFit(vals, guesses.length, { init: guesses,
+        sd: fixPE ? peCtl.get() * PE_TO_SD : null });
+      fit = { mu: f.mu, w: f.w, sds: f.mu.map(() => f.sd) };
+      if (!fixPE) { peCtl.input.value = Math.max(0.2, Math.min(1.5, +(f.sd * 0.6745).toFixed(3))); peCtl.val.textContent = peCtl.get().toFixed(3); }
+    }
     drawCanvas(cv);
   });
   poke();
@@ -3092,7 +3150,7 @@ registerExample("example-ex6", (box) => {
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex6-showdata" checked> the data</label></label>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
-        <input type="checkbox" id="ex6-showsmooth"> smoothed curve of the data</label></label>
+        <input type="checkbox" id="ex6-showsmooth" checked> smoothed curve of the data</label></label>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex6-showcomp" checked> the class curves</label></label>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
@@ -3162,8 +3220,14 @@ registerExample("example-ex6", (box) => {
       }
       stds.forEach((m) => drawKetGlyph(pl, m, 0, "#2f5f9f", 8));
     } else if (mode === "blocks") {
+      /* individually coloured blocks, each in its likeliest standard's own
+         tint — no gradient here — with the smoothed curve still on call */
       drawMixture(pl, W, H, { stds, data: KETS142, pe: peCtl.get(), blocks: true,
-                              weights: wts, bigStd: true, xlim });
+                              solidBlocks: true, weights: wts, bigStd: true, xlim });
+      if (show6.smooth) {
+        const dc = dataCurve(KETS142, xlim, 1);
+        pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 2 });
+      }
     } else {
       /* the mixture look: blocks in the bars, gradient under the curves */
       if (show6.data) {
@@ -3324,17 +3388,16 @@ registerExample("example-ex8", (box) => {
     <p>Peirce suspected the data were insufficient to decide how near his theory came to the truth.
       Forty years after Naucratis, Petrie catalogued the qedet again &mdash; <em>Ancient Weights and
       Measures</em> (1926) registers <strong>821 stone qedets</strong> from all over Egypt against
-      the 142 Naucratis weights Peirce had. The same machinery runs on either: set the number of
-      standards, fit them, and see whether the extra data sharpens or dissolves the five.</p>
+      the 142 Naucratis weights Peirce had.</p>
     <div class="mode-tabs">
       <button class="mode-tab active" data-set="naucratis">Naucratis, 1885 (n = 142)</button>
       <button class="mode-tab" data-set="register">all Egypt, 1926 (n = 821)</button>
-      <button class="mode-tab" data-set="both">both, rescaled</button>
-      <button class="mode-tab" data-set="all">every standard at Naucratis</button>
+      <button class="mode-tab" data-set="both">both, summed (n = 963)</button>
     </div>
     <div class="row"><div class="col col-6"></div><div class="col col-6"></div></div>
     <div class="ex-buttonbar">
       <button class="btn btn-success" id="ex8-fit">best fit for this many standards</button>
+      <button class="btn btn-success" id="ex8-best">best fit over all</button>
       <button class="btn" id="ex8-peirce">Peirce's five</button>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex8-fixsd" checked> hold the spread at &#8541; grain</label></label>
@@ -3351,71 +3414,39 @@ registerExample("example-ex8", (box) => {
                           (v) => v.toFixed(3));
   $$(".col", content)[0].appendChild(kCtl.row);
   $$(".col", content)[1].appendChild(peCtl.row);
-  const dataOf = () => (mode === "register" ? QEDET1926 : KETS142);
+  const COMBINED = KETS142.concat(QEDET1926);
+  const dataOf = () => (mode === "register" ? QEDET1926 : mode === "both" ? COMBINED : KETS142);
 
   const cv = mkCanvas(340, (pl, W, H) => {
     const xlim = [135, 154];
-    if (mode === "all") {
-      /* the widest view: all 514 Naukratis units, every standard, on one axis.
-         The ket is one clump in a landscape of clumps — each standard another
-         natural class, merging at its own edges. (Non-ket rows are from the
-         rough transcription and are unverified; two standards lie off this
-         axis, the Phoenician shekel near 220 grains and the Roman uncia near
-         410.) */
-      const alim = [40, 160];
-      const bins = {};
-      ALLUNITS.forEach(([u, si]) => {
-        if (u < alim[0] || u > alim[1]) return;
-        const b = Math.floor((u - alim[0]) / BIN_W);
-        (bins[b] = bins[b] || []).push(si);
-      });
-      let ymax = 4;
-      Object.values(bins).forEach((arr) => { ymax = Math.max(ymax, arr.length); });
-      ymax *= 1.25;
-      pl.setup({ xlim: alim, ylim: [0, ymax], mar: [3, 3, 0.8, 0.8] });
-      pl.axes({ xat: seqBy(40, 160, 20), yat: pretty0(ymax) });
-      pl.axisLabels("grains (value of one unit)", "weights per half-grain");
-      Object.entries(bins).forEach(([b, arr]) => {
-        const x0 = alim[0] + (+b) * BIN_W;
-        arr.sort();
-        arr.forEach((si, y) => pl.rect(x0, y, x0 + BIN_W, y + 1,
-          { col: KTINT[si % KTINT.length], border: PAL.paper }));
-      });
-      const seen = Array.from(new Set(ALLUNITS.filter(([u]) => u >= alim[0] && u <= alim[1]).map(([, si]) => si))).sort();
-      pl.legend("topleft", { legend: seen.map((si) => ALLNAMES[si]),
-        fill: seen.map((si) => KTINT[si % KTINT.length]), cex: 0.72 });
-      const read = $("#ex8-read");
-      if (read) read.innerHTML = `<p>The rest of Petrie's table: every standard at Naucratis on one
-        axis (the Phoenician shekel near 220 grains and the Roman uncia near 410 lie beyond it).
-        The ket is one clump among many &mdash; each standard its own natural class, with its own
-        middling form, and each merging into its neighbours exactly as Peirce says such classes do.
-        The non-ket rows are from the earlier rough transcription and have not had the ket rows'
-        verification.</p>`;
-      return;
-    }
     if (mode === "both") {
+      /* one summed heap: the 1885 counts added onto the 1926 counts bin by
+         bin, the bars wearing the gradient, the 1885 portion a shade darker
+         at the base of each bar */
       const c142 = histCounts(KETS142, BIN_0, xlim[1], BIN_W);
       const c1926 = histCounts(QEDET1926, BIN_0, xlim[1], BIN_W);
-      const scale = Math.max(...c142) / Math.max(...c1926);
-      const ymax = Math.max(...c142) * 1.25;
+      const counts = c142.map((n, i) => n + c1926[i]);
+      const sd8 = peCtl.get() * PE_TO_SD;
+      const wts = nearestCounts(COMBINED, stds);
+      const ymax = Math.max(...counts, 4) * 1.2;
       pl.setup({ xlim, ylim: [0, ymax], mar: [3, 3, 0.8, 0.8] });
       pl.axes({ xat: seqBy(136, 154, 2), yat: pretty0(ymax) });
-      pl.axisLabels("grains (value of one qedet)", "weights per half-grain (1926 rescaled)");
-      c1926.forEach((n, i) => { if (n) pl.rect(BIN_0 + i * BIN_W, 0, BIN_0 + (i + 1) * BIN_W, n * scale, { col: "rgba(154,123,63,.30)", border: PAL.paper }); });
-      c142.forEach((n, i) => { if (n) pl.rect(BIN_0 + i * BIN_W, 0, BIN_0 + (i + 1) * BIN_W, n, { col: "rgba(47,111,159,.38)", border: PAL.paper }); });
-      /* each dataset's own smoothed curve, and the model sum against either */
-      const dcA = dataCurve(KETS142, xlim, 1), dcB = dataCurve(QEDET1926, xlim, 1);
-      pl.lines(dcA.xs, dcA.ys, { col: PAL.accent, lwd: 1.8 });
-      pl.lines(dcB.xs, dcB.ys.map((y) => y * scale), { col: PAL.accent4, lwd: 1.8 });
-      const sd8 = peCtl.get() * PE_TO_SD, wA = nearestCounts(KETS142, stds);
+      pl.axisLabels("grains (value of one qedet)", "weights per half-grain");
+      counts.forEach((n, i) => {
+        if (!n) return;
+        const x0 = BIN_0 + i * BIN_W;
+        const r = responsibilities(x0 + BIN_W / 2, stds, wts, sd8);
+        if (c142[i]) pl.rect(x0, 0, x0 + BIN_W, c142[i], { col: mixCol(KCOL, r, 0.75), border: PAL.paper });
+        if (c1926[i]) pl.rect(x0, c142[i], x0 + BIN_W, n, { col: mixCol(KCOL, r, 0.4), border: PAL.paper });
+      });
+      const dc = dataCurve(COMBINED, xlim, 1);
+      pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 2.2 });
       const xs8 = seqBy(xlim[0], xlim[1], 0.05);
-      stds.forEach((m, i) => pl.lines(xs8, xs8.map((x) => wA[i] * BIN_W * dnorm(x, m, sd8)),
-               { col: KCOL[i % KCOL.length], lwd: 1.4 }));
-      pl.lines(xs8, xs8.map((x) => stds.reduce((a, m, i) => a + wA[i] * BIN_W * dnorm(x, m, sd8), 0)),
-               { col: PAL.ink, lwd: 1.2, lty: 2 });
-      stds.forEach((m, i) => { pl.segments(m, 0, m, ymax * 0.9, { col: KCOL[i % KCOL.length], lwd: 1.3, lty: 3 }); drawKetGlyph(pl, m, 0, KCOL[i % KCOL.length], 7); });
-      pl.legend("topright", { legend: ["Naucratis 1885", "all Egypt 1926"],
-        fill: ["rgba(47,111,159,.5)", "rgba(154,123,63,.45)"] });
+      stds.forEach((m, i) => pl.lines(xs8, xs8.map((x) => wts[i] * BIN_W * dnorm(x, m, sd8)),
+               { col: KCOL[i % KCOL.length], lwd: 1.6 }));
+      pl.lines(xs8, xs8.map((x) => stds.reduce((a, m, i) => a + wts[i] * BIN_W * dnorm(x, m, sd8), 0)),
+               { col: PAL.accent2, lwd: 1.8, lty: 2 });
+      stds.forEach((m, i) => { pl.segments(m, 0, m, ymax * 0.9, { col: KCOL[i % KCOL.length], lwd: 1.3, lty: 3 }); drawKetGlyph(pl, m, 0, KCOL[i % KCOL.length], 8); });
     } else {
       drawMixture(pl, W, H, { stds, data: dataOf(), pe: peCtl.get(), mixture: true,
         weights: nearestCounts(dataOf(), stds), bigStd: true, xlim });
@@ -3425,20 +3456,27 @@ registerExample("example-ex8", (box) => {
     }
     const read = $("#ex8-read");
     if (read) read.innerHTML = mode === "register"
-      ? `<p>The all-Egypt register is a broad single mound near 140&ndash;141 grains: weights from
-         many towns and centuries piled together until the classes merge past recovery. Fit five
-         standards to it and they crowd the middle instead of finding Peirce's five &mdash; his
-         caution about what more data would show was well placed, though this register is a wider
-         population, not a re-survey of Naucratis.</p>`
+      ? `<p>There do appear to be five peaks, and fitting five standards to the register finds them
+         at <span style="font-variant-numeric:tabular-nums">139.1 / 141.9 / 144.6 / 147.1 / 150.4</span>
+         grains &mdash; within a fraction of a grain of Peirce's five, only the heaviest drifting
+         upward. The classes are looser here (the fitted probable error is near 0.73 grains against
+         his &#8541;), which is what piling many towns and centuries together does. What the extra
+         data still cannot settle is the <em>number</em>: by the information criterion four broad
+         standards cover the heap slightly better than five, the margin two or three units, and
+         seven follow the bin noise and are charged for it. Press <em>best fit over all</em> to
+         watch the criterion choose.</p>`
       : mode === "naucratis"
       ? `<p>The one-town hoard: clumping visible, and five standards fit it comfortably. Drag the
          domes or press best-fit and compare with Peirce's five.</p>`
-      : `<p>Both at once, the 1926 register rescaled to comparable height.</p>`;
+      : `<p>One heap: the 1926 counts and the 1885 counts added bin by bin &mdash; four weights at
+         140 grains in the earlier set are four more blocks in that bar &mdash; with the 1885
+         portion the darker base of each bar. The black curve smooths the summed data; drag the
+         standards or fit as anywhere else.</p>`;
   });
   $(".plot-container", content).appendChild(cv);
 
   attachDrag(cv,
-    (x) => { if (mode === "both") return null; let bi = null, bd = 0.7; stds.forEach((m, i) => { const d = Math.abs(x - m); if (d < bd) { bd = d; bi = i; } }); return bi; },
+    (x) => { let bi = null, bd = 0.7; stds.forEach((m, i) => { const d = Math.abs(x - m); if (d < bd) { bd = d; bi = i; } }); return bi; },
     (i, x) => { stds[i] = Math.max(135.2, Math.min(153.8, +x.toFixed(2))); drawCanvas(cv); });
 
   function reseed(k) {
@@ -3452,6 +3490,30 @@ registerExample("example-ex8", (box) => {
     const fit = emFit(dataOf(), stds.length, { init: stds, sd: fixed ? peCtl.get() * PE_TO_SD : null });
     stds = fit.mu.slice();
     if (!fixed) { peCtl.input.value = (fit.sd * 0.6745).toFixed(3); peCtl.input.dispatchEvent(new Event("input")); }
+    drawCanvas(cv);
+  });
+  $("#ex8-best", content).addEventListener("click", () => {
+    /* the real best fit under the current assumptions: every number of
+       standards from one to six is fitted and scored by BIC (as in the
+       elaborate-calculations example), and the winner is installed */
+    const vals = dataOf();
+    const fixed = $("#ex8-fixsd", content).checked;
+    let best = null;
+    for (let k = 1; k <= 6; k++) {
+      const f = emFit(vals, k, { sd: fixed ? peCtl.get() * PE_TO_SD : null });
+      let ll = 0;
+      vals.forEach((v) => {
+        let d = 0;
+        f.mu.forEach((m, i) => { d += f.w[i] * dnorm(v, m, f.sd); });
+        ll += Math.log(Math.max(d, 1e-12));
+      });
+      const bic = -2 * ll + 2 * k * Math.log(vals.length);
+      if (!best || bic < best.bic) best = { k, f, bic };
+    }
+    stds = best.f.mu.slice();
+    kCtl.input.value = best.k; kCtl.input.dispatchEvent(new Event("input"));
+    stds = best.f.mu.slice();
+    if (!fixed) { peCtl.input.value = Math.max(0.2, Math.min(1.5, +(best.f.sd * 0.6745).toFixed(3))); peCtl.input.dispatchEvent(new Event("input")); }
     drawCanvas(cv);
   });
   $("#ex8-peirce", content).addEventListener("click", () => {
@@ -3672,11 +3734,11 @@ registerExample("example-ex14", (box) => {
       <button class="btn btn-sm" id="ex14-scatter">scatter everything</button>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex14-per"> each standard its own method</label></label>
-    </div>
-    <div class="ex-buttonbar" id="ex14-perrow" style="display:none">
+      <span style="margin-left:auto"></span>
       <button class="btn btn-sm btn-warning" id="ex14-data">against the real kets</button>
       <button class="btn btn-sm btn-success" id="ex14-snap" style="display:none">snap to best fit</button>
     </div>
+    <div class="ex-buttonbar" id="ex14-perrow" style="display:none"></div>
     <div class="row"><div class="col col-4" id="ex14-nrow"></div>
       <div class="col col-4" id="ex14-arow" style="display:none"></div>
       <div class="col col-4" id="ex14-brow" style="display:none"></div></div>
@@ -3878,15 +3940,16 @@ registerExample("example-ex16", (box) => {
      wherever they lead; final causation reaches the address however it can */
   const GRID = 11, CELL = 1;
   const content = h(`<div id="ex16-content" class="example-content">
-    <p>A fake map, and the difference between the two kinds of causation. Under <em>efficient
-      causation</em>, every walker is given the same compulsions &mdash; two blocks north, one
-      east, one south, one east &mdash; and obeys them from wherever it happens to start. What
-      matters is that each does what it is told; where it ends up is no part of the story, so
-      scattered starts give scattered ends. Under <em>final causation</em>, the walkers get no
-      route at all &mdash; only the address marked in gold. Each finds its own way: one hugs the
-      avenues, one wanders, one cuts corners, one is a bird and flies straight. The routes differ
-      and even converge only near the end; the destination alone is fixed. <em>The general result
-      may be brought about at one time in one way, and at another time in another.</em></p>
+    <p>Efficient causation is compulsion regardless of end. Set different starting points, give
+      the walkers a direction &mdash; two blocks north, one east, one south, one east, or whatever
+      you type below &mdash; then watch them go and follow it. What matters is that they do what
+      they are told, not where they end up: they start from different places and they end up in
+      different places. In final causation mode the starting places are the same, and can again be
+      scattered, but this time an address is highlighted &mdash; click the map to move it. Press
+      play and each blob takes its own route to the address: some meandering, some direct, and in
+      places their routes converge; one is a bird and flies straight there. They are going to the
+      general result, and the particular compulsions do not matter. <em>The general result may be
+      brought about at one time in one way, and at another time in another.</em></p>
     <div class="mode-tabs">
       <button class="mode-tab active" data-m="eff">efficient causation</button>
       <button class="mode-tab" data-m="fin">final causation</button>
@@ -3895,27 +3958,61 @@ registerExample("example-ex16", (box) => {
       <button class="btn btn-primary" id="ex16-play">play</button>
       <button class="btn" id="ex16-scatter">scatter the starting points</button>
       <button class="btn" id="ex16-reset">reset</button>
+      <label class="ctl" id="ex16-dirlab" style="margin:0 0 0 auto;display:inline-flex;align-items:center;gap:6px;">
+        the directions <input id="ex16-dirs" type="text" value="2N, 1E, 1S, 1E" size="14"
+        style="font:inherit;padding:2px 6px;"></label>
     </div>
     <div class="plot-container"></div>
     <div class="result-box" id="ex16-read"></div>
   </div>`);
   box.appendChild(content);
 
-  const DIRS = [[0, 1], [0, 1], [1, 0], [0, -1], [1, 0]];   /* 2 N, 1 E, 1 S, 1 E */
-  const DIRWORDS = "two blocks north, one east, one south, one east";
+  let DIRS = [[0, 1], [0, 1], [1, 0], [0, -1], [1, 0]];   /* 2 N, 1 E, 1 S, 1 E */
+  let DIRWORDS = "two blocks north, one east, one south, one east";
   let mode = "eff";
   let target = [8, 7];
   let starts = [[1, 1], [2, 6], [5, 2], [8, 1]];
   let walkers = [], step = 0, timer = null;
   const STYLES = ["avenue", "wander", "corner", "bird"];
 
+  function parseDirs(s) {
+    const out = [], words = [];
+    const re = /(\d*)\s*([NSEW])/gi;
+    const D = { N: [0, 1], S: [0, -1], E: [1, 0], W: [-1, 0] };
+    let m;
+    while ((m = re.exec(s))) {
+      const n = Math.max(1, Math.min(9, parseInt(m[1] || "1", 10)));
+      for (let i = 0; i < n; i++) out.push(D[m[2].toUpperCase()]);
+      words.push(n + m[2].toUpperCase());
+    }
+    return out.length ? { dirs: out, words: words.join(", ") } : null;
+  }
+  /* how far the instructed route strays from its start, so starting points can
+     be kept where the whole walk stays on the map */
+  function routeBounds() {
+    let x = 0, y = 0, minx = 0, maxx = 0, miny = 0, maxy = 0;
+    DIRS.forEach(([dx, dy]) => {
+      x += dx; y += dy;
+      minx = Math.min(minx, x); maxx = Math.max(maxx, x);
+      miny = Math.min(miny, y); maxy = Math.max(maxy, y);
+    });
+    return { x0: Math.max(0, -minx), x1: Math.min(GRID - 1, GRID - 1 - maxx),
+             y0: Math.max(0, -miny), y1: Math.min(GRID - 1, GRID - 1 - maxy) };
+  }
+  function clampStarts() {
+    const b = routeBounds();
+    starts = starts.map(([x, y]) => [Math.max(b.x0, Math.min(b.x1, x)),
+                                     Math.max(b.y0, Math.min(b.y1, y))]);
+  }
   function reset() {
     step = 0;
     walkers = starts.map((s, i) => ({ pos: s.slice(), trail: [s.slice()], style: STYLES[i % 4], done: false }));
     drawCanvas(cv); read();
   }
   function scatter() {
-    starts = starts.map(() => [1 + Math.floor(Math.random() * (GRID - 2)), 1 + Math.floor(Math.random() * (GRID - 2))]);
+    const b = routeBounds();
+    starts = starts.map(() => [b.x0 + Math.floor(Math.random() * Math.max(1, b.x1 - b.x0 + 1)),
+                               b.y0 + Math.floor(Math.random() * Math.max(1, b.y1 - b.y0 + 1))]);
     reset();
   }
   function advance() {
@@ -3989,14 +4086,7 @@ registerExample("example-ex16", (box) => {
     });
   });
   $(".plot-container", content).appendChild(cv);
-  /* in final mode the address can be dragged anywhere on the map */
-  attachDrag(cv, () => (mode === "fin" ? 0 : null), (i, x) => {
-    /* invY needed too: use the canvas's plot to recover both coordinates */
-    const pl = cv._pl;
-    if (!pl) return;
-    target = [Math.max(0, Math.min(GRID - 1, Math.round(x))), target[1]];
-    drawCanvas(cv);
-  });
+  /* in final mode a click anywhere on the map sets the address */
   cv.addEventListener("pointerdown", (ev) => {
     if (mode !== "fin") return;
     const r = cv.getBoundingClientRect(), pl = cv._pl;
@@ -4010,7 +4100,8 @@ registerExample("example-ex16", (box) => {
     if (!el) return;
     if (mode === "eff") {
       el.innerHTML = step === 0
-        ? `<p>Four walkers, four starting corners, one set of compulsions: ${DIRWORDS}. Press play.</p>`
+        ? `<p>Press play, and each walker will follow the directions &mdash; ${DIRWORDS} &mdash;
+           from its own starting point.</p>`
         : step >= DIRS.length
         ? `<p>Every walker obeyed the same compulsions perfectly &mdash; and they stand in four
            different places. Efficient causation is satisfied by the obedience, wherever it lands.</p>`
@@ -4036,9 +4127,17 @@ registerExample("example-ex16", (box) => {
     if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
     reset();
   });
+  $("#ex16-dirs", content).addEventListener("change", (e) => {
+    const p = parseDirs(e.target.value);
+    if (!p) { e.target.value = "2N, 1E, 1S, 1E"; return; }
+    DIRS = p.dirs; DIRWORDS = p.words;
+    if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
+    clampStarts(); reset();
+  });
   $$(".mode-tab", content).forEach((b) => b.addEventListener("click", () => {
     $$(".mode-tab", content).forEach((x) => x.classList.remove("active"));
     b.classList.add("active"); mode = b.dataset.m;
+    $("#ex16-dirlab", content).style.display = mode === "eff" ? "" : "none";
     if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
     reset();
   }));
@@ -4347,13 +4446,13 @@ registerExample("example-ex17", (box) => {
       Where he says above that there were five standards, it is because he had previously worked it
       out &mdash; though in the first attempt he concluded three, &ldquo;and it is not unlikely
       there is another.&rdquo;</p>
-    <p>His method was to tally all 158 weights into half-grain &ldquo;bins.&rdquo; He did this in
+    <p class="ed-note">His method was to tally all 158 weights into half-grain &ldquo;bins.&rdquo; He did this in
       order, and as he proceeded he noted where there were apparent peaks or changes: after finding
       only 6 weights in the 139.2&ndash;139.6 bin, he writes, <em>&ldquo;The numbers begin to fall
       off. But not so fast as they should, for now we are probably approaching another
       standard.&rdquo;</em> He recorded these numbers in a table with headings <em>App[arent].
       standard &middot; No. weights &middot; Smoothed &middot; Separated</em>.</p>
-    <p>The Smoothed column follows an exact rule, and he wrote it down: an earlier draft heads
+    <p class="ed-note">The Smoothed column follows an exact rule, and he wrote it down: an earlier draft heads
       the column <em>&ldquo;The same smoothed by 0.7 each + 0.3 previous.&rdquo;</em> That is,
       <span class="math">smoothed = 0.7 &times; this bin + 0.3 &times; the bin before</span> &mdash;
       and it reproduces every one of the thirty smoothed values in both drafts exactly (try the
@@ -4370,7 +4469,7 @@ registerExample("example-ex17", (box) => {
       noted in the margin.</p>
     <div class="mode-tabs">
       <button class="mode-tab active" data-v="walk">work through it</button>
-      <button class="mode-tab" data-v="chart">his working, drawn</button>
+      <button class="mode-tab" data-v="chart">smoothing</button>
       <button class="mode-tab" data-v="table">his table</button>
       <button class="mode-tab" data-v="ms">the manuscript</button>
     </div>
@@ -4509,6 +4608,14 @@ registerExample("example-ex17", (box) => {
       const [lo, c] = FA[i];
       pl.rect(lo, 0, lo + 0.5, c, { col: "rgba(87,93,102,.30)", border: PAL.paper });
     }
+    /* the smoothing rides alongside the tally, as it did on his page: each
+       tallied bin's smoothed value (0.7 this + 0.3 previous) appears with it */
+    for (let i = 0; i < upTo; i++) {
+      const [lo, c] = FA[i];
+      const sm = 0.7 * c + 0.3 * (i ? FA[i - 1][1] : 0);
+      pl.points([lo + 0.25], [sm], { col: "#b03a2e", cex: 0.8 });
+      pl.points([lo + 0.25], [sm], { col: "#b03a2e", cex: 1.45, pch: 21 });
+    }
     myFlags.forEach((x) => {
       pl.segments(x, 0, x, ymax * 0.6, { col: PAL.accent, lwd: 1.4, lty: 3 });
       drawKetGlyph(pl, x, 0, PAL.accent, 8);
@@ -4521,7 +4628,7 @@ registerExample("example-ex17", (box) => {
     if (aside) {
       const hit = ASIDES[upTo - 1];
       aside.innerHTML = upTo === 0
-        ? "The cleaned weights wait in order of value. Step through the bins as he did; flag a standard whenever the counts persuade you one is near."
+        ? "The cleaned weights wait in order of value. Step through the bins as he did; the red dot over each tallied bin is his smoothed value (0.7 of this bin + 0.3 of the one before). Flag a standard whenever the counts persuade you one is near."
         : upTo >= FA.length
         ? "All 158 tallied (159 by his count). His standards appear in gold" + (myFlags.length ? " \u2014 yours in blue, for comparison." : ".")
         : (hit || `bins tallied: ${upTo} of ${FA.length}`);
@@ -4546,6 +4653,7 @@ registerExample("example-ex17", (box) => {
     upTo = 0; myFlags = []; drawCanvas(wcv);
   });
   $("#ex17-walkview .plot-container", content).appendChild(wcv);
+  $("#ex17-chartview .plot-container", content).appendChild(cv);
 
   const tb = $("#ex17-tbody", content);
   FA.forEach(([lo, c, t, sm, sep]) => {

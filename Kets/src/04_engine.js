@@ -125,7 +125,8 @@ function drawMixture(pl, W, H, o) {
       if (b >= 0 && b < nb) per[si][b]++;
     };
     if (o.copies) o.copies.forEach((c, si) => c.forEach((v) => put(v, si)));
-    const graded = !o.copies;   /* data: the colour graduates smoothly bin to bin */
+    /* data: the colour graduates smoothly bin to bin, unless solid blocks are asked for */
+    const graded = !o.copies && !o.solidBlocks;
     (o.data || []).forEach((v) => {
       const r = responsibilities(v, stds, wts, sd);
       let bi = 0; r.forEach((q, j) => { if (q > r[bi]) bi = j; });
@@ -156,16 +157,34 @@ function drawMixture(pl, W, H, o) {
       pl.rect(b0, 0, b0 + BIN_W, counts[i], { col: fill, border: PAL.paper });
     }
   }
-  /* gradient fill under the sum curve: each slice blends the standards' colours
-     by their share at that abscissa */
+  /* gradient fill under the curves. Colours keep to their own curves: up to the
+     lower curves the shades blend by the curves' own heights; above that, only
+     the curves that reach higher continue, each band blending just the colours
+     whose curves still cover it — so no colour ever climbs another's slope,
+     and the amount of each colour reflects the chance of a copy landing there */
   if (o.gradientSum && stds.length) {
+    const alpha = o.mixture ? 0.22 : 0.35;
     for (let x = xlim[0]; x < xlim[1]; x += 0.08) {
-      const y = o.sumOnly
-        ? stds.reduce((a, m, i) => a + wts[i] * BIN_W * dnorm(x + 0.04, m, sd), 0)
-        : Math.max(...stds.map((m, i) => wts[i] * BIN_W * dnorm(x + 0.04, m, sd)));
-      if (y < ymax * 0.004) continue;
-      const r = responsibilities(x + 0.04, stds, wts, sd);
-      pl.rect(x, 0, x + 0.08, y, { col: mixCol(KCOL, r, o.mixture ? 0.22 : 0.35), border: null });
+      const mid = x + 0.04;
+      if (o.sumOnly) {
+        const y = stds.reduce((a, m, i) => a + wts[i] * BIN_W * dnorm(mid, m, sd), 0);
+        if (y < ymax * 0.004) continue;
+        pl.rect(x, 0, x + 0.08, y,
+                { col: mixCol(KCOL, responsibilities(mid, stds, wts, sd), alpha), border: null });
+        continue;
+      }
+      const hs = stds.map((m, i) => wts[i] * BIN_W * dnorm(mid, m, sd));
+      const ord = hs.map((_, i) => i).sort((a, b) => hs[a] - hs[b]);
+      let y0 = 0;
+      ord.forEach((oi, j) => {
+        const y1 = hs[oi];
+        if (y1 <= y0) return;
+        if (y1 - y0 > ymax * 0.002) {
+          const wt = hs.map((hh, i) => (ord.indexOf(i) >= j ? hh : 0));
+          pl.rect(x, y0, x + 0.08, y1, { col: mixCol(KCOL, wt, alpha), border: null });
+        }
+        y0 = y1;
+      });
     }
   }
   /* component curves and their sum, scaled to expected bin counts */

@@ -17,6 +17,15 @@ None open.
 
 ### Awaiting approval
 
+#### eighth pass — blocks are blocks again
+The blocks view is back to individually coloured blocks, each in its likeliest standard's own
+solid tint — the gradient stays out of that view — and the smoothed curve of the data draws
+there whenever its checkbox is on (which it now is by default, matching the state it showed).
+
+##### the notes this answers
+
+unde the blocks view we WANT to be able to see thhe individually coloured blocks, not the gradient. please change it back for that view. also it shoudl still have the smoothed curve visible. come on.
+
 #### seventh pass — the gradient, at last, and the second attempt
 You were right and I finally saw it: I had been reading "gradient" as the wash under the curves,
 while your screenshot shows the BARS themselves shading smoothly across the axis. Fixed at the

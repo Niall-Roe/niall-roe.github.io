@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 13
 number: 14
 title: "Methods and Error curves"
@@ -17,6 +16,33 @@ container: example-ex14
 None open.
 
 ### Awaiting approval
+
+#### eighth pass — the against-the-kets view, found and restored
+It was lost to a plumbing mistake, not removed on purpose: in the last pass the "against the real
+kets" and "snap to best fit" buttons were moved into the row that holds the per-standard method
+pickers — a row that is hidden until the per-standard toggle is on, and that is wiped and rebuilt
+whenever it changes. So the buttons existed and were never visible. They now live on the main
+button bar, always shown, and the per-standard row holds only the pickers. (Your other four
+comments in this panel are about the walkers example; they are applied there — see the Final
+Causes entry.)
+
+##### the notes this answers
+
+why have we lost the "compare against the kets data" view? that was sort of the whole point?
+
+---
+
+[applied to the Final Causes example, recorded in its entry:]
+
+cut this AI crap language, "Four walkers, four starting corners, one set of compulsions: two blocks north, one east, one south, one east. Press play."
+
+cut this "A fake map, and the difference between the two kinds of causation. Under efficient causation, every walker is given the same compulsions — two blocks north, one east, one south, one east — and obeys them from wherever it happens to start. What matters is that each does what it is told; where it ends up is no part of the story, so scattered starts give scattered ends. Under final causation, the walkers get no route at all — only the address marked in gold. Each finds its own way: one hugs the avenues, one wanders, one cuts corners, one is a bird and flies straight. The routes differ and even converge only near the end; the destination alone is fixed. The general result may be brought about at one time in one way, and at another time in another."
+
+have the explainer just be a minimally modified version of what. I said to you. 
+
+fix the fact that starting points still trace out a path when they are off map. 
+
+give the user a way to set the directions and the address, though keep the defaults as they are.
 
 #### seventh pass — your text, the spread, and Peirce's own sketches
 The explainer is your wording verbatim. A spread slider now governs every process (and snap-to-fit

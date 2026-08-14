@@ -17,6 +17,30 @@ None open.
 
 ### Awaiting approval
 
+#### seventh pass — one heap, kets only
+The "every standard at Naucratis" tab is removed — the example is just kets now. The both screen
+is one summed histogram: the 1885 counts added onto the 1926 counts bin by bin (four weights at
+140 in the earlier set are four more blocks in that bar), no superimposing. The bars wear the
+gradient as everywhere else, with the 1885 portion the darker base of each bar; the summed data's
+smoothed curve is the prominent black line; the standards are draggable on every tab. Also in:
+the "best fit over all" button — it fits every number of standards from one to six under your
+hold-the-spread toggle, scores them by the information criterion, and installs the winner.
+And your bracketed question in the register text is answered with the computed facts: the five
+peaks survive (a five-standard fit lands at 139.1 / 141.9 / 144.6 / 147.1 / 150.4, a fraction of
+a grain off Peirce's five), the classes are looser (fitted probable error near 0.73 grains), and
+what the data cannot settle is the number — four broad standards edge out five by two or three
+BIC units, and seven follow the bin noise and are penalized. The old "crowd the middle" sentence
+was wrong and is gone; the takeaway written into the example is decidability, not disappearance.
+
+##### the notes this answers
+
+you have totally missed my meaning here. I do nt at all want to see the other weights and standards. I want the both screen to be just kets. but I want it to simply show all the kets on one histogram. not superimpose two histograms on top of one another. please read the previous note where I describe this.
+
+[and, from the earlier round] cut "The same machinery runs on either…" — cut; summary curves more
+prominent — the summed curve is the heaviest line on the both screen; drag the standards — on
+every tab now; "best fit over all" — built as the extra button you suggested; rewrite the
+register text — rewritten as above.
+
 #### sixth pass — the rest of the data, shown
 A fourth tab: "every standard at Naucratis" — all 514 units of Petrie's table on one axis, each
 standard a clump in its own colour (Arabic dirhem through the ket; the Phoenician shekel and Roman

@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 6
 number: 7
 title: "Working out"

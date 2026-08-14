@@ -38,13 +38,13 @@ registerExample("example-ex17", (box) => {
       Where he says above that there were five standards, it is because he had previously worked it
       out &mdash; though in the first attempt he concluded three, &ldquo;and it is not unlikely
       there is another.&rdquo;</p>
-    <p>His method was to tally all 158 weights into half-grain &ldquo;bins.&rdquo; He did this in
+    <p class="ed-note">His method was to tally all 158 weights into half-grain &ldquo;bins.&rdquo; He did this in
       order, and as he proceeded he noted where there were apparent peaks or changes: after finding
       only 6 weights in the 139.2&ndash;139.6 bin, he writes, <em>&ldquo;The numbers begin to fall
       off. But not so fast as they should, for now we are probably approaching another
       standard.&rdquo;</em> He recorded these numbers in a table with headings <em>App[arent].
       standard &middot; No. weights &middot; Smoothed &middot; Separated</em>.</p>
-    <p>The Smoothed column follows an exact rule, and he wrote it down: an earlier draft heads
+    <p class="ed-note">The Smoothed column follows an exact rule, and he wrote it down: an earlier draft heads
       the column <em>&ldquo;The same smoothed by 0.7 each + 0.3 previous.&rdquo;</em> That is,
       <span class="math">smoothed = 0.7 &times; this bin + 0.3 &times; the bin before</span> &mdash;
       and it reproduces every one of the thirty smoothed values in both drafts exactly (try the
@@ -61,7 +61,7 @@ registerExample("example-ex17", (box) => {
       noted in the margin.</p>
     <div class="mode-tabs">
       <button class="mode-tab active" data-v="walk">work through it</button>
-      <button class="mode-tab" data-v="chart">his working, drawn</button>
+      <button class="mode-tab" data-v="chart">smoothing</button>
       <button class="mode-tab" data-v="table">his table</button>
       <button class="mode-tab" data-v="ms">the manuscript</button>
     </div>
@@ -200,6 +200,14 @@ registerExample("example-ex17", (box) => {
       const [lo, c] = FA[i];
       pl.rect(lo, 0, lo + 0.5, c, { col: "rgba(87,93,102,.30)", border: PAL.paper });
     }
+    /* the smoothing rides alongside the tally, as it did on his page: each
+       tallied bin's smoothed value (0.7 this + 0.3 previous) appears with it */
+    for (let i = 0; i < upTo; i++) {
+      const [lo, c] = FA[i];
+      const sm = 0.7 * c + 0.3 * (i ? FA[i - 1][1] : 0);
+      pl.points([lo + 0.25], [sm], { col: "#b03a2e", cex: 0.8 });
+      pl.points([lo + 0.25], [sm], { col: "#b03a2e", cex: 1.45, pch: 21 });
+    }
     myFlags.forEach((x) => {
       pl.segments(x, 0, x, ymax * 0.6, { col: PAL.accent, lwd: 1.4, lty: 3 });
       drawKetGlyph(pl, x, 0, PAL.accent, 8);
@@ -212,7 +220,7 @@ registerExample("example-ex17", (box) => {
     if (aside) {
       const hit = ASIDES[upTo - 1];
       aside.innerHTML = upTo === 0
-        ? "The cleaned weights wait in order of value. Step through the bins as he did; flag a standard whenever the counts persuade you one is near."
+        ? "The cleaned weights wait in order of value. Step through the bins as he did; the red dot over each tallied bin is his smoothed value (0.7 of this bin + 0.3 of the one before). Flag a standard whenever the counts persuade you one is near."
         : upTo >= FA.length
         ? "All 158 tallied (159 by his count). His standards appear in gold" + (myFlags.length ? " \u2014 yours in blue, for comparison." : ".")
         : (hit || `bins tallied: ${upTo} of ${FA.length}`);
@@ -237,6 +245,7 @@ registerExample("example-ex17", (box) => {
     upTo = 0; myFlags = []; drawCanvas(wcv);
   });
   $("#ex17-walkview .plot-container", content).appendChild(wcv);
+  $("#ex17-chartview .plot-container", content).appendChild(cv);
 
   const tb = $("#ex17-tbody", content);
   FA.forEach(([lo, c, t, sm, sep]) => {

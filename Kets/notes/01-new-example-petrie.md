@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 1
 number: 2
 title: "Petrie"
@@ -18,6 +17,19 @@ Choose: the balance mini-interactive, the wall-painting pair, or leave the panel
 A source credit for your qedet photograph would also be good to record.
 
 ### Awaiting approval
+
+#### eighth pass — the aside cut, your caption in
+The exactitude note under the map is cut in full, and the kets photo now reads "Here are five
+kets from University College London's Petrie Museum of Egyptian Archaeology." The choice of
+balance mini-interactive / wall-painting pair / leave-as-is stays open above.
+
+##### the notes this answers
+
+cut:
+
+The map is drawn, and schematic. On the exactitude itself: in verifying the data behind this page, five misprints surfaced in Petrie's own 1926 register — a wrong multiplier at three catalogue numbers, a slipped digit at two more — each caught only because his tables print redundant columns whose arithmetic must agree. Even the exact metrologist's table has an error curve; the redundancy he built in is what makes the errors findable.
+
+for the kets, write "Here are five Ket's from University College London's Petrie Museum of Egyptian Archaeology.
 
 #### seventh pass — your qedet photo, and the clause
 Your photograph of the seven domed qedets is in, replacing the faience weight, and "as Petrie

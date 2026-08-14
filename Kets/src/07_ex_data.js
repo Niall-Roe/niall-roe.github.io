@@ -61,17 +61,16 @@ registerExample("example-ex8", (box) => {
     <p>Peirce suspected the data were insufficient to decide how near his theory came to the truth.
       Forty years after Naucratis, Petrie catalogued the qedet again &mdash; <em>Ancient Weights and
       Measures</em> (1926) registers <strong>821 stone qedets</strong> from all over Egypt against
-      the 142 Naucratis weights Peirce had. The same machinery runs on either: set the number of
-      standards, fit them, and see whether the extra data sharpens or dissolves the five.</p>
+      the 142 Naucratis weights Peirce had.</p>
     <div class="mode-tabs">
       <button class="mode-tab active" data-set="naucratis">Naucratis, 1885 (n = 142)</button>
       <button class="mode-tab" data-set="register">all Egypt, 1926 (n = 821)</button>
-      <button class="mode-tab" data-set="both">both, rescaled</button>
-      <button class="mode-tab" data-set="all">every standard at Naucratis</button>
+      <button class="mode-tab" data-set="both">both, summed (n = 963)</button>
     </div>
     <div class="row"><div class="col col-6"></div><div class="col col-6"></div></div>
     <div class="ex-buttonbar">
       <button class="btn btn-success" id="ex8-fit">best fit for this many standards</button>
+      <button class="btn btn-success" id="ex8-best">best fit over all</button>
       <button class="btn" id="ex8-peirce">Peirce's five</button>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex8-fixsd" checked> hold the spread at &#8541; grain</label></label>
@@ -88,71 +87,39 @@ registerExample("example-ex8", (box) => {
                           (v) => v.toFixed(3));
   $$(".col", content)[0].appendChild(kCtl.row);
   $$(".col", content)[1].appendChild(peCtl.row);
-  const dataOf = () => (mode === "register" ? QEDET1926 : KETS142);
+  const COMBINED = KETS142.concat(QEDET1926);
+  const dataOf = () => (mode === "register" ? QEDET1926 : mode === "both" ? COMBINED : KETS142);
 
   const cv = mkCanvas(340, (pl, W, H) => {
     const xlim = [135, 154];
-    if (mode === "all") {
-      /* the widest view: all 514 Naukratis units, every standard, on one axis.
-         The ket is one clump in a landscape of clumps — each standard another
-         natural class, merging at its own edges. (Non-ket rows are from the
-         rough transcription and are unverified; two standards lie off this
-         axis, the Phoenician shekel near 220 grains and the Roman uncia near
-         410.) */
-      const alim = [40, 160];
-      const bins = {};
-      ALLUNITS.forEach(([u, si]) => {
-        if (u < alim[0] || u > alim[1]) return;
-        const b = Math.floor((u - alim[0]) / BIN_W);
-        (bins[b] = bins[b] || []).push(si);
-      });
-      let ymax = 4;
-      Object.values(bins).forEach((arr) => { ymax = Math.max(ymax, arr.length); });
-      ymax *= 1.25;
-      pl.setup({ xlim: alim, ylim: [0, ymax], mar: [3, 3, 0.8, 0.8] });
-      pl.axes({ xat: seqBy(40, 160, 20), yat: pretty0(ymax) });
-      pl.axisLabels("grains (value of one unit)", "weights per half-grain");
-      Object.entries(bins).forEach(([b, arr]) => {
-        const x0 = alim[0] + (+b) * BIN_W;
-        arr.sort();
-        arr.forEach((si, y) => pl.rect(x0, y, x0 + BIN_W, y + 1,
-          { col: KTINT[si % KTINT.length], border: PAL.paper }));
-      });
-      const seen = Array.from(new Set(ALLUNITS.filter(([u]) => u >= alim[0] && u <= alim[1]).map(([, si]) => si))).sort();
-      pl.legend("topleft", { legend: seen.map((si) => ALLNAMES[si]),
-        fill: seen.map((si) => KTINT[si % KTINT.length]), cex: 0.72 });
-      const read = $("#ex8-read");
-      if (read) read.innerHTML = `<p>The rest of Petrie's table: every standard at Naucratis on one
-        axis (the Phoenician shekel near 220 grains and the Roman uncia near 410 lie beyond it).
-        The ket is one clump among many &mdash; each standard its own natural class, with its own
-        middling form, and each merging into its neighbours exactly as Peirce says such classes do.
-        The non-ket rows are from the earlier rough transcription and have not had the ket rows'
-        verification.</p>`;
-      return;
-    }
     if (mode === "both") {
+      /* one summed heap: the 1885 counts added onto the 1926 counts bin by
+         bin, the bars wearing the gradient, the 1885 portion a shade darker
+         at the base of each bar */
       const c142 = histCounts(KETS142, BIN_0, xlim[1], BIN_W);
       const c1926 = histCounts(QEDET1926, BIN_0, xlim[1], BIN_W);
-      const scale = Math.max(...c142) / Math.max(...c1926);
-      const ymax = Math.max(...c142) * 1.25;
+      const counts = c142.map((n, i) => n + c1926[i]);
+      const sd8 = peCtl.get() * PE_TO_SD;
+      const wts = nearestCounts(COMBINED, stds);
+      const ymax = Math.max(...counts, 4) * 1.2;
       pl.setup({ xlim, ylim: [0, ymax], mar: [3, 3, 0.8, 0.8] });
       pl.axes({ xat: seqBy(136, 154, 2), yat: pretty0(ymax) });
-      pl.axisLabels("grains (value of one qedet)", "weights per half-grain (1926 rescaled)");
-      c1926.forEach((n, i) => { if (n) pl.rect(BIN_0 + i * BIN_W, 0, BIN_0 + (i + 1) * BIN_W, n * scale, { col: "rgba(154,123,63,.30)", border: PAL.paper }); });
-      c142.forEach((n, i) => { if (n) pl.rect(BIN_0 + i * BIN_W, 0, BIN_0 + (i + 1) * BIN_W, n, { col: "rgba(47,111,159,.38)", border: PAL.paper }); });
-      /* each dataset's own smoothed curve, and the model sum against either */
-      const dcA = dataCurve(KETS142, xlim, 1), dcB = dataCurve(QEDET1926, xlim, 1);
-      pl.lines(dcA.xs, dcA.ys, { col: PAL.accent, lwd: 1.8 });
-      pl.lines(dcB.xs, dcB.ys.map((y) => y * scale), { col: PAL.accent4, lwd: 1.8 });
-      const sd8 = peCtl.get() * PE_TO_SD, wA = nearestCounts(KETS142, stds);
+      pl.axisLabels("grains (value of one qedet)", "weights per half-grain");
+      counts.forEach((n, i) => {
+        if (!n) return;
+        const x0 = BIN_0 + i * BIN_W;
+        const r = responsibilities(x0 + BIN_W / 2, stds, wts, sd8);
+        if (c142[i]) pl.rect(x0, 0, x0 + BIN_W, c142[i], { col: mixCol(KCOL, r, 0.75), border: PAL.paper });
+        if (c1926[i]) pl.rect(x0, c142[i], x0 + BIN_W, n, { col: mixCol(KCOL, r, 0.4), border: PAL.paper });
+      });
+      const dc = dataCurve(COMBINED, xlim, 1);
+      pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 2.2 });
       const xs8 = seqBy(xlim[0], xlim[1], 0.05);
-      stds.forEach((m, i) => pl.lines(xs8, xs8.map((x) => wA[i] * BIN_W * dnorm(x, m, sd8)),
-               { col: KCOL[i % KCOL.length], lwd: 1.4 }));
-      pl.lines(xs8, xs8.map((x) => stds.reduce((a, m, i) => a + wA[i] * BIN_W * dnorm(x, m, sd8), 0)),
-               { col: PAL.ink, lwd: 1.2, lty: 2 });
-      stds.forEach((m, i) => { pl.segments(m, 0, m, ymax * 0.9, { col: KCOL[i % KCOL.length], lwd: 1.3, lty: 3 }); drawKetGlyph(pl, m, 0, KCOL[i % KCOL.length], 7); });
-      pl.legend("topright", { legend: ["Naucratis 1885", "all Egypt 1926"],
-        fill: ["rgba(47,111,159,.5)", "rgba(154,123,63,.45)"] });
+      stds.forEach((m, i) => pl.lines(xs8, xs8.map((x) => wts[i] * BIN_W * dnorm(x, m, sd8)),
+               { col: KCOL[i % KCOL.length], lwd: 1.6 }));
+      pl.lines(xs8, xs8.map((x) => stds.reduce((a, m, i) => a + wts[i] * BIN_W * dnorm(x, m, sd8), 0)),
+               { col: PAL.accent2, lwd: 1.8, lty: 2 });
+      stds.forEach((m, i) => { pl.segments(m, 0, m, ymax * 0.9, { col: KCOL[i % KCOL.length], lwd: 1.3, lty: 3 }); drawKetGlyph(pl, m, 0, KCOL[i % KCOL.length], 8); });
     } else {
       drawMixture(pl, W, H, { stds, data: dataOf(), pe: peCtl.get(), mixture: true,
         weights: nearestCounts(dataOf(), stds), bigStd: true, xlim });
@@ -162,20 +129,27 @@ registerExample("example-ex8", (box) => {
     }
     const read = $("#ex8-read");
     if (read) read.innerHTML = mode === "register"
-      ? `<p>The all-Egypt register is a broad single mound near 140&ndash;141 grains: weights from
-         many towns and centuries piled together until the classes merge past recovery. Fit five
-         standards to it and they crowd the middle instead of finding Peirce's five &mdash; his
-         caution about what more data would show was well placed, though this register is a wider
-         population, not a re-survey of Naucratis.</p>`
+      ? `<p>There do appear to be five peaks, and fitting five standards to the register finds them
+         at <span style="font-variant-numeric:tabular-nums">139.1 / 141.9 / 144.6 / 147.1 / 150.4</span>
+         grains &mdash; within a fraction of a grain of Peirce's five, only the heaviest drifting
+         upward. The classes are looser here (the fitted probable error is near 0.73 grains against
+         his &#8541;), which is what piling many towns and centuries together does. What the extra
+         data still cannot settle is the <em>number</em>: by the information criterion four broad
+         standards cover the heap slightly better than five, the margin two or three units, and
+         seven follow the bin noise and are charged for it. Press <em>best fit over all</em> to
+         watch the criterion choose.</p>`
       : mode === "naucratis"
       ? `<p>The one-town hoard: clumping visible, and five standards fit it comfortably. Drag the
          domes or press best-fit and compare with Peirce's five.</p>`
-      : `<p>Both at once, the 1926 register rescaled to comparable height.</p>`;
+      : `<p>One heap: the 1926 counts and the 1885 counts added bin by bin &mdash; four weights at
+         140 grains in the earlier set are four more blocks in that bar &mdash; with the 1885
+         portion the darker base of each bar. The black curve smooths the summed data; drag the
+         standards or fit as anywhere else.</p>`;
   });
   $(".plot-container", content).appendChild(cv);
 
   attachDrag(cv,
-    (x) => { if (mode === "both") return null; let bi = null, bd = 0.7; stds.forEach((m, i) => { const d = Math.abs(x - m); if (d < bd) { bd = d; bi = i; } }); return bi; },
+    (x) => { let bi = null, bd = 0.7; stds.forEach((m, i) => { const d = Math.abs(x - m); if (d < bd) { bd = d; bi = i; } }); return bi; },
     (i, x) => { stds[i] = Math.max(135.2, Math.min(153.8, +x.toFixed(2))); drawCanvas(cv); });
 
   function reseed(k) {
@@ -189,6 +163,30 @@ registerExample("example-ex8", (box) => {
     const fit = emFit(dataOf(), stds.length, { init: stds, sd: fixed ? peCtl.get() * PE_TO_SD : null });
     stds = fit.mu.slice();
     if (!fixed) { peCtl.input.value = (fit.sd * 0.6745).toFixed(3); peCtl.input.dispatchEvent(new Event("input")); }
+    drawCanvas(cv);
+  });
+  $("#ex8-best", content).addEventListener("click", () => {
+    /* the real best fit under the current assumptions: every number of
+       standards from one to six is fitted and scored by BIC (as in the
+       elaborate-calculations example), and the winner is installed */
+    const vals = dataOf();
+    const fixed = $("#ex8-fixsd", content).checked;
+    let best = null;
+    for (let k = 1; k <= 6; k++) {
+      const f = emFit(vals, k, { sd: fixed ? peCtl.get() * PE_TO_SD : null });
+      let ll = 0;
+      vals.forEach((v) => {
+        let d = 0;
+        f.mu.forEach((m, i) => { d += f.w[i] * dnorm(v, m, f.sd); });
+        ll += Math.log(Math.max(d, 1e-12));
+      });
+      const bic = -2 * ll + 2 * k * Math.log(vals.length);
+      if (!best || bic < best.bic) best = { k, f, bic };
+    }
+    stds = best.f.mu.slice();
+    kCtl.input.value = best.k; kCtl.input.dispatchEvent(new Event("input"));
+    stds = best.f.mu.slice();
+    if (!fixed) { peCtl.input.value = Math.max(0.2, Math.min(1.5, +(best.f.sd * 0.6745).toFixed(3))); peCtl.input.dispatchEvent(new Event("input")); }
     drawCanvas(cv);
   });
   $("#ex8-peirce", content).addEventListener("click", () => {

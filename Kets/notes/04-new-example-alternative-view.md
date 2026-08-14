@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 4
 number: 5
 title: "Alternative view"

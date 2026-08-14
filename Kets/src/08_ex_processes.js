@@ -205,11 +205,11 @@ registerExample("example-ex14", (box) => {
       <button class="btn btn-sm" id="ex14-scatter">scatter everything</button>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex14-per"> each standard its own method</label></label>
-    </div>
-    <div class="ex-buttonbar" id="ex14-perrow" style="display:none">
+      <span style="margin-left:auto"></span>
       <button class="btn btn-sm btn-warning" id="ex14-data">against the real kets</button>
       <button class="btn btn-sm btn-success" id="ex14-snap" style="display:none">snap to best fit</button>
     </div>
+    <div class="ex-buttonbar" id="ex14-perrow" style="display:none"></div>
     <div class="row"><div class="col col-4" id="ex14-nrow"></div>
       <div class="col col-4" id="ex14-arow" style="display:none"></div>
       <div class="col col-4" id="ex14-brow" style="display:none"></div></div>
@@ -411,15 +411,16 @@ registerExample("example-ex16", (box) => {
      wherever they lead; final causation reaches the address however it can */
   const GRID = 11, CELL = 1;
   const content = h(`<div id="ex16-content" class="example-content">
-    <p>A fake map, and the difference between the two kinds of causation. Under <em>efficient
-      causation</em>, every walker is given the same compulsions &mdash; two blocks north, one
-      east, one south, one east &mdash; and obeys them from wherever it happens to start. What
-      matters is that each does what it is told; where it ends up is no part of the story, so
-      scattered starts give scattered ends. Under <em>final causation</em>, the walkers get no
-      route at all &mdash; only the address marked in gold. Each finds its own way: one hugs the
-      avenues, one wanders, one cuts corners, one is a bird and flies straight. The routes differ
-      and even converge only near the end; the destination alone is fixed. <em>The general result
-      may be brought about at one time in one way, and at another time in another.</em></p>
+    <p>Efficient causation is compulsion regardless of end. Set different starting points, give
+      the walkers a direction &mdash; two blocks north, one east, one south, one east, or whatever
+      you type below &mdash; then watch them go and follow it. What matters is that they do what
+      they are told, not where they end up: they start from different places and they end up in
+      different places. In final causation mode the starting places are the same, and can again be
+      scattered, but this time an address is highlighted &mdash; click the map to move it. Press
+      play and each blob takes its own route to the address: some meandering, some direct, and in
+      places their routes converge; one is a bird and flies straight there. They are going to the
+      general result, and the particular compulsions do not matter. <em>The general result may be
+      brought about at one time in one way, and at another time in another.</em></p>
     <div class="mode-tabs">
       <button class="mode-tab active" data-m="eff">efficient causation</button>
       <button class="mode-tab" data-m="fin">final causation</button>
@@ -428,27 +429,61 @@ registerExample("example-ex16", (box) => {
       <button class="btn btn-primary" id="ex16-play">play</button>
       <button class="btn" id="ex16-scatter">scatter the starting points</button>
       <button class="btn" id="ex16-reset">reset</button>
+      <label class="ctl" id="ex16-dirlab" style="margin:0 0 0 auto;display:inline-flex;align-items:center;gap:6px;">
+        the directions <input id="ex16-dirs" type="text" value="2N, 1E, 1S, 1E" size="14"
+        style="font:inherit;padding:2px 6px;"></label>
     </div>
     <div class="plot-container"></div>
     <div class="result-box" id="ex16-read"></div>
   </div>`);
   box.appendChild(content);
 
-  const DIRS = [[0, 1], [0, 1], [1, 0], [0, -1], [1, 0]];   /* 2 N, 1 E, 1 S, 1 E */
-  const DIRWORDS = "two blocks north, one east, one south, one east";
+  let DIRS = [[0, 1], [0, 1], [1, 0], [0, -1], [1, 0]];   /* 2 N, 1 E, 1 S, 1 E */
+  let DIRWORDS = "two blocks north, one east, one south, one east";
   let mode = "eff";
   let target = [8, 7];
   let starts = [[1, 1], [2, 6], [5, 2], [8, 1]];
   let walkers = [], step = 0, timer = null;
   const STYLES = ["avenue", "wander", "corner", "bird"];
 
+  function parseDirs(s) {
+    const out = [], words = [];
+    const re = /(\d*)\s*([NSEW])/gi;
+    const D = { N: [0, 1], S: [0, -1], E: [1, 0], W: [-1, 0] };
+    let m;
+    while ((m = re.exec(s))) {
+      const n = Math.max(1, Math.min(9, parseInt(m[1] || "1", 10)));
+      for (let i = 0; i < n; i++) out.push(D[m[2].toUpperCase()]);
+      words.push(n + m[2].toUpperCase());
+    }
+    return out.length ? { dirs: out, words: words.join(", ") } : null;
+  }
+  /* how far the instructed route strays from its start, so starting points can
+     be kept where the whole walk stays on the map */
+  function routeBounds() {
+    let x = 0, y = 0, minx = 0, maxx = 0, miny = 0, maxy = 0;
+    DIRS.forEach(([dx, dy]) => {
+      x += dx; y += dy;
+      minx = Math.min(minx, x); maxx = Math.max(maxx, x);
+      miny = Math.min(miny, y); maxy = Math.max(maxy, y);
+    });
+    return { x0: Math.max(0, -minx), x1: Math.min(GRID - 1, GRID - 1 - maxx),
+             y0: Math.max(0, -miny), y1: Math.min(GRID - 1, GRID - 1 - maxy) };
+  }
+  function clampStarts() {
+    const b = routeBounds();
+    starts = starts.map(([x, y]) => [Math.max(b.x0, Math.min(b.x1, x)),
+                                     Math.max(b.y0, Math.min(b.y1, y))]);
+  }
   function reset() {
     step = 0;
     walkers = starts.map((s, i) => ({ pos: s.slice(), trail: [s.slice()], style: STYLES[i % 4], done: false }));
     drawCanvas(cv); read();
   }
   function scatter() {
-    starts = starts.map(() => [1 + Math.floor(Math.random() * (GRID - 2)), 1 + Math.floor(Math.random() * (GRID - 2))]);
+    const b = routeBounds();
+    starts = starts.map(() => [b.x0 + Math.floor(Math.random() * Math.max(1, b.x1 - b.x0 + 1)),
+                               b.y0 + Math.floor(Math.random() * Math.max(1, b.y1 - b.y0 + 1))]);
     reset();
   }
   function advance() {
@@ -522,14 +557,7 @@ registerExample("example-ex16", (box) => {
     });
   });
   $(".plot-container", content).appendChild(cv);
-  /* in final mode the address can be dragged anywhere on the map */
-  attachDrag(cv, () => (mode === "fin" ? 0 : null), (i, x) => {
-    /* invY needed too: use the canvas's plot to recover both coordinates */
-    const pl = cv._pl;
-    if (!pl) return;
-    target = [Math.max(0, Math.min(GRID - 1, Math.round(x))), target[1]];
-    drawCanvas(cv);
-  });
+  /* in final mode a click anywhere on the map sets the address */
   cv.addEventListener("pointerdown", (ev) => {
     if (mode !== "fin") return;
     const r = cv.getBoundingClientRect(), pl = cv._pl;
@@ -543,7 +571,8 @@ registerExample("example-ex16", (box) => {
     if (!el) return;
     if (mode === "eff") {
       el.innerHTML = step === 0
-        ? `<p>Four walkers, four starting corners, one set of compulsions: ${DIRWORDS}. Press play.</p>`
+        ? `<p>Press play, and each walker will follow the directions &mdash; ${DIRWORDS} &mdash;
+           from its own starting point.</p>`
         : step >= DIRS.length
         ? `<p>Every walker obeyed the same compulsions perfectly &mdash; and they stand in four
            different places. Efficient causation is satisfied by the obedience, wherever it lands.</p>`
@@ -569,9 +598,17 @@ registerExample("example-ex16", (box) => {
     if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
     reset();
   });
+  $("#ex16-dirs", content).addEventListener("change", (e) => {
+    const p = parseDirs(e.target.value);
+    if (!p) { e.target.value = "2N, 1E, 1S, 1E"; return; }
+    DIRS = p.dirs; DIRWORDS = p.words;
+    if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
+    clampStarts(); reset();
+  });
   $$(".mode-tab", content).forEach((b) => b.addEventListener("click", () => {
     $$(".mode-tab", content).forEach((x) => x.classList.remove("active"));
     b.classList.add("active"); mode = b.dataset.m;
+    $("#ex16-dirlab", content).style.display = mode === "eff" ? "" : "none";
     if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
     reset();
   }));

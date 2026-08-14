@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 10
 number: 11
 title: "Towns"
@@ -17,6 +16,22 @@ container: example-ex11
 None open.
 
 ### Awaiting approval
+
+#### eighth pass — the fill keeps to its own curves, everywhere
+Fixed at the engine level, so this plot and every other gradient-under-curves plot obey it: up to
+the lower curve the shading blends the owners by their shares; above that height only the curves
+that actually reach higher continue, each in its own colour — the yellow never climbs the green
+slope again. Because each colour now fills exactly the region under its own curve, the amount of
+each colour on the page is the probability of a copied ket landing there: a mostly-yellow stretch
+is mostly yellow because a ket found there mostly is one.
+
+##### the notes this answers
+
+'/Users/niallroe/Documents/GitHub/niall-roe.github.io/Kets/Images/Image 2026-08-14 at 5.54 AM.png'
+
+the yellow should not go up the green curve here. the shaded area should reflect the probabilities of a copied ket landing in one of the areas. the reason it is mostly yellow in our nearly case should reflect the fact that its .... totally shading yellow bits. just think through this one and do what you think I am asking for please.
+
+### Completed
 
 #### seventh pass — read, and done properly
 Bars: the smooth gradient across bins, as in your screenshot, in this palette. Circles: each town's

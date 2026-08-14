@@ -1,5 +1,4 @@
 ---
-queued: true
 position: 12
 number: 13
 title: "Probability Curve"
