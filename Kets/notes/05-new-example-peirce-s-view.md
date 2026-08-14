@@ -17,6 +17,46 @@ None open.
 
 ### Awaiting approval
 
+#### ninth pass — your note text, and the live restatement
+The mis-posted block is disregarded, as you say — it is answered on example 5. The note under the
+plot is now your text: Peirce worked through this twice, the first attempt's 140 / 145 / 149 with
+142½ not unlikely, the second attempt beginning from that working but confidently asserting five,
+and the 36 / 30 / 30 / 22 / 24 against his 36 / 25 / 26 / 23 / 34. One word changed: “proving the
+counts” is set as “providing the counts” — say the word if you did mean proving. It ends with the
+live sentence, “As you have it now, your five standards at … contain … weights each,” each
+standard and each count wearing its own colour and following the domes as you drag them.
+
+##### the notes this answers
+
+This one does not make it clear to me what is going on. 
+
+and when you add text... indent it. that is a global. universal always change that I dont want to have to remind you of every time forever thanks. 
+
+is this the best approach? I recall here being something called like a gaussian mixture model or something. 
+
+whatever we do, it shoudl display the standards in the same way we have been displaying them. the graphs you have here dont really tell ole anything.
+
+---
+
+sorry, the suggestion that read as follows was for example 5, disregard: 
+
+"This one does not make it clear to me what is going on.
+
+and when you add text... indent it. that is a global. universal always change that I dont want to have to remind you of every time forever thanks.
+
+is this the best approach? I recall here being something called like a gaussian mixture model or something.
+
+whatever we do, it shoudl display the standards in the same way we have been displaying them. the graphs you have here dont really tell ole anything."
+
+---
+
+change this to be
+
+Peirce worked through this twice. in his first attempt he tabulated the weights in half-grain classes, smoothed the counts by hand, and read the clusterings off the chart, concluding standards at about 140, 145 and 149 grains, with another not unlikely at about 142½ (see the above example). The second attempt apparently begins from that working but confidently asserts that there are five standards, proving the counts in the table above. Assigning each ket to its nearest standard under his own five gives 36 / 30 / 30 / 22 / 24, not his 36 / 25 / 26 / 23 / 34. 
+
+As you have it now, your [x] standards at [a b c...] contain [n, m o] weights each. [make sure colour coordination matches. this is basically just reprinting the 
+x were designed to conform to ta standard of ..."]
+
 #### eighth pass — blocks are blocks again
 The blocks view is back to individually coloured blocks, each in its likeliest standard's own
 solid tint — the gradient stays out of that view — and the smoothed curve of the data draws

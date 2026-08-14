@@ -17,6 +17,22 @@ None open.
 
 ### Awaiting approval
 
+#### eighth pass — buttons that hold still
+The cast button no longer moves: the copies count has come out of the button bar (it is reported
+in the readout under the plot instead), so nothing shifts when it appears, and both bars are set
+in the small button size with the settings pinned left and the actions pinned right, so the
+figuring row no longer spills. Randomize is on the known view too — there it also sets the
+probable-error slider to the spread it drew with, since on that page everything is known. And each
+per-standard spread slider now wears its own standard's colour, thumb and value alike.
+
+##### the notes this answers
+
+this is good except for the buttons. the cast button moves after I hit it. on the figuring page they seem to sort of spill over. lets have a randomize button on the known view too. 
+
+when I untangle "same spread for each" it works great, but the slider colours dont match the dist colours. 
+
+(the gradient is perfect, thank you.)
+
 #### seventh pass — your comments, item by item
 Each line of your paste, as pasted. The intro is your text ("If you knew the standards and you
 knew how well standards would be copied…"); the old "Two directions through one picture" is cut.

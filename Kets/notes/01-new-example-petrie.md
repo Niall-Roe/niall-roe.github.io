@@ -4,7 +4,7 @@ number: 2
 title: "Petrie"
 anchor: "Prof. [W. M.] Flinders Petrie, whose reasoning powers I had admired long before his other great scientific qualities had been proved, among which his great exactitude and circumspection as a metrologist concerns us here, exhumed, at the ancient trading town of Naucratis, no less than 158 balance-weights having the Egyptian ket as their unit."
 heading: "New example — Petrie"
-status: awaiting
+status: done
 container: example-ex2
 ---
 ### Text
@@ -16,7 +16,7 @@ container: example-ex2
 Choose: the balance mini-interactive, the wall-painting pair, or leave the panel as it stands.
 A source credit for your qedet photograph would also be good to record.
 
-### Awaiting approval
+### Completed
 
 #### eighth pass — the aside cut, your caption in
 The exactitude note under the map is cut in full, and the kets photo now reads "Here are five

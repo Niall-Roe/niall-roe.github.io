@@ -19,22 +19,23 @@ registerExample("example-ex4", (box) => {
     </div>
     <div class="row"><div class="col col-6"></div><div class="col col-6"></div></div>
     <div class="ex-buttonbar" id="ex4-bar-know">
-      <button class="btn" id="ex4-two">two standards</button>
-      <button class="btn" id="ex4-clusters">two clusters (3 low + 2 high)</button>
-      <button class="btn btn-warning" id="ex4-petrie">Petrie's data, as Peirce cleaned it</button>
-      <span style="margin-left:auto" id="ex4-tally" class="ex27-lead"></span>
-      <button class="btn btn-primary" id="ex4-copy25">cast 25 of each</button>
-      <button class="btn" id="ex4-clear">clear the copies</button>
+      <button class="btn btn-sm" id="ex4-two">two standards</button>
+      <button class="btn btn-sm" id="ex4-clusters">two clusters (3 low + 2 high)</button>
+      <button class="btn btn-sm btn-warning" id="ex4-petrie">Petrie's data, as Peirce cleaned it</button>
+      <button class="btn btn-sm" id="ex4-randk">randomize</button>
+      <span style="margin-left:auto"></span>
+      <button class="btn btn-sm btn-primary" id="ex4-copy25">cast 25 of each</button>
+      <button class="btn btn-sm" id="ex4-clear">clear the copies</button>
     </div>
     <div class="ex-buttonbar" id="ex4-bar-blind" style="display:none">
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
-        <input type="checkbox" id="ex4-fixpe" checked> hold the probable error at the slider</label></label>
+        <input type="checkbox" id="ex4-fixpe" checked> hold the probable error</label></label>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
-        <input type="checkbox" id="ex4-samesd" checked> same spread for each</label></label>
+        <input type="checkbox" id="ex4-samesd" checked> same spread each</label></label>
       <span style="margin-left:auto"></span>
-      <button class="btn btn-warning" id="ex4-rand">randomize</button>
-      <button class="btn btn-success" id="ex4-snap">snap to best fit</button>
-      <button class="btn" id="ex4-reveal">reveal the actual</button>
+      <button class="btn btn-sm btn-warning" id="ex4-rand">randomize</button>
+      <button class="btn btn-sm btn-success" id="ex4-snap">snap to best fit</button>
+      <button class="btn btn-sm" id="ex4-reveal">reveal the actual</button>
     </div>
     <div class="row" id="ex4-sdrow" style="display:none"></div>
     <div class="plot-container"></div>
@@ -61,7 +62,10 @@ registerExample("example-ex4", (box) => {
     guesses.forEach((m, i) => {
       const col = h(`<div class="col col-4"></div>`);
       const c = ctlSlider(`spread of <span style="color:${KCOL[i % KCOL.length]}">standard ${i + 1}</span> (grains, as s.d.)`,
-                          "k" + ((i % 4) + 1), 0.3, 2.5, 0.05, +gSds[i].toFixed(2), (v) => v.toFixed(2));
+                          "k1", 0.3, 2.5, 0.05, +gSds[i].toFixed(2), (v) => v.toFixed(2));
+      /* the slider wears its own standard's colour, matching the curve it moves */
+      c.input.style.accentColor = KCOL[i % KCOL.length];
+      c.val.style.color = KCOL[i % KCOL.length];
       c.input.addEventListener("input", () => { gSds[i] = c.get(); fit = null; drawCanvas(cv); });
       col.appendChild(c.row); row.appendChild(col);
     });
@@ -168,19 +172,18 @@ registerExample("example-ex4", (box) => {
       drawCanvas(cv);
     });
 
-  function tally() {
-    const t = dataMode ? KETS142.length : copies.reduce((a, c) => a + c.length, 0);
-    $("#ex4-tally", content).textContent = dataMode ? "the 142 kets" : (t ? `${t} copies cast` : "");
-  }
   function know() {
     const read = $("#ex4-read");
-    if (read && !blind) read.innerHTML = dataMode
-      ? `<p>The real kets, stacked as blocks and coloured by their likeliest standard under the
+    if (!read || blind) return;
+    const t = copies.reduce((a, c) => a + c.length, 0);
+    read.innerHTML = dataMode
+      ? `<p>The 142 real kets, stacked as blocks and coloured by their likeliest standard under the
          current placement. The second mode hands you this same heap without the standards.</p>`
       : `<p>The copies you cast here are the data the second mode will ask you to fit. Each
-         standard's thin curve is what its copies would print with endlessly many castings.</p>`;
+         standard's thin curve is what its copies would print with endlessly many castings.${
+         t ? ` <strong>${t}</strong> copies cast so far.` : ""}</p>`;
   }
-  function poke() { drawCanvas(cv); tally(); if (!blind) know(); }
+  function poke() { drawCanvas(cv); if (!blind) know(); }
   $("#ex4-copy25", content).addEventListener("click", () => {
     if (dataMode) return;
     stds.forEach((m, i) => { for (let j = 0; j < 25; j++) copies[i].push(PROCESSES.skillful.draw(m, peCtl.get())); });
@@ -194,8 +197,9 @@ registerExample("example-ex4", (box) => {
   $("#ex4-two", content).addEventListener("click", () => preset([143.8, 145.6]));
   $("#ex4-clusters", content).addEventListener("click", () => preset([139.4, 140.6, 141.8, 147.6, 149.4]));
   $("#ex4-petrie", content).addEventListener("click", () => preset(PEIRCE_STANDARDS, true));
-  $("#ex4-rand", content).addEventListener("click", () => {
-    /* a hidden truth: some standards at some spread, 100 copies of each */
+  function randomize(showPE) {
+    /* some standards at some spread, 100 copies of each — a hidden truth when
+       done from the figuring page, in plain sight from the known one */
     const k = 2 + Math.floor(Math.random() * 4);
     let tries = 0, next;
     do {
@@ -207,8 +211,12 @@ registerExample("example-ex4", (box) => {
     castPE = +(0.35 + Math.random() * 0.65).toFixed(3);
     copies = stds.map((m) => Array.from({ length: 100 }, () => PROCESSES.skillful.draw(m, castPE)));
     fit = null; reveal = false;
+    kCtl.input.value = k; kCtl.val.textContent = String(k);
+    if (showPE) { peCtl.input.value = castPE; peCtl.val.textContent = castPE.toFixed(3); }
     poke();
-  });
+  }
+  $("#ex4-rand", content).addEventListener("click", () => randomize(false));
+  $("#ex4-randk", content).addEventListener("click", () => randomize(true));
   $("#ex4-reveal", content).addEventListener("click", (e) => {
     reveal = !reveal;
     e.target.classList.toggle("is-active", reveal);
@@ -290,16 +298,15 @@ registerExample("example-ex6", (box) => {
         <input type="checkbox" id="ex6-fixsd" checked> hold the spread at &#8541; grain</label></label>
     </div>
     <div class="plot-container"></div>
-    <div class="note-block">The manuscript shows the sequence: in his <em>first attempt</em> Peirce
-      tabulated the weights in half-grain classes, smoothed the counts by hand, and read the
-      clusterings off the chart &mdash; concluding standards at about 140, 145 and 149 grains, with
-      another not unlikely at about 142&frac12; (the example above walks that page). The <em>second
-      attempt</em> begins from that working with five standards and the counts of the table above.
-      Assigning each ket to its nearest standard under his own five gives
+    <div class="note-block">Peirce worked through this twice. In his first attempt he tabulated
+      the weights in half-grain classes, smoothed the counts by hand, and read the clusterings off
+      the chart, concluding standards at about 140, 145 and 149 grains, with another not unlikely
+      at about 142&frac12; (see the above example). The second attempt apparently begins from that
+      working but confidently asserts that there are five standards, providing the counts in the
+      table above. Assigning each ket to its nearest standard under his own five gives
       <span style="font-variant-numeric:tabular-nums">36&thinsp;/&thinsp;30&thinsp;/&thinsp;30&thinsp;/&thinsp;22&thinsp;/&thinsp;24</span>,
-      not his printed <span style="font-variant-numeric:tabular-nums">36&thinsp;/&thinsp;25&thinsp;/&thinsp;26&thinsp;/&thinsp;23&thinsp;/&thinsp;34</span>
-      &mdash; his counts were read off the drawn chart, and the chart was never inked for the
-      printer. The best-fit button does the "very intricate problem" by machine.</div>
+      not his <span style="font-variant-numeric:tabular-nums">36&thinsp;/&thinsp;25&thinsp;/&thinsp;26&thinsp;/&thinsp;23&thinsp;/&thinsp;34</span>.
+      <span id="ex6-now"></span></div>
   </div>`);
   box.appendChild(content);
 
@@ -398,8 +405,22 @@ registerExample("example-ex6", (box) => {
     bindings["c" + i] = () => (i <= stds.length ? String(counts()[i - 1]) : "&mdash;");
     bindings["s" + i] = () => (i <= stds.length ? String(+stds[i - 1].toFixed(2)) : "&mdash;");
   }
+  /* the live restatement of the table's sentences, in the standards' colours */
+  function updateNow() {
+    const el = $("#ex6-now", content);
+    if (!el) return;
+    const cts = counts();
+    const at = stds.map((m, i) =>
+      `<span style="color:${KCOL[i % KCOL.length]}">${+m.toFixed(2)}</span>`).join(" / ");
+    const each = stds.map((_, i) =>
+      `<span style="color:${KCOL[i % KCOL.length]}">${cts[i]}</span>`).join(" / ");
+    el.innerHTML = `As you have it now, your ${NUMW[stds.length - 1]} standards at
+      <span style="font-variant-numeric:tabular-nums">${at}</span> grains contain
+      <span style="font-variant-numeric:tabular-nums">${each}</span> weights each.`;
+  }
   registerLive("example-ex6", bindings, {
     onRefresh: (on) => {
+      updateNow();
       for (let i = 1; i <= 5; i++) {
         const tr = $("#std-row-" + i);
         if (tr) tr.style.color = on && i <= stds.length ? KCOL[i - 1] : "";

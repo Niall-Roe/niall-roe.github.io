@@ -17,6 +17,17 @@ None open.
 
 ### Awaiting approval
 
+#### ninth pass — set to Peirce's data
+The button is in. It sets five standards at his positions, opens the each-standard-its-own-method
+view with a picker per standard, and casts the copies in his printed proportions —
+36 / 25 / 26 / 23 / 34, 144 in all, his own count of the weights — at the ⅝-grain spread, with the
+against-the-kets view switched on so the supposal lies over the real data. Touching the copies
+slider hands the counts back to the slider's rule.
+
+##### the notes this answers
+
+this is almost perfect. add a button that says "set to Peirce's data" and it just sets the numbers of copies of each standard to the number he supposed, and the right overall number, standard position, etc. this requires opening the each standard own method view, but also giving each standard a proportion of the total, which shoudl be set to the petrie total, and then proportions set to give Peirce's numbers. thanks!
+
 #### eighth pass — the against-the-kets view, found and restored
 It was lost to a plumbing mistake, not removed on purpose: in the last pass the "against the real
 kets" and "snap to best fit" buttons were moved into the row that holds the per-standard method

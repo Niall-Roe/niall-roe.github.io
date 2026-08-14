@@ -19,6 +19,24 @@ lighter neighbour.
 
 ### Awaiting approval
 
+#### eighth pass — the procedure walked, in his order
+On the order, from the pages: he tallies first, in one sitting — the remarks about numbers falling
+off and standards approaching are part of the tally itself — and the Smoothed column belongs to
+the ruled table he draws up afterwards, with the standards read off only at the end. So the walk
+mirrors that now. The tally fills bin by bin with his asides, and then a second, smoothing pass
+sweeps back across the chart: each step lights the class being worked and the lighter class before
+it, and prints that row's arithmetic — 0.7 × this class + 0.3 × the one before = the red dot —
+against what his table actually gives. His standards appear only when both passes are done. The
+smoothing view walks the same procedure at your own pace: a row slider lights the same two classes
+and prints the blend and his value for that row, beside the α slider that shows the rule is exact
+on all thirty.
+
+##### the notes this answers
+
+the slider on the smoothing bin works well. but It doesnt help me understand the procedure he was actually using. can you add somethign that helps with that?
+
+also... lets make sure the order is right. looking at those pages, did he smith first, or find standards first, or do them together? our approach should mirror his.
+
 #### seventh pass — the empty view, explained and fixed
 Why "his working, drawn" displayed nothing: the view's canvas was built but never attached to the
 page — a one-line omission, now fixed, and the fifth-pass content (the α-slider rule

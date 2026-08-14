@@ -203,6 +203,7 @@ registerExample("example-ex14", (box) => {
       <button class="btn btn-sm" id="ex14-add">add a standard</button>
       <button class="btn btn-sm" id="ex14-one">back to one</button>
       <button class="btn btn-sm" id="ex14-scatter">scatter everything</button>
+      <button class="btn btn-sm btn-warning" id="ex14-peirceset">set to Peirce's data</button>
       <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
         <input type="checkbox" id="ex14-per"> each standard its own method</label></label>
       <span style="margin-left:auto"></span>
@@ -219,6 +220,7 @@ registerExample("example-ex14", (box) => {
   let stds = [144.7];
   let proc = "skillful", copies = [], curves = [], vsData = false;
   let perMode = false, perProc = ["skillful"];
+  let perN = null;      /* per-standard copy counts; null = the slider for all */
   function rebuildPerRow() {
     const row = $("#ex14-perrow", content);
     row.style.display = perMode ? "" : "none";
@@ -265,10 +267,11 @@ registerExample("example-ex14", (box) => {
     copies = []; curves = [];
     stds.forEach((m, si) => {
       const pk = perMode ? (perProc[si] || "skillful") : null;
+      const n = perN ? perN[si] : NC();
       const c = [];
-      for (let i = 0; i < NC(); i++) c.push(pk ? drawOneAs(m, pk) : drawOne(m));
+      for (let i = 0; i < n; i++) c.push(pk ? drawOneAs(m, pk) : drawOne(m));
       copies.push(c);
-      curves.push(pk ? processCurve(pk, m, sCtl.get(), NC()) : curveOf(m, NC()));
+      curves.push(pk ? processCurve(pk, m, sCtl.get(), n) : curveOf(m, n));
     });
   };
   recast();
@@ -310,7 +313,7 @@ registerExample("example-ex14", (box) => {
   });
   bar.appendChild(betaBtn);
   [aCtl, bCtl].forEach((c) => c.input.addEventListener("input", () => { if (proc === "beta") { recast(); drawCanvas(cv); } }));
-  nCtl.input.addEventListener("input", () => { recast(); drawCanvas(cv); });
+  nCtl.input.addEventListener("input", () => { perN = null; recast(); drawCanvas(cv); });
   const cv = mkCanvas(310, (pl, W, H) => {
     const xlim = vsData ? [136, 153.5] : [Math.min(...stds) - 4, Math.max(...stds) + 4];
     const all = [].concat(...copies);
@@ -390,7 +393,19 @@ registerExample("example-ex14", (box) => {
     stds.push(+(139 + Math.random() * 11).toFixed(1));
     rebuildPerRow(); recast(); drawCanvas(cv);
   });
-  $("#ex14-one", content).addEventListener("click", () => { stds = [144.7]; rebuildPerRow(); recast(); drawCanvas(cv); });
+  $("#ex14-one", content).addEventListener("click", () => { stds = [144.7]; perN = null; rebuildPerRow(); recast(); drawCanvas(cv); });
+  $("#ex14-peirceset", content).addEventListener("click", () => {
+    /* his supposal exactly: five standards at his positions, each with its own
+       method to choose, and the copies in his printed proportions 36/25/26/23/34
+       (144 in all — his count of the weights) */
+    stds = PEIRCE_STANDARDS.slice();
+    perMode = true; $("#ex14-per", content).checked = true;
+    perProc = stds.map((_, i) => perProc[i] || "skillful");
+    perN = [36, 25, 26, 23, 34];
+    sCtl.input.value = PEIRCE_PE; sCtl.input.dispatchEvent(new Event("input"));
+    if (!vsData) { vsData = true; $("#ex14-data", content).classList.add("is-active"); $("#ex14-snap", content).style.display = ""; }
+    rebuildPerRow(); recast(); drawCanvas(cv);
+  });
   $("#ex14-per", content).addEventListener("input", (e) => {
     perMode = e.target.checked; rebuildPerRow(); recast(); drawCanvas(cv);
   });
@@ -411,16 +426,14 @@ registerExample("example-ex16", (box) => {
      wherever they lead; final causation reaches the address however it can */
   const GRID = 11, CELL = 1;
   const content = h(`<div id="ex16-content" class="example-content">
-    <p>Efficient causation is compulsion regardless of end. Set different starting points, give
-      the walkers a direction &mdash; two blocks north, one east, one south, one east, or whatever
-      you type below &mdash; then watch them go and follow it. What matters is that they do what
-      they are told, not where they end up: they start from different places and they end up in
-      different places. In final causation mode the starting places are the same, and can again be
-      scattered, but this time an address is highlighted &mdash; click the map to move it. Press
-      play and each blob takes its own route to the address: some meandering, some direct, and in
-      places their routes converge; one is a bird and flies straight there. They are going to the
-      general result, and the particular compulsions do not matter. <em>The general result may be
-      brought about at one time in one way, and at another time in another.</em></p>
+    <p>Here we contrast efficient and final causation. Efficient causation works by brute
+      compulsion regardless of where the compulsions lead you. Final causation works by leading to
+      an end, regardless of the brute compulsions that got you there. Here you can see this with an
+      analogy to giving directions. Efficient causation is like brute force directions &mdash;
+      &ldquo;go one block north, one block east, &hellip; etc.&rdquo; One can successfully follow
+      those directions regardless of where they lead. Final causation is like &ldquo;arrive at
+      12th and main.&rdquo; We do not care which route you take, only that you satisfy a general
+      outcome.</p>
     <div class="mode-tabs">
       <button class="mode-tab active" data-m="eff">efficient causation</button>
       <button class="mode-tab" data-m="fin">final causation</button>
@@ -431,7 +444,14 @@ registerExample("example-ex16", (box) => {
       <button class="btn" id="ex16-reset">reset</button>
       <label class="ctl" id="ex16-dirlab" style="margin:0 0 0 auto;display:inline-flex;align-items:center;gap:6px;">
         the directions <input id="ex16-dirs" type="text" value="2N, 1E, 1S, 1E" size="14"
-        style="font:inherit;padding:2px 6px;"></label>
+        style="font:inherit;padding:2px 6px;">
+        <span id="ex16-compass" style="display:inline-flex;gap:3px;">
+          <button class="btn btn-sm" data-d="N">N&uarr;</button>
+          <button class="btn btn-sm" data-d="E">E&rarr;</button>
+          <button class="btn btn-sm" data-d="S">S&darr;</button>
+          <button class="btn btn-sm" data-d="W">W&larr;</button>
+          <button class="btn btn-sm" data-d="">clear</button>
+        </span></label>
     </div>
     <div class="plot-container"></div>
     <div class="result-box" id="ex16-read"></div>
@@ -571,7 +591,7 @@ registerExample("example-ex16", (box) => {
     if (!el) return;
     if (mode === "eff") {
       el.innerHTML = step === 0
-        ? `<p>Press play, and each walker will follow the directions &mdash; ${DIRWORDS} &mdash;
+        ? `<p>When you press play each walker will follow the directions &mdash; ${DIRWORDS} &mdash;
            from its own starting point.</p>`
         : step >= DIRS.length
         ? `<p>Every walker obeyed the same compulsions perfectly &mdash; and they stand in four
@@ -579,8 +599,8 @@ registerExample("example-ex16", (box) => {
         : `<p>Step ${step} of ${DIRS.length}: each is following the instructions.</p>`;
     } else {
       el.innerHTML = step === 0
-        ? `<p>The same scattered starts, no route given &mdash; only the address. Click anywhere on
-           the map to move the address; press play.</p>`
+        ? `<p>When you press play, each agent makes their way to the indicated address. Click
+           anywhere on the map to move the address.</p>`
         : done === walkers.length
         ? `<p>All four are at the address, by four routes that agree nowhere except the end. The
            result's general character was fixed; the particular way was not &mdash; that is final
@@ -598,13 +618,23 @@ registerExample("example-ex16", (box) => {
     if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
     reset();
   });
-  $("#ex16-dirs", content).addEventListener("change", (e) => {
-    const p = parseDirs(e.target.value);
-    if (!p) { e.target.value = "2N, 1E, 1S, 1E"; return; }
+  function applyDirs() {
+    const input = $("#ex16-dirs", content);
+    const p = parseDirs(input.value);
+    if (!p) { input.value = "2N, 1E, 1S, 1E"; return applyDirs(); }
+    input.value = p.words;
     DIRS = p.dirs; DIRWORDS = p.words;
     if (timer) { clearInterval(timer); timer = null; $("#ex16-play", content).textContent = "play"; }
     clampStarts(); reset();
-  });
+  }
+  $("#ex16-dirs", content).addEventListener("change", applyDirs);
+  $$("#ex16-compass button", content).forEach((b) => b.addEventListener("click", () => {
+    const input = $("#ex16-dirs", content);
+    /* clear empties the box; the walk keeps its last route until a new leg is added */
+    if (!b.dataset.d) { input.value = ""; return; }
+    input.value = (input.value.trim() ? input.value.trim().replace(/,?\s*$/, ", ") : "") + "1" + b.dataset.d;
+    applyDirs();
+  }));
   $$(".mode-tab", content).forEach((b) => b.addEventListener("click", () => {
     $$(".mode-tab", content).forEach((x) => x.classList.remove("active"));
     b.classList.add("active"); mode = b.dataset.m;

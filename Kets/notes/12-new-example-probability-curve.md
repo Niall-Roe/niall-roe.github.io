@@ -17,6 +17,39 @@ None open.
 
 ### Awaiting approval
 
+#### eighth pass — possibility, not height, lights the column
+I had the rule wrong: the column was lit by whichever curve stood tallest over it, so a standard
+that could not have thrown the ket still showed its colour. Now the column lights only the curves
+of standards that could have thrown *this* ket — a standard whose wager is nil keeps its curve
+dark however tall it stands, so no green appears until the ket comes under the green curve — and
+within the column each colour still keeps to its own curve. Both standards are draggable now,
+along with the ket. A beta law is a fifth tab, with α and β sliders. The readout sits behind the
+grey rule so it cannot be read as paper text; the “drag the black ket…” sentence is cut from the
+gaussian and flat readouts; the nearer-yet-impossible sentence is recomputed from wherever the ket
+and standards actually are, and names the standard it is about. The ask-the-data-which-law button
+is gone.
+
+##### the notes this answers
+
+this is still not working. I would do a new screen shot but the problem is the same. do you see what the problem is? if the ket is near the green one, it is still only possible that it came from yellow, so no part of the green curve should be lit up (until the ket is under that curve)
+
+lets also make the two standards movable?
+
+also globally, if you have added explainer text it needs to be indented. "assuming a ... ] looks like it is part of the paper which is bad. 
+
+ also add the alpha beta distribution mode here. 
+
+here are the texts we can use (remember to grey indent these)
+
+Gaussian:fine, but cut this: 
+Drag the black ket, change the law, and watch the wager move.
+
+same for flat.
+
+ for the sharp ones, this sentence should update depending on where the ket is "This ket sits nearer the 144.7 standard, yet under a law that cuts off sharply just above each standard, 144.7 cannot have thrown it."
+
+remove the "ask the data which law" button
+
 #### seventh pass — colours keep to their own curves
 The fill now runs blended up to the lower curve only; above that, the taller curve's own colour
 alone continues — the amber never climbs the green slope, and with the sharp-cutoff law the green

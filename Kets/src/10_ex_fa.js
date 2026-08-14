@@ -84,8 +84,10 @@ registerExample("example-ex17", (box) => {
         <label class="ctl checkbox" style="margin:0;display:inline-flex;"><label>
           <input type="checkbox" id="ex17-rule" checked> the rule: &alpha;&thinsp;&times;&thinsp;this + (1&minus;&alpha;)&thinsp;&times;&thinsp;previous</label></label>
       </div>
-      <div class="row"><div class="col col-6" id="ex17-arow"></div></div>
+      <div class="row"><div class="col col-6" id="ex17-arow"></div>
+        <div class="col col-6" id="ex17-rrow"></div></div>
       <div class="plot-container"></div>
+      <p class="ex7-work-line" id="ex17-roweq"></p>
       <p class="ex7-work-line" id="ex17-verdict"></p>
     </div>
     <div id="ex17-tableview" style="display:none">
@@ -137,15 +139,34 @@ registerExample("example-ex17", (box) => {
   };
   const show = { smooth: true, sep: true, rule: true };
   const aCtl = ctlSlider("&alpha; (his heading says 0.7)", "k2", 0, 1, 0.05, 0.7, (v) => v.toFixed(2));
+  const rowCtl = ctlSlider("walk his procedure, row by row", "k3", 1, 30, 1, 12);
   const cv = mkCanvas(330, (pl, W, H) => {
     const xlim = [136.4, 152.2];
     const ymax = 13.5;
+    const r17 = rowCtl.get() - 1;
     pl.setup({ xlim, ylim: [0, ymax], mar: [3, 3, 0.8, 0.8] });
     pl.axes({ xat: seqBy(137, 152, 2), yat: pretty0(ymax) });
     pl.axisLabels("grains", "weights per half-grain class");
-    FA.forEach(([lo, c, t]) => {
-      pl.rect(lo, 0, lo + 0.5, c, { col: c === t ? "rgba(87,93,102,.30)" : "rgba(154,123,63,.5)", border: PAL.paper });
+    FA.forEach(([lo, c, t], i) => {
+      /* the working row and the previous (lighter) one are lit, so the blend
+         being taken is visible on the chart itself */
+      const lit = i === r17 ? "rgba(154,123,63,.55)" : i === r17 - 1 ? "rgba(154,123,63,.3)" : null;
+      pl.rect(lo, 0, lo + 0.5, c, { col: lit || (c === t ? "rgba(87,93,102,.30)" : "rgba(154,123,63,.5)"), border: PAL.paper });
     });
+    {
+      const eq = $("#ex17-roweq");
+      if (eq) {
+        const a17 = aCtl.get();
+        const prev = r17 ? FA[r17 - 1][1] : 0;
+        const val = a17 * FA[r17][1] + (1 - a17) * prev;
+        eq.innerHTML = `Row ${r17 + 1}, the ${FA[r17][0].toFixed(1)}&ndash;${(FA[r17][0] + 0.4).toFixed(1)} class:
+          take ${a17.toFixed(2)} of its own count and ${(1 - a17).toFixed(2)} of the lighter class before it &mdash;
+          <span class="math">${a17.toFixed(2)} &times; ${FA[r17][1]} + ${(1 - a17).toFixed(2)} &times; ${prev} =
+          <strong>${val.toFixed(2)}</strong></span>${FA[r17][3] !== null
+            ? ` &mdash; his Smoothed value: <strong>${FA[r17][3].toFixed(1)}</strong>${Math.abs(val - FA[r17][3]) < 0.051 ? " ✓" : ""}`
+            : " &mdash; his table leaves this row blank"}.`;
+      }
+    }
     FA_STDS.forEach((m) => {
       pl.segments(m, 0, m, ymax * 0.94, { col: PAL.inkFaint, lwd: 1, lty: 3 });
       pl.text(m, ymax * 0.97, m === 142.5 ? "142\u00bd?" : String(m), { col: PAL.inkSoft, cex: 0.8 });
@@ -188,48 +209,65 @@ registerExample("example-ex17", (box) => {
          shares, row by row.`;
   });
 
-  /* ---- the walk: bins revealed in order, his asides arriving on cue ---- */
-  let upTo = 0, myFlags = [], wTimer = null;
+  /* ---- the walk: the tally first, then his smoothing pass over it \u2014 the
+     order of the manuscript (he tallied in one sitting, noting approaching
+     standards as he went; the Smoothed column belongs to the table he ruled
+     afterwards) ---- */
+  let upTo = 0, smUpTo = 0, myFlags = [], wTimer = null;
+  const ruleAt = (i) => +(0.7 * FA[i][1] + 0.3 * (i ? FA[i - 1][1] : 0)).toFixed(2);
   const wcv = mkCanvas(330, (pl, W, H) => {
     const xlim = [136.4, 152.2];
     const ymax = 13.5;
     pl.setup({ xlim, ylim: [0, ymax], mar: [3, 3, 0.8, 0.8] });
     pl.axes({ xat: seqBy(137, 152, 2), yat: pretty0(ymax) });
     pl.axisLabels("grains", "weights per half-grain class");
+    /* during the smoothing pass, the working row and its lighter neighbour
+       are lit so the 0.7/0.3 blend can be seen being taken */
+    const smRow = smUpTo > 0 && smUpTo <= FA.length ? smUpTo - 1 : null;
     for (let i = 0; i < upTo; i++) {
       const [lo, c] = FA[i];
-      pl.rect(lo, 0, lo + 0.5, c, { col: "rgba(87,93,102,.30)", border: PAL.paper });
+      const lit = smRow !== null && (i === smRow || i === smRow - 1);
+      pl.rect(lo, 0, lo + 0.5, c,
+              { col: lit ? (i === smRow ? "rgba(154,123,63,.55)" : "rgba(154,123,63,.3)")
+                         : "rgba(87,93,102,.30)", border: PAL.paper });
     }
-    /* the smoothing rides alongside the tally, as it did on his page: each
-       tallied bin's smoothed value (0.7 this + 0.3 previous) appears with it */
-    for (let i = 0; i < upTo; i++) {
-      const [lo, c] = FA[i];
-      const sm = 0.7 * c + 0.3 * (i ? FA[i - 1][1] : 0);
-      pl.points([lo + 0.25], [sm], { col: "#b03a2e", cex: 0.8 });
-      pl.points([lo + 0.25], [sm], { col: "#b03a2e", cex: 1.45, pch: 21 });
+    for (let i = 0; i < smUpTo; i++) {
+      const sm = ruleAt(i);
+      pl.points([FA[i][0] + 0.25], [sm], { col: "#b03a2e", cex: 0.8 });
+      pl.points([FA[i][0] + 0.25], [sm], { col: "#b03a2e", cex: 1.45, pch: 21 });
     }
     myFlags.forEach((x) => {
       pl.segments(x, 0, x, ymax * 0.6, { col: PAL.accent, lwd: 1.4, lty: 3 });
       drawKetGlyph(pl, x, 0, PAL.accent, 8);
     });
-    if (upTo >= FA.length) FA_STDS.forEach((m) => {
+    if (smUpTo >= FA.length) FA_STDS.forEach((m) => {
       pl.segments(m, 0, m, ymax * 0.94, { col: PAL.accent4, lwd: 1.2, lty: 3 });
       pl.text(m, ymax * 0.97, m === 142.5 ? "142\u00bd?" : String(m), { col: PAL.accent4, cex: 0.8 });
     });
     const aside = $("#ex17-aside");
     if (aside) {
       const hit = ASIDES[upTo - 1];
-      aside.innerHTML = upTo === 0
-        ? "The cleaned weights wait in order of value. Step through the bins as he did; the red dot over each tallied bin is his smoothed value (0.7 of this bin + 0.3 of the one before). Flag a standard whenever the counts persuade you one is near."
-        : upTo >= FA.length
-        ? "All 158 tallied (159 by his count). His standards appear in gold" + (myFlags.length ? " \u2014 yours in blue, for comparison." : ".")
-        : (hit || `bins tallied: ${upTo} of ${FA.length}`);
+      if (upTo === 0) {
+        aside.innerHTML = "The cleaned weights wait in order of value. Step through the bins as he did \u2014 first the tally, then his smoothing pass over it. Flag a standard whenever the counts persuade you one is near.";
+      } else if (upTo < FA.length) {
+        aside.innerHTML = hit || `bins tallied: ${upTo} of ${FA.length}`;
+      } else if (smUpTo === 0) {
+        aside.innerHTML = "All 158 tallied (159 by his count). Now his smoothing pass: each class is re-taken as 0.7 of itself + 0.3 of the class before \u2014 keep stepping.";
+      } else if (smUpTo < FA.length) {
+        const i = smUpTo - 1, prev = i ? FA[i - 1][1] : 0;
+        aside.innerHTML = `smoothing ${FA[i][0].toFixed(1)}&ndash;${(FA[i][0] + 0.4).toFixed(1)}: ` +
+          `0.7 \u00d7 ${FA[i][1]} + 0.3 \u00d7 ${prev} = <strong>${ruleAt(i).toFixed(1)}</strong>` +
+          (FA[i][3] !== null ? ` \u2014 his table: ${FA[i][3].toFixed(1)}` : " \u2014 his table leaves this row blank");
+      } else {
+        aside.innerHTML = "Tallied and smoothed. His standards appear in gold" + (myFlags.length ? " \u2014 yours in blue, for comparison." : ".");
+      }
     }
   });
   function wstep() {
     if (upTo < FA.length) { upTo++; drawCanvas(wcv); }
+    else if (smUpTo < FA.length) { smUpTo++; drawCanvas(wcv); }
     else if (wTimer) { clearInterval(wTimer); wTimer = null; $("#ex17-wplay", content).textContent = "play"; }
-    if (ASIDES[upTo - 1] && wTimer) { clearInterval(wTimer); wTimer = null; $("#ex17-wplay", content).textContent = "play"; }
+    if (upTo < FA.length && ASIDES[upTo - 1] && wTimer) { clearInterval(wTimer); wTimer = null; $("#ex17-wplay", content).textContent = "play"; }
   }
   $("#ex17-wstep", content).addEventListener("click", wstep);
   $("#ex17-wplay", content).addEventListener("click", (e) => {
@@ -242,7 +280,7 @@ registerExample("example-ex17", (box) => {
   });
   $("#ex17-wreset", content).addEventListener("click", () => {
     if (wTimer) { clearInterval(wTimer); wTimer = null; $("#ex17-wplay", content).textContent = "play"; }
-    upTo = 0; myFlags = []; drawCanvas(wcv);
+    upTo = 0; smUpTo = 0; myFlags = []; drawCanvas(wcv);
   });
   $("#ex17-walkview .plot-container", content).appendChild(wcv);
   $("#ex17-chartview .plot-container", content).appendChild(cv);
@@ -267,7 +305,9 @@ registerExample("example-ex17", (box) => {
     if (b.dataset.v === "walk") drawCanvas(wcv);
   }));
   $("#ex17-arow", content).appendChild(aCtl.row);
+  $("#ex17-rrow", content).appendChild(rowCtl.row);
   aCtl.input.addEventListener("input", () => drawCanvas(cv));
+  rowCtl.input.addEventListener("input", () => drawCanvas(cv));
   ["smooth", "sep", "rule"].forEach((k) => {
     $("#ex17-" + k, content).addEventListener("input", (e) => { show[k] = e.target.checked; drawCanvas(cv); });
   });
@@ -281,29 +321,109 @@ registerExample("example-ex18", (box) => {
   box.appendChild(exHeader("Interactive Example: Figuring out the probable error", "ex18-content"));
   const content = h(`<div id="ex18-content" class="example-content">
     <p>The probable error is defined by the halving in Peirce's sentence: it is the distance from
-      the standard within which half the copies fall, and beyond which the other half stray. So it
-      can be figured out from the data directly, with no curve assumed:
-      <span class="click-cue">slide the allowance</span> until the two halves balance.</p>
+      the standard within which half the copies fall, and beyond which the other half stray. His
+      rough pages work it out by bisection; here is that route, step by step &mdash; and then the
+      halving on the data itself.</p>
+    <div class="ex-buttonbar">
+      <button class="btn btn-sm" id="ex18-back">back</button>
+      <button class="btn btn-sm btn-primary" id="ex18-next">next step</button>
+      <span class="ex27-lead" id="ex18-stepn"></span>
+    </div>
+    <div class="plot-container" id="ex18-route"></div>
+    <p class="ex7-work-line" id="ex18-routeread"></p>
     <div class="row"><div class="col col-6"></div><div class="col col-6" style="align-self:center">
       <span id="ex18-read" class="ex7-work-line"></span></div></div>
-    <div class="plot-container"></div>
-    <div class="note-block">The manuscript shows his own route to it: on the rough pages he bisects
-      the counts between the lightest weight and the lightest inferred standard, and between the
-      heaviest weight and the heaviest, getting <span class="math">1.1</span> and
-      <span class="math">0.9</span> grains &mdash; &ldquo;of 0.7 of one per cent, which should be
-      the probable error of a simple weight&rdquo; &mdash; and the published text rounds the story
-      to &ldquo;four or five tenths of one per cent &hellip; from half to two-thirds of a
-      grain,&rdquo; settling on <span class="math">&#8541;</span>. Against his five standards, the halving allowance of the data
-      is 0.700 grains exactly (the median departure) &mdash; the first attempt's own figure &mdash;
-      while the published &#8541; is a shade tighter, holding 59 of the 142. The band below each
-      standard shows the allowance; each ket wears its colour when it is within the allowance of
-      its standard, and fades when it strays beyond.</div>
+    <div class="plot-container" id="ex18-hist"></div>
+    <div class="note-block">The band below each standard shows the allowance; each ket wears its
+      colour when it is within the allowance of its standard, and fades when it strays beyond.
+      Against his five standards the halving allowance of the data is 0.700 grains exactly (the
+      median departure) &mdash; the manuscript's own figure &mdash; while the published
+      <span class="math">&#8541;</span> is a shade tighter, holding 59 of the 142.</div>
   </div>`);
   box.appendChild(content);
 
   const peCtl = ctlSlider("the allowance either side of a standard (grains)", "k4",
                           0.1, 2.0, 0.025, 1.0, (v) => v.toFixed(3));
   $$(".col", content)[0].appendChild(peCtl.row);
+
+  /* ---- his route: the bisections of the rough pages, with the two inferred
+     standards draggable so the arithmetic can be watched changing ---- */
+  const LIGHT = 136.8, HEAVY = 151.3;   /* his range; the table's two heavier strays put aside */
+  let sLo = 139.0, sHi = 149.5, step18 = 0;
+  const CLO = KCOL[0], CHI = KCOL[4];
+  const halfLo = () => (sLo - LIGHT) / 2, halfHi = () => (HEAVY - sHi) / 2;
+  const rcv = mkCanvas(190, (pl, W, H) => {
+    const xlim = [136, 152.3];
+    pl.setup({ xlim, ylim: [0, 3], mar: [3, 0.6, 0.6, 0.6] });
+    pl.axes({ xat: seqBy(137, 152, 2), yat: [] });
+    pl.axisLabels("grains", "");
+    pl.abline({ h: 1, col: PAL.inkFaint, lwd: 1 });
+    KETS142.forEach((v) => pl.segments(v, 0.88, v, 1.12, { col: "rgba(87,93,102,.35)", lwd: 1 }));
+    [[LIGHT, "lightest weight"], [HEAVY, "heaviest weight"]].forEach(([v, lab]) => {
+      pl.segments(v, 0.72, v, 1.28, { col: PAL.ink, lwd: 1.8 });
+      pl.text(v, 0.5, v.toFixed(1), { col: PAL.ink, cex: 0.8 });
+    });
+    [[sLo, CLO], [sHi, CHI]].forEach(([m, c]) => {
+      pl.segments(m, 0.72, m, 1.6, { col: c, lwd: 1.2, lty: 3 });
+      drawKetGlyph(pl, m, 1.28, c, 8);
+      pl.text(m, 0.5, m.toFixed(1), { col: c, cex: 0.8 });
+    });
+    const bracket = (a, b, c, y) => {
+      pl.segments(a, y, b, y, { col: c, lwd: 1.6 });
+      pl.segments(a, y - 0.08, a, y + 0.08, { col: c, lwd: 1.6 });
+      pl.segments(b, y - 0.08, b, y + 0.08, { col: c, lwd: 1.6 });
+      const mid = (a + b) / 2;
+      pl.segments(mid, y - 0.12, mid, y + 0.12, { col: c, lwd: 2 });
+      pl.text(mid, y + 0.42, ((b - a) / 2).toFixed(2) + " grs.", { col: c, cex: 0.85 });
+    };
+    if (step18 >= 1) bracket(LIGHT, sLo, CLO, 2.0);
+    if (step18 >= 2) bracket(sHi, HEAVY, CHI, 2.0);
+    const read = $("#ex18-routeread");
+    if (!read) return;
+    const mean = (halfLo() + halfHi()) / 2;
+    const texts = [
+      `His route, from the rough pages. Press <em>next step</em>; the two inferred standards
+       <span class="click-cue">can be dragged</span> at any point to see the arithmetic move.`,
+      `The light end: from the lightest weight (${LIGHT}) to the lightest inferred standard
+       (<span style="color:${CLO}">${sLo.toFixed(1)}</span>), the gap is
+       ${(sLo - LIGHT).toFixed(2)} grains. No weight strays farther below its standard than that
+       whole gap, so bisecting it gives the typical departure:
+       <strong style="color:${CLO}">${halfLo().toFixed(2)} grains</strong>.`,
+      `The heavy end, the same way: from the heaviest standard
+       (<span style="color:${CHI}">${sHi.toFixed(1)}</span>) to the heaviest weight (${HEAVY}),
+       the gap is ${(HEAVY - sHi).toFixed(2)}; bisected,
+       <strong style="color:${CHI}">${halfHi().toFixed(2)} grains</strong>.`,
+      `The two halves &mdash; <span style="color:${CLO}">${halfLo().toFixed(2)}</span> and
+       <span style="color:${CHI}">${halfHi().toFixed(2)}</span> &mdash; agree on about
+       <strong>${mean.toFixed(1)} grain${Math.abs(mean - 1) < 0.05 ? "" : "s"}</strong>, which is
+       ${(100 * mean / 144.7).toFixed(1)} of one per cent of a ket &mdash; the manuscript's
+       &ldquo;0.7 of one per cent, which should be the probable error of a simple weight.&rdquo;`,
+      `The published text rounds the story to &ldquo;four or five tenths of one per cent &hellip;
+       from half to two-thirds of a grain,&rdquo; settling on &#8541; = 0.625. Below, the data's
+       own halving: slide the allowance to 0.700 and the halves balance.`,
+    ];
+    read.innerHTML = texts[step18];
+    const n = $("#ex18-stepn");
+    if (n) n.textContent = step18 ? `step ${step18} of 4` : "";
+  });
+  $("#ex18-route", content).appendChild(rcv);
+  attachDrag(rcv,
+    (x) => {
+      let bi = null, bd = 0.8;
+      [[0, sLo], [1, sHi]].forEach(([i, m]) => { const d = Math.abs(x - m); if (d < bd) { bd = d; bi = i; } });
+      return bi;
+    },
+    (i, x) => {
+      if (i === 0) sLo = Math.max(LIGHT + 0.4, Math.min(143, +x.toFixed(1)));
+      else sHi = Math.max(145, Math.min(HEAVY - 0.4, +x.toFixed(1)));
+      drawCanvas(rcv);
+    });
+  $("#ex18-next", content).addEventListener("click", () => {
+    step18 = Math.min(4, step18 + 1);
+    if (step18 === 4) { peCtl.input.value = 0.625; peCtl.input.dispatchEvent(new Event("input")); }
+    drawCanvas(rcv);
+  });
+  $("#ex18-back", content).addEventListener("click", () => { step18 = Math.max(0, step18 - 1); drawCanvas(rcv); });
 
   /* each ket's distance to its nearest of Peirce's standards */
   const dist = KETS142.map((v) => {
@@ -348,7 +468,7 @@ registerExample("example-ex18", (box) => {
         (half ? " &mdash; the median departure: this allowance is the probable error. (Fifteen kets sit exactly 0.7 from a standard, so the halves balance as nearly as the data allow.)" : ".");
     }
   });
-  $(".plot-container", content).appendChild(cv);
+  $("#ex18-hist", content).appendChild(cv);
   peCtl.input.addEventListener("input", () => drawCanvas(cv));
 });
 </script>
@@ -361,23 +481,30 @@ registerExample("example-ex18", (box) => {
 registerExample("example-ex5", (box) => {
   box.appendChild(exHeader("Interactive Example: The elaborate calculations, done", "ex5-content"));
   const content = h(`<div id="ex5-content" class="example-content">
-    <p>Peirce judged the elaborate calculations a waste of time in 1902, when every fit was a week
-      of arithmetic. A machine does them in a moment, so here they are. For each number of
-      standards, the best-fitting mixture is computed (expectation&ndash;maximization, the spread
-      shared); the fits are then compared by the Bayesian information criterion, which charges each
-      extra standard for its parameters; and resampling the 142 kets shows how firmly the data pin
-      the standards down.</p>
+    <p>The modern name for Peirce's rough-and-ready theory is a <em>gaussian mixture model</em>:
+      several standards, each printing copies scattered by the probability curve, mixed in unknown
+      proportions. Fitting one to the data is the elaborate calculation Peirce declined in 1902,
+      when every fit was a week of arithmetic; a machine does it in a moment. Press run. For each
+      number of standards from one to six, the best-fitting mixture is computed
+      (expectation&ndash;maximization, the spread shared); slide the number of standards to see
+      each fit drawn over the kets in the usual picture. The criterion charges each extra standard
+      for its parameters and prefers the number that earns its keep, and resampling the 142 kets
+      150 times scatters small ticks under the axis showing where each resampling puts the
+      standards &mdash; how firmly the data pin them down.</p>
     <div class="ex-buttonbar">
       <button class="btn btn-success" id="ex5-run">run the calculations</button>
       <span class="ex27-lead" id="ex5-status"></span>
     </div>
-    <div class="plot-container" id="ex5-bic"></div>
-    <div class="plot-container" id="ex5-boot" style="display:none"></div>
-    <div class="result-box" id="ex5-read"></div>
+    <div class="row"><div class="col col-6" id="ex5-krow" style="display:none"></div></div>
+    <div class="plot-container" id="ex5-plot"></div>
+    <div class="note-block" id="ex5-read" style="display:none"></div>
   </div>`);
   box.appendChild(content);
 
-  let fits = null, boot = null;
+  let fits = null, bics = null, bestK = 5;
+  const boots = {};                       /* bootstrap standard positions, per k */
+  const kCtl = ctlSlider("number of standards", "k1", 1, 6, 1, 5);
+  $("#ex5-krow", content).appendChild(kCtl.row);
   const loglik = (fit) => {
     let ll = 0;
     KETS142.forEach((v) => {
@@ -387,36 +514,51 @@ registerExample("example-ex5", (box) => {
     });
     return ll;
   };
-  const cvB = mkCanvas(240, (pl, W, H) => {
+  const bootFor = (k) => {
+    if (!boots[k]) {
+      boots[k] = [];
+      for (let b = 0; b < 150; b++) {
+        const sample = Array.from({ length: KETS142.length },
+          () => KETS142[Math.floor(Math.random() * KETS142.length)]);
+        boots[k].push(emFit(sample, k, { init: fits[k - 1].mu, iters: 30 }).mu);
+      }
+    }
+    return boots[k];
+  };
+  const cv = mkCanvas(330, (pl, W, H) => {
     if (!fits) { blankPlot(pl, "press run"); return; }
-    const bics = fits.map((f, i) => -2 * f.ll + 2 * (i + 1) * Math.log(KETS142.length));
-    const bmin = Math.min(...bics), bmax = Math.max(...bics);
-    pl.setup({ xlim: [0.4, 6.6], ylim: [bmin - (bmax - bmin) * 0.15, bmax + (bmax - bmin) * 0.1],
-               mar: [3, 3.4, 0.8, 0.8] });
-    pl.axes({ xat: [1, 2, 3, 4, 5, 6], yat: RPlot.ticks(bmin, bmax, 4) });
-    pl.axisLabels("number of standards", "BIC (lower is better)");
-    bics.forEach((b, i) => {
-      const best = b === bmin;
-      pl.rect(i + 0.7, bmin - (bmax - bmin) * 0.15, i + 1.3, b,
-              { col: best ? "rgba(74,124,89,.4)" : "rgba(87,93,102,.25)", border: PAL.paper });
-      pl.text(i + 1, b + (bmax - bmin) * 0.045, b.toFixed(0), { col: best ? PAL.accent3 : PAL.inkSoft, cex: 0.8 });
-    });
-  });
-  $("#ex5-bic", content).appendChild(cvB);
-  const cvBoot = mkCanvas(220, (pl, W, H) => {
-    if (!boot) return;
+    const k = kCtl.get(), f = fits[k - 1];
     const xlim = [136, 153.5];
-    pl.setup({ xlim, ylim: [0, 1], mar: [3, 0.8, 0.8, 0.8] });
-    pl.axes({ xat: seqBy(136, 153.5, 2), yat: [] });
-    pl.axisLabels("grains — where the five standards land, across 150 resamplings", "");
-    boot.forEach((sample) => sample.forEach((m, i) =>
-      pl.points([m], [0.18 + 0.15 * i], { col: KCOL[i % KCOL.length], cex: 0.45 })));
-    PEIRCE_STANDARDS.forEach((m, i) => {
-      pl.segments(m, 0.05, m, 0.95, { col: PAL.ink, lwd: 1, lty: 3 });
-      pl.text(m, 0.98, String(m), { col: PAL.inkSoft, cex: 0.75 });
-    });
+    /* the fit, in the usual picture: gradient bars, class curves, sum, domes */
+    drawMixture(pl, W, H, { stds: f.mu, data: KETS142, pe: f.sd * 0.6745, mixture: true,
+      weights: f.w.map((w) => w * KETS142.length), bigStd: true, xlim });
+    const dc = dataCurve(KETS142, xlim, 1);
+    pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 1.8 });
+    /* where each of the 150 resamplings puts the standards: ticks on the floor */
+    bootFor(k).forEach((sample) => sample.forEach((m, i) => {
+      pl.segments(m, 0, m, 0.55, { col: KCOL[i % KCOL.length], lwd: 1 });
+    }));
+    const read = $("#ex5-read");
+    if (read) {
+      read.style.display = "";
+      const at = f.mu.map((m, i) =>
+        `<span style="color:${KCOL[i % KCOL.length]};font-variant-numeric:tabular-nums">${m.toFixed(1)}</span>`).join(" / ");
+      read.innerHTML = `With <strong>${k}</strong> standard${k > 1 ? "s" : ""} the best fit lands
+        at ${at} grains, probable error ${(f.sd * 0.6745).toFixed(2)}; its score is
+        <span style="font-variant-numeric:tabular-nums">${bics[k - 1].toFixed(0)}</span> (lower is
+        better), and the criterion's preferred number is <strong>${bestK}</strong> &mdash; five
+        trail it by ${(bics[4] - bics[bestK - 1]).toFixed(1)}, four by
+        ${(bics[3] - bics[bestK - 1]).toFixed(1)}. Judged by parsimony on the 142 weights alone, a
+        few broad classes cover the heap as well as five tight ones; what makes five reasonable is
+        the practice of weighing, which fixes a single weight's probable error near half a grain
+        and forbids classes as loose as the two-standard fit's
+        ${(fits[1].sd * 0.6745).toFixed(1)} grains. The ticks under the axis are the 150
+        resamplings: the outer standards hold firm, the middle ones slide. His verdict, computed:
+        some such theory must be true, and the data alone are insufficient to fix it.`;
+    }
   });
-  $("#ex5-boot", content).appendChild(cvBoot);
+  $("#ex5-plot", content).appendChild(cv);
+  kCtl.input.addEventListener("input", () => { if (fits) drawCanvas(cv); });
 
   $("#ex5-run", content).addEventListener("click", () => {
     const status = $("#ex5-status", content);
@@ -428,35 +570,12 @@ registerExample("example-ex5", (box) => {
         f.ll = loglik(f);
         fits.push(f);
       }
-      boot = [];
-      for (let b = 0; b < 150; b++) {
-        const sample = Array.from({ length: KETS142.length },
-          () => KETS142[Math.floor(Math.random() * KETS142.length)]);
-        boot.push(emFit(sample, 5, { init: PEIRCE_STANDARDS, iters: 30 }).mu);
-      }
-      const bics = fits.map((f, i) => -2 * f.ll + 2 * (i + 1) * Math.log(KETS142.length));
-      const bmin = Math.min(...bics);
-      const bestK = bics.indexOf(bmin) + 1;
+      bics = fits.map((f, i) => -2 * f.ll + 2 * (i + 1) * Math.log(KETS142.length));
+      bestK = bics.indexOf(Math.min(...bics)) + 1;
+      kCtl.input.value = bestK; kCtl.val.textContent = String(bestK);
       status.textContent = "";
-      $("#ex5-boot", content).style.display = "";
-      drawCanvas(cvB); drawCanvas(cvBoot);
-      const f5 = fits[4], fB = fits[bestK - 1];
-      $("#ex5-read", content).innerHTML = `<p>The criterion prefers <strong>${bestK}</strong>
-        standard${bestK > 1 ? "s" : ""} (at
-        <span style="font-variant-numeric:tabular-nums">${fB.mu.map((m) => m.toFixed(1)).join(" / ")}</span>,
-        probable error ${(fB.sd * 0.6745).toFixed(2)} grains); five standards trail it by
-        ${(bics[4] - bmin).toFixed(1)} BIC units, four by ${(bics[3] - bmin).toFixed(1)}. That is
-        worth sitting with: judged by parsimony on the 142 weights alone, a few broad classes cover
-        the heap as well as five tight ones &mdash; the five are not demanded by the numbers. What
-        makes five reasonable is everything else Peirce brings: the practice of weighing, which fixes
-        the probable error of a single weight near half a grain and so forbids classes as loose as
-        the two-standard fit's ${(fits[1].sd * 0.6745).toFixed(1)} grains. With the spread pinned at
-        &#8541;, five standards land at
-        <span style="font-variant-numeric:tabular-nums">${f5.mu.map((m) => m.toFixed(1)).join(" / ")}</span>,
-        close to his <span style="font-variant-numeric:tabular-nums">139.2 / 142.2 / 144.7 / 146.95 /
-        149.7</span>. The resampling shows the outer standards held firmly, the middle ones sliding.
-        His verdict, computed: some such theory must be true, and the data alone are insufficient to
-        fix it &mdash; the hypothesis rests on what else you know.</p>`;
+      $("#ex5-krow", content).style.display = "";
+      drawCanvas(cv);
     }, 30);
   });
 });

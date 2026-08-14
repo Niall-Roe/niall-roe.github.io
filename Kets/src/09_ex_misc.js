@@ -12,30 +12,34 @@ registerExample("example-ex10", (box) => {
     <p>Peirce wrote over 5,000 entries for the <em>Century Dictionary</em>, and in 1884&ndash;85 was
       in charge of the Office of Weights and Measures of the United States. (Testifying to Congress
       in that capacity in 1885, he dissuaded the United States from adopting the meter as its
-      standard &mdash; something he later recalled as a proud achievement.) Here is the dictionary
-      entry he wrote on the pound. In it he draws on his own manuscript list of some three hundred
-      local pounds, the list he says is kept at the Astor Library. Before the metric system, the
+      standard, which he later recalled as a proud achievement.)
+      <a href="../century-pound/">Here is the dictionary entry he wrote on the pound.</a>
+      In it he draws on his own manuscript list of some three hundred
+      local pounds, a list he says is kept at the Astor Library. Before the metric system, the
       pound was not unlike the ket: the pound of Amsterdam, of Cologne, of Toulouse, of Vienna were
       all different weights.</p>
-    <p class="click-info">The article, in facsimile:
-      <a href="../century-pound/">The Century Dictionary &mdash; &ldquo;pound&rdquo;</a>
-      (pages 4657&ndash;4658, with the tables of local pounds).</p>
   </div>`));
 });
 
 registerExample("example-ex11", (box) => {
   box.appendChild(exHeader("Five towns, five standards", "ex11-content"));
   const content = h(`<div id="ex11-content" class="example-content">
-    <p>Naucratis was the licensed port of trade where Greek merchants met the Egyptian interior.
-      Weights travel with trade: if each trading partner kept its own civic ket, as every European
-      city kept its own pound, the heaps in Naucratis' soil are the standards of its correspondents,
-      shuffled together. Above, the heaps; below, the towns wearing them &mdash; each circle sized by
-      how many of the 142 kets its standard claims, and greyed by how deeply its class merges into
-      its neighbours'.</p>
+    <p>Here, Peirce is putting forth hypotheses that would explain the number of standards. He
+      suggests they could reflect standard weights from five different towns. If each of five
+      trading partners kept its own ket, as every European city kept its own pound, the heap of
+      kets found in Naucratis' soil could have come from its trade partners (or perhaps four
+      trade partners and a home standard). Here, the size of the circles reflects the number of kets
+      supposed to come from that town, while its colour reflects the standard they were supposedly
+      following. Standards that are so close as to be substantially merged reflect this with a
+      mixed colour.</p>
     <div class="plot-container" id="ex11-mix"></div>
     <div class="plot-container" id="ex11-map"></div>
-    <p class="note-block">The towns are real; the assignment of standards to towns is illustrative
-      only &mdash; Peirce says <em>probable</em>, and neither he nor Petrie names the five.</p>
+    <p class="note-block">Peirce does not consider the hypothesis Petrie later puts forward in
+      <em>Ancient Weights and Measures</em> (1926, ch. vi &sect;32, pp. 14&ndash;15), that the
+      standard itself changed over time: there Petrie reads the qedet's spread historically &mdash;
+      Old Kingdom weights falling into two families near 144 and 149 grains, the families merged
+      past tracing by the xviii<sup>th</sup> dynasty, and a late fixed standard of 140 at
+      Heliopolis.</p>
   </div>`);
   box.appendChild(content);
 
@@ -93,7 +97,7 @@ registerExample("example-ex11", (box) => {
 
 registerExample("example-ex13", (box) => {
   box.appendChild(exHeader("Interactive Example: The law of error", "ex13-content"));
-  const A = 144.7, B = 146.95, CA = KCOL[1], CB = KCOL[2];
+  const CA = KCOL[1], CB = KCOL[2];
   const content = h(`<div id="ex13-content" class="example-content">
     <p>Peirce is assuming that the process of copying kets results in normally distributed errors.
       Later on, he discusses the legitimacy of this assumption; here he uses it at least in part for
@@ -103,22 +107,28 @@ registerExample("example-ex13", (box) => {
       <button class="mode-tab active" data-l="gauss">probability curve</button>
       <button class="mode-tab" data-l="uniform">flat within a tolerance</button>
       <button class="mode-tab" data-l="cutR">smooth left, sharp cutoff right</button>
+      <button class="mode-tab" data-l="beta">a beta law</button>
       <button class="mode-tab" data-l="none">assume nothing</button>
     </div>
-    <div class="row"><div class="col col-6"></div>
-      <div class="col col-6" style="align-self:center;">
-        <button class="btn btn-warning" id="ex13-demo">nearer, yet less likely</button>
-        <button class="btn btn-success" id="ex13-ask">ask the data which law</button></div></div>
+    <div class="row"><div class="col col-4"></div>
+      <div class="col col-3" id="ex13-arow" style="display:none"></div>
+      <div class="col col-3" id="ex13-brow" style="display:none"></div>
+      <div class="col col-2" style="align-self:center;">
+        <button class="btn btn-sm btn-warning" id="ex13-demo">nearer, yet less likely</button></div></div>
     <div class="plot-container"></div>
-    <div class="result-box" id="ex13-read"></div>
-    <div class="note-block" id="ex13-ans" style="display:none"></div>
+    <div class="note-block" id="ex13-read"></div>
   </div>`);
   box.appendChild(content);
   let law = "gauss", q = 145.8;
+  let A = 144.7, B = 146.95;
   const peCtl = ctlSlider("probable error (grains)", "k4", 0.2, 1.2, 0.025, PEIRCE_PE, (v) => v.toFixed(3));
+  const aCtl = ctlSlider("beta &alpha;", "k2", 0.6, 8, 0.2, 2, (v) => v.toFixed(1));
+  const bCtl = ctlSlider("beta &beta;", "k3", 0.6, 8, 0.2, 5, (v) => v.toFixed(1));
   $$(".col", content)[0].appendChild(peCtl.row);
+  $("#ex13-arow", content).appendChild(aCtl.row);
+  $("#ex13-brow", content).appendChild(bCtl.row);
 
-  const LAWNAME = { gauss: "Gaussian", uniform: "flat-tolerance", cutR: "sharp-cutoff" };
+  const LAWNAME = { gauss: "Gaussian", uniform: "flat-tolerance", cutR: "sharp-cutoff", beta: "Beta" };
   function dens(law, x, m, pe) {
     const sd = pe * PE_TO_SD;
     if (law === "gauss") return dnorm(x, m, sd);
@@ -129,6 +139,7 @@ registerExample("example-ex13", (box) => {
       const Z = tau; /* normalizer of exp((x-m-c)/tau) integrated to m+c */
       return Math.exp((x - m - c) / tau) / Z;
     }
+    if (law === "beta") return lawDens("beta", x, m, pe, { a: aCtl.get(), b: bCtl.get() });
     return 0;
   }
   const cv = mkCanvas(280, (pl, W, H) => {
@@ -154,15 +165,19 @@ registerExample("example-ex13", (box) => {
       pl.lines(xs, fA, { col: CA, lwd: 1.8 });
       pl.lines(xs, fB, { col: CB, lwd: 1.8 });
       /* the column the found ket activates: one probable error wide, saturated,
-         clipped to the curves, and coloured throughout by the wager at the ket
-         itself — a 0% wager shows no trace of that standard's colour */
+         and lit ONLY under curves of standards that could actually have thrown
+         this ket — a standard with a zero wager keeps its whole curve unlit,
+         however tall it stands over the column */
       const qA = 26 * dens(law, q, A, pe), qB = 23 * dens(law, q, B, pe);
       if (qA + qB > 0) {
-        const colQ = mixCol([CA, CB], [qA, qB], 0.85);
         for (let x = q - pe / 2; x < q + pe / 2; x += 0.03) {
-          const hgt = Math.max(26 * dens(law, x + 0.015, A, pe), 23 * dens(law, x + 0.015, B, pe));
-          if (hgt <= 0) continue;
-          pl.rect(x, 0, x + 0.03, hgt, { col: colQ, border: null });
+          const hA = qA > 0 ? 26 * dens(law, x + 0.015, A, pe) : 0;
+          const hB = qB > 0 ? 23 * dens(law, x + 0.015, B, pe) : 0;
+          if (hA <= 0 && hB <= 0) continue;
+          const lo = Math.min(hA, hB), hi = Math.max(hA, hB);
+          if (lo > 0) pl.rect(x, 0, x + 0.03, lo, { col: mixCol([CA, CB], [qA, qB], 0.85), border: null });
+          if (hi > lo) pl.rect(x, lo, x + 0.03, hi,
+            { col: hA > hB ? "rgba(74,124,89,.8)" : "rgba(154,123,63,.8)", border: null });
         }
       }
     }
@@ -176,60 +191,60 @@ registerExample("example-ex13", (box) => {
     const read = $("#ex13-read");
     if (!read) return;
     if (law === "none") {
-      read.innerHTML = `<p>With nothing assumed: the standards sit there, the ket sits there, and
+      read.innerHTML = `With nothing assumed: the standards sit there, the ket sits there, and
         there is <strong>no proportion to report</strong> &mdash; not an unknown number, no number.
-        Definiteness has to be bought, and some law of error is the coin.</p>`;
+        Definiteness has to be bought, and some law of error is the coin.`;
     } else {
-      const dA = 26 * dens(law, q, A, peCtl.get()), dB = 23 * dens(law, q, B, peCtl.get());
+      const dA = 26 * dens(law, q, A, pe), dB = 23 * dens(law, q, B, pe);
       const pA = dA + dB > 0 ? dA / (dA + dB) : null;
+      /* nearer, yet impossible: the ket sits closer to a standard whose law
+         cannot have thrown it — recomputed as the ket and standards move */
+      const nearA = Math.abs(q - A) < Math.abs(q - B);
+      const nearVal = (nearA ? A : B).toFixed(1), nearCol = nearA ? CA : CB;
+      const impossible = pA !== null && ((nearA && dA <= 0) || (!nearA && dB <= 0));
       read.innerHTML = pA === null
-        ? `<p>Under this law neither standard could have thrown a copy so far &mdash; a genuinely
-           foreign ket.</p>`
-        : `<p>Assuming a <strong>${LAWNAME[law]}</strong> law of error, and two standard kets (at
-           <span style="color:${CA}">144.7</span> and <span style="color:${CB}">146.95</span> grains),
+        ? `Under this law neither standard could have thrown a copy so far &mdash; a genuinely
+           foreign ket.`
+        : `Assuming a <strong>${LAWNAME[law]}${law === "beta" ? `(${aCtl.get().toFixed(1)}, ${bCtl.get().toFixed(1)})` : ""}</strong>
+           law of error, and two standard kets (at
+           <span style="color:${CA}">${A.toFixed(2)}</span> and <span style="color:${CB}">${B.toFixed(2)}</span> grains),
            we would wager that a newly found ket of ${q.toFixed(1)} grains came from the
-           <span style="color:${CA}">144.7 standard ${Math.round(pA * 100)}%</span> of the time, and
-           from the <span style="color:${CB}">146.95 standard ${Math.round(100 - pA * 100)}%</span>.
-           ${law === "cutR" && q > A + 0.5 * peCtl.get() && pA < 0.5
-             ? "This ket sits nearer the 144.7 standard, yet under a law that cuts off sharply just above each standard, 144.7 cannot have thrown it."
-             : "Drag the black ket, change the law, and watch the wager move."}</p>`;
+           <span style="color:${CA}">${A.toFixed(2)} standard ${Math.round(pA * 100)}%</span> of the time, and
+           from the <span style="color:${CB}">${B.toFixed(2)} standard ${Math.round(100 - pA * 100)}%</span>.${
+           impossible
+             ? ` This ket sits nearer the <span style="color:${nearCol}">${nearVal}</span> standard,
+                yet under this law ${nearVal} cannot have thrown it.`
+             : ""}`;
     }
   });
   $(".plot-container", content).appendChild(cv);
-  attachDrag(cv, () => 0, (i, x) => { q = Math.max(142.0, Math.min(149.5, x)); drawCanvas(cv); });
-  peCtl.input.addEventListener("input", () => drawCanvas(cv));
+  /* the ket and both standards are draggable */
+  attachDrag(cv,
+    (x) => {
+      const marks = [q, A, B];
+      let bi = 0, bd = Math.abs(x - q);
+      marks.forEach((m, i) => { const d = Math.abs(x - m); if (d < bd) { bd = d; bi = i; } });
+      return bd < 0.9 ? bi : null;
+    },
+    (i, x) => {
+      const v = Math.max(142.0, Math.min(149.5, x));
+      if (i === 0) q = v;
+      else if (i === 1) A = +v.toFixed(2);
+      else B = +v.toFixed(2);
+      drawCanvas(cv);
+    });
+  [peCtl, aCtl, bCtl].forEach((c) => c.input.addEventListener("input", () => drawCanvas(cv)));
   $$("#ex13-laws .mode-tab", content).forEach((b) => b.addEventListener("click", () => {
     $$("#ex13-laws .mode-tab", content).forEach((x) => x.classList.remove("active"));
-    b.classList.add("active"); law = b.dataset.l; drawCanvas(cv);
+    b.classList.add("active"); law = b.dataset.l;
+    $("#ex13-arow", content).style.display = $("#ex13-brow", content).style.display =
+      law === "beta" ? "" : "none";
+    drawCanvas(cv);
   }));
-  $("#ex13-ask", content).addEventListener("click", () => {
-    /* the second half of Peirce's remark, made quantitative: score each law on
-       the real 142 kets about his five standards, by log-likelihood */
-    const stds = PEIRCE_STANDARDS, wts = nearestCounts(KETS142, stds);
-    const tot = wts.reduce((a, b) => a + b, 0);
-    const score = (lw) => {
-      let ll = 0;
-      KETS142.forEach((v) => {
-        let d = 0;
-        stds.forEach((m, i) => { d += (wts[i] / tot) * lawDens(lw, v, m, peCtl.get()); });
-        ll += Math.log(Math.max(d, 1e-12));
-      });
-      return ll;
-    };
-    const rows = [["gauss", "probability curve"], ["uniform", "flat tolerance"], ["cutR", "sharp cutoff right"]]
-      .map(([k, lab]) => [lab, score(k)]);
-    const best = Math.max(...rows.map((r) => r[1]));
-    const el = $("#ex13-ans", content);
-    el.style.display = "";
-    el.innerHTML = `Log-likelihood of the 142 kets about Peirce's five standards, per law:
-      ${rows.map(([lab, ll]) => `<br>&nbsp;&nbsp;${lab}: <span style="font-variant-numeric:tabular-nums">${ll.toFixed(1)}</span>${ll === best ? " (best)" : ""}`).join("")}
-      <br>The margins are a handful of log-units on 142 weights &mdash; the sort of difference a
-      different cut of the data could reverse. This is Peirce's &ldquo;insufficient,
-      apparently&rdquo; made quantitative: the data lean, but they do not decide.`;
-  });
   $("#ex13-demo", content).addEventListener("click", () => {
-    law = "cutR"; q = A + 0.9 * peCtl.get();
+    law = "cutR"; q = Math.min(A, B) + 0.9 * peCtl.get();
     $$("#ex13-laws .mode-tab", content).forEach((x) => x.classList.toggle("active", x.dataset.l === "cutR"));
+    $("#ex13-arow", content).style.display = $("#ex13-brow", content).style.display = "none";
     drawCanvas(cv);
   });
 });

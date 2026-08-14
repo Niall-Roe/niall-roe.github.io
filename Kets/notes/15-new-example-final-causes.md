@@ -17,6 +17,26 @@ None open.
 
 ### Awaiting approval
 
+#### ninth pass — the compass, and your texts
+Compass buttons sit beside the directions box: N↑ E→ S↓ W← each append a one-block leg (“, 1N”
+and so on) and the walk restarts on the new route; clear empties the box to build a route from
+nothing. The explainer is your efficient-versus-final contrast verbatim, and both readouts are
+your sentences. One thing to confirm: your play sentence reads “2N, 1E, 1S, 1N”, while the default
+route is still the “2N, 1E, 1S, 1E” you told me to keep — the sentence prints whatever route is
+actually loaded, so it says 1E by default. Say the word and the default ends 1N instead.
+
+##### the notes this answers
+
+have the directions be recordable with arrow or compass buttons maybe?they dont need to be fancy, but hitting the N^ one could just add ", 1N" to the list.
+
+for the texts
+
+"Here we contrast efficient and final causation. Efficient causation works by brute compulsion regardless of where the compulsions lead you. Final causation works by leading to an end, regardless of the brute compulsions that got you there. Here you can see this with an analogy to giving directions. Efficient causation is like brute force directions "go one block north, one block east, ... etc.". one can successfully follow those directions regardless of where they lead. Final causation is like "arrive at 12th and main". We do not care which route you take, only that you satisfy a general outcome."
+
+"When you press play each walker will follow the directions — 2N, 1E, 1S, 1N — from its own starting point."
+
+"When you press play, each agent makes their way to the indicated address. Click anywhere on the map to move the address"
+
 #### eighth pass — your words, your controls
 (Your four comments on this example arrived in the Methods panel; applied here.) The two flagged
 passages are cut — the "fake map, and the difference between the two kinds of causation" intro

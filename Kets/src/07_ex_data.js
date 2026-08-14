@@ -128,6 +128,7 @@ registerExample("example-ex8", (box) => {
       pl.lines(dc.xs, dc.ys, { col: PAL.ink, lwd: 1.8 });
     }
     const read = $("#ex8-read");
+    if (read) read.style.display = mode === "both" ? "none" : "";
     if (read) read.innerHTML = mode === "register"
       ? `<p>There do appear to be five peaks, and fitting five standards to the register finds them
          at <span style="font-variant-numeric:tabular-nums">139.1 / 141.9 / 144.6 / 147.1 / 150.4</span>
@@ -141,10 +142,7 @@ registerExample("example-ex8", (box) => {
       : mode === "naucratis"
       ? `<p>The one-town hoard: clumping visible, and five standards fit it comfortably. Drag the
          domes or press best-fit and compare with Peirce's five.</p>`
-      : `<p>One heap: the 1926 counts and the 1885 counts added bin by bin &mdash; four weights at
-         140 grains in the earlier set are four more blocks in that bar &mdash; with the 1885
-         portion the darker base of each bar. The black curve smooths the summed data; drag the
-         standards or fit as anywhere else.</p>`;
+      : "";
   });
   $(".plot-container", content).appendChild(cv);
 

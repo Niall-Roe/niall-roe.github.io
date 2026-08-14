@@ -17,6 +17,14 @@ None open.
 
 ### Awaiting approval
 
+#### eighth pass — the paragraph cut
+Cut. The both screen carries no readout at all now; the summed heap and its curve are left to
+speak for themselves.
+
+##### the notes this answers
+
+cut: One heap: the 1926 counts and the 1885 counts added bin by bin — four weights at 140 grains in the earlier set are four more blocks in that bar — with the 1885 portion the darker base of each bar. The black curve smooths the summed data; drag the standards or fit as anywhere else.
+
 #### seventh pass — one heap, kets only
 The "every standard at Naucratis" tab is removed — the example is just kets now. The both screen
 is one summed histogram: the 1885 counts added onto the 1926 counts bin by bin (four weights at
