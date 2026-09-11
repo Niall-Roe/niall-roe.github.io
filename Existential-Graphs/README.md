@@ -6,9 +6,12 @@ step and nothing is loaded from the network.
 ## What it does
 
 - **Translate** — ordinary logical notation into an existential graph, with the graph
-  read back endoporeutically and an English gloss.
-- **Proofs** — thirteen proofs, animated step by step, each step labelled with the rule
-  that licenses it.
+  read back endoporeutically and an English gloss. The formula boxes close their own
+  brackets, pick out matching pairs, colour the notation as you type, and carry a row of
+  buttons for the glyphs. `Ax`/`Ex` and `∀`/`∃` and `(x)`/`(Ex)` all work.
+- **Proofs** — twenty-five proofs, animated step by step. Each step first marks the graph
+  the rule is about to act on, then shows the transformation: enclosures growing to make
+  room, a copy appearing where it was scribed, an erased graph fading away.
 - **Scribe** — build a graph by hand (or from a formula, or from the linear notation),
   see what it says, and apply the rules to it. Every move offered is legal.
 - **Find a proof** — a bidirectional search over the five rules, with a verdict on
@@ -26,10 +29,29 @@ domain refutes conclusively, and otherwise the search reports only what it did a
 not find. The search handles Alpha theorems up to about eight steps and simple Beta
 inferences; deeper Beta proofs, Barbara among them, are in the proof library instead.
 
+## Where the exercises come from
+
+Several of the theorems on the Proofs tab are the sort of thing set as natural-deduction
+exercises in the open logic textbooks — *forall x: Calgary* (P. D. Magnus, Tim Button,
+Aaron Thomas-Bolduc and Richard Zach, CC BY 4.0) and the Open Logic Project. The theorems
+are common property; what is shown here is what becomes of them when they are proved by
+scribing and erasing.
+
+## Drawing conventions
+
+Cuts carry a very light shadow, to separate the levels of a nest. Oddly enclosed areas are
+shaded, which is Peirce's own device in MS 514. Where one line of identity crosses another
+the horizontal one hops over it — Peirce's 'bridge', "a bit of paper ribbon, with one line
+passing under it and the other upon it". Hooks are laid down a spot's left edge in the
+order of the lines that reach them, so a spot's own lines never cross; the numerals carry
+the order of the argument places instead.
+
 ## Verification
 
-Every proof in the library is checked at load time: each step must follow from the one
-before by a single application of one of the five rules. Barbara reproduces Roberts'
+Every proof in the library is checked: each step must follow from the one before by a
+single application of one of the five rules, the first graph must be the premisses and the
+last the conclusion. The proofs are also replayed through the rules engine when loaded, so
+that the animation follows the very nodes the rules act on. Barbara reproduces Roberts'
 published proof (p. 61) step for step, under his own rule sequence — R3, R1, R3(a),
 R3(b), R2, R4, R5, R1.
 

@@ -120,6 +120,11 @@ $('#d-loadlin').onclick = () => {
   catch(e){ $('#d-err').textContent = e.message; }
 };
 ['#d-shade','#d-handles'].forEach(s => $(s).addEventListener('change', drawRender));
+// Enter scribes; shift-Enter starts a new line
+[['#d-from','#d-load'], ['#d-lin','#d-loadlin']].forEach(([box, btn]) =>
+  $(box).addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); $(btn).click(); }
+  }));
 
 /* --- the legal moves, offered for experiment ------------------------------ */
 function drawMoves(){
@@ -240,33 +245,49 @@ function runProof(hard){
 $('#v-go').onclick = () => runProof(false);
 $('#v-hard').onclick = () => runProof(true);
 function vLoad(steps){
-  VV.steps = steps; VV.graphs = steps.map(s => s.graph); VV.i = 0;
+  VV.steps = steps;
+  const h = hydrateSteps(steps);
+  VV.graphs = h.graphs; VV.mvs = h.mvs; VV.i = 0;
   $('#v-proofcard').style.display = '';
   $('#v-steps').innerHTML = steps.map((s,k) =>
     '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
     esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
   vShow(0);
 }
-function vShow(i){
+function vShow(i, animate){
   if (!VV.steps) return;
+  const from = VV.i;
   VV.i = Math.max(0, Math.min(VV.steps.length-1, i));
-  stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
+  if (VV.anim){ VV.anim.cancel(); VV.anim = null; }
+  if (animate && VV.i === from + 1){
+    VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], VV.mvs[VV.i],
+      { shade:true, wobble:true, markMs: 620, moveMs: 700 }, () => { VV.anim = null; });
+  } else {
+    stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
+  }
   const s = VV.steps[VV.i];
   $('#v-why').innerHTML = '<b>'+esc(s.rule||'Premiss')+'</b> — '+esc(s.why)+
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
     esc(fmtFull(sugar(readGraph(VV.graphs[VV.i]))))+'</span>';
   $$('#v-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === VV.i));
 }
-function vStop(){ if (VV.timer){ clearInterval(VV.timer); VV.timer=null; $('#v-play').textContent='▶ play'; } }
-$('#v-next').onclick = ()=>{ vStop(); vShow(VV.i+1); };
+function vStop(){
+  if (VV.timer){ clearTimeout(VV.timer); VV.timer=null; }
+  if (VV.anim){ VV.anim.cancel(); VV.anim=null; }
+  $('#v-play').textContent='▶ play';
+}
+$('#v-next').onclick = ()=>{ vStop(); vShow(VV.i+1, true); };
 $('#v-prev').onclick = ()=>{ vStop(); vShow(VV.i-1); };
 $('#v-first').onclick = ()=>{ vStop(); vShow(0); };
 $('#v-steps').onclick = e => { const li = e.target.closest('li'); if (li){ vStop(); vShow(+li.dataset.k); } };
 $('#v-play').onclick = () => {
-  if (VV.timer){ vStop(); return; }
-  if (VV.i >= VV.steps.length-1) VV.i = -1;
+  if (VV.timer || VV.anim){ vStop(); return; }
+  if (VV.i >= VV.steps.length-1) vShow(0);
   $('#v-play').textContent = '❚❚ pause';
-  VV.timer = setInterval(() => {
-    if (VV.i >= VV.steps.length-1){ vStop(); return; } vShow(VV.i+1);
-  }, 1400);
+  const advance = () => {
+    if (VV.i >= VV.steps.length-1){ vStop(); return; }
+    vShow(VV.i+1, true);
+    VV.timer = setTimeout(advance, 1700);
+  };
+  VV.timer = setTimeout(advance, 300);
 };

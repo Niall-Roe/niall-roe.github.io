@@ -11,7 +11,7 @@ function machine(id, title, cite, note, premF, goalF, opts){
   print('{ id:'+J(id)+', title:'+J(title)+', cite:'+J(cite)+', note:'+J(note)+
         ', prem:'+J(premF)+', goal:'+J(goalF)+', found:"machine", steps:'+J(steps)+' },');
 }
-function hand(id, title, cite, note, premF, goalF, chain){
+function hand(id, title, cite, note, premF, goalF, chain, prov){
   const gs = chain.map(parseEG);
   const pal = subgraphPalette(gs);
   const steps = [{ eg: chain[0], rule: null, why: 'The premisses, scribed on the sheet of assertion.' }];
@@ -27,14 +27,14 @@ function hand(id, title, cite, note, premF, goalF, chain){
   }
   if (!ok) return;
   print('{ id:'+J(id)+', title:'+J(title)+', cite:'+J(cite)+', note:'+J(note)+
-        ', prem:'+J(premF)+', goal:'+J(goalF)+', found:"book", steps:'+J(steps)+' },');
+        ', prem:'+J(premF)+', goal:'+J(goalF)+', found:'+J(prov||'book')+', steps:'+J(steps)+' },');
 }
 
 print('const PROOFS = [');
 hand('mp','Modus ponens','Roberts 1973, §3.3(1), p. 45',
   'Peirce’s own illustration. Roberts works on an iterated copy so that the premisses stay on the sheet as a record; here the premisses themselves are transformed, the shorter route he says students prefer.',
   ['P','P -> Q'],'Q',
-  ['P { P | Q }','P ( ( Q ) )','P Q','Q']);
+  ['P { P | Q }','P ( ( Q ) )','P Q','Q'], 'hand');
 machine('em','The excluded middle','', 'A theorem: it is proved from the blank sheet of assertion, which by C1 is itself a graph.', [], 'P | ~P');
 machine('hs','Hypothetical syllogism','', 'Chaining two conditionals.', ['P -> Q','Q -> R'], 'P -> R');
 machine('dm','De Morgan','', 'The denial of a disjunction.', ['~(P | Q)'], '~P & ~Q');
@@ -67,5 +67,45 @@ machine('exgen','Existential generalisation','',
   ['Ax Fx'], 'Ex Fx');
 machine('conv','Conversion','', 'A trivial Beta inference, given to show the rules working on lines of identity.',
   ['Ex (Fx & Gx)'], 'Ex (Gx & Fx)');
+
+// ---- exercises of the kind set in the open logic textbooks ----------------
+var FX = 'A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.';
+machine('mirab','Consequentia mirabilis','', 'If its own denial implies it, it is true. Cardano and Clavius made much of this; '+FX, [], '(~P -> P) -> P');
+machine('export','Exportation','', 'A conjunction in the antecedent may be peeled off into a second conditional. '+FX, [], '((P & Q) -> R) -> (P -> (Q -> R))');
+machine('import','Importation','', 'And back again. '+FX, [], '(P -> (Q -> R)) -> ((P & Q) -> R)');
+machine('orcond','Either way round','', 'Of any two propositions, one implies the other. Students find this hard to believe until they prove it; '+FX, [], '(P -> Q) | (Q -> P)');
+machine('nonself','Nothing is its own denial','', 'The liar, refused. '+FX, [], '~(P <-> ~P)');
+machine('distrib','Distribution','', 'Conjunction over disjunction. '+FX, [], '(P & (Q | R)) -> ((P & Q) | (P & R))');
+machine('reductio','Reductio ad absurdum','', 'If a supposition yields both a proposition and its denial, the supposition is false. '+FX, [], '((P -> Q) & (P -> ~Q)) -> ~P');
+machine('fregec','A collapse of Frege’s axiom','', 'A shorter cousin of the self-distributive law. '+FX, [], '((P -> Q) -> P) -> ((P -> Q) -> Q)');
+machine('exallq','Some-for-all to all-for-some','',
+  'The valid half of the exchange of quantifiers. The converse is invalid, and the Find a proof tab will show you a countermodel for it on two individuals.',
+  ['Ex Ay Rxy'], 'Ay Ex Rxy');
+machine('qn','Quantifier negation — nothing to prove','',
+  'In ordinary notation ¬Ex Fx and Ax ¬Fx are different formulas needing a rule to pass between them. Scribed as graphs they are one and the same graph, so there is nothing to transform. This is one of the places where Peirce’s notation is doing analytic work that the algebraic notation hides.',
+  ['~Ex Fx'], 'Ax ~Fx');
+hand('darii','The syllogism Darii','constructed after Roberts 1973, §4.3(2), p. 61',
+  'Some F is G, and all G is H, therefore some F is H. The line of identity is branched, run into the universal premiss and joined there, which is how the universal gets applied to the very individual the particular premiss supplies.',
+  ['Ax (Gx -> Hx)','Ex (Fx & Gx)'],'Ex (Fx & Hx)',
+  ['*x F[x] G[x] ( *y G[y] ( H[y] ) )',
+   '*x *w x~w F[x] G[x] ( *y G[y] ( H[y] ) )',
+   '*x *w x~w F[x] G[x] ( *w *y G[y] ( H[y] ) )',
+   '*x *w x~w F[x] G[x] ( *w *y w~y G[y] ( H[y] ) )',
+   '*x *w x~w F[x] G[x] ( *w *y w~y ( H[y] ) )',
+   '*x F[x] G[x] H[x]',
+   '*x F[x] H[x]'], 'hand');
+hand('celarent','The syllogism Celarent','constructed after Roberts 1973, §4.3(2), p. 61',
+  'All F is G, and no G is H, therefore no F is H. The same surgery as Barbara, on a negative premiss.',
+  ['Ax (Fx -> Gx)','Ax (Gx -> ~Hx)'],'Ax (Fx -> ~Hx)',
+  ['( *x F[x] ( G[x] ) ) ( *y G[y] H[y] )',
+   '( *x F[x] ( G[x] ( *y G[y] H[y] ) ) ) ( *z G[z] H[z] )',
+   '( *x F[x] ( G[x] ( *y G[y] H[y] ) ) )',
+   '( *x F[x] ( G[x] *w x~w ( *y G[y] H[y] ) ) )',
+   '( *x F[x] ( G[x] *w x~w ( *w *y G[y] H[y] ) ) )',
+   '( *x F[x] ( G[x] *w x~w ( *w *y w~y G[y] H[y] ) ) )',
+   '( *x F[x] ( G[x] *w x~w ( *w *y w~y H[y] ) ) )',
+   '( *x F[x] ( ( H[x] ) ) )',
+   '( *x F[x] H[x] )'], 'hand');
+
 print('];');
 LOG.join('\n');

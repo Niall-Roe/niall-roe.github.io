@@ -109,12 +109,10 @@ function compileFormula(ast, opts){
   function compNeg(a, area){
     switch (a.t){
       case 'not': comp(a.a, area); return;                 // the double cut collapses
-      case 'imp': {                                        // ¬(A ⊃ B) is A and not-B
+      case 'imp':                                          // ¬(A ⊃ B) is A and not-B
         comp(a.a, area);
-        const c = addCut(g, area);
-        comp(a.b, g.nodes[c].inner);
+        compNeg(a.b, area);
         return;
-      }
       case 'or':                                           // ¬(A ∨ B) is ¬A and ¬B
         a.xs.forEach(x => compNeg(x, area));
         return;

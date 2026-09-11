@@ -110,13 +110,67 @@ $('#t-ex').onclick = ev => {
   $('#t-in').value = T_EXAMPLES[+b.dataset.i][0]; translate();
 };
 
+/* --- rebuilding a proof so that it can be animated -------------------------
+   A transformation carries node identifiers across (applyMove clones the
+   graph), so re-running the proof gives us graphs whose parts can be followed
+   from one step to the next. It also tells us which rule acted on what. */
+function resolveMove(gA, gB, pal, printed){
+  const k = canonGraph(gB);
+  let loose = null;
+  for (const mv of legalMoves(gA, { dir:'fwd', palette: pal, maxNodes: 120, beta: true })){
+    let h; try { h = applyMove(gA, mv, pal); } catch(e){ continue; }
+    if (canonGraph(h) === k) return { mv, graph: h };
+    // the linear notation cannot always tell apart two points of one ligature
+    // lying on the same area; where it cannot, match on what it prints
+    if (!loose && printed && writeEG(h, true) === printed) loose = { mv, graph: h };
+  }
+  return loose;
+}
+function hydrateProof(p){
+  if (p._h) return p._h;
+  const target = p.steps.map(s => parseEG(s.eg));
+  const pal = subgraphPalette(target);
+  const graphs = [target[0]], mvs = [null];
+  for (let i = 1; i < target.length; i++){
+    const r = resolveMove(graphs[i-1], target[i], pal, p.steps[i].eg);
+    graphs.push(r ? r.graph : target[i]);
+    mvs.push(r ? r.mv : null);
+  }
+  p._h = { graphs, mvs };
+  return p._h;
+}
+// the same, for a proof the finder has just produced
+function hydrateSteps(steps){
+  const graphs = steps.map(s => s.graph);
+  const pal = subgraphPalette(graphs);
+  const mvs = [null];
+  for (let i = 1; i < graphs.length; i++){
+    const r = resolveMove(graphs[i-1], graphs[i], pal);
+    mvs.push(r ? r.mv : null);
+  }
+  return { graphs, mvs };
+}
+
 /* ============================== PROOFS ===================================== */
-const PF = { proof: null, i: 0, timer: null };
-$('#pf-sel').innerHTML = PROOFS.map((p,i) => '<option value="'+i+'">'+esc(p.title)+'</option>').join('');
+const PF = { proof: null, i: 0, timer: null, anim: null };
+// group the list: propositional graphs first, then those with lines of identity
+(function(){
+  const alpha = [], beta = [];
+  PROOFS.forEach((p,i) => {
+    let isBeta = false;
+    try { isBeta = !isAlpha(parseEG(p.steps[p.steps.length-1].eg)) ||
+                   p.prem.some(f => !isAlpha(compileFormula(parseFormula(f)).graph)); } catch(e){}
+    (isBeta ? beta : alpha).push('<option value="'+i+'">'+esc(p.title)+'</option>');
+  });
+  $('#pf-sel').innerHTML =
+    '<optgroup label="Alpha — the logic of truth functions">'+alpha.join('')+'</optgroup>'+
+    '<optgroup label="Beta — lines of identity and quantification">'+beta.join('')+'</optgroup>';
+})();
 function pfLoad(i){
   const p = PROOFS[i];
   PF.proof = p; PF.i = 0;
-  PF.graphs = p.steps.map(s => parseEG(s.eg));
+  const h = hydrateProof(p);
+  PF.graphs = h.graphs; PF.mvs = h.mvs;
   $('#pf-cite').innerHTML = p.cite ? '<b>'+esc(p.cite)+'</b>' : '';
   $('#pf-note').textContent = p.note || '';
   $('#pf-kv').innerHTML =
@@ -124,21 +178,30 @@ function pfLoad(i){
                    : '<dt>from</dt><dd>the blank sheet of assertion</dd>') +
     '<dt>conclusion</dt><dd>'+esc(fmtSrc(p.goal))+'</dd>' +
     '<dt>steps</dt><dd>'+(p.steps.length-1)+'</dd>';
-  $('#pf-prov').textContent = p.found === 'book'
-    ? 'Each step here is the one printed in the source, and each has been checked against the rules.'
-    : 'This sequence was found by the proof finder in this page, and each step checked against the rules.';
+  $('#pf-prov').textContent =
+    p.found === 'book' ? 'Each step here is the one printed in the source, and each has been checked against the rules.'
+  : p.found === 'hand' ? 'This sequence was worked out for this page, not transcribed; each step has been checked against the rules.'
+  : 'This sequence was found by the proof finder in this page, and each step checked against the rules.';
   $('#pf-steps').innerHTML = p.steps.map((s,k) =>
     '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
     esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
   pfShow(0);
 }
 function fmtSrc(s){ try { return fmt(parseFormula(s), 0); } catch(e){ return s; } }
-function pfShow(i){
+function pfShow(i, animate){
   const p = PF.proof; if (!p) return;
+  const from = PF.i;
   PF.i = Math.max(0, Math.min(p.steps.length-1, i));
+  if (PF.anim){ PF.anim.cancel(); PF.anim = null; }
   const g = PF.graphs[PF.i];
-  const hl = {};
-  stageSvg($('#pf-stage'), g, { shade:true, wobble:true, highlight: hl });
+  const speed = +$('#pf-speed').value;
+  if (animate && PF.i === from + 1 && ANIM_ON()){
+    PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, PF.mvs[PF.i],
+      { shade:true, wobble:true, markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
+      () => { PF.anim = null; });
+  } else {
+    stageSvg($('#pf-stage'), g, { shade:true, wobble:true });
+  }
   const s = p.steps[PF.i];
   $('#pf-why').innerHTML = '<b>'+esc(s.rule ? s.rule : 'Premiss')+'</b> — '+esc(s.why)+
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
@@ -148,21 +211,23 @@ function pfShow(i){
 }
 $('#pf-sel').onchange = e => { pfStop(); pfLoad(+e.target.value); };
 $('#pf-steps').onclick = e => { const li = e.target.closest('li'); if (li){ pfStop(); pfShow(+li.dataset.k); } };
-$('#pf-next').onclick = () => { pfStop(); pfShow(PF.i+1); };
+$('#pf-next').onclick = () => { pfStop(); pfShow(PF.i+1, true); };
 $('#pf-prev').onclick = () => { pfStop(); pfShow(PF.i-1); };
 $('#pf-first').onclick = () => { pfStop(); pfShow(0); };
-function pfStop(){ if (PF.timer){ clearInterval(PF.timer); PF.timer = null; $('#pf-play').textContent = '▶ play'; } }
+function pfStop(){
+  if (PF.timer){ clearTimeout(PF.timer); PF.timer = null; }
+  if (PF.anim){ PF.anim.cancel(); PF.anim = null; }
+  $('#pf-play').textContent = '▶ play';
+}
+const ANIM_ON = () => !$('#pf-anim') || $('#pf-anim').checked;
 $('#pf-play').onclick = () => {
-  if (PF.timer){ pfStop(); return; }
-  if (PF.i >= PF.proof.steps.length-1) PF.i = -1;
+  if (PF.timer || PF.anim){ pfStop(); return; }
+  if (PF.i >= PF.proof.steps.length-1) pfShow(0);
   $('#pf-play').textContent = '❚❚ pause';
-  const tick = () => {
+  const advance = () => {
     if (PF.i >= PF.proof.steps.length-1){ pfStop(); return; }
-    pfShow(PF.i+1);
+    pfShow(PF.i+1, true);
+    PF.timer = setTimeout(advance, +$('#pf-speed').value + 260);
   };
-  PF.timer = setInterval(tick, +$('#pf-speed').value);
-  tick();
+  PF.timer = setTimeout(advance, 300);
 };
-$('#pf-speed').oninput = () => { if (PF.timer){ clearInterval(PF.timer);
-  PF.timer = setInterval(() => { if (PF.i >= PF.proof.steps.length-1){ pfStop(); return; }
-    pfShow(PF.i+1); }, +$('#pf-speed').value); } };

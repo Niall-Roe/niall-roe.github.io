@@ -50,16 +50,29 @@ $('#n-about').innerHTML = [
  '<p><b>Deeper Beta proofs.</b> The syllogism Barbara is beyond the present search, which is ',
  'why it is given on the Proofs tab in the form Roberts prints, each of its eight steps ',
  'checked against the rules by this page.</p>',
+ '<p><b>Where the exercises come from.</b> Several of the theorems on the Proofs tab are ',
+ 'the sort of thing set as natural-deduction exercises in the open logic textbooks: ',
+ '<i>forall x: Calgary</i> by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and Richard ',
+ 'Zach (CC BY 4.0, forallx.openlogicproject.org), and the Open Logic Project ',
+ '(openlogicproject.org). The theorems themselves are common property; what is shown here ',
+ 'is what becomes of them when they are proved by scribing and erasing instead.</p>',
  '<p><b>What is not here.</b> Gamma — the broken cut, graphs of graphs, the potentials, ',
  'modality — and the tinctured graphs of 1906. Roberts, chapters 5 and 6.</p>',
  '<hr class="sep"><p><b>Sources.</b> Don D. Roberts, <i>The Existential Graphs of Charles S. ',
  'Peirce</i> (The Hague: Mouton, 1973), chapters 3 and 4 and Appendices 3 and 4. ',
  'Charles S. Peirce, MS 514 (1909), transcribed with commentary by John F. Sowa, ',
- 'jfsowa.com/peirce/ms514.htm. References of the form 4.492 are to the ',
- '<i>Collected Papers</i>.</p>'
+ 'jfsowa.com/peirce/ms514.htm. P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and Richard ',
+ 'Zach, <i>forall x: Calgary. An Introduction to Formal Logic</i>, CC BY 4.0. ',
+ 'References of the form 4.492 are to the <i>Collected Papers</i>.</p>'
 ].join('');
 
 /* ---- go ------------------------------------------------------------------ */
+enhanceEditor($('#t-in'));
+enhanceEditor($('#v-prem'));
+enhanceEditor($('#v-goal'));
+enhanceEditor($('#d-from'));
+enhanceEditor($('#d-lin'), { glyphs: false });
+
 translate();
 pfLoad(0);
 drawRender();

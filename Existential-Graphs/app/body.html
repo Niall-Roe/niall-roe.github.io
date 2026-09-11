@@ -83,8 +83,10 @@
           <button class="btn ghost" id="pf-next">forward ▶</button>
           <span class="sp"></span>
           <label class="mono" style="font-size:12px;color:var(--ink3)">speed
-            <input type="range" id="pf-speed" min="400" max="3000" value="1500" step="100" style="vertical-align:middle">
+            <input type="range" id="pf-speed" min="500" max="3200" value="1600" step="100" style="vertical-align:middle">
           </label>
+          <label style="font-size:12px;color:var(--ink3);display:flex;gap:5px;align-items:center">
+            <input type="checkbox" id="pf-anim" checked> animate</label>
         </div>
       </div>
       <div class="card" style="margin-top:18px">
@@ -122,10 +124,10 @@
       </div>
       <div class="card" style="margin-top:18px">
         <h2>Start from a formula</h2>
-        <input type="text" id="d-from" value="Ex (Fx &amp; ~Gx)" spellcheck="false">
+        <textarea id="d-from" rows="1" spellcheck="false">Ex (Fx &amp; ~Gx)</textarea>
         <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
         <h3>Or from linear notation</h3>
-        <input type="text" id="d-lin" value="( *x F[x] ( G[x] ) )" spellcheck="false">
+        <textarea id="d-lin" rows="2" spellcheck="false">( *x F[x] ( G[x] ) )</textarea>
         <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
         <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
         <code>*x</code> a point of the line <span class="mono">x</span> ·

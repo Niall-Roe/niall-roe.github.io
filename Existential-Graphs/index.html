@@ -51,6 +51,35 @@ nav.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:va
 .card p{margin:0 0 9px;color:var(--ink2);font-size:13.5px}
 .card p.tight{margin-bottom:4px}
 
+/* the formula boxes: a transparent textarea over a coloured mirror */
+.editor{position:relative;border:1px solid var(--rule2);border-radius:6px;
+  background:var(--paper);overflow:hidden}
+.editor:focus-within{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+.editor pre.hl,.editor textarea{
+  margin:0;padding:9px 11px;border:0;font:14px/1.55 var(--mono);
+  white-space:pre-wrap;word-break:break-word;overflow-wrap:anywhere;
+  letter-spacing:0;tab-size:2}
+.editor pre.hl{position:absolute;inset:0;pointer-events:none;overflow:hidden;
+  color:var(--ink);background:none}
+.editor textarea{position:relative;display:block;width:100%;background:none;
+  color:transparent;caret-color:var(--accent);resize:vertical;outline:none}
+.editor textarea::selection{background:color-mix(in srgb,var(--accent) 28%,transparent)}
+.hl .op{color:var(--accent);font-weight:600}
+.hl .qu{color:#2f6b7d;font-weight:600}
+.hl .pred{color:var(--ink)}
+.hl .var{color:var(--ink3);font-style:italic}
+.hl .par{color:var(--ink2)}
+.hl .par.match{background:color-mix(in srgb,var(--accent) 26%,transparent);
+  border-radius:3px;color:var(--ink);font-weight:700}
+.hl .par.bad{color:var(--bad);text-decoration:underline wavy var(--bad);text-underline-offset:3px}
+.hl .punc{color:var(--ink3)}
+@media (prefers-color-scheme: dark){ .hl .qu{color:#7fb8c8} }
+.glyphs{display:flex;gap:4px;flex-wrap:wrap;margin-top:6px}
+.glyphs button{appearance:none;background:var(--card);border:1px solid var(--rule2);
+  border-radius:5px;min-width:30px;padding:3px 7px;cursor:pointer;
+  font:15px/1.2 var(--serif);color:var(--ink2)}
+.glyphs button:hover{border-color:var(--accent);color:var(--accent);background:var(--paper)}
+
 label.fld{display:block;font-size:12px;color:var(--ink3);margin:0 0 4px;font-weight:500}
 textarea,input[type=text]{width:100%;background:var(--paper);color:var(--ink);
   border:1px solid var(--rule2);border-radius:6px;padding:8px 10px;
@@ -81,6 +110,8 @@ button.btn:disabled{opacity:.42;cursor:default}
 svg.eg{display:block;max-width:100%;height:auto}
 svg.eg .sa{fill:var(--sheet);stroke:var(--rule2);stroke-dasharray:3 4}
 svg.eg .cut{fill:var(--sheet);stroke:var(--ink);stroke-width:1.7;stroke-linejoin:round}
+svg.eg .cut.raised{filter:drop-shadow(0 1px 1.4px rgba(0,0,0,.16))}
+@media (prefers-color-scheme: dark){ svg.eg .cut.raised{filter:drop-shadow(0 1px 1.6px rgba(0,0,0,.5))} }
 svg.eg .cut.odd{fill:var(--shade)}
 svg.eg .spotbg{fill:none}
 svg.eg .spot text{font:13px/1 var(--serif);fill:var(--ink)}
@@ -91,6 +122,16 @@ svg.eg .cut.hl-add,svg.eg .spot.hl-add rect{stroke:var(--hl-add);stroke-width:3}
 svg.eg .spot.hl-add text{fill:var(--hl-add)}
 svg.eg .cut.hl-del,svg.eg .spot.hl-del rect{stroke:var(--hl-del);stroke-width:3}
 svg.eg .spot.hl-del text{fill:var(--hl-del)}
+/* the ring that marks what a rule is about to act on */
+svg.eg .focus{fill:none;stroke-width:2.6;rx:10}
+svg.eg .focus-del{stroke:var(--bad);animation:pulseDel 1s ease-in-out infinite}
+svg.eg .focus-src{stroke:var(--ok);animation:pulseSrc 1s ease-in-out infinite}
+svg.eg .focus-area{stroke:var(--accent);stroke-dasharray:6 4;animation:pulseSrc 1s ease-in-out infinite}
+@keyframes pulseDel{0%,100%{opacity:.25}50%{opacity:1}}
+@keyframes pulseSrc{0%,100%{opacity:.3}50%{opacity:1}}
+@media (prefers-reduced-motion: reduce){
+  svg.eg .focus-del,svg.eg .focus-src,svg.eg .focus-area{animation:none;opacity:.9}
+}
 svg.eg .handle{fill:var(--card);stroke:var(--accent);stroke-width:1.6;cursor:pointer}
 svg.eg .handle.sel{fill:var(--accent)}
 svg.eg .pick{cursor:pointer}
@@ -242,8 +283,10 @@ hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
           <button class="btn ghost" id="pf-next">forward ▶</button>
           <span class="sp"></span>
           <label class="mono" style="font-size:12px;color:var(--ink3)">speed
-            <input type="range" id="pf-speed" min="400" max="3000" value="1500" step="100" style="vertical-align:middle">
+            <input type="range" id="pf-speed" min="500" max="3200" value="1600" step="100" style="vertical-align:middle">
           </label>
+          <label style="font-size:12px;color:var(--ink3);display:flex;gap:5px;align-items:center">
+            <input type="checkbox" id="pf-anim" checked> animate</label>
         </div>
       </div>
       <div class="card" style="margin-top:18px">
@@ -281,10 +324,10 @@ hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
       </div>
       <div class="card" style="margin-top:18px">
         <h2>Start from a formula</h2>
-        <input type="text" id="d-from" value="Ex (Fx &amp; ~Gx)" spellcheck="false">
+        <textarea id="d-from" rows="1" spellcheck="false">Ex (Fx &amp; ~Gx)</textarea>
         <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
         <h3>Or from linear notation</h3>
-        <input type="text" id="d-lin" value="( *x F[x] ( G[x] ) )" spellcheck="false">
+        <textarea id="d-lin" rows="2" spellcheck="false">( *x F[x] ( G[x] ) )</textarea>
         <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
         <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
         <code>*x</code> a point of the line <span class="mono">x</span> ·
@@ -906,12 +949,10 @@ function compileFormula(ast, opts){
   function compNeg(a, area){
     switch (a.t){
       case 'not': comp(a.a, area); return;                 // the double cut collapses
-      case 'imp': {                                        // ¬(A ⊃ B) is A and not-B
+      case 'imp':                                          // ¬(A ⊃ B) is A and not-B
         comp(a.a, area);
-        const c = addCut(g, area);
-        comp(a.b, g.nodes[c].inner);
+        compNeg(a.b, area);
         return;
-      }
       case 'or':                                           // ¬(A ∨ B) is ¬A and ¬B
         a.xs.forEach(x => compNeg(x, area));
         return;
@@ -2019,17 +2060,19 @@ function assemble(F, B, meetKey, expanded, palette){
    ========================================================================== */
 
 const LAY = {
-  padX: 16, padY: 12,       // inside a cut
-  leftM: 20,                // left margin of an area, where the lines run
-  gap: 9,                   // between graphs on one area
-  spotH: 22, spotPadX: 9,
-  charW: 7.1, minSpotW: 26,
-  hookGap: 11,
+  padX: 20, padY: 15,       // inside a cut
+  leftM: 22,                // left margin of an area, where the lines run
+  gap: 12,                  // between graphs on one area
+  spotH: 24, spotPadX: 7,
+  charW: 7.1, minSpotW: 24,
+  hookGap: 16,
   bareW: 26, bareH: 16,
-  laneW: 9
+  laneW: 15
 };
 
-function textWidth(s){ return Math.max(LAY.minSpotW, s.length * LAY.charW + 2*LAY.spotPadX); }
+function textWidth(s, nhooks){
+  return Math.max(LAY.minSpotW, s.length * LAY.charW + 2*LAY.spotPadX) + (nhooks > 1 ? 12 : 0);
+}
 
 /* Does anything on or under this area carry a line of identity? Where lines
    are involved the graphs are stacked, so that each spot's hooks face the
@@ -2072,7 +2115,7 @@ function measure(g, areaId, M, maxRow, LN){
     const n = g.nodes[id];
     let bw, bh;
     if (n.k === 'spot'){
-      bw = textWidth(n.name);
+      bw = textWidth(n.name, n.hooks.length);
       bh = Math.max(LAY.spotH, n.hooks.length * LAY.hookGap + 8);
     } else {
       const m = measure(g, n.inner, M, maxRow, LN);
@@ -2106,7 +2149,7 @@ function measure(g, areaId, M, maxRow, LN){
   if (area.lns.length && !rows.length){ w = Math.max(w, LAY.bareW); h = Math.max(h, LAY.bareH); }
   if (!rows.length && !area.lns.length){ w = Math.max(w, 30); h = Math.max(h, 16); }
   const nLanes = LN ? Object.keys(LN.lanes[areaId]).length : (area.lns.length ? 1 : 0);
-  const lm = nLanes ? 8 + nLanes * LAY.laneW + 6 : LAY.padX;
+  const lm = nLanes ? 10 + nLanes * LAY.laneW + 8 : LAY.padX;
   const box = { w: lm + w + LAY.padX, h: h + 2*LAY.padY, contentW: w, leftM: lm, rows, horiz };
   M[areaId] = box;
   return box;
@@ -2130,14 +2173,33 @@ function place(g, areaId, x, y, M, P){
   }
 }
 
-/* ---- hook points --------------------------------------------------------- */
-function hookPoints(g, spotId, P){
+/* ---- hook points ---------------------------------------------------------
+   The hooks are laid down the spot's left edge in the order of the lines that
+   reach them, not in the order of the arguments, so that a spot's own lines
+   never have to cross each other. Which place is which is carried by the
+   numerals instead — Peirce distinguishes the hooks by position around the
+   spot, which a uniform left edge cannot do. */
+function hookPoints(g, spotId, P, LN){
   const n = g.nodes[spotId], p = P[spotId];
   const k = n.hooks.length, out = {};
   if (!k) return out;
+  const laneOf = h => {
+    if (!LN) return 0;
+    const lig = LN.lig[h];
+    // the lane this hook's ligature runs in, on the nearest area that has one
+    let a = n.area;
+    while (a){
+      const m = LN.lanes[a];
+      if (m && m[lig] !== undefined) return depthOf(g, a) * 100 + m[lig];
+      a = placeOf(g, a);
+    }
+    return 999;
+  };
+  const order = n.hooks.map((h,i) => ({ h, i, lane: laneOf(h) }))
+                       .sort((a,b) => a.lane - b.lane || a.i - b.i);
   const span = (k-1) * LAY.hookGap;
-  let y0 = p.y + p.h/2 - span/2;
-  n.hooks.forEach((h,i) => out[h] = { x: p.x, y: y0 + i*LAY.hookGap, i });
+  const y0 = p.y + p.h/2 - span/2;
+  order.forEach((o, row) => out[o.h] = { x: p.x, y: y0 + row*LAY.hookGap, i: o.i });
   return out;
 }
 
@@ -2146,7 +2208,7 @@ function placeLines(g, P, LN){
   const pos = {}, fixed = {};
   for (const n of Object.values(g.nodes)){
     if (n.k !== 'spot') continue;
-    const hp = hookPoints(g, n.id, P);
+    const hp = hookPoints(g, n.id, P, LN);
     for (const h in hp){ pos[h] = { x: hp[h].x, y: hp[h].y }; fixed[h] = true; }
   }
   // spine points sit in their own area's margin, each ligature in its own lane
@@ -2154,7 +2216,7 @@ function placeLines(g, P, LN){
     if (fixed[l.id]) continue;
     const a = P[l.area];
     const lane = LN ? (LN.lanes[l.area][LN.lig[l.id]] || 0) : 0;
-    pos[l.id] = { x: a.x + 8 + lane * LAY.laneW, y: a.y + a.h/2 };
+    pos[l.id] = { x: a.x + 10 + lane * LAY.laneW, y: a.y + a.h/2 };
   }
   // relax towards the neighbours, clamped inside the owning area
   for (let it = 0; it < 60; it++){
@@ -2208,21 +2270,157 @@ function roundRect(x,y,w,h,r){
           V ${y+r} Q ${x} ${y} ${x+r} ${y} Z`;
 }
 
+/* ---- paths for the lines of identity -------------------------------------
+   The points of a ligature are strung into chains, so that each unbroken run
+   of line is one path. Chains break only where a line ends or branches. */
+function lineChains(g, pos){
+  const adj = {};
+  for (const l of Object.keys(g.lns)) adj[l] = [];
+  for (const e of Object.values(g.edges)){
+    if (!pos[e.a] || !pos[e.b] || !adj[e.a] || !adj[e.b]) continue;
+    adj[e.a].push({ to:e.b, e:e.id });
+    adj[e.b].push({ to:e.a, e:e.id });
+  }
+  const used = new Set(), chains = [];
+  const deg = l => adj[l].length;
+  function walkFrom(start){
+    for (const first of adj[start]){
+      if (used.has(first.e)) continue;
+      used.add(first.e);
+      const pts = [start, first.to];
+      let prev = start, cur = first.to;
+      while (deg(cur) === 2){
+        const nxt = adj[cur].find(x => !used.has(x.e));
+        if (!nxt) break;
+        used.add(nxt.e);
+        prev = cur; cur = nxt.to; pts.push(cur);
+      }
+      chains.push(pts);
+    }
+  }
+  for (const l of Object.keys(adj)) if (deg(l) !== 2) walkFrom(l);
+  for (const l of Object.keys(adj)) walkFrom(l);   // whatever is left is a cycle
+  return chains;
+}
+// Between two points that share neither coordinate the line turns a corner:
+// it runs vertically at the smaller x, then across — the hook shape Peirce draws.
+function elbowPoints(chain, pos){
+  const out = [pos[chain[0]]];
+  for (let i = 1; i < chain.length; i++){
+    const a = out[out.length-1], b = pos[chain[i]];
+    if (!b) continue;
+    if (Math.abs(a.x-b.x) > 1 && Math.abs(a.y-b.y) > 1)
+      out.push(a.x < b.x ? { x:a.x, y:b.y } : { x:b.x, y:a.y });
+    out.push(b);
+  }
+  return out;
+}
+// A polyline with the corners rounded — the radius never exceeds half of either
+// adjacent run, so a corner can never overshoot its own segment — and with a
+// small hop wherever this line crosses another. The hop is Peirce's 'bridge',
+// "a bit of paper ribbon, with one line passing under it and the other upon it"
+// (Ms 455, quoted Roberts p. 55).
+function roundedPath(pts, maxR, hops){
+  const P = dedupePts(pts);
+  if (P.length < 2) return null;
+  const n = P.length;
+  const rad = new Array(n).fill(0);
+  for (let i = 1; i < n-1; i++){
+    const d1 = dist(P[i-1], P[i]), d2 = dist(P[i], P[i+1]);
+    const r = Math.min(maxR, d1/2, d2/2);
+    rad[i] = r < 0.8 ? 0 : r;
+  }
+  const towards = (p, q, r) => r <= 0 ? { x:p.x, y:p.y }
+    : { x: p.x + (q.x-p.x)/dist(p,q)*r, y: p.y + (q.y-p.y)/dist(p,q)*r };
+
+  let d = '';
+  for (let i = 0; i < n-1; i++){
+    const A = i === 0 ? P[0] : towards(P[i], P[i+1], rad[i]);
+    const B = i === n-2 ? P[n-1] : towards(P[i+1], P[i], rad[i+1]);
+    if (i === 0) d += `M ${r2(A.x)} ${r2(A.y)}`;
+    d += runWithHops(A, B, hops && hops[i]);
+    if (i < n-2){
+      const C = towards(P[i+1], P[i+2], rad[i+1]);
+      d += ` Q ${r2(P[i+1].x)} ${r2(P[i+1].y)} ${r2(C.x)} ${r2(C.y)}`;
+    }
+  }
+  return d;
+}
+const HOPR = 4.2;
+function runWithHops(A, B, xs){
+  if (!xs || !xs.length || Math.abs(A.y - B.y) > 0.5) return ` L ${r2(B.x)} ${r2(B.y)}`;
+  const fwd = B.x > A.x;
+  const lo = Math.min(A.x, B.x) + HOPR + 1, hi = Math.max(A.x, B.x) - HOPR - 1;
+  const use = xs.filter(x => x > lo && x < hi).sort((p,q) => fwd ? p-q : q-p);
+  let d = '';
+  for (const x of use){
+    const x1 = fwd ? x - HOPR : x + HOPR, x2 = fwd ? x + HOPR : x - HOPR;
+    d += ` L ${r2(x1)} ${r2(A.y)} A ${HOPR} ${HOPR} 0 0 ${fwd ? 1 : 0} ${r2(x2)} ${r2(A.y)}`;
+  }
+  return d + ` L ${r2(B.x)} ${r2(B.y)}`;
+}
+function dedupePts(pts){
+  const P = [];
+  for (const p of pts){
+    if (!p) continue;
+    const q = P[P.length-1];
+    if (!q || Math.abs(q.x-p.x) > 0.4 || Math.abs(q.y-p.y) > 0.4) P.push(p);
+  }
+  return P;
+}
+const dist = (p,q) => Math.hypot(p.x-q.x, p.y-q.y) || 1e-6;
+
+/* Where one line crosses another, the horizontal one hops over. */
+function crossingHops(polys){
+  const hops = polys.map(p => p.map(() => []));
+  for (let i = 0; i < polys.length; i++){
+    const P = dedupePts(polys[i]);
+    for (let si = 0; si < P.length-1; si++){
+      const a = P[si], b = P[si+1];
+      if (Math.abs(a.y - b.y) > 0.5) continue;            // not horizontal
+      const xlo = Math.min(a.x,b.x), xhi = Math.max(a.x,b.x);
+      for (let j = 0; j < polys.length; j++){
+        if (j === i) continue;
+        const Q = dedupePts(polys[j]);
+        for (let sj = 0; sj < Q.length-1; sj++){
+          const c = Q[sj], e = Q[sj+1];
+          if (Math.abs(c.x - e.x) > 0.5) continue;        // not vertical
+          const ylo = Math.min(c.y,e.y), yhi = Math.max(c.y,e.y);
+          if (c.x > xlo + 2 && c.x < xhi - 2 && a.y > ylo + 2 && a.y < yhi - 2)
+            hops[i][si].push(c.x);
+        }
+      }
+    }
+  }
+  return hops;
+}
+
+const r2 = n => Math.round(n*100)/100;
+
 /* ---- the renderer -------------------------------------------------------- */
-function renderGraph(g, opts){
+// Geometry only: sizes and positions for every area, node and line point.
+function geom(g, opts){
   opts = opts || {};
   const M = {}, P = {};
   const LN = laneMap(g);
   measure(g, g.root, M, opts.maxRow, LN);
   place(g, g.root, 0, 0, M, P);
   const pos = placeLines(g, P, LN);
-  const W = M[g.root].w, H = M[g.root].h;
+  return { M, P, pos, LN, W: M[g.root].w, H: M[g.root].h };
+}
+
+function renderGraph(g, opts){
+  opts = opts || {};
+  const G0 = geom(g, opts);
+  const M = G0.M, P = G0.P, pos = G0.pos, LN = G0.LN;
+  const W = G0.W, H = G0.H;
   const parts = [];
   const shade = opts.shade;
   const wobble = opts.wobble !== false;
   const hl = opts.highlight || {};      // {nodeId:'add'|'del'|'move'}
 
   // the sheet of assertion
+  const raised = opts.raised === false ? '' : ' raised';
   parts.push(`<rect class="sa" x="0.5" y="0.5" width="${W-1}" height="${H-1}" rx="6"/>`);
 
   function drawArea(areaId){
@@ -2231,39 +2429,29 @@ function renderGraph(g, opts){
       const mark = hl[id] ? ' hl-'+hl[id] : '';
       if (n.k === 'cut'){
         const d = depthOf(g, n.inner);
-        parts.push(`<path class="cut${mark}${shade && d%2===1 ? ' odd':''}" d="${
+        parts.push(`<path class="cut${mark}${raised}${shade && d%2===1 ? ' odd':''}" d="${
           cutPath(p.x, p.y, p.w, p.h, n.id, wobble)}" data-node="${n.id}" data-area="${n.inner}"/>`);
         drawArea(n.inner);
       } else {
         parts.push(`<g class="spot${mark}" data-node="${n.id}">`+
           `<rect class="spotbg" x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="5"/>`+
-          `<text x="${p.x + p.w/2}" y="${p.y + p.h/2}" dominant-baseline="central" text-anchor="middle">${
-            esc(n.name)}</text></g>`);
+          `<text x="${p.x + p.w/2 + (n.hooks.length > 1 ? 6 : 0)}" y="${p.y + p.h/2}" `+
+          `dominant-baseline="central" text-anchor="middle">${esc(n.name)}</text></g>`);
       }
     }
   }
   drawArea(g.root);
 
-  // lines of identity, drawn heavy (C6-C8)
-  const segs = [];
-  for (const e of Object.values(g.edges)){
-    const a = pos[e.a], b = pos[e.b];
-    if (!a || !b) continue;
-    segs.push({ e, a, b });
-  }
-  for (const s of segs){
-    const {a, b} = s;
-    let d;
-    if (Math.abs(a.y - b.y) < 1.5) d = `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
-    else if (Math.abs(a.x - b.x) < 1.5) d = `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
-    else {
-      // an elbow: run out to the shared margin, then across
-      const mx = Math.min(a.x, b.x);
-      d = `M ${a.x} ${a.y} L ${mx+0.01} ${a.y} Q ${mx} ${a.y} ${mx} ${a.y + Math.sign(b.y-a.y)*3}`+
-          ` L ${mx} ${b.y - Math.sign(b.y-a.y)*3} Q ${mx} ${b.y} ${mx+3} ${b.y} L ${b.x} ${b.y}`;
-    }
-    parts.push(`<path class="loi" d="${d}" data-edge="${s.e.id}"/>`);
-  }
+  // lines of identity, drawn heavy (C6-C8). A ligature is drawn as whole
+  // chains rather than edge by edge: a line is one graph (C7), and drawing it
+  // in pieces leaves the round ends of each piece stacked at every junction.
+  const chains = lineChains(g, pos);
+  const polys  = chains.map(ch => dedupePts(elbowPoints(ch, pos)));
+  const hops   = crossingHops(polys);
+  polys.forEach((pts, i) => {
+    const d = roundedPath(pts, 5, hops[i]);
+    if (d) parts.push(`<path class="loi" d="${d}" data-chain="${chains[i].join(',')}"/>`);
+  });
   // a ligature with a single point and no edge is the bare line of C6
   for (const l of Object.values(g.lns)){
     if (neighbours(g, l.id).length) continue;
@@ -2272,21 +2460,21 @@ function renderGraph(g, opts){
     const p = pos[l.id];
     parts.push(`<path class="loi" d="M ${p.x} ${p.y} L ${p.x + LAY.bareW} ${p.y}" data-ln="${l.id}"/>`);
   }
-  // branch points
+  // where three or more lines meet, a dot just fills the join (C8, teridentity)
   for (const l of Object.values(g.lns)){
     if (neighbours(g, l.id).length >= 3){
       const p = pos[l.id];
-      parts.push(`<circle class="branch" cx="${p.x}" cy="${p.y}" r="2.6"/>`);
+      parts.push(`<circle class="branch" cx="${p.x}" cy="${p.y}" r="1.7"/>`);
     }
   }
   // hook numerals, so the order of a spot's hooks can be read off
   if (opts.hookNumbers !== false)
   for (const n of Object.values(g.nodes)){
     if (n.k !== 'spot' || n.hooks.length < 2) continue;
-    const hp = hookPoints(g, n.id, P);
-    n.hooks.forEach((h,i) => {
+    const hp = hookPoints(g, n.id, P, LN);
+    n.hooks.forEach(h => {
       const q = hp[h];
-      parts.push(`<text class="hooknum" x="${q.x+5}" y="${q.y-4}">${i+1}</text>`);
+      parts.push(`<text class="hooknum" x="${q.x+6}" y="${q.y-4}">${q.i+1}</text>`);
     });
   }
 
@@ -2517,9 +2705,213 @@ function writeEG(g, plain){
   }
   return areaX(g.root, {}).text;
 }
+/* ============================================================================
+   ANIMATING A TRANSFORMATION.
+
+   A proof is a sequence of writings and erasures, and it is much easier to see
+   what a rule does if the diagram shows it happening. Each step is played in
+   two beats: first the graph the rule is about to act on is marked and left
+   standing for a moment, then the drawing moves — enclosures growing to make
+   room, a copy appearing where it was scribed, an erased graph fading away.
+
+   Node and line identifiers survive a transformation (applyMove clones the
+   graph), so a node can be followed from one step to the next and its geometry
+   interpolated between them.
+   ========================================================================== */
+
+const EASE = t => t<0.5 ? 4*t*t*t : 1 - Math.pow(-2*t+2, 3)/2;
+const lerp = (a,b,t) => a + (b-a)*t;
+
+/* Which graphs is this rule about to act on, and how should they be marked? */
+function moveFocus(g, mv){
+  const f = {};
+  if (!mv) return f;
+  const areaCut = a => { const A = g.areas[a]; return A && A.cut ? A.cut : null; };
+  switch (mv.op){
+    case 'erase':     f[mv.node] = 'del'; break;
+    case 'deiterate': f[mv.node] = 'del'; if (mv.witness) f[mv.witness] = 'src'; break;
+    case 'iterate':   f[mv.node] = 'src'; { const c = areaCut(mv.target); if (c) f[c] = 'area'; } break;
+    case 'insert':    { const c = areaCut(mv.area); if (c) f[c] = 'area'; } break;
+    case 'dcIn':      (mv.items||[]).forEach(i => f[i] = 'src');
+                      { const c = areaCut(mv.area); if (c && !(mv.items||[]).length) f[c] = 'area'; } break;
+    case 'dcOut':     f[mv.cut] = 'del'; break;
+    case 'join': case 'eraseEdge': case 'addLine': case 'delLine':
+    case 'branch': case 'extend': case 'retract': break;
+  }
+  return f;
+}
+
+/* The transition is prepared once — geometry for both graphs, and the set of
+   things to draw — and then a frame is produced for each value of t. */
+function prepareTween(gA, gB, GA, GB, opts){
+  opts = opts || {};
+  const nodeIds = [...new Set([...Object.keys(gA.nodes), ...Object.keys(gB.nodes)])];
+  const depthOfId = id => {
+    const g = gB.nodes[id] ? gB : gA;
+    return depthOf(g, g.nodes[id].area);
+  };
+  const nodes = nodeIds.sort((x,y) => depthOfId(x) - depthOfId(y)).map(id => {
+    const inA = !!gA.nodes[id], inB = !!gB.nodes[id];
+    const n = inB ? gB.nodes[id] : gA.nodes[id];
+    let a = GA.P[id], b = GB.P[id];
+    if (!a && !b) return null;
+    if (!a) a = shrink(b);
+    if (!b) b = shrink(a);
+    const g = inB ? gB : gA;
+    return { id, n, a, b, inA, inB,
+             odd: n.k === 'cut' && depthOf(g, n.inner) % 2 === 1 };
+  }).filter(Boolean);
+
+  const edgesA = new Set(Object.keys(gA.edges)), edgesB = new Set(Object.keys(gB.edges));
+  const keyOf = e => e.a < e.b ? e.a+'|'+e.b : e.b+'|'+e.a;
+  const lookupA = {}, lookupB = {};
+  for (const e of Object.values(gA.edges)) lookupA[keyOf(e)] = e.id;
+  for (const e of Object.values(gB.edges)) lookupB[keyOf(e)] = e.id;
+  const chainEdgeIds = (ch, look) => {
+    const out = [];
+    for (let i=0;i+1<ch.length;i++){
+      const k = ch[i] < ch[i+1] ? ch[i]+'|'+ch[i+1] : ch[i+1]+'|'+ch[i];
+      if (look[k]) out.push(look[k]);
+    }
+    return out;
+  };
+  const chains = [];
+  for (const ch of lineChains(gB, GB.pos)){
+    const ids = chainEdgeIds(ch, lookupB);
+    chains.push({ ch, fresh: ids.some(x => !edgesA.has(x)), gone: false });
+  }
+  for (const ch of lineChains(gA, GA.pos)){
+    const ids = chainEdgeIds(ch, lookupA);
+    if (!ids.some(x => !edgesB.has(x))) continue;    // already covered by B's chains
+    chains.push({ ch, fresh: false, gone: true });
+  }
+  // bare, unattached lines (C6)
+  const bare = [];
+  const hookSet = g => { const s = new Set();
+    for (const n of Object.values(g.nodes)) if (n.k==='spot') n.hooks.forEach(h=>s.add(h)); return s; };
+  const hA = hookSet(gA), hB = hookSet(gB);
+  for (const l of new Set([...Object.keys(gA.lns), ...Object.keys(gB.lns)])){
+    const inA = gA.lns[l] && !neighbours(gA,l).length && !hA.has(l);
+    const inB = gB.lns[l] && !neighbours(gB,l).length && !hB.has(l);
+    if (inA || inB) bare.push({ l, inA: !!inA, inB: !!inB });
+  }
+
+  return { gA, gB, GA, GB, nodes, chains, bare, opts,
+           W: Math.max(GA.W, GB.W), H: Math.max(GA.H, GB.H) };
+}
+
+function tweenFrame(sp, t){
+  const { GA, GB, opts } = sp;
+  const parts = [];
+  const shade = opts.shade, wobble = opts.wobble !== false;
+  const outT = Math.min(1, t / 0.45);            // what goes, goes early
+  const inT  = Math.max(0, (t - 0.5) / 0.5);     // what comes, comes late
+  const e = EASE(t);
+
+  const raised = opts.raised === false ? '' : ' raised';
+  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${sp.W-1}" height="${sp.H-1}" rx="6"/>`);
+
+  for (const it of sp.nodes){
+    const op = it.inA && it.inB ? 1 : it.inB ? inT : 1 - outT;
+    if (op <= 0.01) continue;
+    const x = lerp(it.a.x, it.b.x, e), y = lerp(it.a.y, it.b.y, e);
+    const w = lerp(it.a.w, it.b.w, e), h = lerp(it.a.h, it.b.h, e);
+    if (it.n.k === 'cut'){
+      parts.push(`<path class="cut${raised}${shade && it.odd ? ' odd':''}" opacity="${r2(op)}" d="${
+        cutPath(x, y, w, h, it.n.id, wobble)}"/>`);
+    } else {
+      parts.push(`<g class="spot" opacity="${r2(op)}"><text x="${
+        r2(x + w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(y + h/2)}" `+
+        `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+    }
+  }
+
+  // one interpolated position for every point of every line
+  const POS = {};
+  for (const ln of new Set([...Object.keys(GA.pos), ...Object.keys(GB.pos)])){
+    const a = GA.pos[ln], b = GB.pos[ln];
+    POS[ln] = (a && b) ? { x: lerp(a.x,b.x,e), y: lerp(a.y,b.y,e) } : (a || b);
+  }
+  const live = sp.chains.map(c => ({ c, op: c.gone ? 1-outT : (c.fresh ? inT : 1) }))
+                        .filter(x => x.op > 0.01);
+  const polys = live.map(x => dedupePts(elbowPoints(x.c.ch, POS)));
+  const hops  = crossingHops(polys);
+  polys.forEach((pts, i) => {
+    const d = roundedPath(pts, 5, hops[i]);
+    if (d) parts.push(`<path class="loi" opacity="${r2(live[i].op)}" d="${d}"/>`);
+  });
+  for (const b of sp.bare){
+    const op = b.inA && b.inB ? 1 : b.inB ? inT : 1 - outT;
+    if (op <= 0.01) continue;
+    const p = POS[b.l]; if (!p) continue;
+    parts.push(`<path class="loi" opacity="${r2(op)}" d="M ${r2(p.x)} ${r2(p.y)} L ${
+      r2(p.x + LAY.bareW)} ${r2(p.y)}"/>`);
+  }
+  return parts.join('\n');
+}
+function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 }; }
+
+/* ---- the player ---------------------------------------------------------- */
+function svgWrap(inner, w, h, scale, pad){
+  pad = pad || 12;
+  return `<svg class="eg" xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${w+2*pad} ${h+2*pad}" `+
+         `width="${(w+2*pad)*scale}" height="${(h+2*pad)*scale}">${inner}</svg>`;
+}
+
+/* Plays gA -> gB inside `el`. Returns a handle with .cancel(). */
+function playTransition(el, gA, gB, mv, opts, done){
+  opts = opts || {};
+  const GA = geom(gA, opts), GB = geom(gB, opts);
+  const W = Math.max(GA.W, GB.W), H = Math.max(GA.H, GB.H);
+  const pad = 12;
+  const availW = Math.max(80, el.clientWidth - 34), availH = opts.maxH || 420;
+  const scale = Math.min(availW/(W+2*pad), availH/(H+2*pad), 2.4);
+
+  const markMs = opts.markMs === undefined ? 700 : opts.markMs;
+  const moveMs = opts.moveMs === undefined ? 720 : opts.moveMs;
+  let raf = 0, timer = 0, cancelled = false;
+  const sp = prepareTween(gA, gB, GA, GB, opts);
+
+  // beat one: mark what the rule is about to act on
+  el.innerHTML = svgWrap(tweenFrame(sp, 0), W, H, scale, pad);
+  markNodes(el, gA, GA, moveFocus(gA, mv));
+
+  timer = setTimeout(() => {
+    if (cancelled) return;
+    const t0 = performance.now();
+    const tick = now => {
+      if (cancelled) return;
+      const t = Math.min(1, (now - t0) / moveMs);
+      el.innerHTML = svgWrap(tweenFrame(sp, t), W, H, scale, pad);
+      if (t < 1) raf = requestAnimationFrame(tick);
+      else if (done) done();
+    };
+    raf = requestAnimationFrame(tick);
+  }, markMs);
+
+  return { cancel(){ cancelled = true; cancelAnimationFrame(raf); clearTimeout(timer); } };
+}
+
+// An overlay ring around the graphs the rule is about to act on.
+function markNodes(el, g, G, focus){
+  const svg = el.querySelector('svg');
+  if (!svg) return;
+  const ns = 'http://www.w3.org/2000/svg';
+  for (const id of Object.keys(focus)){
+    const p = G.P[id]; if (!p) continue;
+    const kind = focus[id];
+    const r = document.createElementNS(ns, 'rect');
+    const m = 4;
+    r.setAttribute('x', p.x - m); r.setAttribute('y', p.y - m);
+    r.setAttribute('width', p.w + 2*m); r.setAttribute('height', p.h + 2*m);
+    r.setAttribute('rx', 10);
+    r.setAttribute('class', 'focus focus-' + kind);
+    svg.appendChild(r);
+  }
+}
 /* --- the verified proof library --- */
 const PROOFS = [
-{ id:"mp", title:"Modus ponens", cite:"Roberts 1973, §3.3(1), p. 45", note:"Peirce’s own illustration. Roberts works on an iterated copy so that the premisses stay on the sheet as a record; here the premisses themselves are transformed, the shorter route he says students prefer.", prem:["P","P -> Q"], goal:"Q", found:"book", steps:[{"eg":"P { P | Q }","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"P ( ( Q ) )","rule":"R4","why":"R4, deiteration: “P” could have been got by iterating “P”, which is less enclosed, so it may be erased."},{"eg":"P Q","rule":"R5","why":"R5: a double cut is removed."},{"eg":"Q","rule":"R1","why":"R1, erasure: “P” is evenly enclosed, so it may be erased."}] },
+{ id:"mp", title:"Modus ponens", cite:"Roberts 1973, §3.3(1), p. 45", note:"Peirce’s own illustration. Roberts works on an iterated copy so that the premisses stay on the sheet as a record; here the premisses themselves are transformed, the shorter route he says students prefer.", prem:["P","P -> Q"], goal:"Q", found:"hand", steps:[{"eg":"P { P | Q }","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"P ( ( Q ) )","rule":"R4","why":"R4, deiteration: “P” could have been got by iterating “P”, which is less enclosed, so it may be erased."},{"eg":"P Q","rule":"R5","why":"R5: a double cut is removed."},{"eg":"Q","rule":"R1","why":"R1, erasure: “P” is evenly enclosed, so it may be erased."}] },
 { id:"em", title:"The excluded middle", cite:"", note:"A theorem: it is proved from the blank sheet of assertion, which by C1 is itself a graph.", prem:[], goal:"P | ~P", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( P ) ( ( P ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."}] },
 { id:"hs", title:"Hypothetical syllogism", cite:"", note:"Chaining two conditionals.", prem:["P -> Q","Q -> R"], goal:"P -> R", found:"machine", steps:[{"eg":"( P ( Q ) ) ( Q ( R ) )","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( P ( Q ) ( R ) ) ( Q ( R ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( P ( Q ( R ) ) ( R ) ) ( Q ( R ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( P ( R ) ) ( Q ( R ) )","rule":"R4","why":"R4, deiteration: the copy could have been got by iteration, so it may be erased."},{"eg":"( P ( R ) )","rule":"R1","why":"R1, erasure: the graph is evenly enclosed, so it may be erased."}] },
 { id:"dm", title:"De Morgan", cite:"", note:"The denial of a disjunction.", prem:["~(P | Q)"], goal:"~P & ~Q", found:"machine", steps:[{"eg":"( P ) ( Q )","rule":null,"why":"The conclusion is already scribed."}] },
@@ -2532,7 +2924,167 @@ const PROOFS = [
 { id:"selfid", title:"Everything is identical to itself", cite:"Roberts 1973, §4.3(3), p. 62", note:"The first of the two axioms of identity. In Peirce’s hands identity is not a predicate but the line itself, so the proof is a matter of scribing a line and closing it into a cycle.", prem:[], goal:"Ax (x=x)", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( *a (  ) )","rule":"C6/R2","why":"C6: an unattached line of identity may always be scribed — \"something exists\"."},{"eg":"( *a ( *a ) )","rule":"R3(a,b)","why":"R3(a,b), iteration: a loose end is extended."}] },
 { id:"exgen", title:"Existential generalisation", cite:"", note:"From ‘everything is F’ to ‘something is F’. The step that supplies the existence is C6: an unattached line may always be scribed on the sheet.", prem:["Ax Fx"], goal:"Ex Fx", found:"machine", steps:[{"eg":"( *a ( *a F[a] ) )","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"*a ( *b ( *b F[b] ) )","rule":"C6/R2","why":"C6: an unattached line of identity may always be scribed — \"something exists\"."},{"eg":"*a ( *b *a ( *b F[b] ) )","rule":"R3(b)","why":"R3(b), iteration: a loose end of the ligature is extended inwards through a cut."},{"eg":"*a ( *a ( *a F[a] ) )","rule":"R2","why":"R2, insertion: two lines of identity oddly enclosed on the same area are joined."},{"eg":"*a F[a]","rule":"R5","why":"R5: a double cut is removed."}] },
 { id:"conv", title:"Conversion", cite:"", note:"A trivial Beta inference, given to show the rules working on lines of identity.", prem:["Ex (Fx & Gx)"], goal:"Ex (Gx & Fx)", found:"machine", steps:[{"eg":"*a F[a] G[a]","rule":null,"why":"The conclusion is already scribed."}] },
+{ id:"mirab", title:"Consequentia mirabilis", cite:"", note:"If its own denial implies it, it is true. Cardano and Clavius made much of this; A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.", prem:[], goal:"(~P -> P) -> P", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ) ) ( P ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( ( P ) ( P ) ) ( P ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."}] },
+{ id:"export", title:"Exportation", cite:"", note:"A conjunction in the antecedent may be peeled off into a second conditional. A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.", prem:[], goal:"((P & Q) -> R) -> (P -> (Q -> R))", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P Q ( R ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P Q ( R ) ) ) ( P Q ( R ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( P Q ( R ) ) ( ( P ( ( Q ( R ) ) ) ) ) )","rule":"R5","why":"R5: a double cut is inserted."}] },
+{ id:"import", title:"Importation", cite:"", note:"And back again. A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.", prem:[], goal:"(P -> (Q -> R)) -> ((P & Q) -> R)", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ( ( Q ( R ) ) ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ( ( Q ( R ) ) ) ) ) ( P ( ( Q ( R ) ) ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( P ( ( Q ( R ) ) ) ) ( ( P Q ( R ) ) ) )","rule":"R5","why":"R5: a double cut is removed."}] },
+{ id:"orcond", title:"Either way round", cite:"", note:"Of any two propositions, one implies the other. Students find this hard to believe until they prove it; A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.", prem:[], goal:"(P -> Q) | (Q -> P)", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( ( Q ( P ) ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( ( Q ( P ) ) ) ) ( ( Q ( P ) ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( ( ( Q ) ) ) ( ( Q ( P ) ) ) )","rule":"R1","why":"R1, erasure: the graph is evenly enclosed, so it may be erased."},{"eg":"( ( ( P ( Q ) ) ) ( ( Q ( P ) ) ) )","rule":"R2","why":"R2, insertion: the graph stands on an oddly enclosed area, where any graph may be scribed."}] },
+{ id:"nonself", title:"Nothing is its own denial", cite:"", note:"The liar, refused. A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.", prem:[], goal:"~(P <-> ~P)", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ) ) ( P ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( P ( ( P ) ) ) ( ( P ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."},{"eg":"( ( P ( ( P ) ) ) ( ( P ) ( P ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."}] },
+{ id:"distrib", title:"Distribution", cite:"", note:"Conjunction over disjunction. A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.", prem:[], goal:"(P & (Q | R)) -> ((P & Q) | (P & R))", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) P )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( (  ) P ( ( Q ) ( R ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( ( Q ) ( R ) ) ) P ( ( Q ) ( R ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( P ( ( Q ) ( R ) ) ( ( ( Q ) ( P R ) ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."},{"eg":"( P ( ( Q ) ( R ) ) ( ( ( P Q ) ( P R ) ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."}] },
+{ id:"reductio", title:"Reductio ad absurdum", cite:"", note:"If a supposition yields both a proposition and its denial, the supposition is false. A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.", prem:[], goal:"((P -> Q) & (P -> ~Q)) -> ~P", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ( Q ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( (  ) ( P ( Q ) ) ( P ( ( Q ) ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ( ( Q ) ) ) ) ( P ( Q ) ) ( P ( ( Q ) ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( P ( Q ) ) ( P ( ( Q ) ) ) ( ( P ( P ( Q ) ) ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."},{"eg":"( ( P ( Q ) ) ( P ( ( Q ) ) ) ( ( P ) ) )","rule":"R4","why":"R4, deiteration: the copy could have been got by iteration, so it may be erased."}] },
+{ id:"fregec", title:"A collapse of Frege’s axiom", cite:"", note:"A shorter cousin of the self-distributive law. A standard exercise in the open textbooks — forall x: Calgary (Magnus, Button, Thomas-Bolduc, Zach, CC BY 4.0) and the Open Logic Project set it for natural deduction. Here it falls to Peirce’s five rules instead.", prem:[], goal:"((P -> Q) -> P) -> ((P -> Q) -> Q)", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( ( P ( Q ) ) ( P ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( ( P ( Q ) ) ( P ) ) ) ( ( P ( Q ) ) ( P ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( ( ( P ( Q ) ) ( P ) ( Q ) ) ) ( ( P ( Q ) ) ( P ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ( Q ) ) ( P ) ) ( ( ( P ( Q ) ) ( Q ) ( P ( Q ) ) ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."},{"eg":"( ( ( P ( Q ) ) ( P ) ) ( ( ( P ( Q ) ) ( Q ) ) ) )","rule":"R4","why":"R4, deiteration: the copy could have been got by iteration, so it may be erased."}] },
+{ id:"exallq", title:"Some-for-all to all-for-some", cite:"", note:"The valid half of the exchange of quantifiers. The converse is invalid, and the Find a proof tab will show you a countermodel for it on two individuals.", prem:["Ex Ay Rxy"], goal:"Ay Ex Rxy", found:"machine", steps:[{"eg":"*a ( *b *a ( *a *b R[a,b] ) )","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"*a ( *b *a ( *a *b R[c,b] ) )","rule":"R1","why":"R1, erasure: an evenly enclosed portion of a line of identity is erased."},{"eg":"*a ( *b *a ( *b R[c,b] ) )","rule":"R4(a,b)","why":"R4(a,b), deiteration: a loose end is retracted."},{"eg":"*a ( *b ( *b R[c,b] ) )","rule":"R4(a,b)","why":"R4(a,b), deiteration: a loose end is retracted."},{"eg":"*a ( *b ( *c *b R[c,b] ) )","rule":"R3(a,b)","why":"R3(a,b), iteration: a loose end is extended."},{"eg":"( *a ( *b *a R[b,a] ) )","rule":"R1","why":"R1, erasure: an evenly enclosed line of identity is erased."}] },
+{ id:"qn", title:"Quantifier negation — nothing to prove", cite:"", note:"In ordinary notation ¬Ex Fx and Ax ¬Fx are different formulas needing a rule to pass between them. Scribed as graphs they are one and the same graph, so there is nothing to transform. This is one of the places where Peirce’s notation is doing analytic work that the algebraic notation hides.", prem:["~Ex Fx"], goal:"Ax ~Fx", found:"machine", steps:[{"eg":"( *a F[a] )","rule":null,"why":"The conclusion is already scribed."}] },
+{ id:"darii", title:"The syllogism Darii", cite:"constructed after Roberts 1973, §4.3(2), p. 61", note:"Some F is G, and all G is H, therefore some F is H. The line of identity is branched, run into the universal premiss and joined there, which is how the universal gets applied to the very individual the particular premiss supplies.", prem:["Ax (Gx -> Hx)","Ex (Fx & Gx)"], goal:"Ex (Fx & Hx)", found:"hand", steps:[{"eg":"*x F[x] G[x] ( *y G[y] ( H[y] ) )","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"*x *w x~w F[x] G[x] ( *y G[y] ( H[y] ) )","rule":"R3(a)","why":"R3(a), iteration: a branch with a loose end is added to a line of identity."},{"eg":"*x *w x~w F[x] G[x] ( *w *y G[y] ( H[y] ) )","rule":"R3(b)","why":"R3(b), iteration: a loose end of the ligature is extended inwards through a cut."},{"eg":"*x *w x~w F[x] G[x] ( *w *y w~y G[y] ( H[y] ) )","rule":"R2","why":"R2, insertion: two lines of identity oddly enclosed on the same area are joined."},{"eg":"*x *w x~w F[x] G[x] ( *w *y w~y ( H[y] ) )","rule":"R4","why":"R4, deiteration: “G” could have been got by iterating “G”, which is less enclosed, so it may be erased."},{"eg":"*x F[x] G[x] H[x]","rule":"R5","why":"R5: a double cut is removed."},{"eg":"*x F[x] H[x]","rule":"R1","why":"R1, erasure: “G” is evenly enclosed, so it may be erased."}] },
+{ id:"celarent", title:"The syllogism Celarent", cite:"constructed after Roberts 1973, §4.3(2), p. 61", note:"All F is G, and no G is H, therefore no F is H. The same surgery as Barbara, on a negative premiss.", prem:["Ax (Fx -> Gx)","Ax (Gx -> ~Hx)"], goal:"Ax (Fx -> ~Hx)", found:"hand", steps:[{"eg":"( *x F[x] ( G[x] ) ) ( *y G[y] H[y] )","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( *x F[x] ( G[x] ( *y G[y] H[y] ) ) ) ( *z G[z] H[z] )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( *x F[x] ( G[x] ( *y G[y] H[y] ) ) )","rule":"R1","why":"R1, erasure: the enclosure is evenly enclosed, so it may be erased."},{"eg":"( *x F[x] ( G[x] *w x~w ( *y G[y] H[y] ) ) )","rule":"R3(a)","why":"R3(a), iteration: a branch with a loose end is added to a line of identity."},{"eg":"( *x F[x] ( G[x] *w x~w ( *w *y G[y] H[y] ) ) )","rule":"R3(b)","why":"R3(b), iteration: a loose end of the ligature is extended inwards through a cut."},{"eg":"( *x F[x] ( G[x] *w x~w ( *w *y w~y G[y] H[y] ) ) )","rule":"R2","why":"R2, insertion: two lines of identity oddly enclosed on the same area are joined."},{"eg":"( *x F[x] ( G[x] *w x~w ( *w *y w~y H[y] ) ) )","rule":"R4","why":"R4, deiteration: “G” could have been got by iterating “G”, which is less enclosed, so it may be erased."},{"eg":"( *x F[x] ( ( H[x] ) ) )","rule":"R1","why":"R1, erasure: “G” is evenly enclosed, so it may be erased."},{"eg":"( *x F[x] H[x] )","rule":"R5","why":"R5: a double cut is removed."}] },
 ];
+/* ============================================================================
+   A SMALL EDITOR FOR THE FORMULA BOXES.
+   Brackets close themselves, a closing bracket typed over one already there
+   steps past it, backspace between a pair takes both, and the text is coloured
+   as you type with the matching brackets picked out.
+   ========================================================================== */
+
+const PAIRS = { '(': ')', '[': ']' };
+const CLOSERS = new Set([')', ']']);
+
+function enhanceEditor(ta, opts){
+  opts = opts || {};
+  if (!ta || ta.dataset.enhanced) return;
+  ta.dataset.enhanced = '1';
+
+  const wrap = document.createElement('div');
+  wrap.className = 'editor';
+  ta.parentNode.insertBefore(wrap, ta);
+  const pre = document.createElement('pre');
+  pre.className = 'hl';
+  pre.setAttribute('aria-hidden', 'true');
+  wrap.appendChild(pre);
+  wrap.appendChild(ta);
+  ta.setAttribute('spellcheck', 'false');
+  ta.setAttribute('autocapitalize', 'off');
+  ta.setAttribute('autocomplete', 'off');
+
+  if (opts.glyphs !== false){
+    const bar = document.createElement('div');
+    bar.className = 'glyphs';
+    bar.innerHTML = GLYPHS.map(g =>
+      `<button type="button" data-ins="${esc(g.ins)}" title="${esc(g.t)}">${esc(g.s)}</button>`).join('');
+    bar.onmousedown = e => {                      // mousedown, so focus is not lost
+      const b = e.target.closest('button'); if (!b) return;
+      e.preventDefault();
+      insertAt(ta, b.dataset.ins);
+      fire(ta);
+    };
+    wrap.parentNode.insertBefore(bar, wrap.nextSibling);
+  }
+
+  const paint = () => {
+    pre.innerHTML = highlight(ta.value, ta.selectionStart);
+    pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft;
+  };
+  ta.addEventListener('input', paint);
+  ta.addEventListener('keyup', paint);
+  ta.addEventListener('click', paint);
+  ta.addEventListener('scroll', () => { pre.scrollTop = ta.scrollTop; pre.scrollLeft = ta.scrollLeft; });
+  ta.addEventListener('blur', () => { pre.innerHTML = highlight(ta.value, -1); });
+
+  ta.addEventListener('keydown', e => {
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    const s = ta.selectionStart, t = ta.selectionEnd, v = ta.value;
+    if (PAIRS[e.key]){
+      e.preventDefault();
+      const sel = v.slice(s, t);
+      const ins = e.key + sel + PAIRS[e.key];
+      ta.value = v.slice(0, s) + ins + v.slice(t);
+      ta.selectionStart = ta.selectionEnd = sel ? s + ins.length : s + 1;
+      fire(ta); return;
+    }
+    if (CLOSERS.has(e.key) && s === t && v[s] === e.key){
+      e.preventDefault();
+      ta.selectionStart = ta.selectionEnd = s + 1;
+      paint(); return;
+    }
+    if (e.key === 'Backspace' && s === t && s > 0 && PAIRS[v[s-1]] === v[s]){
+      e.preventDefault();
+      ta.value = v.slice(0, s-1) + v.slice(s+1);
+      ta.selectionStart = ta.selectionEnd = s - 1;
+      fire(ta); return;
+    }
+    if (e.key === 'Tab' && s === t && CLOSERS.has(v[s])){
+      e.preventDefault();
+      ta.selectionStart = ta.selectionEnd = s + 1;
+      paint(); return;
+    }
+  });
+  paint();
+}
+function insertAt(ta, text){
+  const s = ta.selectionStart, t = ta.selectionEnd;
+  ta.value = ta.value.slice(0, s) + text + ta.value.slice(t);
+  ta.selectionStart = ta.selectionEnd = s + text.length;
+  ta.focus();
+}
+function fire(ta){ ta.dispatchEvent(new Event('input', { bubbles: true })); }
+
+const GLYPHS = [
+  { s:'¬', ins:'~',   t:'not' },
+  { s:'∧', ins:' & ', t:'and' },
+  { s:'∨', ins:' | ', t:'or' },
+  { s:'⊃', ins:' -> ',t:'if … then (the scroll)' },
+  { s:'≡', ins:' <-> ',t:'if and only if' },
+  { s:'∀', ins:'Ax ', t:'for every x' },
+  { s:'∃', ins:'Ex ', t:'for some x' },
+  { s:'=', ins:'=',   t:'is identical with' },
+  { s:'( )', ins:'()',t:'brackets' }
+];
+
+/* --- colouring ------------------------------------------------------------ */
+const TOKRE = /(\s+)|(<->|<=>|->|=>|⊃|→|≡|↔)|([~¬!&∧∨|+·•])|([∀∃])|([()\[\]])|([A-Za-z_][A-Za-z0-9_']*)|(=)|(,)|([\s\S])/g;
+
+function bracketMap(src){
+  const st = [], m = {};
+  for (let i = 0; i < src.length; i++){
+    const c = src[i];
+    if (c === '(' || c === '[') st.push(i);
+    else if (c === ')' || c === ']'){
+      if (st.length){ const j = st.pop(); m[i] = j; m[j] = i; }
+      else m[i] = -1;                               // closes nothing
+    }
+  }
+  for (const j of st) m[j] = -1;                    // never closed
+  return m;
+}
+function highlight(src, caret){
+  const bm = bracketMap(src);
+  let hi = -1, hj = -1;
+  if (caret >= 0){
+    for (const k of [caret, caret-1]){
+      if (k >= 0 && k < src.length && '()[]'.includes(src[k]) && bm[k] >= 0){
+        hi = k; hj = bm[k]; break;
+      }
+    }
+  }
+  let out = '', m;
+  TOKRE.lastIndex = 0;
+  while ((m = TOKRE.exec(src)) !== null){
+    const i = m.index, txt = m[0];
+    if (m[1]) { out += esc(txt); continue; }
+    let cls = '';
+    if (m[2] || m[3]) cls = 'op';
+    else if (m[4]) cls = 'qu';
+    else if (m[5]){
+      cls = 'par';
+      if (bm[i] === -1) cls += ' bad';
+      else if (i === hi || i === hj) cls += ' match';
+    }
+    else if (m[6]) cls = /^[AE][a-z][0-9]?'?$/.test(txt) ? 'qu'
+                       : /^[A-Z]/.test(txt) ? 'pred' : 'var';
+    else if (m[7]) cls = 'op';
+    else if (m[8]) cls = 'punc';
+    out += cls ? `<span class="${cls}">${esc(txt)}</span>` : esc(txt);
+  }
+  return out + '\n';     // a trailing line keeps the box from clipping
+}
 /* ============================================================================
    THE APPLICATION
    ========================================================================== */
@@ -2645,13 +3197,67 @@ $('#t-ex').onclick = ev => {
   $('#t-in').value = T_EXAMPLES[+b.dataset.i][0]; translate();
 };
 
+/* --- rebuilding a proof so that it can be animated -------------------------
+   A transformation carries node identifiers across (applyMove clones the
+   graph), so re-running the proof gives us graphs whose parts can be followed
+   from one step to the next. It also tells us which rule acted on what. */
+function resolveMove(gA, gB, pal, printed){
+  const k = canonGraph(gB);
+  let loose = null;
+  for (const mv of legalMoves(gA, { dir:'fwd', palette: pal, maxNodes: 120, beta: true })){
+    let h; try { h = applyMove(gA, mv, pal); } catch(e){ continue; }
+    if (canonGraph(h) === k) return { mv, graph: h };
+    // the linear notation cannot always tell apart two points of one ligature
+    // lying on the same area; where it cannot, match on what it prints
+    if (!loose && printed && writeEG(h, true) === printed) loose = { mv, graph: h };
+  }
+  return loose;
+}
+function hydrateProof(p){
+  if (p._h) return p._h;
+  const target = p.steps.map(s => parseEG(s.eg));
+  const pal = subgraphPalette(target);
+  const graphs = [target[0]], mvs = [null];
+  for (let i = 1; i < target.length; i++){
+    const r = resolveMove(graphs[i-1], target[i], pal, p.steps[i].eg);
+    graphs.push(r ? r.graph : target[i]);
+    mvs.push(r ? r.mv : null);
+  }
+  p._h = { graphs, mvs };
+  return p._h;
+}
+// the same, for a proof the finder has just produced
+function hydrateSteps(steps){
+  const graphs = steps.map(s => s.graph);
+  const pal = subgraphPalette(graphs);
+  const mvs = [null];
+  for (let i = 1; i < graphs.length; i++){
+    const r = resolveMove(graphs[i-1], graphs[i], pal);
+    mvs.push(r ? r.mv : null);
+  }
+  return { graphs, mvs };
+}
+
 /* ============================== PROOFS ===================================== */
-const PF = { proof: null, i: 0, timer: null };
-$('#pf-sel').innerHTML = PROOFS.map((p,i) => '<option value="'+i+'">'+esc(p.title)+'</option>').join('');
+const PF = { proof: null, i: 0, timer: null, anim: null };
+// group the list: propositional graphs first, then those with lines of identity
+(function(){
+  const alpha = [], beta = [];
+  PROOFS.forEach((p,i) => {
+    let isBeta = false;
+    try { isBeta = !isAlpha(parseEG(p.steps[p.steps.length-1].eg)) ||
+                   p.prem.some(f => !isAlpha(compileFormula(parseFormula(f)).graph)); } catch(e){}
+    (isBeta ? beta : alpha).push('<option value="'+i+'">'+esc(p.title)+'</option>');
+  });
+  $('#pf-sel').innerHTML =
+    '<optgroup label="Alpha — the logic of truth functions">'+alpha.join('')+'</optgroup>'+
+    '<optgroup label="Beta — lines of identity and quantification">'+beta.join('')+'</optgroup>';
+})();
 function pfLoad(i){
   const p = PROOFS[i];
   PF.proof = p; PF.i = 0;
-  PF.graphs = p.steps.map(s => parseEG(s.eg));
+  const h = hydrateProof(p);
+  PF.graphs = h.graphs; PF.mvs = h.mvs;
   $('#pf-cite').innerHTML = p.cite ? '<b>'+esc(p.cite)+'</b>' : '';
   $('#pf-note').textContent = p.note || '';
   $('#pf-kv').innerHTML =
@@ -2659,21 +3265,30 @@ function pfLoad(i){
                    : '<dt>from</dt><dd>the blank sheet of assertion</dd>') +
     '<dt>conclusion</dt><dd>'+esc(fmtSrc(p.goal))+'</dd>' +
     '<dt>steps</dt><dd>'+(p.steps.length-1)+'</dd>';
-  $('#pf-prov').textContent = p.found === 'book'
-    ? 'Each step here is the one printed in the source, and each has been checked against the rules.'
-    : 'This sequence was found by the proof finder in this page, and each step checked against the rules.';
+  $('#pf-prov').textContent =
+    p.found === 'book' ? 'Each step here is the one printed in the source, and each has been checked against the rules.'
+  : p.found === 'hand' ? 'This sequence was worked out for this page, not transcribed; each step has been checked against the rules.'
+  : 'This sequence was found by the proof finder in this page, and each step checked against the rules.';
   $('#pf-steps').innerHTML = p.steps.map((s,k) =>
     '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
     esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
   pfShow(0);
 }
 function fmtSrc(s){ try { return fmt(parseFormula(s), 0); } catch(e){ return s; } }
-function pfShow(i){
+function pfShow(i, animate){
   const p = PF.proof; if (!p) return;
+  const from = PF.i;
   PF.i = Math.max(0, Math.min(p.steps.length-1, i));
+  if (PF.anim){ PF.anim.cancel(); PF.anim = null; }
   const g = PF.graphs[PF.i];
-  const hl = {};
-  stageSvg($('#pf-stage'), g, { shade:true, wobble:true, highlight: hl });
+  const speed = +$('#pf-speed').value;
+  if (animate && PF.i === from + 1 && ANIM_ON()){
+    PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, PF.mvs[PF.i],
+      { shade:true, wobble:true, markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
+      () => { PF.anim = null; });
+  } else {
+    stageSvg($('#pf-stage'), g, { shade:true, wobble:true });
+  }
   const s = p.steps[PF.i];
   $('#pf-why').innerHTML = '<b>'+esc(s.rule ? s.rule : 'Premiss')+'</b> — '+esc(s.why)+
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
@@ -2683,24 +3298,26 @@ function pfShow(i){
 }
 $('#pf-sel').onchange = e => { pfStop(); pfLoad(+e.target.value); };
 $('#pf-steps').onclick = e => { const li = e.target.closest('li'); if (li){ pfStop(); pfShow(+li.dataset.k); } };
-$('#pf-next').onclick = () => { pfStop(); pfShow(PF.i+1); };
+$('#pf-next').onclick = () => { pfStop(); pfShow(PF.i+1, true); };
 $('#pf-prev').onclick = () => { pfStop(); pfShow(PF.i-1); };
 $('#pf-first').onclick = () => { pfStop(); pfShow(0); };
-function pfStop(){ if (PF.timer){ clearInterval(PF.timer); PF.timer = null; $('#pf-play').textContent = '▶ play'; } }
+function pfStop(){
+  if (PF.timer){ clearTimeout(PF.timer); PF.timer = null; }
+  if (PF.anim){ PF.anim.cancel(); PF.anim = null; }
+  $('#pf-play').textContent = '▶ play';
+}
+const ANIM_ON = () => !$('#pf-anim') || $('#pf-anim').checked;
 $('#pf-play').onclick = () => {
-  if (PF.timer){ pfStop(); return; }
-  if (PF.i >= PF.proof.steps.length-1) PF.i = -1;
+  if (PF.timer || PF.anim){ pfStop(); return; }
+  if (PF.i >= PF.proof.steps.length-1) pfShow(0);
   $('#pf-play').textContent = '❚❚ pause';
-  const tick = () => {
+  const advance = () => {
     if (PF.i >= PF.proof.steps.length-1){ pfStop(); return; }
-    pfShow(PF.i+1);
+    pfShow(PF.i+1, true);
+    PF.timer = setTimeout(advance, +$('#pf-speed').value + 260);
   };
-  PF.timer = setInterval(tick, +$('#pf-speed').value);
-  tick();
+  PF.timer = setTimeout(advance, 300);
 };
-$('#pf-speed').oninput = () => { if (PF.timer){ clearInterval(PF.timer);
-  PF.timer = setInterval(() => { if (PF.i >= PF.proof.steps.length-1){ pfStop(); return; }
-    pfShow(PF.i+1); }, +$('#pf-speed').value); } };
 /* =============================== SCRIBE ==================================== */
 const ED = { g: newGraph(), sel: null, hist: [], pick: [] };
 function edPush(){ ED.hist.push(cloneGraph(ED.g)); if (ED.hist.length > 60) ED.hist.shift(); }
@@ -2823,6 +3440,11 @@ $('#d-loadlin').onclick = () => {
   catch(e){ $('#d-err').textContent = e.message; }
 };
 ['#d-shade','#d-handles'].forEach(s => $(s).addEventListener('change', drawRender));
+// Enter scribes; shift-Enter starts a new line
+[['#d-from','#d-load'], ['#d-lin','#d-loadlin']].forEach(([box, btn]) =>
+  $(box).addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); $(btn).click(); }
+  }));
 
 /* --- the legal moves, offered for experiment ------------------------------ */
 function drawMoves(){
@@ -2943,35 +3565,51 @@ function runProof(hard){
 $('#v-go').onclick = () => runProof(false);
 $('#v-hard').onclick = () => runProof(true);
 function vLoad(steps){
-  VV.steps = steps; VV.graphs = steps.map(s => s.graph); VV.i = 0;
+  VV.steps = steps;
+  const h = hydrateSteps(steps);
+  VV.graphs = h.graphs; VV.mvs = h.mvs; VV.i = 0;
   $('#v-proofcard').style.display = '';
   $('#v-steps').innerHTML = steps.map((s,k) =>
     '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
     esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
   vShow(0);
 }
-function vShow(i){
+function vShow(i, animate){
   if (!VV.steps) return;
+  const from = VV.i;
   VV.i = Math.max(0, Math.min(VV.steps.length-1, i));
-  stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
+  if (VV.anim){ VV.anim.cancel(); VV.anim = null; }
+  if (animate && VV.i === from + 1){
+    VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], VV.mvs[VV.i],
+      { shade:true, wobble:true, markMs: 620, moveMs: 700 }, () => { VV.anim = null; });
+  } else {
+    stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
+  }
   const s = VV.steps[VV.i];
   $('#v-why').innerHTML = '<b>'+esc(s.rule||'Premiss')+'</b> — '+esc(s.why)+
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
     esc(fmtFull(sugar(readGraph(VV.graphs[VV.i]))))+'</span>';
   $$('#v-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === VV.i));
 }
-function vStop(){ if (VV.timer){ clearInterval(VV.timer); VV.timer=null; $('#v-play').textContent='▶ play'; } }
-$('#v-next').onclick = ()=>{ vStop(); vShow(VV.i+1); };
+function vStop(){
+  if (VV.timer){ clearTimeout(VV.timer); VV.timer=null; }
+  if (VV.anim){ VV.anim.cancel(); VV.anim=null; }
+  $('#v-play').textContent='▶ play';
+}
+$('#v-next').onclick = ()=>{ vStop(); vShow(VV.i+1, true); };
 $('#v-prev').onclick = ()=>{ vStop(); vShow(VV.i-1); };
 $('#v-first').onclick = ()=>{ vStop(); vShow(0); };
 $('#v-steps').onclick = e => { const li = e.target.closest('li'); if (li){ vStop(); vShow(+li.dataset.k); } };
 $('#v-play').onclick = () => {
-  if (VV.timer){ vStop(); return; }
-  if (VV.i >= VV.steps.length-1) VV.i = -1;
+  if (VV.timer || VV.anim){ vStop(); return; }
+  if (VV.i >= VV.steps.length-1) vShow(0);
   $('#v-play').textContent = '❚❚ pause';
-  VV.timer = setInterval(() => {
-    if (VV.i >= VV.steps.length-1){ vStop(); return; } vShow(VV.i+1);
-  }, 1400);
+  const advance = () => {
+    if (VV.i >= VV.steps.length-1){ vStop(); return; }
+    vShow(VV.i+1, true);
+    VV.timer = setTimeout(advance, 1700);
+  };
+  VV.timer = setTimeout(advance, 300);
 };
 /* =========================== CONVENTIONS & RULES =========================== */
 const CONVENTIONS = [
@@ -3025,16 +3663,29 @@ $('#n-about').innerHTML = [
  '<p><b>Deeper Beta proofs.</b> The syllogism Barbara is beyond the present search, which is ',
  'why it is given on the Proofs tab in the form Roberts prints, each of its eight steps ',
  'checked against the rules by this page.</p>',
+ '<p><b>Where the exercises come from.</b> Several of the theorems on the Proofs tab are ',
+ 'the sort of thing set as natural-deduction exercises in the open logic textbooks: ',
+ '<i>forall x: Calgary</i> by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and Richard ',
+ 'Zach (CC BY 4.0, forallx.openlogicproject.org), and the Open Logic Project ',
+ '(openlogicproject.org). The theorems themselves are common property; what is shown here ',
+ 'is what becomes of them when they are proved by scribing and erasing instead.</p>',
  '<p><b>What is not here.</b> Gamma — the broken cut, graphs of graphs, the potentials, ',
  'modality — and the tinctured graphs of 1906. Roberts, chapters 5 and 6.</p>',
  '<hr class="sep"><p><b>Sources.</b> Don D. Roberts, <i>The Existential Graphs of Charles S. ',
  'Peirce</i> (The Hague: Mouton, 1973), chapters 3 and 4 and Appendices 3 and 4. ',
  'Charles S. Peirce, MS 514 (1909), transcribed with commentary by John F. Sowa, ',
- 'jfsowa.com/peirce/ms514.htm. References of the form 4.492 are to the ',
- '<i>Collected Papers</i>.</p>'
+ 'jfsowa.com/peirce/ms514.htm. P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and Richard ',
+ 'Zach, <i>forall x: Calgary. An Introduction to Formal Logic</i>, CC BY 4.0. ',
+ 'References of the form 4.492 are to the <i>Collected Papers</i>.</p>'
 ].join('');
 
 /* ---- go ------------------------------------------------------------------ */
+enhanceEditor($('#t-in'));
+enhanceEditor($('#v-prem'));
+enhanceEditor($('#v-goal'));
+enhanceEditor($('#d-from'));
+enhanceEditor($('#d-lin'), { glyphs: false });
+
 translate();
 pfLoad(0);
 drawRender();
