@@ -1,6 +1,8 @@
 /* ============================================================================
    THE APPLICATION
    ========================================================================== */
+const PREFS = { colour: true };
+const WRIT = { pf: null, v: null };
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -12,7 +14,7 @@ $$('nav.tabs button').forEach(b => b.onclick = () => {
 });
 // a panel that was hidden had no width to size its drawing to
 function refresh(tab){
-  if (tab === 'translate') translate();
+  if (tab === 'translate') translate(false);
   else if (tab === 'proofs' && PF.proof) pfShow(PF.i);
   else if (tab === 'draw') drawRender();
   else if (tab === 'prove' && VV.steps) vShow(VV.i);
@@ -28,7 +30,7 @@ window.addEventListener('resize', () => {
 
 /* ---- shared rendering helpers -------------------------------------------- */
 function stageSvg(el, g, opts){
-  el.innerHTML = svgDoc(g, Object.assign({ pad: 12, scale: 1 }, opts||{}));
+  el.innerHTML = svgDoc(g, Object.assign({ pad: 12, scale: 1, colourLines: PREFS.colour }, opts||{}));
   const svg = el.querySelector('svg');
   if (svg){
     const w = parseFloat(svg.getAttribute('width'));
@@ -76,11 +78,30 @@ const T_EXAMPLES = [
   ['Ex Ey (Mx & My & Exy)', 'some man eats a man']
 ];
 function tOpts(){ return { shade: $('#t-shade').checked, wobble: $('#t-wobble').checked,
-                           hookNumbers: $('#t-hooks').checked }; }
-function translate(){
+                           hookNumbers: $('#t-hooks').checked, colourLines: PREFS.colour }; }
+const TR = { graph: null, anim: null, timer: 0 };
+
+// Draw the new graph by moving the old one into it, so that what the change to
+// the formula does to the graph can be watched rather than guessed.
+function drawTranslated(g, animate){
+  const el = $('#t-stage');
+  if (TR.anim){ TR.anim.cancel(); TR.anim = null; }
+  const prev = TR.graph;
+  TR.graph = g;
+  if (!animate || !prev || !window.playTransition){ stageSvg(el, g, tOpts()); return; }
+  let aligned;
+  try { aligned = alignGraph(prev, g); } catch(e){ aligned = null; }
+  if (!aligned){ stageSvg(el, g, tOpts()); return; }
+  TR.graph = aligned;
+  TR.anim = playTransition(el, prev, aligned, null,
+    Object.assign({ markMs: 0, moveMs: 620 }, tOpts()),
+    () => { TR.anim = null; });
+}
+function translate(animate){
   const src = $('#t-in').value.trim();
   $('#t-err').textContent = '';
-  if (!src){ $('#t-stage').innerHTML = '<em style="color:var(--ink3)">the blank sheet</em>';
+  if (!src){ TR.graph = null; if (TR.anim){ TR.anim.cancel(); TR.anim = null; }
+    $('#t-stage').innerHTML = '<em style="color:var(--ink3)">the blank sheet</em>';
     $('#t-read').textContent = ''; $('#t-gloss').textContent = '';
     $('#t-lin').textContent = ''; $('#t-alt').innerHTML=''; $('#t-val').innerHTML=''; return; }
   let ast, r;
@@ -90,7 +111,7 @@ function translate(){
     return;
   }
   const g = r.graph;
-  stageSvg($('#t-stage'), g, tOpts());
+  drawTranslated(g, animate);
   const rd = readings(g);
   $('#t-read').textContent = rd.plain;
   $('#t-gloss').textContent = rd.gloss;
@@ -101,13 +122,22 @@ function translate(){
   $('#t-notes').innerHTML = r.notes.map(n => '<div>'+esc(n)+'</div>').join('');
   $('#t-val').innerHTML = valuationBadge(g);
 }
-$('#t-in').addEventListener('input', translate);
-['#t-shade','#t-wobble','#t-hooks'].forEach(s => $(s).addEventListener('change', translate));
+$('#t-in').addEventListener('input', () => {
+  if (!$('#t-live').checked) return;
+  clearTimeout(TR.timer);
+  TR.timer = setTimeout(() => translate(true), 420);   // let the typing settle
+});
+$('#t-in').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); clearTimeout(TR.timer); translate(true); }
+});
+$('#t-draw').onclick = () => { clearTimeout(TR.timer); translate(true); };
+['#t-shade','#t-wobble','#t-hooks'].forEach(s => $(s).addEventListener('change', () => translate(false)));
 $('#t-ex').innerHTML = T_EXAMPLES.map((e,i) =>
   '<button data-i="'+i+'" title="'+esc(e[0])+'">'+esc(e[1])+'</button>').join('');
 $('#t-ex').onclick = ev => {
   const b = ev.target.closest('button'); if (!b) return;
-  $('#t-in').value = T_EXAMPLES[+b.dataset.i][0]; translate();
+  setEditorValue('#t-in', T_EXAMPLES[+b.dataset.i][0]);
+  clearTimeout(TR.timer); translate(true);
 };
 
 /* --- rebuilding a proof so that it can be animated -------------------------
@@ -197,8 +227,15 @@ function pfShow(i, animate){
   const speed = +$('#pf-speed').value;
   if (animate && PF.i === from + 1 && ANIM_ON()){
     PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, PF.mvs[PF.i],
-      { shade:true, wobble:true, markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
+      { shade:true, wobble:true, colourLines: PREFS.colour,
+        markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
       () => { PF.anim = null; });
+  } else if (animate && PF.i === from - 1 && ANIM_ON()){
+    // rewinding is not a rule application, so nothing is marked; the drawing
+    // simply runs backwards
+    PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, null,
+      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 0,
+        moveMs: Math.round(speed*0.4) }, () => { PF.anim = null; });
   } else {
     stageSvg($('#pf-stage'), g, { shade:true, wobble:true });
   }
@@ -207,12 +244,13 @@ function pfShow(i, animate){
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
     esc(fmtFull(sugar(readGraph(g))))+'</span>';
   $$('#pf-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === PF.i));
+  if (WRIT.pf) WRIT.pf();
   const cur = $('#pf-steps li.cur'); if (cur) cur.scrollIntoView({block:'nearest'});
 }
 $('#pf-sel').onchange = e => { pfStop(); pfLoad(+e.target.value); };
 $('#pf-steps').onclick = e => { const li = e.target.closest('li'); if (li){ pfStop(); pfShow(+li.dataset.k); } };
 $('#pf-next').onclick = () => { pfStop(); pfShow(PF.i+1, true); };
-$('#pf-prev').onclick = () => { pfStop(); pfShow(PF.i-1); };
+$('#pf-prev').onclick = () => { pfStop(); pfShow(PF.i-1, true); };
 $('#pf-first').onclick = () => { pfStop(); pfShow(0); };
 function pfStop(){
   if (PF.timer){ clearTimeout(PF.timer); PF.timer = null; }

@@ -117,11 +117,35 @@ svg.eg .spotbg{fill:none}
 svg.eg .spot text{font:13px/1 var(--serif);fill:var(--ink)}
 svg.eg .loi{stroke:var(--ink);stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
 svg.eg .branch{fill:var(--ink)}
+/* Telling the lines apart. Peirce drew in one ink; this is an aid, like the
+   shading, and nothing in the logic turns on it. */
+svg.eg .lc0{stroke:#7d1f1f} svg.eg circle.lc0{fill:#7d1f1f}
+svg.eg .lc1{stroke:#1d5130} svg.eg circle.lc1{fill:#1d5130}
+svg.eg .lc2{stroke:#1e3a70} svg.eg circle.lc2{fill:#1e3a70}
+svg.eg .lc3{stroke:#5d2a6d} svg.eg circle.lc3{fill:#5d2a6d}
+svg.eg .lc4{stroke:#7a4a12} svg.eg circle.lc4{fill:#7a4a12}
+svg.eg .lc5{stroke:#11555d} svg.eg circle.lc5{fill:#11555d}
+svg.eg .lc6{stroke:#6d1f49} svg.eg circle.lc6{fill:#6d1f49}
+@media (prefers-color-scheme: dark){
+  svg.eg .lc0{stroke:#e79191} svg.eg circle.lc0{fill:#e79191}
+  svg.eg .lc1{stroke:#8fd0a1} svg.eg circle.lc1{fill:#8fd0a1}
+  svg.eg .lc2{stroke:#94b8ec} svg.eg circle.lc2{fill:#94b8ec}
+  svg.eg .lc3{stroke:#cba5e3} svg.eg circle.lc3{fill:#cba5e3}
+  svg.eg .lc4{stroke:#e3b978} svg.eg circle.lc4{fill:#e3b978}
+  svg.eg .lc5{stroke:#7fcbd3} svg.eg circle.lc5{fill:#7fcbd3}
+  svg.eg .lc6{stroke:#eaa1c4} svg.eg circle.lc6{fill:#eaa1c4}
+}
 svg.eg .hooknum{font:8px var(--sans);fill:var(--ink3)}
 svg.eg .cut.hl-add,svg.eg .spot.hl-add rect{stroke:var(--hl-add);stroke-width:3}
 svg.eg .spot.hl-add text{fill:var(--hl-add)}
 svg.eg .cut.hl-del,svg.eg .spot.hl-del rect{stroke:var(--hl-del);stroke-width:3}
 svg.eg .spot.hl-del text{fill:var(--hl-del)}
+svg.eg .telegraph{fill:none;stroke:var(--accent);stroke-width:1.8;stroke-dasharray:5 4;
+  opacity:.8;animation:dash 1.1s linear infinite}
+svg.eg .telegraph-head{fill:var(--accent);opacity:.8}
+@keyframes dash{to{stroke-dashoffset:-18}}
+@media (prefers-reduced-motion: reduce){ svg.eg .telegraph{animation:none} }
+
 /* the ring that marks what a rule is about to act on */
 svg.eg .focus{fill:none;stroke-width:2.6;rx:10}
 svg.eg .focus-del{stroke:var(--bad);animation:pulseDel 1s ease-in-out infinite}
@@ -176,6 +200,23 @@ code,.mono{font-family:var(--mono);font-size:12.8px}
 .movegroup{font:600 11.5px var(--sans);letter-spacing:.06em;text-transform:uppercase;
   color:var(--ink3);margin:10px 0 3px;padding-left:9px}
 
+/* the written record of a proof */
+button.btn.seg{padding:5px 11px;font-size:12.5px}
+button.btn.seg.on{background:var(--accent);color:#fff;border-color:transparent}
+table.writ{border-collapse:collapse;width:100%;font-size:13px;margin-top:12px}
+table.writ td{padding:5px 8px;vertical-align:top;border-top:1px solid var(--rule)}
+table.writ tr:first-child td{border-top:0}
+table.writ tr{cursor:pointer}
+table.writ tr:hover td{background:color-mix(in srgb,var(--rule) 38%,transparent)}
+table.writ tr.cur td{background:color-mix(in srgb,var(--accent) 13%,transparent)}
+table.writ td.n{color:var(--ink3);font-family:var(--mono);font-size:12px;width:1%;
+  white-space:nowrap;text-align:right}
+table.writ td.g{font-family:var(--mono);font-size:12.5px;word-break:break-word}
+table.writ td.g .alt{display:block;color:var(--ink2);font-family:var(--serif);
+  font-size:13.5px;margin-top:3px}
+table.writ td.r{width:1%;white-space:nowrap;color:var(--accent);font-weight:600;
+  font-size:12.5px;text-align:right}
+table.writ td.g .flag{color:var(--bad);cursor:help}
 table.tt{border-collapse:collapse;font-family:var(--mono);font-size:12px;margin-top:6px}
 table.tt th,table.tt td{border:1px solid var(--rule);padding:2px 8px;text-align:center}
 table.tt th{color:var(--ink3);font-weight:600}
@@ -222,10 +263,16 @@ hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
       <h2>A proposition in ordinary notation</h2>
       <textarea id="t-in" rows="3" spellcheck="false">Ax (Fx -> Gx)</textarea>
       <div class="chips" id="t-ex"></div>
+      <div class="btnrow">
+        <button class="btn" id="t-draw">Draw it</button>
+        <label style="font-size:12.5px;color:var(--ink2);display:flex;gap:5px;align-items:center">
+          <input type="checkbox" id="t-live" checked> draw as I type</label>
+      </div>
       <div class="toggles">
         <label><input type="checkbox" id="t-shade" checked> shade oddly enclosed areas</label>
         <label><input type="checkbox" id="t-wobble" checked> hand-drawn cuts</label>
         <label><input type="checkbox" id="t-hooks" checked> number the hooks</label>
+        <label><input type="checkbox" class="pref-colour" checked> colour the lines of identity</label>
       </div>
       <hr class="sep">
       <h2>How to write it</h2>
@@ -287,11 +334,25 @@ hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
           </label>
           <label style="font-size:12px;color:var(--ink3);display:flex;gap:5px;align-items:center">
             <input type="checkbox" id="pf-anim" checked> animate</label>
+          <label style="font-size:12px;color:var(--ink3);display:flex;gap:5px;align-items:center">
+            <input type="checkbox" class="pref-colour" checked> colour lines</label>
         </div>
       </div>
       <div class="card" style="margin-top:18px">
         <h2>Steps</h2>
         <ol class="steps" id="pf-steps"></ol>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>The proof in writing</h2>
+        <div class="btnrow" style="margin-top:0">
+          <button class="btn ghost seg on" data-form="linear">Linear notation</button>
+          <button class="btn ghost seg" data-form="formula">Ordinary notation</button>
+          <button class="btn ghost seg" data-form="both">Both</button>
+          <span class="sp" style="flex:1"></span>
+          <button class="btn ghost" id="pf-copy">Copy</button>
+        </div>
+        <div id="pf-writ"></div>
+        <p class="note" id="pf-writnote"></p>
       </div>
     </div>
   </div>
@@ -320,6 +381,7 @@ hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
         <div class="toggles">
           <label><input type="checkbox" id="d-shade" checked> shade odd areas</label>
           <label><input type="checkbox" id="d-handles" checked> show line points</label>
+          <label><input type="checkbox" class="pref-colour" checked> colour the lines</label>
         </div>
       </div>
       <div class="card" style="margin-top:18px">
@@ -374,6 +436,10 @@ Q -> R</textarea>
         <button class="btn ghost" id="v-hard">Search harder</button>
       </div>
       <div class="chips" id="v-ex"></div>
+      <hr class="sep">
+      <h2>Exercises from the open textbooks</h2>
+      <select id="v-book" style="width:100%"></select>
+      <p class="note" id="v-booknote" style="margin-top:8px"></p>
       <p class="note">Alpha validity is always decided outright, by the truth-value
       analysis of Roberts §3.2, whether or not a proof is found. Beta validity is not
       decidable; there a countermodel refutes, and otherwise the search can only report
@@ -395,6 +461,18 @@ Q -> R</textarea>
           <button class="btn ghost" id="v-next">forward ▶</button>
         </div>
         <ol class="steps" id="v-steps" style="margin-top:14px"></ol>
+      </div>
+      <div class="card" id="v-writ-card" style="margin-top:18px;display:none">
+        <h2>The proof in writing</h2>
+        <div class="btnrow" style="margin-top:0">
+          <button class="btn ghost seg on" data-form="linear">Linear notation</button>
+          <button class="btn ghost seg" data-form="formula">Ordinary notation</button>
+          <button class="btn ghost seg" data-form="both">Both</button>
+          <span class="sp" style="flex:1"></span>
+          <button class="btn ghost" id="v-copy">Copy</button>
+        </div>
+        <div id="v-writ"></div>
+        <p class="note" id="v-writnote"></p>
       </div>
     </div>
   </div>
@@ -642,6 +720,12 @@ function tokenize(src){
     if (c === ')' || c === ']'){ T.push({t:')', i}); i++; continue; }
     if (c === ','){ T.push({t:',', i}); i++; continue; }
     if (c === '='){ T.push({t:'=', i}); i++; continue; }
+    if (c === '⊥' || c === '⊤'){ T.push({t:'lit', v:c, i}); i++; continue; }
+    if (c === '"'){
+      const j = s.indexOf('"', i+1);
+      if (j < 0) throw new ParseError('Unclosed quotation mark.', i);
+      T.push({t:'str', v: s.slice(i+1, j), i}); i = j+1; continue;
+    }
     if (c === '-' && s[i+1] !== '>'){ T.push({t:'not', s:'-', i}); i++; continue; }
     if (isIdStart(c)){
       let j = i; while (j < s.length && isId(s[j])) j++;
@@ -745,6 +829,9 @@ function parseFormula(src){
     return vs;
   }
   function primary(){
+    if (at('lit')){ const tk = T[p++]; return { t: tk.v === '⊥' ? 'false' : 'true' }; }
+    if (at('id') && /^(absurd|falsum|contradiction)$/i.test(T[p].v)){ p++; return {t:'false'}; }
+    if (at('id') && /^(tautology|blank)$/i.test(T[p].v)){ p++; return {t:'true'}; }
     if (at('(')){
       // "(x)Fx" — the classical universal prefix
       if (T[p+1] && T[p+1].t==='id' && /^[a-z][0-9]?'?$/.test(T[p+1].v)
@@ -773,6 +860,16 @@ function parseFormula(src){
         p = save;
       }
       p++; const f = formula(); eat(')'); return f;
+    }
+    if (at('str')){
+      const tk = T[p++];
+      let args = [];
+      if (at('(')){
+        p++;
+        if (!at(')')){ for(;;){ const a = eat('id'); args.push(a.v); if (at(',')){p++;continue;} break; } }
+        eat(')');
+      }
+      return {t:'atom', name: tk.v, args};
     }
     if (at('id')){
       const tk = T[p++];
@@ -805,6 +902,29 @@ function parseFormula(src){
   const f = formula();
   if (!at('eof')) throw new ParseError('Unexpected extra input', T[p].i);
   return f;
+}
+
+/* A rendering that always parses back: spot names are quoted where they must
+   be, and every spot is written with its arguments in brackets. */
+function fmtStrict(a, outerPrec){
+  outerPrec = outerPrec||0;
+  const wrap = (s,p) => p < outerPrec ? '('+s+')' : s;
+  const nm = n => /^[A-Za-z_][A-Za-z0-9_']*$/.test(n) && !/^[AE][a-z][0-9]?'?$/.test(n)
+      ? n : '"'+n+'"';
+  switch(a.t){
+    case 'true':  return '⊤';
+    case 'false': return '⊥';
+    case 'atom':  return a.args.length ? nm(a.name)+'('+a.args.join(',')+')' : nm(a.name);
+    case 'eq':    return a.l+'='+a.r;
+    case 'not':   return '~'+fmtStrict(a.a, 5);
+    case 'and':   return wrap(a.xs.map(x=>fmtStrict(x,4)).join(' & '), 4);
+    case 'or':    return wrap(a.xs.map(x=>fmtStrict(x,3)).join(' | '), 3);
+    case 'imp':   return wrap(fmtStrict(a.a,3)+' -> '+fmtStrict(a.b,2), 2);
+    case 'iff':   return wrap(fmtStrict(a.a,2)+' <-> '+fmtStrict(a.b,2), 1);
+    case 'all':   return wrap('A'+a.v+' '+fmtStrict(a.a,5), 5);
+    case 'ex':    return wrap('E'+a.v+' '+fmtStrict(a.a,5), 5);
+  }
+  return '?';
 }
 
 /* --- pretty-print an AST back to notation --------------------------------- */
@@ -902,6 +1022,8 @@ function compileFormula(ast, opts){
         return;
       }
       case 'not': compNeg(a.a, area); return;
+      case 'true': return;                                  // the blank sheet (C1)
+      case 'false': addCut(g, area); return;                  // the empty cut (C5)
       case 'and': a.xs.forEach(x => comp(x, area)); return;
       case 'or': {
         // ¬(¬x₁ ∧ ¬x₂ ∧ …)
@@ -948,6 +1070,8 @@ function compileFormula(ast, opts){
   // scribe the denial of `a` on `area`
   function compNeg(a, area){
     switch (a.t){
+      case 'false': return;                                // ¬⊥ asserts nothing
+      case 'true': addCut(g, area); return;
       case 'not': comp(a.a, area); return;                 // the double cut collapses
       case 'imp':                                          // ¬(A ⊃ B) is A and not-B
         comp(a.a, area);
@@ -2102,7 +2226,16 @@ function laneMap(g){
     const m = lanes[l.area];
     if (m[lig[l.id]] === undefined) m[lig[l.id]] = Object.keys(m).length;
   }
-  return { lanes, lig, hooks };
+  // a stable order for the ligatures, so that colouring them is repeatable
+  const mins = {};
+  for (const l of Object.keys(lig)){
+    const n = parseInt(String(l).replace(/\D/g,''), 10) || 0;
+    if (mins[lig[l]] === undefined || n < mins[lig[l]]) mins[lig[l]] = n;
+  }
+  const order = Object.keys(mins).sort((a,b) => mins[a] - mins[b]);
+  const rank = {};
+  order.forEach((k,i) => rank[k] = i);
+  return { lanes, lig, hooks, rank, count: order.length };
 }
 
 /* ---- measure: bottom-up sizes ------------------------------------------- */
@@ -2445,12 +2578,14 @@ function renderGraph(g, opts){
   // lines of identity, drawn heavy (C6-C8). A ligature is drawn as whole
   // chains rather than edge by edge: a line is one graph (C7), and drawing it
   // in pieces leaves the round ends of each piece stacked at every junction.
+  const colour = opts.colourLines && LN.count > 1;
+  const lc = ln => colour ? ' lc' + (LN.rank[LN.lig[ln]] % 7) : '';
   const chains = lineChains(g, pos);
   const polys  = chains.map(ch => dedupePts(elbowPoints(ch, pos)));
   const hops   = crossingHops(polys);
   polys.forEach((pts, i) => {
     const d = roundedPath(pts, 5, hops[i]);
-    if (d) parts.push(`<path class="loi" d="${d}" data-chain="${chains[i].join(',')}"/>`);
+    if (d) parts.push(`<path class="loi${lc(chains[i][0])}" d="${d}" data-chain="${chains[i].join(',')}"/>`);
   });
   // a ligature with a single point and no edge is the bare line of C6
   for (const l of Object.values(g.lns)){
@@ -2458,13 +2593,13 @@ function renderGraph(g, opts){
     const isHook = Object.values(g.nodes).some(n => n.k==='spot' && n.hooks.includes(l.id));
     if (isHook) continue;
     const p = pos[l.id];
-    parts.push(`<path class="loi" d="M ${p.x} ${p.y} L ${p.x + LAY.bareW} ${p.y}" data-ln="${l.id}"/>`);
+    parts.push(`<path class="loi${lc(l.id)}" d="M ${p.x} ${p.y} L ${p.x + LAY.bareW} ${p.y}" data-ln="${l.id}"/>`);
   }
   // where three or more lines meet, a dot just fills the join (C8, teridentity)
   for (const l of Object.values(g.lns)){
     if (neighbours(g, l.id).length >= 3){
       const p = pos[l.id];
-      parts.push(`<circle class="branch" cx="${p.x}" cy="${p.y}" r="1.7"/>`);
+      parts.push(`<circle class="branch${lc(l.id)}" cx="${p.x}" cy="${p.y}" r="1.7"/>`);
     }
   }
   // hook numerals, so the order of a spot's hooks can be read off
@@ -2664,14 +2799,32 @@ function writeEG(g, plain){
         for (let i=1;i<got.length;i++) joins.push(got[0]+'~'+got[i]);
       }
     }
-    const nm = l => nameOfComp[find(l)];
-    // a point is worth writing only if it carries no hook
+    const nm0 = l => nameOfComp[find(l)];
+    // A branch with a loose end (R3(a)) puts a second point of one ligature on
+    // one area. The linear form needs a second name for it, joined to the
+    // first, or the branch would be lost.
+    const extra = {};
+    // A branch with a loose end (R3(a)) puts a second point of one ligature on
+    // one area; it needs a second name, joined to the first, or it would be
+    // lost. Only genuinely loose points are treated this way — a point the line
+    // merely passes through is not a separate thing (C7).
+    const seenLoose = new Set();
+    const leaves = l => neighbours(g, l).some(w => g.lns[w].area !== aid);
+    for (const l of A.lns){
+      if (hooks.has(l) || leaves(l)) continue;
+      const r = find(l);
+      if (!seenLoose.has(r)){ seenLoose.add(r); continue; }
+      extra[l] = fresh();
+      joins.push(nameOfComp[r] + '~' + extra[l]);
+    }
+    const nm = l => extra[l] !== undefined ? extra[l] : nm0(l);
     const shown = new Set();
     for (const l of A.lns){
       if (hooks.has(l)) continue;
-      const k = nm(l);
+      const k = nm0(l);
       if (!shown.has(k)){ shown.add(k); out.push('*'+k); }
     }
+    for (const l of A.lns) if (extra[l] !== undefined) out.push('*'+extra[l]);
     out.push(...joins);
     for (const id of A.items){
       if (id === skip) continue;
@@ -2683,8 +2836,8 @@ function writeEG(g, plain){
       const childInh = {};
       const inSet = new Set(g.areas[n.inner].lns);
       for (const e of Object.values(g.edges)){
-        if (here.has(e.a) && inSet.has(e.b)) childInh[e.b] = nm(e.a);
-        else if (here.has(e.b) && inSet.has(e.a)) childInh[e.a] = nm(e.b);
+        if (here.has(e.a) && inSet.has(e.b)) childInh[e.b] = nm0(e.a);
+        else if (here.has(e.b) && inSet.has(e.a)) childInh[e.a] = nm0(e.b);
       }
       if (!plain && n.scroll && g.nodes[n.scroll] && g.nodes[n.scroll].area === n.inner){
         const loop = n.scroll;
@@ -2796,7 +2949,14 @@ function prepareTween(gA, gB, GA, GB, opts){
     if (inA || inB) bare.push({ l, inA: !!inA, inB: !!inB });
   }
 
-  return { gA, gB, GA, GB, nodes, chains, bare, opts,
+  const LNB = laneMap(gB), LNA = laneMap(gA);
+  const colour = opts.colourLines && Math.max(LNA.count, LNB.count) > 1;
+  const lcOf = ln => {
+    if (!colour) return '';
+    const L = LNB.lig[ln] !== undefined ? LNB : LNA;
+    return ' lc' + (L.rank[L.lig[ln]] % 7);
+  };
+  return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf,
            W: Math.max(GA.W, GB.W), H: Math.max(GA.H, GB.H) };
 }
 
@@ -2805,7 +2965,7 @@ function tweenFrame(sp, t){
   const parts = [];
   const shade = opts.shade, wobble = opts.wobble !== false;
   const outT = Math.min(1, t / 0.45);            // what goes, goes early
-  const inT  = Math.max(0, (t - 0.5) / 0.5);     // what comes, comes late
+  const inT  = Math.max(0, (t - 0.18) / 0.82);   // what comes, arrives visibly
   const e = EASE(t);
 
   const raised = opts.raised === false ? '' : ' raised';
@@ -2838,18 +2998,98 @@ function tweenFrame(sp, t){
   const hops  = crossingHops(polys);
   polys.forEach((pts, i) => {
     const d = roundedPath(pts, 5, hops[i]);
-    if (d) parts.push(`<path class="loi" opacity="${r2(live[i].op)}" d="${d}"/>`);
+    if (d) parts.push(`<path class="loi${sp.lcOf(live[i].c.ch[0])}" opacity="${
+      r2(live[i].op)}" d="${d}"/>`);
   });
   for (const b of sp.bare){
     const op = b.inA && b.inB ? 1 : b.inB ? inT : 1 - outT;
     if (op <= 0.01) continue;
     const p = POS[b.l]; if (!p) continue;
-    parts.push(`<path class="loi" opacity="${r2(op)}" d="M ${r2(p.x)} ${r2(p.y)} L ${
+    parts.push(`<path class="loi${sp.lcOf(b.l)}" opacity="${r2(op)}" d="M ${r2(p.x)} ${r2(p.y)} L ${
       r2(p.x + LAY.bareW)} ${r2(p.y)}"/>`);
   }
   return parts.join('\n');
 }
 function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 }; }
+
+/* The first beat: the graph as it stands, with everything but the graphs the
+   rule is about to act on held back, a ghost of whatever is about to be
+   scribed shown where it will appear, and an arrow from a graph to the area it
+   is about to be copied into. The point is to let the eye find the place
+   before anything moves. */
+function markFrame(sp, focus, mv){
+  const { gA, GA, opts } = sp;
+  const parts = [];
+  const shade = opts.shade, wobble = opts.wobble !== false;
+  const raised = opts.raised === false ? '' : ' raised';
+  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${sp.W-1}" height="${sp.H-1}" rx="6"/>`);
+
+  // anything inside a graph in focus is in focus too
+  const lit = new Set(Object.keys(focus));
+  for (const id of Object.keys(focus)){
+    const n = gA.nodes[id];
+    if (n && n.k === 'cut') nodesUnder(gA, n.inner).forEach(x => lit.add(x));
+  }
+  const dimming = lit.size > 0;
+
+  for (const it of sp.nodes){
+    if (!it.inA) continue;
+    const op = !dimming || lit.has(it.id) ? 1 : 0.3;
+    if (it.n.k === 'cut'){
+      parts.push(`<path class="cut${raised}${shade && it.odd ? ' odd':''}" opacity="${op}" d="${
+        cutPath(it.a.x, it.a.y, it.a.w, it.a.h, it.n.id, wobble)}"/>`);
+    } else {
+      parts.push(`<g class="spot" opacity="${op}"><text x="${
+        r2(it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(it.a.y + it.a.h/2)}" `+
+        `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+    }
+  }
+  // the lines, as they stand
+  const chainsA = lineChains(gA, GA.pos);
+  const polysA = chainsA.map(ch => dedupePts(elbowPoints(ch, GA.pos)));
+  const hopsA = crossingHops(polysA);
+  polysA.forEach((pts,i) => {
+    const d = roundedPath(pts, 5, hopsA[i]);
+    if (d) parts.push(`<path class="loi${sp.lcOf(chainsA[i][0])}" opacity="${
+      dimming ? 0.5 : 1}" d="${d}"/>`);
+  });
+  for (const b of sp.bare){
+    if (!b.inA) continue;
+    const p = GA.pos[b.l]; if (!p) continue;
+    parts.push(`<path class="loi${sp.lcOf(b.l)}" opacity="${dimming ? 0.5 : 1}" d="M ${
+      r2(p.x)} ${r2(p.y)} L ${r2(p.x + LAY.bareW)} ${r2(p.y)}"/>`);
+  }
+
+  // an arrow from the graph being copied to the area it is going into
+  if (mv && mv.op === 'iterate'){
+    const from = GA.P[mv.node];
+    const cut = gA.areas[mv.target] && gA.areas[mv.target].cut;
+    const to = cut ? GA.P[cut] : GA.P[gA.root] || null;
+    if (from && to) parts.push(arrowPath(from, to));
+  }
+  return parts.join('\n');
+}
+function arrowPath(a, b){
+  const x1 = a.x + a.w/2, y1 = a.y + a.h/2;
+  const x2 = b.x + b.w/2, y2 = b.y + b.h/2;
+  const dx = x2-x1, dy = y2-y1, len = Math.hypot(dx,dy) || 1;
+  if (len < 18) return '';
+  // pull the ends clear of both boxes and bow the line a little
+  const t0 = Math.min(0.42, (Math.max(a.w,a.h)/2 + 8) / len);
+  const t1 = 1 - Math.min(0.42, (Math.max(b.w,b.h)/2 + 8) / len);
+  if (t1 <= t0) return '';
+  const p0 = { x: x1 + dx*t0, y: y1 + dy*t0 };
+  const p1 = { x: x1 + dx*t1, y: y1 + dy*t1 };
+  const mx = (p0.x+p1.x)/2 - dy*0.16, my = (p0.y+p1.y)/2 + dx*0.16;
+  const ang = Math.atan2(p1.y-my, p1.x-mx), h = 7;
+  const head = [
+    [p1.x, p1.y],
+    [p1.x - h*Math.cos(ang-0.42), p1.y - h*Math.sin(ang-0.42)],
+    [p1.x - h*Math.cos(ang+0.42), p1.y - h*Math.sin(ang+0.42)]
+  ].map(p => r2(p[0])+','+r2(p[1])).join(' ');
+  return `<path class="telegraph" d="M ${r2(p0.x)} ${r2(p0.y)} Q ${r2(mx)} ${r2(my)} ${
+    r2(p1.x)} ${r2(p1.y)}"/><polygon class="telegraph-head" points="${head}"/>`;
+}
 
 /* ---- the player ---------------------------------------------------------- */
 function svgWrap(inner, w, h, scale, pad){
@@ -2873,8 +3113,9 @@ function playTransition(el, gA, gB, mv, opts, done){
   const sp = prepareTween(gA, gB, GA, GB, opts);
 
   // beat one: mark what the rule is about to act on
-  el.innerHTML = svgWrap(tweenFrame(sp, 0), W, H, scale, pad);
-  markNodes(el, gA, GA, moveFocus(gA, mv));
+  const focus = moveFocus(gA, mv);
+  el.innerHTML = svgWrap(markFrame(sp, focus, mv), W, H, scale, pad);
+  markNodes(el, gA, GA, focus);
 
   timer = setTimeout(() => {
     if (cancelled) return;
@@ -2908,6 +3149,73 @@ function markNodes(el, g, G, focus){
     r.setAttribute('class', 'focus focus-' + kind);
     svg.appendChild(r);
   }
+}
+
+/* ============================================================================
+   ALIGNING TWO GRAPHS THAT SHARE NO HISTORY.
+   Within a proof a transformation carries identifiers across, so a node can be
+   followed from step to step. Two graphs compiled from two different formulas
+   have no such connection, and would simply cross-fade. Matching them up by
+   shape first — same enclosure in the same place, same spot with the same name
+   — lets the parts they have in common move rather than blink.
+   ========================================================================== */
+function alignGraph(gA, gB){
+  const ligA = ligIndex(gA), ligB = ligIndex(gB);
+  const node = {}, area = {}, ln = {};
+  area[gB.root] = gA.root;
+
+  (function matchArea(aA, aB){
+    const itemsA = gA.areas[aA].items, itemsB = gB.areas[aB].items;
+    const used = new Set();
+    const take = (a, b) => {
+      node[b] = a; used.add(a);
+      const nA = gA.nodes[a], nB = gB.nodes[b];
+      if (nB.k === 'cut'){ area[nB.inner] = nA.inner; matchArea(nA.inner, nB.inner); }
+      else nB.hooks.forEach((h,i) => { if (nA.hooks[i]) ln[h] = nA.hooks[i]; });
+    };
+    for (const b of itemsB){                         // exactly the same subgraph
+      const cb = canonNode(gB, b, ligB);
+      const a = itemsA.find(x => !used.has(x) && canonNode(gA, x, ligA) === cb);
+      if (a) take(a, b);
+    }
+    for (const b of itemsB){                         // failing that, the same kind
+      if (node[b]) continue;
+      const nB = gB.nodes[b];
+      const a = itemsA.find(x => !used.has(x) && gA.nodes[x].k === nB.k &&
+        (nB.k !== 'spot' || gA.nodes[x].name === nB.name));
+      if (a) take(a, b);
+    }
+  })(gA.root, gB.root);
+
+  // everything else in B gets an identifier of its own, distinct from A's
+  let k = 0;
+  const fresh = () => 'z' + (++k);
+  const nid = x => node[x] || (node[x] = fresh());
+  const aid = x => area[x] || (area[x] = fresh());
+  const lid = x => ln[x]   || (ln[x]   = fresh());
+
+  const h = { areas:{}, nodes:{}, lns:{}, edges:{}, root: gA.root };
+  for (const a of Object.keys(gB.areas)){
+    const A = gB.areas[a];
+    h.areas[aid(a)] = { id: aid(a), cut: A.cut ? nid(A.cut) : null,
+      items: A.items.map(nid), lns: A.lns.map(lid) };
+  }
+  for (const x of Object.keys(gB.nodes)){
+    const n = gB.nodes[x];
+    h.nodes[nid(x)] = n.k === 'cut'
+      ? { k:'cut', id: nid(x), area: aid(n.area), inner: aid(n.inner),
+          scroll: n.scroll ? nid(n.scroll) : undefined }
+      : { k:'spot', id: nid(x), area: aid(n.area), name: n.name, hooks: n.hooks.map(lid) };
+  }
+  for (const x of Object.keys(gB.lns))
+    h.lns[lid(x)] = { id: lid(x), area: aid(gB.lns[x].area) };
+  let e = 0;
+  for (const x of Object.keys(gB.edges)){
+    const E = gB.edges[x];
+    const id = 'ze' + (++e);
+    h.edges[id] = { id, a: lid(E.a), b: lid(E.b) };
+  }
+  return h;
 }
 /* --- the verified proof library --- */
 const PROOFS = [
@@ -3025,6 +3333,14 @@ function insertAt(ta, text){
   ta.focus();
 }
 function fire(ta){ ta.dispatchEvent(new Event('input', { bubbles: true })); }
+// setting .value from script fires no event, so the mirror would keep showing
+// the old text until the box was next touched
+function setEditorValue(sel, text){
+  const ta = typeof sel === 'string' ? document.querySelector(sel) : sel;
+  if (!ta) return;
+  ta.value = text;
+  fire(ta);
+}
 
 const GLYPHS = [
   { s:'¬', ins:'~',   t:'not' },
@@ -3088,6 +3404,8 @@ function highlight(src, caret){
 /* ============================================================================
    THE APPLICATION
    ========================================================================== */
+const PREFS = { colour: true };
+const WRIT = { pf: null, v: null };
 const $  = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
 
@@ -3099,7 +3417,7 @@ $$('nav.tabs button').forEach(b => b.onclick = () => {
 });
 // a panel that was hidden had no width to size its drawing to
 function refresh(tab){
-  if (tab === 'translate') translate();
+  if (tab === 'translate') translate(false);
   else if (tab === 'proofs' && PF.proof) pfShow(PF.i);
   else if (tab === 'draw') drawRender();
   else if (tab === 'prove' && VV.steps) vShow(VV.i);
@@ -3115,7 +3433,7 @@ window.addEventListener('resize', () => {
 
 /* ---- shared rendering helpers -------------------------------------------- */
 function stageSvg(el, g, opts){
-  el.innerHTML = svgDoc(g, Object.assign({ pad: 12, scale: 1 }, opts||{}));
+  el.innerHTML = svgDoc(g, Object.assign({ pad: 12, scale: 1, colourLines: PREFS.colour }, opts||{}));
   const svg = el.querySelector('svg');
   if (svg){
     const w = parseFloat(svg.getAttribute('width'));
@@ -3163,11 +3481,30 @@ const T_EXAMPLES = [
   ['Ex Ey (Mx & My & Exy)', 'some man eats a man']
 ];
 function tOpts(){ return { shade: $('#t-shade').checked, wobble: $('#t-wobble').checked,
-                           hookNumbers: $('#t-hooks').checked }; }
-function translate(){
+                           hookNumbers: $('#t-hooks').checked, colourLines: PREFS.colour }; }
+const TR = { graph: null, anim: null, timer: 0 };
+
+// Draw the new graph by moving the old one into it, so that what the change to
+// the formula does to the graph can be watched rather than guessed.
+function drawTranslated(g, animate){
+  const el = $('#t-stage');
+  if (TR.anim){ TR.anim.cancel(); TR.anim = null; }
+  const prev = TR.graph;
+  TR.graph = g;
+  if (!animate || !prev || !window.playTransition){ stageSvg(el, g, tOpts()); return; }
+  let aligned;
+  try { aligned = alignGraph(prev, g); } catch(e){ aligned = null; }
+  if (!aligned){ stageSvg(el, g, tOpts()); return; }
+  TR.graph = aligned;
+  TR.anim = playTransition(el, prev, aligned, null,
+    Object.assign({ markMs: 0, moveMs: 620 }, tOpts()),
+    () => { TR.anim = null; });
+}
+function translate(animate){
   const src = $('#t-in').value.trim();
   $('#t-err').textContent = '';
-  if (!src){ $('#t-stage').innerHTML = '<em style="color:var(--ink3)">the blank sheet</em>';
+  if (!src){ TR.graph = null; if (TR.anim){ TR.anim.cancel(); TR.anim = null; }
+    $('#t-stage').innerHTML = '<em style="color:var(--ink3)">the blank sheet</em>';
     $('#t-read').textContent = ''; $('#t-gloss').textContent = '';
     $('#t-lin').textContent = ''; $('#t-alt').innerHTML=''; $('#t-val').innerHTML=''; return; }
   let ast, r;
@@ -3177,7 +3514,7 @@ function translate(){
     return;
   }
   const g = r.graph;
-  stageSvg($('#t-stage'), g, tOpts());
+  drawTranslated(g, animate);
   const rd = readings(g);
   $('#t-read').textContent = rd.plain;
   $('#t-gloss').textContent = rd.gloss;
@@ -3188,13 +3525,22 @@ function translate(){
   $('#t-notes').innerHTML = r.notes.map(n => '<div>'+esc(n)+'</div>').join('');
   $('#t-val').innerHTML = valuationBadge(g);
 }
-$('#t-in').addEventListener('input', translate);
-['#t-shade','#t-wobble','#t-hooks'].forEach(s => $(s).addEventListener('change', translate));
+$('#t-in').addEventListener('input', () => {
+  if (!$('#t-live').checked) return;
+  clearTimeout(TR.timer);
+  TR.timer = setTimeout(() => translate(true), 420);   // let the typing settle
+});
+$('#t-in').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); clearTimeout(TR.timer); translate(true); }
+});
+$('#t-draw').onclick = () => { clearTimeout(TR.timer); translate(true); };
+['#t-shade','#t-wobble','#t-hooks'].forEach(s => $(s).addEventListener('change', () => translate(false)));
 $('#t-ex').innerHTML = T_EXAMPLES.map((e,i) =>
   '<button data-i="'+i+'" title="'+esc(e[0])+'">'+esc(e[1])+'</button>').join('');
 $('#t-ex').onclick = ev => {
   const b = ev.target.closest('button'); if (!b) return;
-  $('#t-in').value = T_EXAMPLES[+b.dataset.i][0]; translate();
+  setEditorValue('#t-in', T_EXAMPLES[+b.dataset.i][0]);
+  clearTimeout(TR.timer); translate(true);
 };
 
 /* --- rebuilding a proof so that it can be animated -------------------------
@@ -3284,8 +3630,15 @@ function pfShow(i, animate){
   const speed = +$('#pf-speed').value;
   if (animate && PF.i === from + 1 && ANIM_ON()){
     PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, PF.mvs[PF.i],
-      { shade:true, wobble:true, markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
+      { shade:true, wobble:true, colourLines: PREFS.colour,
+        markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
       () => { PF.anim = null; });
+  } else if (animate && PF.i === from - 1 && ANIM_ON()){
+    // rewinding is not a rule application, so nothing is marked; the drawing
+    // simply runs backwards
+    PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, null,
+      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 0,
+        moveMs: Math.round(speed*0.4) }, () => { PF.anim = null; });
   } else {
     stageSvg($('#pf-stage'), g, { shade:true, wobble:true });
   }
@@ -3294,12 +3647,13 @@ function pfShow(i, animate){
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
     esc(fmtFull(sugar(readGraph(g))))+'</span>';
   $$('#pf-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === PF.i));
+  if (WRIT.pf) WRIT.pf();
   const cur = $('#pf-steps li.cur'); if (cur) cur.scrollIntoView({block:'nearest'});
 }
 $('#pf-sel').onchange = e => { pfStop(); pfLoad(+e.target.value); };
 $('#pf-steps').onclick = e => { const li = e.target.closest('li'); if (li){ pfStop(); pfShow(+li.dataset.k); } };
 $('#pf-next').onclick = () => { pfStop(); pfShow(PF.i+1, true); };
-$('#pf-prev').onclick = () => { pfStop(); pfShow(PF.i-1); };
+$('#pf-prev').onclick = () => { pfStop(); pfShow(PF.i-1, true); };
 $('#pf-first').onclick = () => { pfStop(); pfShow(0); };
 function pfStop(){
   if (PF.timer){ clearTimeout(PF.timer); PF.timer = null; }
@@ -3390,6 +3744,7 @@ function drawRender(){
   $('#d-hint').textContent = hint;
 
   drawMoves();
+  if (!ED.quiet) syncScribeBoxes('graph');
 }
 function togglePick(ln){
   const i = ED.pick.indexOf(ln);
@@ -3430,13 +3785,25 @@ $('#d-del').onclick = () => {
 };
 $('#d-undo').onclick = () => { if (ED.hist.length){ ED.g = ED.hist.pop(); ED.sel=null; ED.pick=[]; drawRender(); } };
 $('#d-clear').onclick = () => { edPush(); ED.g = newGraph(); ED.sel=null; ED.pick=[]; drawRender(); };
+// Whichever box is used, the other is brought into step, so that the two
+// descriptions of the graph on the sheet always agree.
+function syncScribeBoxes(from){
+  try {
+    if (from !== 'lin') setEditorValue('#d-lin', writeEG(ED.g) || '');
+    if (from !== 'formula'){
+      const f = fmtStrict(sugar(readGraph(ED.g)), 0);
+      setEditorValue('#d-from', f);
+    }
+  } catch(e){ /* a graph with no formula of its own is left alone */ }
+}
 $('#d-load').onclick = () => {
   try { edPush(); ED.g = compileFormula(parseFormula($('#d-from').value)).graph;
-        ED.sel=null; ED.pick=[]; drawRender(); }
+        ED.sel=null; ED.pick=[]; drawRender(); syncScribeBoxes('formula'); }
   catch(e){ $('#d-err').textContent = e.message; }
 };
 $('#d-loadlin').onclick = () => {
-  try { edPush(); ED.g = parseEG($('#d-lin').value); ED.sel=null; ED.pick=[]; drawRender(); }
+  try { edPush(); ED.g = parseEG($('#d-lin').value); ED.sel=null; ED.pick=[];
+        drawRender(); syncScribeBoxes('lin'); }
   catch(e){ $('#d-err').textContent = e.message; }
 };
 ['#d-shade','#d-handles'].forEach(s => $(s).addEventListener('change', drawRender));
@@ -3496,13 +3863,15 @@ $('#v-ex').innerHTML = V_EXAMPLES.map((e,i)=>'<button data-i="'+i+'">'+esc(e[2])
 $('#v-ex').onclick = e => {
   const b = e.target.closest('button'); if (!b) return;
   const ex = V_EXAMPLES[+b.dataset.i];
-  $('#v-prem').value = ex[0].join('\n'); $('#v-goal').value = ex[1];
+  setEditorValue('#v-prem', ex[0].join('\n'));
+  setEditorValue('#v-goal', ex[1]);
 };
 const VV = { steps: null, graphs: null, i: 0, timer: null };
 function runProof(hard){
   const premSrc = $('#v-prem').value.split('\n').map(s=>s.trim()).filter(Boolean);
   const goalSrc = $('#v-goal').value.trim();
   $('#v-proofcard').style.display = 'none';
+  $('#v-writ-card').style.display = 'none';
   if (!goalSrc){ $('#v-verdict').textContent = 'Give a conclusion.'; return; }
   let prems, goal, premAst, goalAst;
   try {
@@ -3569,6 +3938,7 @@ function vLoad(steps){
   const h = hydrateSteps(steps);
   VV.graphs = h.graphs; VV.mvs = h.mvs; VV.i = 0;
   $('#v-proofcard').style.display = '';
+  $('#v-writ-card').style.display = '';
   $('#v-steps').innerHTML = steps.map((s,k) =>
     '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
     esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
@@ -3581,7 +3951,12 @@ function vShow(i, animate){
   if (VV.anim){ VV.anim.cancel(); VV.anim = null; }
   if (animate && VV.i === from + 1){
     VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], VV.mvs[VV.i],
-      { shade:true, wobble:true, markMs: 620, moveMs: 700 }, () => { VV.anim = null; });
+      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 620, moveMs: 700 },
+      () => { VV.anim = null; });
+  } else if (animate && VV.i === from - 1){
+    VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], null,
+      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 0, moveMs: 560 },
+      () => { VV.anim = null; });
   } else {
     stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
   }
@@ -3590,6 +3965,7 @@ function vShow(i, animate){
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
     esc(fmtFull(sugar(readGraph(VV.graphs[VV.i]))))+'</span>';
   $$('#v-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === VV.i));
+  if (WRIT.v) WRIT.v();
 }
 function vStop(){
   if (VV.timer){ clearTimeout(VV.timer); VV.timer=null; }
@@ -3597,7 +3973,7 @@ function vStop(){
   $('#v-play').textContent='▶ play';
 }
 $('#v-next').onclick = ()=>{ vStop(); vShow(VV.i+1, true); };
-$('#v-prev').onclick = ()=>{ vStop(); vShow(VV.i-1); };
+$('#v-prev').onclick = ()=>{ vStop(); vShow(VV.i-1, true); };
 $('#v-first').onclick = ()=>{ vStop(); vShow(0); };
 $('#v-steps').onclick = e => { const li = e.target.closest('li'); if (li){ vStop(); vShow(+li.dataset.k); } };
 $('#v-play').onclick = () => {
@@ -3611,6 +3987,251 @@ $('#v-play').onclick = () => {
   };
   VV.timer = setTimeout(advance, 300);
 };
+/* ============================================================================
+   EXERCISES FROM THE OPEN TEXTBOOKS.
+   These are the arguments and theorems set for natural deduction in
+   forall x: Calgary, by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and
+   Richard Zach (CC BY 4.0, forallx.openlogicproject.org). They are reproduced
+   here under that licence, to be worked instead by Peirce's five rules.
+   Where the book uses A as a one-place predicate the letter is changed, since
+   "Ax" reads as the universal quantifier in the notation of this page.
+   ========================================================================== */
+
+const BOOK_EXERCISES = [
+  { group: 'Basic rules for TFL — ch. 16', items: [
+    ['J -> ~J', '~J'],
+    ['Q -> (Q & ~Q)', '~Q'],
+    ['A -> (B -> C)', '(A & B) -> C'],
+    ['K & L', 'K <-> L'],
+    ['(C & D) | E', 'E | D'],
+    ['A <-> B\nB <-> C', 'A <-> C'],
+    ['~F -> G\nF -> H', 'G | H'],
+    ['(Z & K) | (K & M)\nK -> D', 'D'],
+    ['~(P -> Q)', '~Q'],
+    ['~(P -> Q)', 'P']
+  ]},
+  { group: 'Constructing proofs — ch. 17', items: [
+    ['A -> B\nA -> C', 'A -> (B & C)'],
+    ['(A & B) -> C', 'A -> (B -> C)'],
+    ['A -> (B -> C)', '(A -> B) -> (A -> C)'],
+    ['A | (B & C)', '(A | B) & (A | C)'],
+    ['(A & B) | (A & C)', 'A & (B | C)'],
+    ['A | B\nA -> C\nB -> D', 'C | D'],
+    ['~A | ~B', '~(A & B)'],
+    ['A & ~B', '~(A -> B)'],
+    ['', '~A -> (A -> ⊥)'],
+    ['', '~(A & ~A)'],
+    ['', '((A -> C) & (B -> C)) -> ((A | B) -> C)'],
+    ['', '~(A -> B) -> (A & ~B)'],
+    ['', '(~A | B) -> (A -> B)']
+  ]},
+  { group: 'Constructing proofs — ch. 17, the harder set', items: [
+    ['', '~~A -> A'],
+    ['~A -> ~B', 'B -> A'],
+    ['A -> B', '~A | B'],
+    ['', '~(A & B) -> (~A | ~B)'],
+    ['A -> (B | C)', '(A -> B) | (A -> C)'],
+    ['', '(A -> B) | (B -> A)'],
+    ['', '((A -> B) -> A) -> A']
+  ]},
+  { group: 'Additional rules for TFL — ch. 18', items: [
+    ['E | F\nF | G\n~F', 'E & G'],
+    ['M | (N -> M)', '~M -> ~N'],
+    ['(M | N) & (O | P)\nN -> P\n~P', 'M & O'],
+    ['(X & Y) | (X & Z)\n~(X & D)\nD | M', 'M']
+  ]},
+  { group: 'Basic rules for FOL — ch. 34', items: [
+    ['Q -> Ax Fx', 'Ax (Q -> Fx)'],
+    ['Ex (Q -> Fx)', 'Q -> Ex Fx'],
+    ['Ax (Fx -> Q)', 'Ex Fx -> Q'],
+    ['', 'Ax (Fx -> Ey Fy)'],
+    ['Ax Rxx', 'Ax Ey Rxy'],
+    ['Ax Ay Az ((Rxy & Ryz) -> Rxz)', 'Ax Ay (Rxy -> Az (Ryz -> Rxz))'],
+    ['Ax (Jx -> Kx)\nEx Ay Lxy\nAx Jx', 'Ex (Kx & Lxx)']
+  ]},
+  { group: 'Conversion of quantifiers — ch. 35', items: [
+    ['Ax (Fx -> ~Gx)', '~Ex (Fx & Gx)'],
+    ['~Ex (Fx & Gx)', 'Ax (Fx -> ~Gx)'],
+    ['~Ex Rxa\nAx Ay Ryx', '⊥'],
+    ['~Ex Ey Lxy', '~Laa']
+  ]},
+  { group: 'Syllogistic figures — ch. 34', items: [
+    ['Ax (Fx -> Gx)\nAx (Gx -> Hx)', 'Ax (Fx -> Hx)'],
+    ['Ax (Gx -> ~Fx)\nAx (Hx -> Gx)', 'Ax (Hx -> ~Fx)'],
+    ['Ax (Gx -> Hx)\nEx (Fx & Gx)', 'Ex (Fx & Hx)'],
+    ['Ax (Gx -> ~Hx)\nEx (Fx & Gx)', 'Ex (Fx & ~Hx)']
+  ]},
+  { group: 'Identity — ch. 37', items: [
+    ['Ax Ay (Rxy -> x=y)', 'Rab -> Rba'],
+    ['Ex Jx\nEx ~Jx', 'Ex Ey ~(x=y)'],
+    ['Pa | Qb\nQb -> b=c\n~Pa', 'Qc']
+  ]}
+];
+
+/* Which of these the search on this page can manage, as measured. Everything
+   else is worth trying with “search harder”, and two of them are in the proof
+   library because the search cannot reach them. */
+const EX_HARDER = new Set([
+  '(A & B) | (A & C)|A & (B | C)',
+  'A | B\nA -> C\nB -> D|C | D',
+  'A <-> B\nB <-> C|A <-> C',
+  '(X & Y) | (X & Z)\n~(X & D)\nD | M|M'
+]);
+const EX_LIBRARY = new Set([
+  'Ax (Fx -> Gx)\nAx (Gx -> Hx)|Ax (Fx -> Hx)',
+  'Ax (Gx -> Hx)\nEx (Fx & Gx)|Ex (Fx & Hx)'
+]);
+
+(function buildExerciseList(){
+  const sel = $('#v-book');
+  if (!sel) return;
+  let html = '<option value="">Pick an exercise…</option>';
+  BOOK_EXERCISES.forEach((g, gi) => {
+    html += '<optgroup label="'+esc(g.group)+'">';
+    g.items.forEach(([prem, goal], ii) => {
+      const label = (prem ? prem.split('\n').join(', ')+' ⊢ ' : '⊢ ') + goal;
+      html += '<option value="'+gi+'.'+ii+'">'+esc(label)+'</option>';
+    });
+    html += '</optgroup>';
+  });
+  sel.innerHTML = html;
+  sel.onchange = () => {
+    if (!sel.value) return;
+    const [gi, ii] = sel.value.split('.').map(Number);
+    const [prem, goal] = BOOK_EXERCISES[gi].items[ii];
+    setEditorValue('#v-prem', prem);
+    setEditorValue('#v-goal', goal);
+    const key = prem+'|'+goal;
+    $('#v-booknote').innerHTML = EX_LIBRARY.has(key)
+      ? 'The search on this page cannot reach this one. It is worked out in full on the Proofs tab.'
+      : EX_HARDER.has(key)
+      ? 'This one needs “search harder”.'
+      : 'Set in <i>forall x: Calgary</i> (CC BY 4.0) for natural deduction.';
+    runProof(EX_HARDER.has(key));
+  };
+  $('#v-booknote').innerHTML =
+    'From <i>forall x: Calgary</i> by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and '+
+    'Richard Zach, CC BY 4.0. Choosing one fills the boxes and runs the search.';
+})();
+
+/* ---- one preference for colouring the lines, shared by every panel -------- */
+(function bindColourPref(){
+  const boxes = $$('.pref-colour');
+  PREFS.colour = true;
+  boxes.forEach(b => b.onchange = () => {
+    PREFS.colour = b.checked;
+    boxes.forEach(o => o.checked = PREFS.colour);
+    const t = $('nav.tabs button[aria-selected="true"]');
+    if (t) refresh(t.dataset.tab);
+  });
+})();
+/* ============================================================================
+   THE PROOF IN WRITING.
+   A proof is a sequence of graphs; this sets that sequence down in the linear
+   notation, in ordinary notation, or in both, so it can be read, copied and
+   checked away from the drawings.
+
+   Each line is verified as it is written: the notation is parsed back and
+   compared with the graph it stands for. The linear form cannot always tell
+   apart two points of one ligature lying on the same area, and where it cannot
+   the line is marked rather than quietly given as exact.
+   ========================================================================== */
+
+function writLine(g0){
+  // A point the line merely passes through is not a separate thing (C7), and a
+  // transformation can leave a good many of them behind. They are dropped
+  // before the graph is written down.
+  let g = g0;
+  try { g = normalizeLines(cloneGraph(g0)); } catch(e){ g = g0; }
+  // always the plain form: whether a cut was laid down as a scroll is a fact
+  // about how the graph was made, not about the graph, and mixing the two
+  // forms in one record would only confuse. The conditional is legible enough
+  // in the ordinary notation beside it.
+  const raw = writeEG(g, true);
+  let exact = true;
+  try { exact = canonGraph(parseEG(raw)) === canonGraph(g); } catch(e){ exact = false; }
+  const eg = raw || '(the blank sheet)';
+  let formula;
+  try { formula = fmtFull(sugar(readGraph(g))); } catch(e){ formula = '—'; }
+  return { eg, raw, formula, exact };
+}
+
+function renderWrit(host, noteEl, graphs, steps, form, cur, onPick){
+  if (!host) return;
+  const rows = graphs.map((g, i) => {
+    const w = writLine(g);
+    const rule = steps[i] && steps[i].rule ? steps[i].rule : 'premiss';
+    const why = steps[i] ? steps[i].why : '';
+    return { w, rule, why, i };
+  });
+  const anyInexact = rows.some(r => !r.w.exact);
+  host.innerHTML = '<table class="writ">' + rows.map(r => {
+    const flag = r.w.exact ? '' :
+      ' <span class="flag" title="The linear notation cannot express this graph exactly: it has a branch with a loose end on an area the line also leaves.">*</span>';
+    let cell;
+    if (form === 'formula') cell = esc(r.w.formula);
+    else if (form === 'both') cell = esc(r.w.eg) + flag + '<span class="alt">' + esc(r.w.formula) + '</span>';
+    else cell = esc(r.w.eg) + flag;
+    return '<tr data-k="'+r.i+'"'+(r.i===cur?' class="cur"':'')+'>'+
+      '<td class="n">'+(r.i+1)+'.</td>'+
+      '<td class="g">'+cell+'</td>'+
+      '<td class="r" title="'+esc(r.why)+'">'+esc(r.rule)+'</td></tr>';
+  }).join('') + '</table>';
+  if (noteEl) noteEl.innerHTML = anyInexact
+    ? 'A line marked <span class="flag">*</span> is one the linear notation cannot set '+
+      'down exactly; the drawing above is the graph itself.'
+    : 'Every line here has been parsed back and checked against the graph it stands for.';
+  if (onPick) host.onclick = e => {
+    const tr = e.target.closest('tr[data-k]');
+    if (tr) onPick(+tr.dataset.k);
+  };
+}
+
+function writText(graphs, steps, form){
+  const rows = graphs.map((g,i) => {
+    const w = writLine(g);
+    const rule = steps[i] && steps[i].rule ? steps[i].rule : 'premiss';
+    return { w, rule, i };
+  });
+  const wid = Math.max(...rows.map(r => (form === 'formula' ? r.w.formula : r.w.eg).length));
+  const out = [];
+  for (const r of rows){
+    const main = form === 'formula' ? r.w.formula : r.w.eg;
+    out.push(String(r.i+1).padStart(3)+'.  '+main.padEnd(Math.min(wid, 70))+
+             '   '+r.rule+(r.w.exact ? '' : '   [*]'));
+    if (form === 'both') out.push('      '+r.w.formula);
+  }
+  if (rows.some(r => !r.w.exact))
+    out.push('', '[*] the linear notation cannot set this graph down exactly.');
+  return out.join('\n');
+}
+
+/* Wire one of these records to a player. */
+function bindWrit(prefix, getState){
+  const host = $('#'+prefix+'-writ'), note = $('#'+prefix+'-writnote');
+  if (!host) return null;
+  const segs = [...host.parentNode.querySelectorAll('button.seg')];
+  const state = { form: 'linear' };
+  const draw = () => {
+    const s = getState();
+    if (!s || !s.graphs) { host.innerHTML = ''; if (note) note.textContent = ''; return; }
+    renderWrit(host, note, s.graphs, s.steps, state.form, s.i, s.onPick);
+  };
+  segs.forEach(b => b.onclick = () => {
+    state.form = b.dataset.form;
+    segs.forEach(o => o.classList.toggle('on', o === b));
+    draw();
+  });
+  const copy = $('#'+prefix+'-copy');
+  if (copy) copy.onclick = () => {
+    const s = getState(); if (!s || !s.graphs) return;
+    const txt = writText(s.graphs, s.steps, state.form);
+    navigator.clipboard && navigator.clipboard.writeText(txt).then(
+      () => { copy.textContent = 'Copied'; setTimeout(() => copy.textContent = 'Copy', 1400); },
+      () => { copy.textContent = 'Copy failed'; setTimeout(() => copy.textContent = 'Copy', 1400); });
+  };
+  return draw;
+}
 /* =========================== CONVENTIONS & RULES =========================== */
 const CONVENTIONS = [
  ['C1','The sheet of assertion in all of its parts is a graph.','4.396, 397'],
@@ -3649,9 +4270,19 @@ $('#n-about').innerHTML = [
  '<p><b>Shading.</b> Shading the oddly enclosed areas is Peirce\'s own device in MS 514, and ',
  'it is offered here as an aid rather than as part of the formation rules. Nothing in the ',
  'logic depends on it.</p>',
+ '<p><b>Colouring the lines.</b> Peirce drew in one ink. Giving each line of identity ',
+ 'its own colour, where there is more than one, is an aid for the eye at the places ',
+ 'where lines cross, and nothing in the logic turns on it. Turn it off and the graphs ',
+ 'are as he would have scribed them.</p>',
  '<p><b>Hook numerals.</b> Peirce distinguishes the hooks of a spot by where the line meets ',
  'it. Since this page lays every hook on the left edge, the small numerals give the order of ',
  'the places instead. They are an artefact of this drawing, not of the system.</p>',
+ '<p><b>The proof in writing.</b> Under each proof the same sequence is set down in ',
+ 'words: each graph in the linear notation, in ordinary notation, or in both, with the ',
+ 'rule that carried one line to the next. Every line is parsed back and checked against ',
+ 'the graph it stands for; the few that the linear notation cannot set down exactly — a ',
+ 'branch with a loose end on an area the line also leaves — are marked rather than ',
+ 'quietly given as exact.</p>',
  '<p><b>What the proof finder does.</b> It searches forwards from the premisses and backwards ',
  'from the conclusion at the same time, using nothing but the five rules, and reports a ',
  'proof when the two halves meet. For Alpha it also decides validity outright by truth-value ',
@@ -3663,8 +4294,14 @@ $('#n-about').innerHTML = [
  '<p><b>Deeper Beta proofs.</b> The syllogism Barbara is beyond the present search, which is ',
  'why it is given on the Proofs tab in the form Roberts prints, each of its eight steps ',
  'checked against the rules by this page.</p>',
- '<p><b>Where the exercises come from.</b> Several of the theorems on the Proofs tab are ',
- 'the sort of thing set as natural-deduction exercises in the open logic textbooks: ',
+ '<p><b>Where the exercises come from.</b> The Find a proof tab carries the exercises ',
+ 'set for natural deduction in <i>forall x: Calgary</i>, reproduced under its CC BY 4.0 ',
+ 'licence, to be worked instead by scribing and erasing. Of the fifty-odd, the search ',
+ 'on this page finds all but two — Barbara and Darii, which are worked out on the ',
+ 'Proofs tab instead. Four need the “search harder” setting. Where the book uses A as a ',
+ 'one-place predicate the letter has been changed, since “Ax” reads here as the ',
+ 'universal quantifier.</p>',
+ '<p>Several of the theorems on the Proofs tab are of the same kind, from ',
  '<i>forall x: Calgary</i> by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and Richard ',
  'Zach (CC BY 4.0, forallx.openlogicproject.org), and the Open Logic Project ',
  '(openlogicproject.org). The theorems themselves are common property; what is shown here ',
@@ -3679,6 +4316,15 @@ $('#n-about').innerHTML = [
  'References of the form 4.492 are to the <i>Collected Papers</i>.</p>'
 ].join('');
 
+/* ---- the written records -------------------------------------------------- */
+const drawPfWrit = bindWrit('pf', () => PF.proof && PF.graphs
+  ? { graphs: PF.graphs, steps: PF.proof.steps, i: PF.i,
+      onPick: k => { pfStop(); pfShow(k); } } : null);
+const drawVWrit = bindWrit('v', () => VV.steps
+  ? { graphs: VV.graphs, steps: VV.steps, i: VV.i,
+      onPick: k => { vStop(); vShow(k); } } : null);
+WRIT.pf = drawPfWrit; WRIT.v = drawVWrit;
+
 /* ---- go ------------------------------------------------------------------ */
 enhanceEditor($('#t-in'));
 enhanceEditor($('#v-prem'));
@@ -3686,7 +4332,7 @@ enhanceEditor($('#v-goal'));
 enhanceEditor($('#d-from'));
 enhanceEditor($('#d-lin'), { glyphs: false });
 
-translate();
+translate(false);
 pfLoad(0);
 drawRender();
 </script>

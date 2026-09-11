@@ -70,6 +70,7 @@ function drawRender(){
   $('#d-hint').textContent = hint;
 
   drawMoves();
+  if (!ED.quiet) syncScribeBoxes('graph');
 }
 function togglePick(ln){
   const i = ED.pick.indexOf(ln);
@@ -110,13 +111,25 @@ $('#d-del').onclick = () => {
 };
 $('#d-undo').onclick = () => { if (ED.hist.length){ ED.g = ED.hist.pop(); ED.sel=null; ED.pick=[]; drawRender(); } };
 $('#d-clear').onclick = () => { edPush(); ED.g = newGraph(); ED.sel=null; ED.pick=[]; drawRender(); };
+// Whichever box is used, the other is brought into step, so that the two
+// descriptions of the graph on the sheet always agree.
+function syncScribeBoxes(from){
+  try {
+    if (from !== 'lin') setEditorValue('#d-lin', writeEG(ED.g) || '');
+    if (from !== 'formula'){
+      const f = fmtStrict(sugar(readGraph(ED.g)), 0);
+      setEditorValue('#d-from', f);
+    }
+  } catch(e){ /* a graph with no formula of its own is left alone */ }
+}
 $('#d-load').onclick = () => {
   try { edPush(); ED.g = compileFormula(parseFormula($('#d-from').value)).graph;
-        ED.sel=null; ED.pick=[]; drawRender(); }
+        ED.sel=null; ED.pick=[]; drawRender(); syncScribeBoxes('formula'); }
   catch(e){ $('#d-err').textContent = e.message; }
 };
 $('#d-loadlin').onclick = () => {
-  try { edPush(); ED.g = parseEG($('#d-lin').value); ED.sel=null; ED.pick=[]; drawRender(); }
+  try { edPush(); ED.g = parseEG($('#d-lin').value); ED.sel=null; ED.pick=[];
+        drawRender(); syncScribeBoxes('lin'); }
   catch(e){ $('#d-err').textContent = e.message; }
 };
 ['#d-shade','#d-handles'].forEach(s => $(s).addEventListener('change', drawRender));
@@ -176,13 +189,15 @@ $('#v-ex').innerHTML = V_EXAMPLES.map((e,i)=>'<button data-i="'+i+'">'+esc(e[2])
 $('#v-ex').onclick = e => {
   const b = e.target.closest('button'); if (!b) return;
   const ex = V_EXAMPLES[+b.dataset.i];
-  $('#v-prem').value = ex[0].join('\n'); $('#v-goal').value = ex[1];
+  setEditorValue('#v-prem', ex[0].join('\n'));
+  setEditorValue('#v-goal', ex[1]);
 };
 const VV = { steps: null, graphs: null, i: 0, timer: null };
 function runProof(hard){
   const premSrc = $('#v-prem').value.split('\n').map(s=>s.trim()).filter(Boolean);
   const goalSrc = $('#v-goal').value.trim();
   $('#v-proofcard').style.display = 'none';
+  $('#v-writ-card').style.display = 'none';
   if (!goalSrc){ $('#v-verdict').textContent = 'Give a conclusion.'; return; }
   let prems, goal, premAst, goalAst;
   try {
@@ -249,6 +264,7 @@ function vLoad(steps){
   const h = hydrateSteps(steps);
   VV.graphs = h.graphs; VV.mvs = h.mvs; VV.i = 0;
   $('#v-proofcard').style.display = '';
+  $('#v-writ-card').style.display = '';
   $('#v-steps').innerHTML = steps.map((s,k) =>
     '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
     esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
@@ -261,7 +277,12 @@ function vShow(i, animate){
   if (VV.anim){ VV.anim.cancel(); VV.anim = null; }
   if (animate && VV.i === from + 1){
     VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], VV.mvs[VV.i],
-      { shade:true, wobble:true, markMs: 620, moveMs: 700 }, () => { VV.anim = null; });
+      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 620, moveMs: 700 },
+      () => { VV.anim = null; });
+  } else if (animate && VV.i === from - 1){
+    VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], null,
+      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 0, moveMs: 560 },
+      () => { VV.anim = null; });
   } else {
     stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
   }
@@ -270,6 +291,7 @@ function vShow(i, animate){
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
     esc(fmtFull(sugar(readGraph(VV.graphs[VV.i]))))+'</span>';
   $$('#v-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === VV.i));
+  if (WRIT.v) WRIT.v();
 }
 function vStop(){
   if (VV.timer){ clearTimeout(VV.timer); VV.timer=null; }
@@ -277,7 +299,7 @@ function vStop(){
   $('#v-play').textContent='▶ play';
 }
 $('#v-next').onclick = ()=>{ vStop(); vShow(VV.i+1, true); };
-$('#v-prev').onclick = ()=>{ vStop(); vShow(VV.i-1); };
+$('#v-prev').onclick = ()=>{ vStop(); vShow(VV.i-1, true); };
 $('#v-first').onclick = ()=>{ vStop(); vShow(0); };
 $('#v-steps').onclick = e => { const li = e.target.closest('li'); if (li){ vStop(); vShow(+li.dataset.k); } };
 $('#v-play').onclick = () => {

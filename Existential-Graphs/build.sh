@@ -18,7 +18,7 @@ cd "$(dirname "$0")"
       src/05-semantics.js src/06-rules.js src/07-prove.js src/08-render.js src/09-egnotation.js src/11-anim.js
   echo '/* --- the verified proof library --- */'
   cat src/10-library.js
-  cat app/ui0-editor.js app/ui1.js app/ui2.js app/ui3.js
+  cat app/ui0-editor.js app/ui1.js app/ui2.js app/ui4-exercises.js app/ui5-writ.js app/ui3.js
   echo '</script>'
   echo '</body></html>'
 } > index.html

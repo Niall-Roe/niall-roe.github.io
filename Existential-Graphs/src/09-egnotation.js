@@ -165,14 +165,32 @@ function writeEG(g, plain){
         for (let i=1;i<got.length;i++) joins.push(got[0]+'~'+got[i]);
       }
     }
-    const nm = l => nameOfComp[find(l)];
-    // a point is worth writing only if it carries no hook
+    const nm0 = l => nameOfComp[find(l)];
+    // A branch with a loose end (R3(a)) puts a second point of one ligature on
+    // one area. The linear form needs a second name for it, joined to the
+    // first, or the branch would be lost.
+    const extra = {};
+    // A branch with a loose end (R3(a)) puts a second point of one ligature on
+    // one area; it needs a second name, joined to the first, or it would be
+    // lost. Only genuinely loose points are treated this way — a point the line
+    // merely passes through is not a separate thing (C7).
+    const seenLoose = new Set();
+    const leaves = l => neighbours(g, l).some(w => g.lns[w].area !== aid);
+    for (const l of A.lns){
+      if (hooks.has(l) || leaves(l)) continue;
+      const r = find(l);
+      if (!seenLoose.has(r)){ seenLoose.add(r); continue; }
+      extra[l] = fresh();
+      joins.push(nameOfComp[r] + '~' + extra[l]);
+    }
+    const nm = l => extra[l] !== undefined ? extra[l] : nm0(l);
     const shown = new Set();
     for (const l of A.lns){
       if (hooks.has(l)) continue;
-      const k = nm(l);
+      const k = nm0(l);
       if (!shown.has(k)){ shown.add(k); out.push('*'+k); }
     }
+    for (const l of A.lns) if (extra[l] !== undefined) out.push('*'+extra[l]);
     out.push(...joins);
     for (const id of A.items){
       if (id === skip) continue;
@@ -184,8 +202,8 @@ function writeEG(g, plain){
       const childInh = {};
       const inSet = new Set(g.areas[n.inner].lns);
       for (const e of Object.values(g.edges)){
-        if (here.has(e.a) && inSet.has(e.b)) childInh[e.b] = nm(e.a);
-        else if (here.has(e.b) && inSet.has(e.a)) childInh[e.a] = nm(e.b);
+        if (here.has(e.a) && inSet.has(e.b)) childInh[e.b] = nm0(e.a);
+        else if (here.has(e.b) && inSet.has(e.a)) childInh[e.a] = nm0(e.b);
       }
       if (!plain && n.scroll && g.nodes[n.scroll] && g.nodes[n.scroll].area === n.inner){
         const loop = n.scroll;

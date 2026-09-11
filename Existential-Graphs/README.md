@@ -6,16 +6,23 @@ step and nothing is loaded from the network.
 ## What it does
 
 - **Translate** — ordinary logical notation into an existential graph, with the graph
-  read back endoporeutically and an English gloss. The formula boxes close their own
+  read back endoporeutically and an English gloss. Type and the drawing moves into its
+  new shape rather than blinking: the two graphs are matched up by shape first, so the
+  parts they have in common travel. The formula boxes close their own
   brackets, pick out matching pairs, colour the notation as you type, and carry a row of
   buttons for the glyphs. `Ax`/`Ex` and `∀`/`∃` and `(x)`/`(Ex)` all work.
-- **Proofs** — twenty-five proofs, animated step by step. Each step first marks the graph
-  the rule is about to act on, then shows the transformation: enclosures growing to make
-  room, a copy appearing where it was scribed, an erased graph fading away.
+- **Proofs** — twenty-five proofs, animated step by step. Each step first holds everything
+  back except the graph the rule is about to act on, ringing it and drawing an arrow to
+  the area it is going into; then the transformation runs, with enclosures growing to make
+  room, a copy appearing where it was scribed, and an erased graph fading away.
 - **Scribe** — build a graph by hand (or from a formula, or from the linear notation),
   see what it says, and apply the rules to it. Every move offered is legal.
 - **Find a proof** — a bidirectional search over the five rules, with a verdict on
-  validity independent of the search.
+  validity independent of the search, and a dropdown of textbook exercises to try.
+- **The proof in writing** — under both players, the same proof set down as text: each
+  graph in the linear notation, in ordinary notation, or in both, with the rule that
+  carried one line to the next. Every line is parsed back and checked against the graph
+  it stands for, and can be copied out.
 - **Conventions & rules** — C1–C9 and R1–R5, quoted from Roberts' Appendix 3.
 
 ## Scope
@@ -29,17 +36,23 @@ domain refutes conclusively, and otherwise the search reports only what it did a
 not find. The search handles Alpha theorems up to about eight steps and simple Beta
 inferences; deeper Beta proofs, Barbara among them, are in the proof library instead.
 
-## Where the exercises come from
+## Exercises
 
-Several of the theorems on the Proofs tab are the sort of thing set as natural-deduction
-exercises in the open logic textbooks — *forall x: Calgary* (P. D. Magnus, Tim Button,
-Aaron Thomas-Bolduc and Richard Zach, CC BY 4.0) and the Open Logic Project. The theorems
-are common property; what is shown here is what becomes of them when they are proved by
-scribing and erasing.
+The Find a proof tab carries a dropdown of the exercises set for natural deduction in
+*forall x: Calgary* (P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and Richard Zach),
+reproduced under its CC BY 4.0 licence and worked here by scribing and erasing instead.
+Choosing one fills the boxes and runs the search. Of the fifty-odd, the search finds all
+but two — Barbara and Darii, which are on the Proofs tab instead — and four need the
+"search harder" setting.
+
+Where the book uses `A` as a one-place predicate the letter is changed, since `Ax` reads
+as the universal quantifier in this page's notation.
 
 ## Drawing conventions
 
-Cuts carry a very light shadow, to separate the levels of a nest. Oddly enclosed areas are
+Each line of identity can be given its own colour where there is more than one, which
+helps the eye at crossings. Peirce drew in one ink, so this is an aid like the shading and
+can be turned off. Cuts carry a very light shadow, to separate the levels of a nest. Oddly enclosed areas are
 shaded, which is Peirce's own device in MS 514. Where one line of identity crosses another
 the horizontal one hops over it — Peirce's 'bridge', "a bit of paper ribbon, with one line
 passing under it and the other upon it". Hooks are laid down a spot's left edge in the

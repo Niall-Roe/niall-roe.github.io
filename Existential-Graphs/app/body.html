@@ -22,10 +22,16 @@
       <h2>A proposition in ordinary notation</h2>
       <textarea id="t-in" rows="3" spellcheck="false">Ax (Fx -> Gx)</textarea>
       <div class="chips" id="t-ex"></div>
+      <div class="btnrow">
+        <button class="btn" id="t-draw">Draw it</button>
+        <label style="font-size:12.5px;color:var(--ink2);display:flex;gap:5px;align-items:center">
+          <input type="checkbox" id="t-live" checked> draw as I type</label>
+      </div>
       <div class="toggles">
         <label><input type="checkbox" id="t-shade" checked> shade oddly enclosed areas</label>
         <label><input type="checkbox" id="t-wobble" checked> hand-drawn cuts</label>
         <label><input type="checkbox" id="t-hooks" checked> number the hooks</label>
+        <label><input type="checkbox" class="pref-colour" checked> colour the lines of identity</label>
       </div>
       <hr class="sep">
       <h2>How to write it</h2>
@@ -87,11 +93,25 @@
           </label>
           <label style="font-size:12px;color:var(--ink3);display:flex;gap:5px;align-items:center">
             <input type="checkbox" id="pf-anim" checked> animate</label>
+          <label style="font-size:12px;color:var(--ink3);display:flex;gap:5px;align-items:center">
+            <input type="checkbox" class="pref-colour" checked> colour lines</label>
         </div>
       </div>
       <div class="card" style="margin-top:18px">
         <h2>Steps</h2>
         <ol class="steps" id="pf-steps"></ol>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>The proof in writing</h2>
+        <div class="btnrow" style="margin-top:0">
+          <button class="btn ghost seg on" data-form="linear">Linear notation</button>
+          <button class="btn ghost seg" data-form="formula">Ordinary notation</button>
+          <button class="btn ghost seg" data-form="both">Both</button>
+          <span class="sp" style="flex:1"></span>
+          <button class="btn ghost" id="pf-copy">Copy</button>
+        </div>
+        <div id="pf-writ"></div>
+        <p class="note" id="pf-writnote"></p>
       </div>
     </div>
   </div>
@@ -120,6 +140,7 @@
         <div class="toggles">
           <label><input type="checkbox" id="d-shade" checked> shade odd areas</label>
           <label><input type="checkbox" id="d-handles" checked> show line points</label>
+          <label><input type="checkbox" class="pref-colour" checked> colour the lines</label>
         </div>
       </div>
       <div class="card" style="margin-top:18px">
@@ -174,6 +195,10 @@ Q -> R</textarea>
         <button class="btn ghost" id="v-hard">Search harder</button>
       </div>
       <div class="chips" id="v-ex"></div>
+      <hr class="sep">
+      <h2>Exercises from the open textbooks</h2>
+      <select id="v-book" style="width:100%"></select>
+      <p class="note" id="v-booknote" style="margin-top:8px"></p>
       <p class="note">Alpha validity is always decided outright, by the truth-value
       analysis of Roberts §3.2, whether or not a proof is found. Beta validity is not
       decidable; there a countermodel refutes, and otherwise the search can only report
@@ -195,6 +220,18 @@ Q -> R</textarea>
           <button class="btn ghost" id="v-next">forward ▶</button>
         </div>
         <ol class="steps" id="v-steps" style="margin-top:14px"></ol>
+      </div>
+      <div class="card" id="v-writ-card" style="margin-top:18px;display:none">
+        <h2>The proof in writing</h2>
+        <div class="btnrow" style="margin-top:0">
+          <button class="btn ghost seg on" data-form="linear">Linear notation</button>
+          <button class="btn ghost seg" data-form="formula">Ordinary notation</button>
+          <button class="btn ghost seg" data-form="both">Both</button>
+          <span class="sp" style="flex:1"></span>
+          <button class="btn ghost" id="v-copy">Copy</button>
+        </div>
+        <div id="v-writ"></div>
+        <p class="note" id="v-writnote"></p>
       </div>
     </div>
   </div>

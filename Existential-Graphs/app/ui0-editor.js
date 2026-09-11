@@ -86,6 +86,14 @@ function insertAt(ta, text){
   ta.focus();
 }
 function fire(ta){ ta.dispatchEvent(new Event('input', { bubbles: true })); }
+// setting .value from script fires no event, so the mirror would keep showing
+// the old text until the box was next touched
+function setEditorValue(sel, text){
+  const ta = typeof sel === 'string' ? document.querySelector(sel) : sel;
+  if (!ta) return;
+  ta.value = text;
+  fire(ta);
+}
 
 const GLYPHS = [
   { s:'¬', ins:'~',   t:'not' },

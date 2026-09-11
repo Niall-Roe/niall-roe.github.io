@@ -37,6 +37,12 @@ function tokenize(src){
     if (c === ')' || c === ']'){ T.push({t:')', i}); i++; continue; }
     if (c === ','){ T.push({t:',', i}); i++; continue; }
     if (c === '='){ T.push({t:'=', i}); i++; continue; }
+    if (c === '⊥' || c === '⊤'){ T.push({t:'lit', v:c, i}); i++; continue; }
+    if (c === '"'){
+      const j = s.indexOf('"', i+1);
+      if (j < 0) throw new ParseError('Unclosed quotation mark.', i);
+      T.push({t:'str', v: s.slice(i+1, j), i}); i = j+1; continue;
+    }
     if (c === '-' && s[i+1] !== '>'){ T.push({t:'not', s:'-', i}); i++; continue; }
     if (isIdStart(c)){
       let j = i; while (j < s.length && isId(s[j])) j++;
@@ -140,6 +146,9 @@ function parseFormula(src){
     return vs;
   }
   function primary(){
+    if (at('lit')){ const tk = T[p++]; return { t: tk.v === '⊥' ? 'false' : 'true' }; }
+    if (at('id') && /^(absurd|falsum|contradiction)$/i.test(T[p].v)){ p++; return {t:'false'}; }
+    if (at('id') && /^(tautology|blank)$/i.test(T[p].v)){ p++; return {t:'true'}; }
     if (at('(')){
       // "(x)Fx" — the classical universal prefix
       if (T[p+1] && T[p+1].t==='id' && /^[a-z][0-9]?'?$/.test(T[p+1].v)
@@ -168,6 +177,16 @@ function parseFormula(src){
         p = save;
       }
       p++; const f = formula(); eat(')'); return f;
+    }
+    if (at('str')){
+      const tk = T[p++];
+      let args = [];
+      if (at('(')){
+        p++;
+        if (!at(')')){ for(;;){ const a = eat('id'); args.push(a.v); if (at(',')){p++;continue;} break; } }
+        eat(')');
+      }
+      return {t:'atom', name: tk.v, args};
     }
     if (at('id')){
       const tk = T[p++];
@@ -200,6 +219,29 @@ function parseFormula(src){
   const f = formula();
   if (!at('eof')) throw new ParseError('Unexpected extra input', T[p].i);
   return f;
+}
+
+/* A rendering that always parses back: spot names are quoted where they must
+   be, and every spot is written with its arguments in brackets. */
+function fmtStrict(a, outerPrec){
+  outerPrec = outerPrec||0;
+  const wrap = (s,p) => p < outerPrec ? '('+s+')' : s;
+  const nm = n => /^[A-Za-z_][A-Za-z0-9_']*$/.test(n) && !/^[AE][a-z][0-9]?'?$/.test(n)
+      ? n : '"'+n+'"';
+  switch(a.t){
+    case 'true':  return '⊤';
+    case 'false': return '⊥';
+    case 'atom':  return a.args.length ? nm(a.name)+'('+a.args.join(',')+')' : nm(a.name);
+    case 'eq':    return a.l+'='+a.r;
+    case 'not':   return '~'+fmtStrict(a.a, 5);
+    case 'and':   return wrap(a.xs.map(x=>fmtStrict(x,4)).join(' & '), 4);
+    case 'or':    return wrap(a.xs.map(x=>fmtStrict(x,3)).join(' | '), 3);
+    case 'imp':   return wrap(fmtStrict(a.a,3)+' -> '+fmtStrict(a.b,2), 2);
+    case 'iff':   return wrap(fmtStrict(a.a,2)+' <-> '+fmtStrict(a.b,2), 1);
+    case 'all':   return wrap('A'+a.v+' '+fmtStrict(a.a,5), 5);
+    case 'ex':    return wrap('E'+a.v+' '+fmtStrict(a.a,5), 5);
+  }
+  return '?';
 }
 
 /* --- pretty-print an AST back to notation --------------------------------- */

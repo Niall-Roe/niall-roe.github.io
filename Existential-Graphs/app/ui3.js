@@ -36,9 +36,19 @@ $('#n-about').innerHTML = [
  '<p><b>Shading.</b> Shading the oddly enclosed areas is Peirce\'s own device in MS 514, and ',
  'it is offered here as an aid rather than as part of the formation rules. Nothing in the ',
  'logic depends on it.</p>',
+ '<p><b>Colouring the lines.</b> Peirce drew in one ink. Giving each line of identity ',
+ 'its own colour, where there is more than one, is an aid for the eye at the places ',
+ 'where lines cross, and nothing in the logic turns on it. Turn it off and the graphs ',
+ 'are as he would have scribed them.</p>',
  '<p><b>Hook numerals.</b> Peirce distinguishes the hooks of a spot by where the line meets ',
  'it. Since this page lays every hook on the left edge, the small numerals give the order of ',
  'the places instead. They are an artefact of this drawing, not of the system.</p>',
+ '<p><b>The proof in writing.</b> Under each proof the same sequence is set down in ',
+ 'words: each graph in the linear notation, in ordinary notation, or in both, with the ',
+ 'rule that carried one line to the next. Every line is parsed back and checked against ',
+ 'the graph it stands for; the few that the linear notation cannot set down exactly — a ',
+ 'branch with a loose end on an area the line also leaves — are marked rather than ',
+ 'quietly given as exact.</p>',
  '<p><b>What the proof finder does.</b> It searches forwards from the premisses and backwards ',
  'from the conclusion at the same time, using nothing but the five rules, and reports a ',
  'proof when the two halves meet. For Alpha it also decides validity outright by truth-value ',
@@ -50,8 +60,14 @@ $('#n-about').innerHTML = [
  '<p><b>Deeper Beta proofs.</b> The syllogism Barbara is beyond the present search, which is ',
  'why it is given on the Proofs tab in the form Roberts prints, each of its eight steps ',
  'checked against the rules by this page.</p>',
- '<p><b>Where the exercises come from.</b> Several of the theorems on the Proofs tab are ',
- 'the sort of thing set as natural-deduction exercises in the open logic textbooks: ',
+ '<p><b>Where the exercises come from.</b> The Find a proof tab carries the exercises ',
+ 'set for natural deduction in <i>forall x: Calgary</i>, reproduced under its CC BY 4.0 ',
+ 'licence, to be worked instead by scribing and erasing. Of the fifty-odd, the search ',
+ 'on this page finds all but two — Barbara and Darii, which are worked out on the ',
+ 'Proofs tab instead. Four need the “search harder” setting. Where the book uses A as a ',
+ 'one-place predicate the letter has been changed, since “Ax” reads here as the ',
+ 'universal quantifier.</p>',
+ '<p>Several of the theorems on the Proofs tab are of the same kind, from ',
  '<i>forall x: Calgary</i> by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and Richard ',
  'Zach (CC BY 4.0, forallx.openlogicproject.org), and the Open Logic Project ',
  '(openlogicproject.org). The theorems themselves are common property; what is shown here ',
@@ -66,6 +82,15 @@ $('#n-about').innerHTML = [
  'References of the form 4.492 are to the <i>Collected Papers</i>.</p>'
 ].join('');
 
+/* ---- the written records -------------------------------------------------- */
+const drawPfWrit = bindWrit('pf', () => PF.proof && PF.graphs
+  ? { graphs: PF.graphs, steps: PF.proof.steps, i: PF.i,
+      onPick: k => { pfStop(); pfShow(k); } } : null);
+const drawVWrit = bindWrit('v', () => VV.steps
+  ? { graphs: VV.graphs, steps: VV.steps, i: VV.i,
+      onPick: k => { vStop(); vShow(k); } } : null);
+WRIT.pf = drawPfWrit; WRIT.v = drawVWrit;
+
 /* ---- go ------------------------------------------------------------------ */
 enhanceEditor($('#t-in'));
 enhanceEditor($('#v-prem'));
@@ -73,6 +98,6 @@ enhanceEditor($('#v-goal'));
 enhanceEditor($('#d-from'));
 enhanceEditor($('#d-lin'), { glyphs: false });
 
-translate();
+translate(false);
 pfLoad(0);
 drawRender();

@@ -62,6 +62,8 @@ function compileFormula(ast, opts){
         return;
       }
       case 'not': compNeg(a.a, area); return;
+      case 'true': return;                                  // the blank sheet (C1)
+      case 'false': addCut(g, area); return;                  // the empty cut (C5)
       case 'and': a.xs.forEach(x => comp(x, area)); return;
       case 'or': {
         // ¬(¬x₁ ∧ ¬x₂ ∧ …)
@@ -108,6 +110,8 @@ function compileFormula(ast, opts){
   // scribe the denial of `a` on `area`
   function compNeg(a, area){
     switch (a.t){
+      case 'false': return;                                // ¬⊥ asserts nothing
+      case 'true': addCut(g, area); return;
       case 'not': comp(a.a, area); return;                 // the double cut collapses
       case 'imp':                                          // ¬(A ⊃ B) is A and not-B
         comp(a.a, area);

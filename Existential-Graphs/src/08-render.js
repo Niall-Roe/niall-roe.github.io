@@ -50,7 +50,16 @@ function laneMap(g){
     const m = lanes[l.area];
     if (m[lig[l.id]] === undefined) m[lig[l.id]] = Object.keys(m).length;
   }
-  return { lanes, lig, hooks };
+  // a stable order for the ligatures, so that colouring them is repeatable
+  const mins = {};
+  for (const l of Object.keys(lig)){
+    const n = parseInt(String(l).replace(/\D/g,''), 10) || 0;
+    if (mins[lig[l]] === undefined || n < mins[lig[l]]) mins[lig[l]] = n;
+  }
+  const order = Object.keys(mins).sort((a,b) => mins[a] - mins[b]);
+  const rank = {};
+  order.forEach((k,i) => rank[k] = i);
+  return { lanes, lig, hooks, rank, count: order.length };
 }
 
 /* ---- measure: bottom-up sizes ------------------------------------------- */
@@ -393,12 +402,14 @@ function renderGraph(g, opts){
   // lines of identity, drawn heavy (C6-C8). A ligature is drawn as whole
   // chains rather than edge by edge: a line is one graph (C7), and drawing it
   // in pieces leaves the round ends of each piece stacked at every junction.
+  const colour = opts.colourLines && LN.count > 1;
+  const lc = ln => colour ? ' lc' + (LN.rank[LN.lig[ln]] % 7) : '';
   const chains = lineChains(g, pos);
   const polys  = chains.map(ch => dedupePts(elbowPoints(ch, pos)));
   const hops   = crossingHops(polys);
   polys.forEach((pts, i) => {
     const d = roundedPath(pts, 5, hops[i]);
-    if (d) parts.push(`<path class="loi" d="${d}" data-chain="${chains[i].join(',')}"/>`);
+    if (d) parts.push(`<path class="loi${lc(chains[i][0])}" d="${d}" data-chain="${chains[i].join(',')}"/>`);
   });
   // a ligature with a single point and no edge is the bare line of C6
   for (const l of Object.values(g.lns)){
@@ -406,13 +417,13 @@ function renderGraph(g, opts){
     const isHook = Object.values(g.nodes).some(n => n.k==='spot' && n.hooks.includes(l.id));
     if (isHook) continue;
     const p = pos[l.id];
-    parts.push(`<path class="loi" d="M ${p.x} ${p.y} L ${p.x + LAY.bareW} ${p.y}" data-ln="${l.id}"/>`);
+    parts.push(`<path class="loi${lc(l.id)}" d="M ${p.x} ${p.y} L ${p.x + LAY.bareW} ${p.y}" data-ln="${l.id}"/>`);
   }
   // where three or more lines meet, a dot just fills the join (C8, teridentity)
   for (const l of Object.values(g.lns)){
     if (neighbours(g, l.id).length >= 3){
       const p = pos[l.id];
-      parts.push(`<circle class="branch" cx="${p.x}" cy="${p.y}" r="1.7"/>`);
+      parts.push(`<circle class="branch${lc(l.id)}" cx="${p.x}" cy="${p.y}" r="1.7"/>`);
     }
   }
   // hook numerals, so the order of a spot's hooks can be read off

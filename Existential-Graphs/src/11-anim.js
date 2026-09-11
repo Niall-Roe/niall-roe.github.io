@@ -89,7 +89,14 @@ function prepareTween(gA, gB, GA, GB, opts){
     if (inA || inB) bare.push({ l, inA: !!inA, inB: !!inB });
   }
 
-  return { gA, gB, GA, GB, nodes, chains, bare, opts,
+  const LNB = laneMap(gB), LNA = laneMap(gA);
+  const colour = opts.colourLines && Math.max(LNA.count, LNB.count) > 1;
+  const lcOf = ln => {
+    if (!colour) return '';
+    const L = LNB.lig[ln] !== undefined ? LNB : LNA;
+    return ' lc' + (L.rank[L.lig[ln]] % 7);
+  };
+  return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf,
            W: Math.max(GA.W, GB.W), H: Math.max(GA.H, GB.H) };
 }
 
@@ -98,7 +105,7 @@ function tweenFrame(sp, t){
   const parts = [];
   const shade = opts.shade, wobble = opts.wobble !== false;
   const outT = Math.min(1, t / 0.45);            // what goes, goes early
-  const inT  = Math.max(0, (t - 0.5) / 0.5);     // what comes, comes late
+  const inT  = Math.max(0, (t - 0.18) / 0.82);   // what comes, arrives visibly
   const e = EASE(t);
 
   const raised = opts.raised === false ? '' : ' raised';
@@ -131,18 +138,98 @@ function tweenFrame(sp, t){
   const hops  = crossingHops(polys);
   polys.forEach((pts, i) => {
     const d = roundedPath(pts, 5, hops[i]);
-    if (d) parts.push(`<path class="loi" opacity="${r2(live[i].op)}" d="${d}"/>`);
+    if (d) parts.push(`<path class="loi${sp.lcOf(live[i].c.ch[0])}" opacity="${
+      r2(live[i].op)}" d="${d}"/>`);
   });
   for (const b of sp.bare){
     const op = b.inA && b.inB ? 1 : b.inB ? inT : 1 - outT;
     if (op <= 0.01) continue;
     const p = POS[b.l]; if (!p) continue;
-    parts.push(`<path class="loi" opacity="${r2(op)}" d="M ${r2(p.x)} ${r2(p.y)} L ${
+    parts.push(`<path class="loi${sp.lcOf(b.l)}" opacity="${r2(op)}" d="M ${r2(p.x)} ${r2(p.y)} L ${
       r2(p.x + LAY.bareW)} ${r2(p.y)}"/>`);
   }
   return parts.join('\n');
 }
 function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 }; }
+
+/* The first beat: the graph as it stands, with everything but the graphs the
+   rule is about to act on held back, a ghost of whatever is about to be
+   scribed shown where it will appear, and an arrow from a graph to the area it
+   is about to be copied into. The point is to let the eye find the place
+   before anything moves. */
+function markFrame(sp, focus, mv){
+  const { gA, GA, opts } = sp;
+  const parts = [];
+  const shade = opts.shade, wobble = opts.wobble !== false;
+  const raised = opts.raised === false ? '' : ' raised';
+  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${sp.W-1}" height="${sp.H-1}" rx="6"/>`);
+
+  // anything inside a graph in focus is in focus too
+  const lit = new Set(Object.keys(focus));
+  for (const id of Object.keys(focus)){
+    const n = gA.nodes[id];
+    if (n && n.k === 'cut') nodesUnder(gA, n.inner).forEach(x => lit.add(x));
+  }
+  const dimming = lit.size > 0;
+
+  for (const it of sp.nodes){
+    if (!it.inA) continue;
+    const op = !dimming || lit.has(it.id) ? 1 : 0.3;
+    if (it.n.k === 'cut'){
+      parts.push(`<path class="cut${raised}${shade && it.odd ? ' odd':''}" opacity="${op}" d="${
+        cutPath(it.a.x, it.a.y, it.a.w, it.a.h, it.n.id, wobble)}"/>`);
+    } else {
+      parts.push(`<g class="spot" opacity="${op}"><text x="${
+        r2(it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(it.a.y + it.a.h/2)}" `+
+        `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+    }
+  }
+  // the lines, as they stand
+  const chainsA = lineChains(gA, GA.pos);
+  const polysA = chainsA.map(ch => dedupePts(elbowPoints(ch, GA.pos)));
+  const hopsA = crossingHops(polysA);
+  polysA.forEach((pts,i) => {
+    const d = roundedPath(pts, 5, hopsA[i]);
+    if (d) parts.push(`<path class="loi${sp.lcOf(chainsA[i][0])}" opacity="${
+      dimming ? 0.5 : 1}" d="${d}"/>`);
+  });
+  for (const b of sp.bare){
+    if (!b.inA) continue;
+    const p = GA.pos[b.l]; if (!p) continue;
+    parts.push(`<path class="loi${sp.lcOf(b.l)}" opacity="${dimming ? 0.5 : 1}" d="M ${
+      r2(p.x)} ${r2(p.y)} L ${r2(p.x + LAY.bareW)} ${r2(p.y)}"/>`);
+  }
+
+  // an arrow from the graph being copied to the area it is going into
+  if (mv && mv.op === 'iterate'){
+    const from = GA.P[mv.node];
+    const cut = gA.areas[mv.target] && gA.areas[mv.target].cut;
+    const to = cut ? GA.P[cut] : GA.P[gA.root] || null;
+    if (from && to) parts.push(arrowPath(from, to));
+  }
+  return parts.join('\n');
+}
+function arrowPath(a, b){
+  const x1 = a.x + a.w/2, y1 = a.y + a.h/2;
+  const x2 = b.x + b.w/2, y2 = b.y + b.h/2;
+  const dx = x2-x1, dy = y2-y1, len = Math.hypot(dx,dy) || 1;
+  if (len < 18) return '';
+  // pull the ends clear of both boxes and bow the line a little
+  const t0 = Math.min(0.42, (Math.max(a.w,a.h)/2 + 8) / len);
+  const t1 = 1 - Math.min(0.42, (Math.max(b.w,b.h)/2 + 8) / len);
+  if (t1 <= t0) return '';
+  const p0 = { x: x1 + dx*t0, y: y1 + dy*t0 };
+  const p1 = { x: x1 + dx*t1, y: y1 + dy*t1 };
+  const mx = (p0.x+p1.x)/2 - dy*0.16, my = (p0.y+p1.y)/2 + dx*0.16;
+  const ang = Math.atan2(p1.y-my, p1.x-mx), h = 7;
+  const head = [
+    [p1.x, p1.y],
+    [p1.x - h*Math.cos(ang-0.42), p1.y - h*Math.sin(ang-0.42)],
+    [p1.x - h*Math.cos(ang+0.42), p1.y - h*Math.sin(ang+0.42)]
+  ].map(p => r2(p[0])+','+r2(p[1])).join(' ');
+  return `<path class="telegraph" d="M ${r2(p0.x)} ${r2(p0.y)} Q ${r2(mx)} ${r2(my)} ${
+    r2(p1.x)} ${r2(p1.y)}"/><polygon class="telegraph-head" points="${head}"/>`;
+}
 
 /* ---- the player ---------------------------------------------------------- */
 function svgWrap(inner, w, h, scale, pad){
@@ -166,8 +253,9 @@ function playTransition(el, gA, gB, mv, opts, done){
   const sp = prepareTween(gA, gB, GA, GB, opts);
 
   // beat one: mark what the rule is about to act on
-  el.innerHTML = svgWrap(tweenFrame(sp, 0), W, H, scale, pad);
-  markNodes(el, gA, GA, moveFocus(gA, mv));
+  const focus = moveFocus(gA, mv);
+  el.innerHTML = svgWrap(markFrame(sp, focus, mv), W, H, scale, pad);
+  markNodes(el, gA, GA, focus);
 
   timer = setTimeout(() => {
     if (cancelled) return;
@@ -201,4 +289,71 @@ function markNodes(el, g, G, focus){
     r.setAttribute('class', 'focus focus-' + kind);
     svg.appendChild(r);
   }
+}
+
+/* ============================================================================
+   ALIGNING TWO GRAPHS THAT SHARE NO HISTORY.
+   Within a proof a transformation carries identifiers across, so a node can be
+   followed from step to step. Two graphs compiled from two different formulas
+   have no such connection, and would simply cross-fade. Matching them up by
+   shape first — same enclosure in the same place, same spot with the same name
+   — lets the parts they have in common move rather than blink.
+   ========================================================================== */
+function alignGraph(gA, gB){
+  const ligA = ligIndex(gA), ligB = ligIndex(gB);
+  const node = {}, area = {}, ln = {};
+  area[gB.root] = gA.root;
+
+  (function matchArea(aA, aB){
+    const itemsA = gA.areas[aA].items, itemsB = gB.areas[aB].items;
+    const used = new Set();
+    const take = (a, b) => {
+      node[b] = a; used.add(a);
+      const nA = gA.nodes[a], nB = gB.nodes[b];
+      if (nB.k === 'cut'){ area[nB.inner] = nA.inner; matchArea(nA.inner, nB.inner); }
+      else nB.hooks.forEach((h,i) => { if (nA.hooks[i]) ln[h] = nA.hooks[i]; });
+    };
+    for (const b of itemsB){                         // exactly the same subgraph
+      const cb = canonNode(gB, b, ligB);
+      const a = itemsA.find(x => !used.has(x) && canonNode(gA, x, ligA) === cb);
+      if (a) take(a, b);
+    }
+    for (const b of itemsB){                         // failing that, the same kind
+      if (node[b]) continue;
+      const nB = gB.nodes[b];
+      const a = itemsA.find(x => !used.has(x) && gA.nodes[x].k === nB.k &&
+        (nB.k !== 'spot' || gA.nodes[x].name === nB.name));
+      if (a) take(a, b);
+    }
+  })(gA.root, gB.root);
+
+  // everything else in B gets an identifier of its own, distinct from A's
+  let k = 0;
+  const fresh = () => 'z' + (++k);
+  const nid = x => node[x] || (node[x] = fresh());
+  const aid = x => area[x] || (area[x] = fresh());
+  const lid = x => ln[x]   || (ln[x]   = fresh());
+
+  const h = { areas:{}, nodes:{}, lns:{}, edges:{}, root: gA.root };
+  for (const a of Object.keys(gB.areas)){
+    const A = gB.areas[a];
+    h.areas[aid(a)] = { id: aid(a), cut: A.cut ? nid(A.cut) : null,
+      items: A.items.map(nid), lns: A.lns.map(lid) };
+  }
+  for (const x of Object.keys(gB.nodes)){
+    const n = gB.nodes[x];
+    h.nodes[nid(x)] = n.k === 'cut'
+      ? { k:'cut', id: nid(x), area: aid(n.area), inner: aid(n.inner),
+          scroll: n.scroll ? nid(n.scroll) : undefined }
+      : { k:'spot', id: nid(x), area: aid(n.area), name: n.name, hooks: n.hooks.map(lid) };
+  }
+  for (const x of Object.keys(gB.lns))
+    h.lns[lid(x)] = { id: lid(x), area: aid(gB.lns[x].area) };
+  let e = 0;
+  for (const x of Object.keys(gB.edges)){
+    const E = gB.edges[x];
+    const id = 'ze' + (++e);
+    h.edges[id] = { id, a: lid(E.a), b: lid(E.b) };
+  }
+  return h;
 }
