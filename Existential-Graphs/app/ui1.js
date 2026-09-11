@@ -156,30 +156,34 @@ function resolveMove(gA, gB, pal, printed){
   }
   return loose;
 }
-function hydrateProof(p){
-  if (p._h) return p._h;
-  const target = p.steps.map(s => parseEG(s.eg));
-  const pal = subgraphPalette(target);
-  const graphs = [target[0]], mvs = [null];
-  for (let i = 1; i < target.length; i++){
-    const r = resolveMove(graphs[i-1], target[i], pal, p.steps[i].eg);
-    graphs.push(r ? r.graph : target[i]);
-    mvs.push(r ? r.mv : null);
-  }
-  p._h = { graphs, mvs };
-  return p._h;
+/* Where a step cannot be resolved to a rule application at all, the drawing
+   must still not start over. The proof finder searches forwards from the
+   premisses and backwards from the conclusion at once, and where the two
+   halves meet the graph on the far side was built in the other tree: not one
+   part of it is the same object as any part of the step before, though the two
+   are drawn the same. alignGraph matches them by shape, so what they have in
+   common moves into place instead of the whole diagram blinking out and back.
+   Without it every found proof had exactly one step that respawned. */
+function carryOver(gPrev, gNext){
+  try { return alignGraph(gPrev, gNext); } catch(e){ return gNext; }
 }
-// the same, for a proof the finder has just produced
-function hydrateSteps(steps){
-  const graphs = steps.map(s => s.graph);
-  const pal = subgraphPalette(graphs);
-  const mvs = [null];
-  for (let i = 1; i < graphs.length; i++){
-    const r = resolveMove(graphs[i-1], graphs[i], pal);
+function hydrateChain(targets, printedAt){
+  const pal = subgraphPalette(targets);
+  const graphs = [targets[0]], mvs = [null];
+  for (let i = 1; i < targets.length; i++){
+    const r = resolveMove(graphs[i-1], targets[i], pal, printedAt ? printedAt(i) : undefined);
+    graphs.push(r ? r.graph : carryOver(graphs[i-1], targets[i]));
     mvs.push(r ? r.mv : null);
   }
   return { graphs, mvs };
 }
+function hydrateProof(p){
+  if (p._h) return p._h;
+  p._h = hydrateChain(p.steps.map(s => parseEG(s.eg)), i => p.steps[i].eg);
+  return p._h;
+}
+// the same, for a proof the finder has just produced
+function hydrateSteps(steps){ return hydrateChain(steps.map(s => s.graph)); }
 
 /* ============================== PROOFS ===================================== */
 const PF = { proof: null, i: 0, timer: null, anim: null };

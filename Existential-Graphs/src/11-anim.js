@@ -118,17 +118,49 @@ function prepareTween(gA, gB, GA, GB, opts){
   const FB = { W: fr ? Math.max(fr.W, GB.W) : GB.W, H: fr ? Math.max(fr.H, GB.H) : GB.H };
   FA.dx = (FA.W - GA.W)/2; FA.dy = (FA.H - GA.H)/2;
   FB.dx = (FB.W - GB.W)/2; FB.dy = (FB.H - GB.H)/2;
+
+  /* What this step adds and what it takes away, and hence how the motion is
+     to be staged. A graph must never simply appear over the top of another:
+     first whatever is erased goes, then the enclosures grow to make room, then
+     the empty room is marked, and only then is the new graph scribed in it. */
+  const hasAdd = nodes.some(it => it.inB && !it.inA) ||
+                 chains.some(c => c.fresh) || bare.some(b => b.inB && !b.inA);
+  const hasDel = nodes.some(it => it.inA && !it.inB) ||
+                 chains.some(c => c.gone) || bare.some(b => b.inA && !b.inB);
+  const sched = opts.stage === false ? null
+    : hasAdd && hasDel ? { out:[0,0.22], geom:[0.20,0.62], pulse:[0.58,0.88], in:[0.70,1] }
+    : hasAdd           ? { out:[0,0.36], geom:[0,0.55],    pulse:[0.53,0.86], in:[0.68,1] }
+    : hasDel           ? { out:[0,0.30], geom:[0.26,1],    pulse:null,        in:[0.4,1] }
+    :                    { out:[0,0.45], geom:[0,1],       pulse:null,        in:[0.18,1] };
+
+  // the room the new graph is going into, for the pulse
+  let addBox = null;
+  const widen = q => { if (!q) return;
+    addBox = addBox ? { x: Math.min(addBox.x,q.x), y: Math.min(addBox.y,q.y),
+                        X: Math.max(addBox.X,q.x+(q.w||0)), Y: Math.max(addBox.Y,q.y+(q.h||0)) }
+                    : { x:q.x, y:q.y, X:q.x+(q.w||0), Y:q.y+(q.h||0) }; };
+  if (sched && sched.pulse){
+    for (const it of nodes) if (it.inB && !it.inA) widen(GB.P[it.id]);
+    for (const c of chains) if (c.fresh) for (const l of c.ch)
+      if (!gA.lns[l] && GB.pos[l]) widen(GB.pos[l]);
+    for (const b of bare) if (b.inB && !b.inA) widen(GB.pos[b.l]);
+  }
+
   return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf, FA, FB,
+           hasAdd, hasDel, sched, addBox,
            W: Math.max(FA.W, FB.W), H: Math.max(FA.H, FB.H) };
 }
+const span = (t, w) => w[1] <= w[0] ? (t >= w[1] ? 1 : 0)
+                     : Math.max(0, Math.min(1, (t - w[0]) / (w[1] - w[0])));
 
 function tweenFrame(sp, t){
   const { GA, GB, opts } = sp;
   const parts = [];
   const shade = opts.shade, wobble = opts.wobble !== false;
-  const outT = Math.min(1, t / 0.45);            // what goes, goes early
-  const inT  = Math.max(0, (t - 0.18) / 0.82);   // what comes, arrives visibly
-  const e = EASE(t);
+  const S = sp.sched || { out:[0,0.45], geom:[0,1], pulse:null, in:[0.18,1] };
+  const outT = span(t, S.out);                   // what goes, goes first
+  const inT  = span(t, S.in);                    // what comes, comes last
+  const e = EASE(span(t, S.geom));               // and the room is made between
 
   const raised = opts.raised === false ? '' : ' raised';
   const FW = lerp(sp.FA.W, sp.FB.W, e), FH = lerp(sp.FA.H, sp.FB.H, e);
@@ -173,6 +205,16 @@ function tweenFrame(sp, t){
     const p = POS[b.l]; if (!p) continue;
     parts.push(`<path class="loi${sp.lcOf(b.l)}" opacity="${r2(op)}" d="M ${r2(p.x)} ${r2(p.y)} L ${
       r2(p.x + LAY.bareW)} ${r2(p.y)}"/>`);
+  }
+  // the room, marked while it stands empty
+  if (S.pulse && sp.addBox){
+    const pT = span(t, S.pulse);
+    if (pT > 0 && pT < 1){
+      const m = 6, B = sp.addBox;
+      parts.push(`<rect class="newroom" opacity="${r2(Math.sin(pT*Math.PI)*0.85)}" x="${
+        r2(B.x-m)}" y="${r2(B.y-m)}" width="${r2(B.X-B.x+2*m)}" height="${
+        r2(B.Y-B.y+2*m)}" rx="9"/>`);
+    }
   }
   return { svg: sheet + `<g class="gr" transform="translate(${r2(dx)},${r2(dy)})">` +
                 parts.join('\n') + '</g>', W: FW, H: FH };
@@ -296,9 +338,11 @@ function playTransition(el, gA, gB, mv, opts, done){
   const scaleFor = (W, H) => Math.min(availW/(W+2*pad), availH/(H+2*pad), 2.4);
 
   const markMs = opts.markMs === undefined ? 700 : opts.markMs;
-  const moveMs = opts.moveMs === undefined ? 720 : opts.moveMs;
+  let moveMs = opts.moveMs === undefined ? 720 : opts.moveMs;
   let raf = 0, timer = 0, cancelled = false;
   const sp = prepareTween(gA, gB, GA, GB, opts);
+  // a staged step is three beats rather than one, so it is given the room
+  if (sp.sched && sp.sched.pulse && sp.addBox) moveMs = Math.round(moveMs * 1.5);
 
   // beat one: mark what the rule is about to act on
   const focus = moveFocus(gA, mv);

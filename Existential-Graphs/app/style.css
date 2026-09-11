@@ -140,6 +140,11 @@ svg.eg .telegraph-head{fill:var(--accent);opacity:.8}
 @keyframes dash{to{stroke-dashoffset:-18}}
 @media (prefers-reduced-motion: reduce){ svg.eg .telegraph{animation:none} }
 
+/* the room an enclosure has just grown, marked while it stands empty */
+svg.eg .newroom{fill:color-mix(in srgb,var(--accent) 12%,transparent);
+  stroke:var(--accent);stroke-width:1.6;stroke-dasharray:5 4}
+@media (prefers-reduced-motion: reduce){ svg.eg .newroom{display:none} }
+
 /* the ring that marks what a rule is about to act on */
 svg.eg .focus{fill:none;stroke-width:2.6;rx:10}
 svg.eg .focus-del{stroke:var(--bad);animation:pulseDel 1s ease-in-out infinite}
