@@ -129,7 +129,7 @@ svg.eg .lc6{stroke:#6d1f49} svg.eg circle.lc6{fill:#6d1f49}
   svg.eg .lc5{stroke:#7fcbd3} svg.eg circle.lc5{fill:#7fcbd3}
   svg.eg .lc6{stroke:#eaa1c4} svg.eg circle.lc6{fill:#eaa1c4}
 }
-svg.eg .hooknum{font:8px var(--sans);fill:var(--ink3)}
+svg.eg .hooknum{font:600 10px var(--sans);fill:var(--ink2)}
 svg.eg .cut.hl-add,svg.eg .spot.hl-add rect{stroke:var(--hl-add);stroke-width:3}
 svg.eg .spot.hl-add text{fill:var(--hl-add)}
 svg.eg .cut.hl-del,svg.eg .spot.hl-del rect{stroke:var(--hl-del);stroke-width:3}
@@ -186,11 +186,15 @@ code,.mono{font-family:var(--mono);font-size:12.8px}
 
 /* transform list */
 .moves{list-style:none;margin:0;padding:0;max-height:330px;overflow-y:auto}
-.moves li{padding:6px 9px;border-radius:5px;cursor:pointer;font-size:13px;
-  display:flex;gap:8px;align-items:baseline}
-.moves li:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
-.moves li .r{font-weight:600;color:var(--accent);min-width:56px;font-size:12.5px}
-.moves li .d{color:var(--ink2);font-size:12.5px}
+.moves li{margin:0}
+.moves button.movebtn{display:block;width:100%;text-align:left;appearance:none;
+  background:none;border:0;border-radius:5px;padding:6px 9px;cursor:pointer;
+  font:inherit;color:inherit}
+.moves button.movebtn:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.moves button.movebtn:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.moves button.movebtn .d{display:block;color:var(--ink2);font-size:12.5px;line-height:1.4}
+.moves button.movebtn .w{display:block;color:var(--ink3);font-size:11.5px;
+  font-family:var(--mono);margin-top:1px}
 .movegroup{font:600 11.5px var(--sans);letter-spacing:.06em;text-transform:uppercase;
   color:var(--ink3);margin:10px 0 3px;padding-left:9px}
 

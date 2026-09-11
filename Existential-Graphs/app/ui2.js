@@ -1,5 +1,5 @@
 /* =============================== SCRIBE ==================================== */
-const ED = { g: newGraph(), sel: null, hist: [], pick: [] };
+const ED = { g: newGraph(), sel: null, hist: [], pick: [], anim: null };
 function edPush(){ ED.hist.push(cloneGraph(ED.g)); if (ED.hist.length > 60) ED.hist.shift(); }
 function edSel(kind, id){ ED.sel = { kind, id }; drawRender(); }
 function selArea(){
@@ -9,6 +9,7 @@ function selArea(){
   return n ? n.area : ED.g.root;
 }
 function drawRender(){
+  if (ED.anim) return;                 // let a running transformation finish
   const el = $('#d-stage');
   const opts = { shade: $('#d-shade').checked, wobble: true,
                  handles: $('#d-handles').checked, pad: 14 };
@@ -139,39 +140,137 @@ $('#d-loadlin').onclick = () => {
     if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); $(btn).click(); }
   }));
 
-/* --- the legal moves, offered for experiment ------------------------------ */
+/* --- the legal moves, offered for experiment ------------------------------
+   Two rules the panel has to obey. Every entry must say where it acts, or eight
+   entries all reading "a double cut is inserted" are indistinguishable and the
+   panel is useless. And applying one must be watchable: this is the one place
+   the reader is doing the logic rather than watching it, so it should get the
+   same marking and movement the Proofs tab gets. -------------------------- */
+
+// How far in an area lies, in words.
+function whereArea(g, area){
+  const d = depthOf(g, area);
+  if (d === 0) return 'on the sheet';
+  if (d === 1) return 'one cut in';
+  if (d === 2) return 'two cuts in';
+  return d + ' cuts in';
+}
+function nameOfNode(g, id){
+  const n = g.nodes[id];
+  if (!n) return 'a graph';
+  return n.k === 'spot' ? '“'+n.name+'”' : 'the enclosure ' + whereArea(g, n.inner);
+}
+// Where this move acts. The line above it already names the graph, so this says
+// only where, and never repeats the name.
+function whereOf(g, mv){
+  switch (mv.op){
+    case 'erase':    return whereArea(g, g.nodes[mv.node].area);
+    case 'dcOut':    return whereArea(g, g.nodes[mv.cut].area);
+    case 'deiterate':
+      return 'the one ' + whereArea(g, g.nodes[mv.node].area) +
+             ', keeping the one ' + whereArea(g, g.nodes[mv.witness].area);
+    case 'iterate':  return 'copied ' + whereArea(g, mv.target);
+    case 'insert':   return whereArea(g, mv.area);
+    case 'dcIn': {
+      const items = (mv.items || []);
+      const what = !items.length ? 'around nothing'
+        : 'around ' + items.map(i => nameOfNode(g, i)).join(' and ');
+      return what + ', ' + whereArea(g, mv.area);
+    }
+    case 'join':     return 'two points ' + whereArea(g, g.lns[mv.a].area);
+    case 'eraseEdge':{ const e = g.edges[mv.edge];
+                       return e ? whereArea(g, g.lns[e.a].area) : ''; }
+    case 'addLine':  return whereArea(g, mv.area);
+    case 'delLine': case 'branch': case 'retract':
+                     return whereArea(g, g.lns[mv.ln].area);
+    case 'extend':   return 'into the enclosure ' + whereArea(g, g.nodes[mv.cut].inner);
+  }
+  return '';
+}
+
+let DMOVES = [];
+function shortWhy(w){ return w.replace(/^R\d[^:]*:\s*/, '').replace(/^C6[^:]*:\s*/,''); }
+
 function drawMoves(){
   let mvs;
   try { mvs = legalMoves(ED.g, { dir:'fwd', palette: [], beta: !isAlpha(ED.g), maxNodes: 40 }); }
   catch(e){ $('#d-moves').innerHTML = '<p class="note">—</p>'; return; }
-  // keep the list readable: dedupe by resulting graph
   const seen = new Set(), keep = [];
   for (const mv of mvs){
     let h; try { h = applyMove(ED.g, mv, []); } catch(e){ continue; }
     const k = canonGraph(h);
-    if (seen.has(k)) continue;
+    if (seen.has(k)) continue;                 // same result by another route
     seen.add(k);
-    keep.push({ mv, h, rule: ruleOf(mv.op, true), why: describeMove(ED.g, mv, true) });
+    keep.push({ mv, h, rule: ruleOf(mv.op, true),
+                why: shortWhy(describeMove(ED.g, mv, true)),
+                where: whereOf(ED.g, mv) });
   }
-  if (!keep.length){ $('#d-moves').innerHTML = '<p class="note">No rule applies to the blank sheet but R5 and C6.</p>'; return; }
+  if (!keep.length){
+    $('#d-moves').innerHTML = '<p class="note">No rule applies to the blank sheet but R5 and C6.</p>';
+    return;
+  }
   const order = ['R1','R2','R3','R3(a)','R3(b)','R4','R4(a)','R4(a,b)','R5','C6/R2'];
-  keep.sort((a,b) => (order.indexOf(a.rule)+99*(order.indexOf(a.rule)<0)) -
-                     (order.indexOf(b.rule)+99*(order.indexOf(b.rule)<0)));
+  const rank = r => { const i = order.indexOf(r); return i < 0 ? 99 : i; };
+  keep.sort((a,b) => rank(a.rule) - rank(b.rule));
+  const counts = {};
+  keep.forEach(k => { const key = k.why+'|'+k.where; counts[key] = (counts[key]||0)+1; });
+  const seenLabel = {};
+  keep.forEach(k => {
+    const key = k.why+'|'+k.where;
+    if (counts[key] > 1){
+      seenLabel[key] = (seenLabel[key]||0)+1;
+      k.where = (k.where ? k.where+' ' : '') + '(' + seenLabel[key] + ' of ' + counts[key] + ')';
+    }
+  });
   const groups = {};
   keep.forEach((k,i) => (groups[k.rule] = groups[k.rule] || []).push({k,i}));
   DMOVES = keep;
   $('#d-moves').innerHTML = Object.keys(groups).map(r =>
     '<div class="movegroup">'+esc(r)+'</div><ul class="moves">'+
-    groups[r].map(({k,i}) => '<li data-i="'+i+'"><span class="d">'+esc(shortWhy(k.why))+'</span></li>').join('')+
+    groups[r].map(({k,i}) =>
+      '<li><button type="button" class="movebtn" data-i="'+i+'">'+
+      '<span class="d">'+esc(k.why)+'</span>'+
+      (k.where ? '<span class="w">'+esc(k.where)+'</span>' : '')+
+      '</button></li>').join('')+
     '</ul>').join('');
 }
-let DMOVES = [];
-function shortWhy(w){ return w.replace(/^R\d[^:]*:\s*/, '').replace(/^C6:\s*/,''); }
-$('#d-moves').onclick = e => {
-  const li = e.target.closest('li[data-i]'); if (!li) return;
-  const k = DMOVES[+li.dataset.i]; if (!k) return;
-  edPush(); ED.g = k.h; ED.sel = null; ED.pick = []; drawRender();
-};
+
+/* Hovering or focusing an entry marks, on the drawing, what that move would act
+   on — which is what tells the eight double-cut entries apart at a glance. */
+function previewMove(i){
+  const k = DMOVES[i];
+  if (!k || ED.anim) return;
+  const opts = { shade: $('#d-shade').checked, wobble: true,
+                 handles: $('#d-handles').checked, colourLines: PREFS.colour, pad: 14 };
+  const el = $('#d-stage');
+  stageSvg(el, ED.g, opts);
+  try { markNodes(el, ED.g, geom(ED.g, opts), moveFocus(ED.g, k.mv)); } catch(e){}
+}
+function unpreview(){ if (!ED.anim) drawRender(); }
+
+$('#d-moves').addEventListener('click', e => {
+  const b = e.target.closest('button[data-i]'); if (!b) return;
+  const k = DMOVES[+b.dataset.i]; if (!k) return;
+  edPush();
+  const el = $('#d-stage');
+  const opts = { shade: $('#d-shade').checked, wobble: true,
+                 colourLines: PREFS.colour, markMs: 520, moveMs: 620 };
+  ED.anim = playTransition(el, ED.g, k.h, k.mv, opts, () => {
+    ED.anim = null; ED.g = k.h; ED.sel = null; ED.pick = []; drawRender();
+  });
+});
+$('#d-moves').addEventListener('mouseover', e => {
+  const b = e.target.closest('button[data-i]'); if (b) previewMove(+b.dataset.i);
+});
+$('#d-moves').addEventListener('mouseout', e => {
+  const b = e.target.closest('button[data-i]'); if (b) unpreview();
+});
+$('#d-moves').addEventListener('focusin', e => {
+  const b = e.target.closest('button[data-i]'); if (b) previewMove(+b.dataset.i);
+});
+$('#d-moves').addEventListener('focusout', e => {
+  const b = e.target.closest('button[data-i]'); if (b) unpreview();
+});
 
 /* ============================== FIND A PROOF =============================== */
 const V_EXAMPLES = [

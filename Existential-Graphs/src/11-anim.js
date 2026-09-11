@@ -28,8 +28,17 @@ function moveFocus(g, mv){
     case 'dcIn':      (mv.items||[]).forEach(i => f[i] = 'src');
                       { const c = areaCut(mv.area); if (c && !(mv.items||[]).length) f[c] = 'area'; } break;
     case 'dcOut':     f[mv.cut] = 'del'; break;
-    case 'join': case 'eraseEdge': case 'addLine': case 'delLine':
-    case 'branch': case 'extend': case 'retract': break;
+    // The rules that work on lines act on points, not on graphs, so these mark
+    // the points themselves. Without them the steps that do the ligature
+    // surgery — Barbara's fourth, fifth and sixth — showed nothing at all.
+    case 'join':      f[mv.a] = 'src'; f[mv.b] = 'src'; break;
+    case 'eraseEdge': { const e = g.edges[mv.edge];
+                        if (e){ f[e.a] = 'del'; f[e.b] = 'del'; } break; }
+    case 'delLine':   f[mv.ln] = 'del'; break;
+    case 'retract':   f[mv.ln] = 'del'; break;
+    case 'branch':    f[mv.ln] = 'src'; break;
+    case 'extend':    f[mv.ln] = 'src'; if (mv.cut) f[mv.cut] = 'area'; break;
+    case 'addLine':   { const c = areaCut(mv.area); if (c) f[c] = 'area'; } break;
   }
   return f;
 }
@@ -51,7 +60,13 @@ function prepareTween(gA, gB, GA, GB, opts){
     if (!a) a = shrink(b);
     if (!b) b = shrink(a);
     const g = inB ? gB : gA;
-    return { id, n, a, b, inA, inB,
+    // hook positions in both geometries, so the numerals can travel too
+    let hkA = null, hkB = null;
+    if (n.k === 'spot' && n.hooks.length > 1){
+      if (inA) try { hkA = hookPoints(gA, id, GA.P, GA.LN); } catch(e){}
+      if (inB) try { hkB = hookPoints(gB, id, GB.P, GB.LN); } catch(e){}
+    }
+    return { id, n, a, b, inA, inB, hkA, hkB,
              odd: n.k === 'cut' && depthOf(g, n.inner) % 2 === 1 };
   }).filter(Boolean);
 
@@ -123,6 +138,8 @@ function tweenFrame(sp, t){
       parts.push(`<g class="spot" opacity="${r2(op)}"><text x="${
         r2(x + w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(y + h/2)}" `+
         `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+      if (opts.hookNumbers !== false && it.n.hooks.length > 1)
+        parts.push(hookNumerals(it, e));
     }
   }
 
@@ -151,6 +168,23 @@ function tweenFrame(sp, t){
   return parts.join('\n');
 }
 function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 }; }
+
+/* Which hook is which place of the spot. The static drawing carries these; so
+   must the moving one, or a relation becomes unreadable the moment it is drawn
+   by an animation rather than at rest. */
+function hookNumerals(it, e){
+  const A = it.hkA, B = it.hkB, src = B || A;
+  if (!src) return '';
+  const out = [];
+  for (const h of it.n.hooks){
+    const a = A && A[h], b = B && B[h];
+    const q = (a && b) ? { x: lerp(a.x,b.x,e), y: lerp(a.y,b.y,e), i:(b.i) }
+            : (b || a);
+    if (!q) continue;
+    out.push(`<text class="hooknum" x="${r2(q.x+6)}" y="${r2(q.y-4)}">${q.i+1}</text>`);
+  }
+  return out.join('');
+}
 
 /* The first beat: the graph as it stands, with everything but the graphs the
    rule is about to act on held back, a ghost of whatever is about to be
@@ -182,6 +216,8 @@ function markFrame(sp, focus, mv){
       parts.push(`<g class="spot" opacity="${op}"><text x="${
         r2(it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(it.a.y + it.a.h/2)}" `+
         `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+      if (opts.hookNumbers !== false && it.n.hooks.length > 1)
+        parts.push(hookNumerals(it, 0));
     }
   }
   // the lines, as they stand
@@ -279,15 +315,24 @@ function markNodes(el, g, G, focus){
   if (!svg) return;
   const ns = 'http://www.w3.org/2000/svg';
   for (const id of Object.keys(focus)){
-    const p = G.P[id]; if (!p) continue;
     const kind = focus[id];
-    const r = document.createElementNS(ns, 'rect');
-    const m = 4;
-    r.setAttribute('x', p.x - m); r.setAttribute('y', p.y - m);
-    r.setAttribute('width', p.w + 2*m); r.setAttribute('height', p.h + 2*m);
-    r.setAttribute('rx', 10);
-    r.setAttribute('class', 'focus focus-' + kind);
-    svg.appendChild(r);
+    const p = G.P[id];
+    if (p){
+      const m = 4;
+      const r = document.createElementNS(ns, 'rect');
+      r.setAttribute('x', p.x - m); r.setAttribute('y', p.y - m);
+      r.setAttribute('width', p.w + 2*m); r.setAttribute('height', p.h + 2*m);
+      r.setAttribute('rx', 10);
+      r.setAttribute('class', 'focus focus-' + kind);
+      svg.appendChild(r);
+      continue;
+    }
+    const q = G.pos && G.pos[id];        // a point of a line of identity
+    if (!q) continue;
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', q.x); c.setAttribute('cy', q.y); c.setAttribute('r', 7);
+    c.setAttribute('class', 'focus focus-' + kind);
+    svg.appendChild(c);
   }
 }
 

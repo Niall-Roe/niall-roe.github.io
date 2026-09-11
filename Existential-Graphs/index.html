@@ -135,7 +135,7 @@ svg.eg .lc6{stroke:#6d1f49} svg.eg circle.lc6{fill:#6d1f49}
   svg.eg .lc5{stroke:#7fcbd3} svg.eg circle.lc5{fill:#7fcbd3}
   svg.eg .lc6{stroke:#eaa1c4} svg.eg circle.lc6{fill:#eaa1c4}
 }
-svg.eg .hooknum{font:8px var(--sans);fill:var(--ink3)}
+svg.eg .hooknum{font:600 10px var(--sans);fill:var(--ink2)}
 svg.eg .cut.hl-add,svg.eg .spot.hl-add rect{stroke:var(--hl-add);stroke-width:3}
 svg.eg .spot.hl-add text{fill:var(--hl-add)}
 svg.eg .cut.hl-del,svg.eg .spot.hl-del rect{stroke:var(--hl-del);stroke-width:3}
@@ -192,11 +192,15 @@ code,.mono{font-family:var(--mono);font-size:12.8px}
 
 /* transform list */
 .moves{list-style:none;margin:0;padding:0;max-height:330px;overflow-y:auto}
-.moves li{padding:6px 9px;border-radius:5px;cursor:pointer;font-size:13px;
-  display:flex;gap:8px;align-items:baseline}
-.moves li:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
-.moves li .r{font-weight:600;color:var(--accent);min-width:56px;font-size:12.5px}
-.moves li .d{color:var(--ink2);font-size:12.5px}
+.moves li{margin:0}
+.moves button.movebtn{display:block;width:100%;text-align:left;appearance:none;
+  background:none;border:0;border-radius:5px;padding:6px 9px;cursor:pointer;
+  font:inherit;color:inherit}
+.moves button.movebtn:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.moves button.movebtn:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.moves button.movebtn .d{display:block;color:var(--ink2);font-size:12.5px;line-height:1.4}
+.moves button.movebtn .w{display:block;color:var(--ink3);font-size:11.5px;
+  font-family:var(--mono);margin-top:1px}
 .movegroup{font:600 11.5px var(--sans);letter-spacing:.06em;text-transform:uppercase;
   color:var(--ink3);margin:10px 0 3px;padding-left:9px}
 
@@ -2914,8 +2918,17 @@ function moveFocus(g, mv){
     case 'dcIn':      (mv.items||[]).forEach(i => f[i] = 'src');
                       { const c = areaCut(mv.area); if (c && !(mv.items||[]).length) f[c] = 'area'; } break;
     case 'dcOut':     f[mv.cut] = 'del'; break;
-    case 'join': case 'eraseEdge': case 'addLine': case 'delLine':
-    case 'branch': case 'extend': case 'retract': break;
+    // The rules that work on lines act on points, not on graphs, so these mark
+    // the points themselves. Without them the steps that do the ligature
+    // surgery — Barbara's fourth, fifth and sixth — showed nothing at all.
+    case 'join':      f[mv.a] = 'src'; f[mv.b] = 'src'; break;
+    case 'eraseEdge': { const e = g.edges[mv.edge];
+                        if (e){ f[e.a] = 'del'; f[e.b] = 'del'; } break; }
+    case 'delLine':   f[mv.ln] = 'del'; break;
+    case 'retract':   f[mv.ln] = 'del'; break;
+    case 'branch':    f[mv.ln] = 'src'; break;
+    case 'extend':    f[mv.ln] = 'src'; if (mv.cut) f[mv.cut] = 'area'; break;
+    case 'addLine':   { const c = areaCut(mv.area); if (c) f[c] = 'area'; } break;
   }
   return f;
 }
@@ -2937,7 +2950,13 @@ function prepareTween(gA, gB, GA, GB, opts){
     if (!a) a = shrink(b);
     if (!b) b = shrink(a);
     const g = inB ? gB : gA;
-    return { id, n, a, b, inA, inB,
+    // hook positions in both geometries, so the numerals can travel too
+    let hkA = null, hkB = null;
+    if (n.k === 'spot' && n.hooks.length > 1){
+      if (inA) try { hkA = hookPoints(gA, id, GA.P, GA.LN); } catch(e){}
+      if (inB) try { hkB = hookPoints(gB, id, GB.P, GB.LN); } catch(e){}
+    }
+    return { id, n, a, b, inA, inB, hkA, hkB,
              odd: n.k === 'cut' && depthOf(g, n.inner) % 2 === 1 };
   }).filter(Boolean);
 
@@ -3009,6 +3028,8 @@ function tweenFrame(sp, t){
       parts.push(`<g class="spot" opacity="${r2(op)}"><text x="${
         r2(x + w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(y + h/2)}" `+
         `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+      if (opts.hookNumbers !== false && it.n.hooks.length > 1)
+        parts.push(hookNumerals(it, e));
     }
   }
 
@@ -3037,6 +3058,23 @@ function tweenFrame(sp, t){
   return parts.join('\n');
 }
 function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 }; }
+
+/* Which hook is which place of the spot. The static drawing carries these; so
+   must the moving one, or a relation becomes unreadable the moment it is drawn
+   by an animation rather than at rest. */
+function hookNumerals(it, e){
+  const A = it.hkA, B = it.hkB, src = B || A;
+  if (!src) return '';
+  const out = [];
+  for (const h of it.n.hooks){
+    const a = A && A[h], b = B && B[h];
+    const q = (a && b) ? { x: lerp(a.x,b.x,e), y: lerp(a.y,b.y,e), i:(b.i) }
+            : (b || a);
+    if (!q) continue;
+    out.push(`<text class="hooknum" x="${r2(q.x+6)}" y="${r2(q.y-4)}">${q.i+1}</text>`);
+  }
+  return out.join('');
+}
 
 /* The first beat: the graph as it stands, with everything but the graphs the
    rule is about to act on held back, a ghost of whatever is about to be
@@ -3068,6 +3106,8 @@ function markFrame(sp, focus, mv){
       parts.push(`<g class="spot" opacity="${op}"><text x="${
         r2(it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(it.a.y + it.a.h/2)}" `+
         `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+      if (opts.hookNumbers !== false && it.n.hooks.length > 1)
+        parts.push(hookNumerals(it, 0));
     }
   }
   // the lines, as they stand
@@ -3165,15 +3205,24 @@ function markNodes(el, g, G, focus){
   if (!svg) return;
   const ns = 'http://www.w3.org/2000/svg';
   for (const id of Object.keys(focus)){
-    const p = G.P[id]; if (!p) continue;
     const kind = focus[id];
-    const r = document.createElementNS(ns, 'rect');
-    const m = 4;
-    r.setAttribute('x', p.x - m); r.setAttribute('y', p.y - m);
-    r.setAttribute('width', p.w + 2*m); r.setAttribute('height', p.h + 2*m);
-    r.setAttribute('rx', 10);
-    r.setAttribute('class', 'focus focus-' + kind);
-    svg.appendChild(r);
+    const p = G.P[id];
+    if (p){
+      const m = 4;
+      const r = document.createElementNS(ns, 'rect');
+      r.setAttribute('x', p.x - m); r.setAttribute('y', p.y - m);
+      r.setAttribute('width', p.w + 2*m); r.setAttribute('height', p.h + 2*m);
+      r.setAttribute('rx', 10);
+      r.setAttribute('class', 'focus focus-' + kind);
+      svg.appendChild(r);
+      continue;
+    }
+    const q = G.pos && G.pos[id];        // a point of a line of identity
+    if (!q) continue;
+    const c = document.createElementNS(ns, 'circle');
+    c.setAttribute('cx', q.x); c.setAttribute('cy', q.y); c.setAttribute('r', 7);
+    c.setAttribute('class', 'focus focus-' + kind);
+    svg.appendChild(c);
   }
 }
 
@@ -3701,7 +3750,7 @@ $('#pf-play').onclick = () => {
   PF.timer = setTimeout(advance, 300);
 };
 /* =============================== SCRIBE ==================================== */
-const ED = { g: newGraph(), sel: null, hist: [], pick: [] };
+const ED = { g: newGraph(), sel: null, hist: [], pick: [], anim: null };
 function edPush(){ ED.hist.push(cloneGraph(ED.g)); if (ED.hist.length > 60) ED.hist.shift(); }
 function edSel(kind, id){ ED.sel = { kind, id }; drawRender(); }
 function selArea(){
@@ -3711,6 +3760,7 @@ function selArea(){
   return n ? n.area : ED.g.root;
 }
 function drawRender(){
+  if (ED.anim) return;                 // let a running transformation finish
   const el = $('#d-stage');
   const opts = { shade: $('#d-shade').checked, wobble: true,
                  handles: $('#d-handles').checked, pad: 14 };
@@ -3841,39 +3891,137 @@ $('#d-loadlin').onclick = () => {
     if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); $(btn).click(); }
   }));
 
-/* --- the legal moves, offered for experiment ------------------------------ */
+/* --- the legal moves, offered for experiment ------------------------------
+   Two rules the panel has to obey. Every entry must say where it acts, or eight
+   entries all reading "a double cut is inserted" are indistinguishable and the
+   panel is useless. And applying one must be watchable: this is the one place
+   the reader is doing the logic rather than watching it, so it should get the
+   same marking and movement the Proofs tab gets. -------------------------- */
+
+// How far in an area lies, in words.
+function whereArea(g, area){
+  const d = depthOf(g, area);
+  if (d === 0) return 'on the sheet';
+  if (d === 1) return 'one cut in';
+  if (d === 2) return 'two cuts in';
+  return d + ' cuts in';
+}
+function nameOfNode(g, id){
+  const n = g.nodes[id];
+  if (!n) return 'a graph';
+  return n.k === 'spot' ? '“'+n.name+'”' : 'the enclosure ' + whereArea(g, n.inner);
+}
+// Where this move acts. The line above it already names the graph, so this says
+// only where, and never repeats the name.
+function whereOf(g, mv){
+  switch (mv.op){
+    case 'erase':    return whereArea(g, g.nodes[mv.node].area);
+    case 'dcOut':    return whereArea(g, g.nodes[mv.cut].area);
+    case 'deiterate':
+      return 'the one ' + whereArea(g, g.nodes[mv.node].area) +
+             ', keeping the one ' + whereArea(g, g.nodes[mv.witness].area);
+    case 'iterate':  return 'copied ' + whereArea(g, mv.target);
+    case 'insert':   return whereArea(g, mv.area);
+    case 'dcIn': {
+      const items = (mv.items || []);
+      const what = !items.length ? 'around nothing'
+        : 'around ' + items.map(i => nameOfNode(g, i)).join(' and ');
+      return what + ', ' + whereArea(g, mv.area);
+    }
+    case 'join':     return 'two points ' + whereArea(g, g.lns[mv.a].area);
+    case 'eraseEdge':{ const e = g.edges[mv.edge];
+                       return e ? whereArea(g, g.lns[e.a].area) : ''; }
+    case 'addLine':  return whereArea(g, mv.area);
+    case 'delLine': case 'branch': case 'retract':
+                     return whereArea(g, g.lns[mv.ln].area);
+    case 'extend':   return 'into the enclosure ' + whereArea(g, g.nodes[mv.cut].inner);
+  }
+  return '';
+}
+
+let DMOVES = [];
+function shortWhy(w){ return w.replace(/^R\d[^:]*:\s*/, '').replace(/^C6[^:]*:\s*/,''); }
+
 function drawMoves(){
   let mvs;
   try { mvs = legalMoves(ED.g, { dir:'fwd', palette: [], beta: !isAlpha(ED.g), maxNodes: 40 }); }
   catch(e){ $('#d-moves').innerHTML = '<p class="note">—</p>'; return; }
-  // keep the list readable: dedupe by resulting graph
   const seen = new Set(), keep = [];
   for (const mv of mvs){
     let h; try { h = applyMove(ED.g, mv, []); } catch(e){ continue; }
     const k = canonGraph(h);
-    if (seen.has(k)) continue;
+    if (seen.has(k)) continue;                 // same result by another route
     seen.add(k);
-    keep.push({ mv, h, rule: ruleOf(mv.op, true), why: describeMove(ED.g, mv, true) });
+    keep.push({ mv, h, rule: ruleOf(mv.op, true),
+                why: shortWhy(describeMove(ED.g, mv, true)),
+                where: whereOf(ED.g, mv) });
   }
-  if (!keep.length){ $('#d-moves').innerHTML = '<p class="note">No rule applies to the blank sheet but R5 and C6.</p>'; return; }
+  if (!keep.length){
+    $('#d-moves').innerHTML = '<p class="note">No rule applies to the blank sheet but R5 and C6.</p>';
+    return;
+  }
   const order = ['R1','R2','R3','R3(a)','R3(b)','R4','R4(a)','R4(a,b)','R5','C6/R2'];
-  keep.sort((a,b) => (order.indexOf(a.rule)+99*(order.indexOf(a.rule)<0)) -
-                     (order.indexOf(b.rule)+99*(order.indexOf(b.rule)<0)));
+  const rank = r => { const i = order.indexOf(r); return i < 0 ? 99 : i; };
+  keep.sort((a,b) => rank(a.rule) - rank(b.rule));
+  const counts = {};
+  keep.forEach(k => { const key = k.why+'|'+k.where; counts[key] = (counts[key]||0)+1; });
+  const seenLabel = {};
+  keep.forEach(k => {
+    const key = k.why+'|'+k.where;
+    if (counts[key] > 1){
+      seenLabel[key] = (seenLabel[key]||0)+1;
+      k.where = (k.where ? k.where+' ' : '') + '(' + seenLabel[key] + ' of ' + counts[key] + ')';
+    }
+  });
   const groups = {};
   keep.forEach((k,i) => (groups[k.rule] = groups[k.rule] || []).push({k,i}));
   DMOVES = keep;
   $('#d-moves').innerHTML = Object.keys(groups).map(r =>
     '<div class="movegroup">'+esc(r)+'</div><ul class="moves">'+
-    groups[r].map(({k,i}) => '<li data-i="'+i+'"><span class="d">'+esc(shortWhy(k.why))+'</span></li>').join('')+
+    groups[r].map(({k,i}) =>
+      '<li><button type="button" class="movebtn" data-i="'+i+'">'+
+      '<span class="d">'+esc(k.why)+'</span>'+
+      (k.where ? '<span class="w">'+esc(k.where)+'</span>' : '')+
+      '</button></li>').join('')+
     '</ul>').join('');
 }
-let DMOVES = [];
-function shortWhy(w){ return w.replace(/^R\d[^:]*:\s*/, '').replace(/^C6:\s*/,''); }
-$('#d-moves').onclick = e => {
-  const li = e.target.closest('li[data-i]'); if (!li) return;
-  const k = DMOVES[+li.dataset.i]; if (!k) return;
-  edPush(); ED.g = k.h; ED.sel = null; ED.pick = []; drawRender();
-};
+
+/* Hovering or focusing an entry marks, on the drawing, what that move would act
+   on — which is what tells the eight double-cut entries apart at a glance. */
+function previewMove(i){
+  const k = DMOVES[i];
+  if (!k || ED.anim) return;
+  const opts = { shade: $('#d-shade').checked, wobble: true,
+                 handles: $('#d-handles').checked, colourLines: PREFS.colour, pad: 14 };
+  const el = $('#d-stage');
+  stageSvg(el, ED.g, opts);
+  try { markNodes(el, ED.g, geom(ED.g, opts), moveFocus(ED.g, k.mv)); } catch(e){}
+}
+function unpreview(){ if (!ED.anim) drawRender(); }
+
+$('#d-moves').addEventListener('click', e => {
+  const b = e.target.closest('button[data-i]'); if (!b) return;
+  const k = DMOVES[+b.dataset.i]; if (!k) return;
+  edPush();
+  const el = $('#d-stage');
+  const opts = { shade: $('#d-shade').checked, wobble: true,
+                 colourLines: PREFS.colour, markMs: 520, moveMs: 620 };
+  ED.anim = playTransition(el, ED.g, k.h, k.mv, opts, () => {
+    ED.anim = null; ED.g = k.h; ED.sel = null; ED.pick = []; drawRender();
+  });
+});
+$('#d-moves').addEventListener('mouseover', e => {
+  const b = e.target.closest('button[data-i]'); if (b) previewMove(+b.dataset.i);
+});
+$('#d-moves').addEventListener('mouseout', e => {
+  const b = e.target.closest('button[data-i]'); if (b) unpreview();
+});
+$('#d-moves').addEventListener('focusin', e => {
+  const b = e.target.closest('button[data-i]'); if (b) previewMove(+b.dataset.i);
+});
+$('#d-moves').addEventListener('focusout', e => {
+  const b = e.target.closest('button[data-i]'); if (b) unpreview();
+});
 
 /* ============================== FIND A PROOF =============================== */
 const V_EXAMPLES = [

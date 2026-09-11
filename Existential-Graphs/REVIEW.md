@@ -13,6 +13,10 @@ verified; everything else is written down but not acted on.
 - The two Translate examples that were wrong have been corrected and checked
   against the engine.
 - Editing a formula twice in a row no longer draws the wrong graph.
+- The hook numerals survive an animated redraw, and are legible.
+- The rules that act on lines of identity now mark what they act on.
+- The Scribe transform panel says where each move acts, previews it on hover or
+  focus, plays it when clicked, and is reachable by keyboard.
 
 All 25 library proofs still verify, replay, render and write out; the searches
 still find their proofs.
@@ -162,7 +166,7 @@ The quantifiers were the wrong way round.
 now satisfiable and reads as three things not all identical; the second reads
 ∀x∃y, as Roberts has it.
 
-## The hook numerals are absent almost everywhere
+## FIXED — the hook numerals were absent almost everywhere
 
 Only `src/08-render.js:436` emits them, and that is the static path. Every
 animated path — clicking an example, pressing Draw it, typing with "draw as I
@@ -174,8 +178,14 @@ This is worse than a cosmetic loss. With three variables the graph cannot be rea
 without them: `Ex Ey Ez (Rxy & Ryz & Rzx & Sx & Sz)` draws three spots all
 labelled R, each with two hooks, and nothing distinguishes R(x,y) from R(y,x).
 
-Where they do render they are 8px in `--ink3` at 3.95:1, tucked against the
+Where they did render they were 8px in `--ink3` at 3.95:1, tucked against the
 spot's letter, and effectively invisible at 1:1.
+
+**Fixed.** The moving drawing now carries them too, interpolating each hook's
+position between the two geometries so the numerals travel with the spot, and
+they are 10px semibold in `--ink2`. Checked on a three-variable relational graph:
+six numerals at rest, six after Draw it, six after clicking an example, where
+before it was six, none, none.
 
 ---
 
@@ -211,32 +221,123 @@ halves, and spurious asterisks in the written proof — not a wrong proof.
 
 ---
 
+# A second look at the experience
+
+My own pass, after the fixes above, at desktop width. Ordered by how much each
+would help a philosopher arriving cold. Items already listed further down are
+not repeated.
+
+## 1. The landing tab never says how to read the picture
+
+The graph is large, clear and correct, and nothing on the tab tells a newcomer
+what the picture means. The three facts that unlock it fit in three sentences:
+graphs side by side are both asserted; a cut denies what it encloses; the heavy
+line means "something", and the further in its outermost end sits, the more it
+comes to mean "anything". Everything is on the Conventions tab, but that is the
+last tab and no one starts there, and nothing on the first four points to it.
+
+A short primer under the graph — three sentences and a link to the conventions
+— would turn the landing tab from a demonstration into an explanation. This is
+the single change with the most leverage.
+
+## 2. The landing tab is cluttered with things that are not the task
+
+Under the formula box: nine glyph buttons, seventeen example chips, a Draw
+button with a checkbox, then four drawing preferences (shade, hand-drawn,
+numerals, colour) — all before "How to write it". The preferences are not part
+of translating anything; they belong in a small row under the graph card, or
+behind a disclosure. The chips could be cut to eight well-chosen ones with the
+rest behind "more".
+
+Three headings and labels need plainer words. "Read back, endoporeutically" is
+the second heading a visitor reads and its second word is a term of art; "What
+the graph says" would do, with the term introduced in the primer. "Beta — a
+finite check only" is a pill with no antecedent on a tab that is not about
+validity at all; drop it here. And the note that appears when a free variable
+is closed for the reader sits at the foot of the third card, a screen below the
+box it is about; the parse error sits in the graph card. Both belong under the
+formula box.
+
+## 3. Scribe opens dead
+
+The tab arrives on a blank sheet, with a Transform panel offering one move. It
+should open with a graph already loaded — the one last drawn on Translate, or
+`Ax (Fx -> Gx)` — so there is something to transform in the first second. The
+instruction "click the sheet's border" is wrong; clicking anywhere on the sheet
+works.
+
+The bigger idea for this tab: give it a goal. Let the reader pick a target — a
+conclusion from the proof library, or one of the textbook exercises — and
+transform the sheet towards it, with the page saying when the goal is reached
+and how many moves it took. That turns the rules from a list into a puzzle,
+which for a logician is the most engaging thing the page could be. It is a
+feature rather than a fix, but the pieces exist: the move panel, the animation,
+and a canonical comparison of graphs.
+
+## 4. Small things on Proofs
+
+A one-line legend for the rings — green is what the rule appeals to, red is what
+is about to go, dashed is the area it acts on — since nothing says so. The
+speed slider runs backwards: its value is a duration, so dragging right makes it
+slower; relabel it "step time" or invert it. Every caption prints its rule
+twice, "R4 — R4, deiteration", because the justification strings already begin
+with the rule. And the stage changes height between steps, so the caption and
+buttons jump up and down the page during play; fixing its minimum height to the
+tallest step of the proof, computed once on load, would hold everything still.
+
+## 5. Small things on Find a proof
+
+The verdict card says "Press the button" beside two buttons; "Search for a
+proof, or pick an exercise below" is what it means. "Search harder" freezes the
+page for up to thirty seconds with a spinner that stops spinning; if it cannot
+be chunked, it should at least say so before starting. The verdict card is
+otherwise a large empty box on arrival, which could carry one sentence on what a
+verdict will say.
+
+## 6. The header
+
+The four-line blurb, with its citation, repeats on every tab and takes the top
+of the screen each time. The first sentence is the useful one; the source
+belongs on the Conventions tab, where it already is.
+
+---
+
 # As a visitor finds it
 
 Ordered by how much it costs a first-time reader. Several of these overlap the
 correctness list above and are not repeated.
 
-**The mark-then-move promise is not kept for any step involving a line of
-identity.** `src/11-anim.js:32` — `join`, `eraseEdge`, `addLine`, `delLine`,
-`branch`, `extend`, `retract` all fall through with no focus at all. In Barbara
-that is steps 4, 5 and 6, the ligature surgery, which are exactly the steps a
-newcomer cannot follow unaided. Marking the enclosing cut, one line each, would
-already help.
+**FIXED — the mark-then-move promise was not kept for any step involving a line
+of identity.** `join`, `eraseEdge`, `addLine`, `delLine`, `branch`, `extend` and
+`retract` all fell through with no focus at all. In Barbara that was steps 4, 5
+and 6, the ligature surgery, which are exactly the steps a newcomer cannot
+follow unaided.
 
-**The legal-move list on Scribe is unusable as offered — this is the roughness.**
-On `Ax (Fx -> Gx)`, the first thing anyone will load, the panel lists 22 moves
-with only 9 distinct descriptions: eight identical lines reading "a double cut is
-inserted", four identical "a branch with a loose end is added", two identical
-"F is scribed again on an area contained by its own place". Nothing distinguishes
-them, there is no preview, and hovering only tints the row.
+These rules act on points rather than on graphs, so the marking now rings the
+points themselves: the two being joined, the one being branched, the one about
+to be retracted. All eight Barbara steps now mark something, where three marked
+nothing.
 
-Applying one is an instant jump — `app/ui2.js:170` assigns and redraws. So the
-one place the reader is doing the logic themselves is the one place with no
-animation, while the tab where they are passive gets the full treatment. Reusing
-`playTransition` with the move's own focus would fix both at once: hovering would
-draw the rings, so the eight double-cut options visibly differ, and clicking
-would play it. The moves are also `<li>` elements rather than buttons, so they
-are not reachable by keyboard and not announced as actionable.
+**FIXED — the legal-move list on Scribe was unusable as offered.** On
+`Ax (Fx -> Gx)`, the first thing anyone will load, the panel listed 22 moves with
+only 9 distinct descriptions: eight identical lines reading "a double cut is
+inserted", four identical "a branch with a loose end is added". Nothing
+distinguished them, there was no preview, and applying one was an instant jump —
+so the one place the reader is doing the logic themselves was the one place with
+no animation.
+
+Each entry now carries a second line saying where it acts: *around the enclosure
+two cuts in, one cut in*, *copied two cuts in*, *keeping the one on the sheet*.
+The wording never repeats what the line above already names. Where two moves
+would still read alike — two branches from different points of one line — they
+are numbered. On the three formulas tried, every move is now distinct: 21 of 21,
+18 of 18, 13 of 13.
+
+Hovering an entry, or reaching it by keyboard, marks on the drawing exactly what
+that move would act on, which is what tells the double-cut entries apart at a
+glance. Clicking plays the transformation with the same marking and movement the
+Proofs tab uses. The entries are buttons, so they are in the tab order and
+announced as actionable.
 
 **A line of identity on the sheet is drawn overlapping the cut wall.** Measured:
 the cut path begins at x=33.3 and the sheet-level line runs to x=36 with a
