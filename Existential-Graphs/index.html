@@ -119,23 +119,24 @@ svg.eg .loi{stroke:var(--ink);stroke-width:3.2;fill:none;stroke-linecap:round;st
 svg.eg .branch{fill:var(--ink)}
 /* Telling the lines apart. Peirce drew in one ink; this is an aid, like the
    shading, and nothing in the logic turns on it. */
-svg.eg .lc0{stroke:#7d1f1f} svg.eg circle.lc0{fill:#7d1f1f}
-svg.eg .lc1{stroke:#1d5130} svg.eg circle.lc1{fill:#1d5130}
-svg.eg .lc2{stroke:#1e3a70} svg.eg circle.lc2{fill:#1e3a70}
-svg.eg .lc3{stroke:#5d2a6d} svg.eg circle.lc3{fill:#5d2a6d}
-svg.eg .lc4{stroke:#7a4a12} svg.eg circle.lc4{fill:#7a4a12}
-svg.eg .lc5{stroke:#11555d} svg.eg circle.lc5{fill:#11555d}
-svg.eg .lc6{stroke:#6d1f49} svg.eg circle.lc6{fill:#6d1f49}
+svg.eg .lc0{stroke:#7d1f1f} svg.eg circle.lc0{fill:#7d1f1f} svg.eg text.lc0{fill:#7d1f1f}
+svg.eg .lc1{stroke:#1d5130} svg.eg circle.lc1{fill:#1d5130} svg.eg text.lc1{fill:#1d5130}
+svg.eg .lc2{stroke:#1e3a70} svg.eg circle.lc2{fill:#1e3a70} svg.eg text.lc2{fill:#1e3a70}
+svg.eg .lc3{stroke:#5d2a6d} svg.eg circle.lc3{fill:#5d2a6d} svg.eg text.lc3{fill:#5d2a6d}
+svg.eg .lc4{stroke:#7a4a12} svg.eg circle.lc4{fill:#7a4a12} svg.eg text.lc4{fill:#7a4a12}
+svg.eg .lc5{stroke:#11555d} svg.eg circle.lc5{fill:#11555d} svg.eg text.lc5{fill:#11555d}
+svg.eg .lc6{stroke:#6d1f49} svg.eg circle.lc6{fill:#6d1f49} svg.eg text.lc6{fill:#6d1f49}
 @media (prefers-color-scheme: dark){
-  svg.eg .lc0{stroke:#e79191} svg.eg circle.lc0{fill:#e79191}
-  svg.eg .lc1{stroke:#8fd0a1} svg.eg circle.lc1{fill:#8fd0a1}
-  svg.eg .lc2{stroke:#94b8ec} svg.eg circle.lc2{fill:#94b8ec}
-  svg.eg .lc3{stroke:#cba5e3} svg.eg circle.lc3{fill:#cba5e3}
-  svg.eg .lc4{stroke:#e3b978} svg.eg circle.lc4{fill:#e3b978}
-  svg.eg .lc5{stroke:#7fcbd3} svg.eg circle.lc5{fill:#7fcbd3}
-  svg.eg .lc6{stroke:#eaa1c4} svg.eg circle.lc6{fill:#eaa1c4}
+  svg.eg .lc0{stroke:#e79191} svg.eg circle.lc0{fill:#e79191} svg.eg text.lc0{fill:#e79191}
+  svg.eg .lc1{stroke:#8fd0a1} svg.eg circle.lc1{fill:#8fd0a1} svg.eg text.lc1{fill:#8fd0a1}
+  svg.eg .lc2{stroke:#94b8ec} svg.eg circle.lc2{fill:#94b8ec} svg.eg text.lc2{fill:#94b8ec}
+  svg.eg .lc3{stroke:#cba5e3} svg.eg circle.lc3{fill:#cba5e3} svg.eg text.lc3{fill:#cba5e3}
+  svg.eg .lc4{stroke:#e3b978} svg.eg circle.lc4{fill:#e3b978} svg.eg text.lc4{fill:#e3b978}
+  svg.eg .lc5{stroke:#7fcbd3} svg.eg circle.lc5{fill:#7fcbd3} svg.eg text.lc5{fill:#7fcbd3}
+  svg.eg .lc6{stroke:#eaa1c4} svg.eg circle.lc6{fill:#eaa1c4} svg.eg text.lc6{fill:#eaa1c4}
 }
-svg.eg .hooknum{font:600 10px var(--sans);fill:var(--ink2)}
+svg.eg .hooknum{font:italic 600 11px var(--serif);fill:var(--ink2)}
+svg.eg .hookpl{font:400 9px var(--sans);font-style:normal;opacity:.65}
 svg.eg .cut.hl-add,svg.eg .spot.hl-add rect{stroke:var(--hl-add);stroke-width:3}
 svg.eg .spot.hl-add text{fill:var(--hl-add)}
 svg.eg .cut.hl-del,svg.eg .spot.hl-del rect{stroke:var(--hl-del);stroke-width:3}
@@ -282,7 +283,7 @@ hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
       <div class="toggles">
         <label><input type="checkbox" id="t-shade" checked> shade oddly enclosed areas</label>
         <label><input type="checkbox" id="t-wobble" checked> hand-drawn cuts</label>
-        <label><input type="checkbox" id="t-hooks" checked> number the hooks</label>
+        <label><input type="checkbox" id="t-hooks" checked> label the hooks</label>
         <label><input type="checkbox" class="pref-colour" checked> colour the lines of identity</label>
       </div>
       <hr class="sep">
@@ -1176,6 +1177,17 @@ function freshVar(st){
   return i < VARNAMES.length ? VARNAMES[i] : 'x'+(i+1);
 }
 
+/* The variable each point of each line carries, as the reading assigns it —
+   so that a diagram can label its hooks with the names that appear in the
+   formula underneath rather than with bare ordinals. Because a line inherits
+   the variable of its least-enclosed part, a ligature keeps one name however
+   many cuts it crosses. */
+function lineVars(g){
+  const st = { n: 0, vars: {} };
+  readArea(g, g.root, {}, st);
+  return st.vars;
+}
+
 function readArea(g, areaId, inherited, st){
   const area = g.areas[areaId];
   const lns = area.lns;
@@ -1210,6 +1222,7 @@ function readArea(g, areaId, inherited, st){
     }
   }
   const varOf = l => compVars[find(l)];
+  if (st.vars) for (const l of lns) st.vars[l] = varOf(l);
 
   /* 3. conjuncts */
   const conj = [];
@@ -2395,6 +2408,17 @@ function hookPoints(g, spotId, P, LN){
   return out;
 }
 
+/* A hook carries two facts: which line reaches it, and which place of the
+   spot it is. The line is named by the variable the reading gives it; the
+   place is the small figure after the name, since the hooks are laid down the
+   spot's edge in the order of their lines and not in the order of the
+   arguments. */
+const SUPER = ['\u00b9','\u00b2','\u00b3','\u2074','\u2075','\u2076','\u2077','\u2078','\u2079'];
+function hookLabel(name, i){
+  const place = SUPER[i] || ('^'+(i+1));
+  return name ? esc(name) + '<tspan class="hookpl">' + place + '</tspan>' : esc(String(i+1));
+}
+
 /* ---- positions for the points of the lines of identity ------------------- */
 function placeLines(g, P, LN){
   const pos = {}, fixed = {};
@@ -2645,6 +2669,7 @@ function renderGraph(g, opts){
   // in pieces leaves the round ends of each piece stacked at every junction.
   const colour = opts.colourLines && LN.count > 1;
   const lc = ln => colour ? ' lc' + (LN.rank[LN.lig[ln]] % 7) : '';
+  let VARS = {}; try { VARS = lineVars(g); } catch(e){}
   const chains = lineChains(g, pos);
   const polys  = chains.map(ch => dedupePts(elbowPoints(ch, pos)));
   const hops   = crossingHops(polys);
@@ -2667,14 +2692,16 @@ function renderGraph(g, opts){
       parts.push(`<circle class="branch${lc(l.id)}" cx="${p.x}" cy="${p.y}" r="1.7"/>`);
     }
   }
-  // hook numerals, so the order of a spot's hooks can be read off
+  // hook labels: the variable each line carries, in the colour of that line,
+  // so that a relation can be read off the drawing the way it is written
   if (opts.hookNumbers !== false)
   for (const n of Object.values(g.nodes)){
     if (n.k !== 'spot' || n.hooks.length < 2) continue;
     const hp = hookPoints(g, n.id, P, LN);
     n.hooks.forEach(h => {
       const q = hp[h];
-      parts.push(`<text class="hooknum" x="${q.x+6}" y="${q.y-4}">${q.i+1}</text>`);
+      parts.push(`<text class="hooknum${lc(h)}" x="${q.x+6}" y="${
+        q.y-4}">${hookLabel(VARS[h], q.i)}</text>`);
     });
   }
 
@@ -3030,6 +3057,41 @@ function prepareTween(gA, gB, GA, GB, opts){
     if (inA || inB) bare.push({ l, inA: !!inA, inB: !!inB });
   }
 
+  /* A point that only one of the two graphs has still needs somewhere to come
+     from, or to go to: the nearest point of its own line that both graphs
+     have. Without this a lengthened line appeared at full length rather than
+     growing out of the line already drawn, and a retracted one vanished
+     instead of drawing back. */
+  const nearestKnown = (g, from, known) => {
+    const seen = new Set([from]); let front = [from];
+    for (let d = 0; d < 40 && front.length; d++){
+      const next = [];
+      for (const l of front) for (const m of neighbours(g, l)){
+        if (seen.has(m)) continue;
+        if (known[m]) return known[m];
+        seen.add(m); next.push(m);
+      }
+      front = next;
+    }
+    return null;
+  };
+  const fromPos = {}, toPos = {};
+  for (const l of Object.keys(gB.lns)) if (!gA.lns[l]){
+    const q = nearestKnown(gB, l, GA.pos); if (q) fromPos[l] = q;
+  }
+  for (const l of Object.keys(gA.lns)) if (!gB.lns[l]){
+    const q = nearestKnown(gA, l, GB.pos); if (q) toPos[l] = q;
+  }
+  // a line that grows or draws back need not fade: it is already continuous
+  for (const c of chains){
+    const anchored = c.ch.some(l => (c.gone ? gB.lns[l] : gA.lns[l]));
+    if (anchored) c.anchored = true;
+  }
+
+  let varsA = {}, varsB = {};
+  try { varsA = lineVars(gA); } catch(e){}
+  try { varsB = lineVars(gB); } catch(e){}
+
   const LNB = laneMap(gB), LNA = laneMap(gA);
   const colour = opts.colourLines && Math.max(LNA.count, LNB.count) > 1;
   const lcOf = ln => {
@@ -3073,7 +3135,7 @@ function prepareTween(gA, gB, GA, GB, opts){
   }
 
   return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf, FA, FB,
-           hasAdd, hasDel, sched, addBox,
+           hasAdd, hasDel, sched, addBox, fromPos, toPos, varsA, varsB,
            W: Math.max(FA.W, FB.W), H: Math.max(FA.H, FB.H) };
 }
 const span = (t, w) => w[1] <= w[0] ? (t >= w[1] ? 1 : 0)
@@ -3106,17 +3168,22 @@ function tweenFrame(sp, t){
         r2(x + w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(y + h/2)}" `+
         `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
       if (opts.hookNumbers !== false && it.n.hooks.length > 1)
-        parts.push(hookNumerals(it, e));
+        parts.push(hookNumerals(it, e, sp));
     }
   }
 
   // one interpolated position for every point of every line
   const POS = {};
   for (const ln of new Set([...Object.keys(GA.pos), ...Object.keys(GB.pos)])){
-    const a = GA.pos[ln], b = GB.pos[ln];
+    const a = GA.pos[ln] || sp.fromPos[ln], b = GB.pos[ln] || sp.toPos[ln];
     POS[ln] = (a && b) ? { x: lerp(a.x,b.x,e), y: lerp(a.y,b.y,e) } : (a || b);
   }
-  const live = sp.chains.map(c => ({ c, op: c.gone ? 1-outT : (c.fresh ? inT : 1) }))
+  // A line that grows out of one already drawn, or draws back into one, needs
+  // no fade — it is continuous with what is there. A retraction is still taken
+  // off the sheet at the very end, so that nothing is left behind.
+  const live = sp.chains.map(c => ({ c, op:
+      c.gone  ? (c.anchored ? Math.min(1, (1-t)*4) : 1-outT)
+    : c.fresh ? (c.anchored ? 1 : inT) : 1 }))
                         .filter(x => x.op > 0.01);
   const polys = live.map(x => dedupePts(elbowPoints(x.c.ch, POS)));
   const hops  = crossingHops(polys);
@@ -3150,16 +3217,22 @@ function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 
 /* Which hook is which place of the spot. The static drawing carries these; so
    must the moving one, or a relation becomes unreadable the moment it is drawn
    by an animation rather than at rest. */
-function hookNumerals(it, e){
+function hookNumerals(it, e, sp){
   const A = it.hkA, B = it.hkB, src = B || A;
   if (!src) return '';
+  // the name a line carries can change under a rule — two lines joined into
+  // one take a single variable — so the label turns over with the motion
+  const vars = sp ? (e < 0.5 ? sp.varsA : sp.varsB) : null;
+  const alt  = sp ? (e < 0.5 ? sp.varsB : sp.varsA) : null;
   const out = [];
   for (const h of it.n.hooks){
     const a = A && A[h], b = B && B[h];
     const q = (a && b) ? { x: lerp(a.x,b.x,e), y: lerp(a.y,b.y,e), i:(b.i) }
             : (b || a);
     if (!q) continue;
-    out.push(`<text class="hooknum" x="${r2(q.x+6)}" y="${r2(q.y-4)}">${q.i+1}</text>`);
+    const name = (vars && vars[h]) || (alt && alt[h]) || null;
+    out.push(`<text class="hooknum${sp ? sp.lcOf(h) : ''}" x="${r2(q.x+6)}" y="${
+      r2(q.y-4)}">${hookLabel(name, q.i)}</text>`);
   }
   return out.join('');
 }
@@ -3195,7 +3268,7 @@ function markFrame(sp, focus, mv){
         r2(it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(it.a.y + it.a.h/2)}" `+
         `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
       if (opts.hookNumbers !== false && it.n.hooks.length > 1)
-        parts.push(hookNumerals(it, 0));
+        parts.push(hookNumerals(it, 0, sp));
     }
   }
   // the lines, as they stand

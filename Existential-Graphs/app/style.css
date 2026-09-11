@@ -113,23 +113,24 @@ svg.eg .loi{stroke:var(--ink);stroke-width:3.2;fill:none;stroke-linecap:round;st
 svg.eg .branch{fill:var(--ink)}
 /* Telling the lines apart. Peirce drew in one ink; this is an aid, like the
    shading, and nothing in the logic turns on it. */
-svg.eg .lc0{stroke:#7d1f1f} svg.eg circle.lc0{fill:#7d1f1f}
-svg.eg .lc1{stroke:#1d5130} svg.eg circle.lc1{fill:#1d5130}
-svg.eg .lc2{stroke:#1e3a70} svg.eg circle.lc2{fill:#1e3a70}
-svg.eg .lc3{stroke:#5d2a6d} svg.eg circle.lc3{fill:#5d2a6d}
-svg.eg .lc4{stroke:#7a4a12} svg.eg circle.lc4{fill:#7a4a12}
-svg.eg .lc5{stroke:#11555d} svg.eg circle.lc5{fill:#11555d}
-svg.eg .lc6{stroke:#6d1f49} svg.eg circle.lc6{fill:#6d1f49}
+svg.eg .lc0{stroke:#7d1f1f} svg.eg circle.lc0{fill:#7d1f1f} svg.eg text.lc0{fill:#7d1f1f}
+svg.eg .lc1{stroke:#1d5130} svg.eg circle.lc1{fill:#1d5130} svg.eg text.lc1{fill:#1d5130}
+svg.eg .lc2{stroke:#1e3a70} svg.eg circle.lc2{fill:#1e3a70} svg.eg text.lc2{fill:#1e3a70}
+svg.eg .lc3{stroke:#5d2a6d} svg.eg circle.lc3{fill:#5d2a6d} svg.eg text.lc3{fill:#5d2a6d}
+svg.eg .lc4{stroke:#7a4a12} svg.eg circle.lc4{fill:#7a4a12} svg.eg text.lc4{fill:#7a4a12}
+svg.eg .lc5{stroke:#11555d} svg.eg circle.lc5{fill:#11555d} svg.eg text.lc5{fill:#11555d}
+svg.eg .lc6{stroke:#6d1f49} svg.eg circle.lc6{fill:#6d1f49} svg.eg text.lc6{fill:#6d1f49}
 @media (prefers-color-scheme: dark){
-  svg.eg .lc0{stroke:#e79191} svg.eg circle.lc0{fill:#e79191}
-  svg.eg .lc1{stroke:#8fd0a1} svg.eg circle.lc1{fill:#8fd0a1}
-  svg.eg .lc2{stroke:#94b8ec} svg.eg circle.lc2{fill:#94b8ec}
-  svg.eg .lc3{stroke:#cba5e3} svg.eg circle.lc3{fill:#cba5e3}
-  svg.eg .lc4{stroke:#e3b978} svg.eg circle.lc4{fill:#e3b978}
-  svg.eg .lc5{stroke:#7fcbd3} svg.eg circle.lc5{fill:#7fcbd3}
-  svg.eg .lc6{stroke:#eaa1c4} svg.eg circle.lc6{fill:#eaa1c4}
+  svg.eg .lc0{stroke:#e79191} svg.eg circle.lc0{fill:#e79191} svg.eg text.lc0{fill:#e79191}
+  svg.eg .lc1{stroke:#8fd0a1} svg.eg circle.lc1{fill:#8fd0a1} svg.eg text.lc1{fill:#8fd0a1}
+  svg.eg .lc2{stroke:#94b8ec} svg.eg circle.lc2{fill:#94b8ec} svg.eg text.lc2{fill:#94b8ec}
+  svg.eg .lc3{stroke:#cba5e3} svg.eg circle.lc3{fill:#cba5e3} svg.eg text.lc3{fill:#cba5e3}
+  svg.eg .lc4{stroke:#e3b978} svg.eg circle.lc4{fill:#e3b978} svg.eg text.lc4{fill:#e3b978}
+  svg.eg .lc5{stroke:#7fcbd3} svg.eg circle.lc5{fill:#7fcbd3} svg.eg text.lc5{fill:#7fcbd3}
+  svg.eg .lc6{stroke:#eaa1c4} svg.eg circle.lc6{fill:#eaa1c4} svg.eg text.lc6{fill:#eaa1c4}
 }
-svg.eg .hooknum{font:600 10px var(--sans);fill:var(--ink2)}
+svg.eg .hooknum{font:italic 600 11px var(--serif);fill:var(--ink2)}
+svg.eg .hookpl{font:400 9px var(--sans);font-style:normal;opacity:.65}
 svg.eg .cut.hl-add,svg.eg .spot.hl-add rect{stroke:var(--hl-add);stroke-width:3}
 svg.eg .spot.hl-add text{fill:var(--hl-add)}
 svg.eg .cut.hl-del,svg.eg .spot.hl-del rect{stroke:var(--hl-del);stroke-width:3}

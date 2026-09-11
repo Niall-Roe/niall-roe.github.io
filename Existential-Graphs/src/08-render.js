@@ -160,6 +160,17 @@ function hookPoints(g, spotId, P, LN){
   return out;
 }
 
+/* A hook carries two facts: which line reaches it, and which place of the
+   spot it is. The line is named by the variable the reading gives it; the
+   place is the small figure after the name, since the hooks are laid down the
+   spot's edge in the order of their lines and not in the order of the
+   arguments. */
+const SUPER = ['\u00b9','\u00b2','\u00b3','\u2074','\u2075','\u2076','\u2077','\u2078','\u2079'];
+function hookLabel(name, i){
+  const place = SUPER[i] || ('^'+(i+1));
+  return name ? esc(name) + '<tspan class="hookpl">' + place + '</tspan>' : esc(String(i+1));
+}
+
 /* ---- positions for the points of the lines of identity ------------------- */
 function placeLines(g, P, LN){
   const pos = {}, fixed = {};
@@ -410,6 +421,7 @@ function renderGraph(g, opts){
   // in pieces leaves the round ends of each piece stacked at every junction.
   const colour = opts.colourLines && LN.count > 1;
   const lc = ln => colour ? ' lc' + (LN.rank[LN.lig[ln]] % 7) : '';
+  let VARS = {}; try { VARS = lineVars(g); } catch(e){}
   const chains = lineChains(g, pos);
   const polys  = chains.map(ch => dedupePts(elbowPoints(ch, pos)));
   const hops   = crossingHops(polys);
@@ -432,14 +444,16 @@ function renderGraph(g, opts){
       parts.push(`<circle class="branch${lc(l.id)}" cx="${p.x}" cy="${p.y}" r="1.7"/>`);
     }
   }
-  // hook numerals, so the order of a spot's hooks can be read off
+  // hook labels: the variable each line carries, in the colour of that line,
+  // so that a relation can be read off the drawing the way it is written
   if (opts.hookNumbers !== false)
   for (const n of Object.values(g.nodes)){
     if (n.k !== 'spot' || n.hooks.length < 2) continue;
     const hp = hookPoints(g, n.id, P, LN);
     n.hooks.forEach(h => {
       const q = hp[h];
-      parts.push(`<text class="hooknum" x="${q.x+6}" y="${q.y-4}">${q.i+1}</text>`);
+      parts.push(`<text class="hooknum${lc(h)}" x="${q.x+6}" y="${
+        q.y-4}">${hookLabel(VARS[h], q.i)}</text>`);
     });
   }
 

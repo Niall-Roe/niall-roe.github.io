@@ -104,6 +104,41 @@ function prepareTween(gA, gB, GA, GB, opts){
     if (inA || inB) bare.push({ l, inA: !!inA, inB: !!inB });
   }
 
+  /* A point that only one of the two graphs has still needs somewhere to come
+     from, or to go to: the nearest point of its own line that both graphs
+     have. Without this a lengthened line appeared at full length rather than
+     growing out of the line already drawn, and a retracted one vanished
+     instead of drawing back. */
+  const nearestKnown = (g, from, known) => {
+    const seen = new Set([from]); let front = [from];
+    for (let d = 0; d < 40 && front.length; d++){
+      const next = [];
+      for (const l of front) for (const m of neighbours(g, l)){
+        if (seen.has(m)) continue;
+        if (known[m]) return known[m];
+        seen.add(m); next.push(m);
+      }
+      front = next;
+    }
+    return null;
+  };
+  const fromPos = {}, toPos = {};
+  for (const l of Object.keys(gB.lns)) if (!gA.lns[l]){
+    const q = nearestKnown(gB, l, GA.pos); if (q) fromPos[l] = q;
+  }
+  for (const l of Object.keys(gA.lns)) if (!gB.lns[l]){
+    const q = nearestKnown(gA, l, GB.pos); if (q) toPos[l] = q;
+  }
+  // a line that grows or draws back need not fade: it is already continuous
+  for (const c of chains){
+    const anchored = c.ch.some(l => (c.gone ? gB.lns[l] : gA.lns[l]));
+    if (anchored) c.anchored = true;
+  }
+
+  let varsA = {}, varsB = {};
+  try { varsA = lineVars(gA); } catch(e){}
+  try { varsB = lineVars(gB); } catch(e){}
+
   const LNB = laneMap(gB), LNA = laneMap(gA);
   const colour = opts.colourLines && Math.max(LNA.count, LNB.count) > 1;
   const lcOf = ln => {
@@ -147,7 +182,7 @@ function prepareTween(gA, gB, GA, GB, opts){
   }
 
   return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf, FA, FB,
-           hasAdd, hasDel, sched, addBox,
+           hasAdd, hasDel, sched, addBox, fromPos, toPos, varsA, varsB,
            W: Math.max(FA.W, FB.W), H: Math.max(FA.H, FB.H) };
 }
 const span = (t, w) => w[1] <= w[0] ? (t >= w[1] ? 1 : 0)
@@ -180,17 +215,22 @@ function tweenFrame(sp, t){
         r2(x + w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(y + h/2)}" `+
         `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
       if (opts.hookNumbers !== false && it.n.hooks.length > 1)
-        parts.push(hookNumerals(it, e));
+        parts.push(hookNumerals(it, e, sp));
     }
   }
 
   // one interpolated position for every point of every line
   const POS = {};
   for (const ln of new Set([...Object.keys(GA.pos), ...Object.keys(GB.pos)])){
-    const a = GA.pos[ln], b = GB.pos[ln];
+    const a = GA.pos[ln] || sp.fromPos[ln], b = GB.pos[ln] || sp.toPos[ln];
     POS[ln] = (a && b) ? { x: lerp(a.x,b.x,e), y: lerp(a.y,b.y,e) } : (a || b);
   }
-  const live = sp.chains.map(c => ({ c, op: c.gone ? 1-outT : (c.fresh ? inT : 1) }))
+  // A line that grows out of one already drawn, or draws back into one, needs
+  // no fade — it is continuous with what is there. A retraction is still taken
+  // off the sheet at the very end, so that nothing is left behind.
+  const live = sp.chains.map(c => ({ c, op:
+      c.gone  ? (c.anchored ? Math.min(1, (1-t)*4) : 1-outT)
+    : c.fresh ? (c.anchored ? 1 : inT) : 1 }))
                         .filter(x => x.op > 0.01);
   const polys = live.map(x => dedupePts(elbowPoints(x.c.ch, POS)));
   const hops  = crossingHops(polys);
@@ -224,16 +264,22 @@ function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 
 /* Which hook is which place of the spot. The static drawing carries these; so
    must the moving one, or a relation becomes unreadable the moment it is drawn
    by an animation rather than at rest. */
-function hookNumerals(it, e){
+function hookNumerals(it, e, sp){
   const A = it.hkA, B = it.hkB, src = B || A;
   if (!src) return '';
+  // the name a line carries can change under a rule — two lines joined into
+  // one take a single variable — so the label turns over with the motion
+  const vars = sp ? (e < 0.5 ? sp.varsA : sp.varsB) : null;
+  const alt  = sp ? (e < 0.5 ? sp.varsB : sp.varsA) : null;
   const out = [];
   for (const h of it.n.hooks){
     const a = A && A[h], b = B && B[h];
     const q = (a && b) ? { x: lerp(a.x,b.x,e), y: lerp(a.y,b.y,e), i:(b.i) }
             : (b || a);
     if (!q) continue;
-    out.push(`<text class="hooknum" x="${r2(q.x+6)}" y="${r2(q.y-4)}">${q.i+1}</text>`);
+    const name = (vars && vars[h]) || (alt && alt[h]) || null;
+    out.push(`<text class="hooknum${sp ? sp.lcOf(h) : ''}" x="${r2(q.x+6)}" y="${
+      r2(q.y-4)}">${hookLabel(name, q.i)}</text>`);
   }
   return out.join('');
 }
@@ -269,7 +315,7 @@ function markFrame(sp, focus, mv){
         r2(it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(it.a.y + it.a.h/2)}" `+
         `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
       if (opts.hookNumbers !== false && it.n.hooks.length > 1)
-        parts.push(hookNumerals(it, 0));
+        parts.push(hookNumerals(it, 0, sp));
     }
   }
   // the lines, as they stand

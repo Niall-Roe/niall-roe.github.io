@@ -25,6 +25,26 @@ verified; everything else is written down but not acted on.
   where the sequence is open-ended, as on Translate. Checked at all 226 step
   boundaries in the library: the still before, the first frame, the last frame
   and the still after place every cut and spot identically.
+- No transformation respawns its graph any more. Two causes. The proof finder
+  searches forwards from the premisses and backwards from the conclusion at
+  once, and where the halves meet the graph on the far side was built in the
+  other tree, so nothing in it was the same object as anything in the step
+  before; `hydrateSteps` re-derived each step's rule but discarded the
+  re-derived graph, so that step could only cross-fade. It now keeps them, as
+  the library path already did, and falls back to matching by shape where no
+  rule can be recovered. Measured over four found proofs and the 25 library
+  proofs: every joint now carries identity, and each drawing is still the graph
+  the search produced.
+- A step is now staged rather than played all at once: what is erased goes
+  first, then the enclosures grow to make room, then the empty room is outlined
+  while it stands empty, and only then is the new graph scribed into it. A step
+  that adds something is given half again as long, since it is three beats
+  rather than one. Lines of identity grow out of the line already drawn and
+  draw back into it instead of fading in and out.
+- Hooks are labelled with the variable each line carries — the same names the
+  reading prints underneath — in the colour of that line, with the argument
+  place as a small figure after the name. Before they were bare ordinals, which
+  said which place but not which line.
 - Scribe opens with P → Q on the sheet, a list of standard propositions to
   start from, and a puzzle mode: pick an inference, its premisses are scribed,
   and the page counts the moves until the sheet says the conclusion. Hints
@@ -203,17 +223,23 @@ before it was six, none, none.
 
 # The page as a piece of software
 
+**Work it by hand should be a button, not a suggestion.** When no proof is
+found, `app/ui2.js` tells the reader to "work it by hand on the Scribe tab" and
+then leaves them to retype the premisses. It should be a button that carries
+the premisses and the conclusion over, scribes the premisses on the Scribe
+sheet and sets the conclusion as the goal — the puzzle machinery already there.
+Niall's note: the Scribe tab wants reworking around this, so do that first
+rather than bolting the button onto it as it stands.
+
 **Search harder freezes everything for up to thirty seconds.** `app/ui2.js:239`
 runs a 30-second cap synchronously, so nothing responds, including the tab bar.
 The exercise dropdown triggers this automatically for the four exercises marked
 as needing it. The budget caps themselves do hold — overshoot is bounded by one
 state's expansion — so this is a responsiveness problem, not a runaway.
 
-**A found proof cross-fades at the joint instead of moving.** `app/ui1.js:173`
-re-derives each step and then throws the result away, where `hydrateProof` at
-`:159` keeps it. The forward and backward halves of a search share no node
-identifiers, so that one step loses the animation the module exists to provide.
-One line, mirroring the function above it.
+**A found proof cross-fades at the joint instead of moving.** FIXED — see
+"Fixed so far". `hydrateSteps` re-derived each step and then threw the result
+away.
 
 **The editor mirror drifts once a box gets a scrollbar.** `app/style.css:52`
 gives the mirror `overflow:hidden` and the textarea `overflow:auto`, so on

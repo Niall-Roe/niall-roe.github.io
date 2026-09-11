@@ -23,6 +23,17 @@ function freshVar(st){
   return i < VARNAMES.length ? VARNAMES[i] : 'x'+(i+1);
 }
 
+/* The variable each point of each line carries, as the reading assigns it —
+   so that a diagram can label its hooks with the names that appear in the
+   formula underneath rather than with bare ordinals. Because a line inherits
+   the variable of its least-enclosed part, a ligature keeps one name however
+   many cuts it crosses. */
+function lineVars(g){
+  const st = { n: 0, vars: {} };
+  readArea(g, g.root, {}, st);
+  return st.vars;
+}
+
 function readArea(g, areaId, inherited, st){
   const area = g.areas[areaId];
   const lns = area.lns;
@@ -57,6 +68,7 @@ function readArea(g, areaId, inherited, st){
     }
   }
   const varOf = l => compVars[find(l)];
+  if (st.vars) for (const l of lns) st.vars[l] = varOf(l);
 
   /* 3. conjuncts */
   const conj = [];
