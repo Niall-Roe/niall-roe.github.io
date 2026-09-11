@@ -151,6 +151,24 @@ PROJECTS = [
         "docs": [],
     },
     {
+        "slug": "regression-to-the-mean",
+        "title": "Regression to the Mean",
+        "year": None,
+        "stage": "building",
+        "planned": None,
+        "notes": None,
+        "next": [
+            "New, 17 August 2026. Galton's two-stage quincunx: the mixture, the two "
+                "directions of the question, and the mean the apparatus has no say in.",
+            "Citations for the 1877 and 1885 Galton papers carry no volume or page "
+                "numbers — they were left out rather than guessed. Fill in from the "
+                "originals.",
+            "Not linked from illustrations/ yet: the card is written but commented out, "
+                "like the other unpublished pages.",
+        ],
+        "docs": [],
+    },
+    {
         "slug": "severity",
         "title": "Severity",
         "year": None,

@@ -1,0 +1,125 @@
+<h1 class="page-title">Regression to the Mean</h1>
+
+<p class="lede">Galton had a quincunx built in 1873: a funnel, rows of offset pins, and a row of
+compartments at the bottom, so that shot poured in at the top settled into a normal curve. It
+showed how a heap of small accidental deflections makes the shape Quetelet found everywhere. What
+it did not show was how that shape survives heredity, where the causes are neither small nor
+accidental. The machine below is the answer Galton worked out on the quincunx, and it is
+interactive because he seems never to have built it.</p>
+
+<p>Cut the board in two part-way down and put a second row of compartments at the cut, the level
+marked A&ndash;A. Barriers run from there down into the lower half so that nothing strays
+sideways while it crosses. Now the shot stop half way. Open one compartment at A&ndash;A and its
+contents fall through the remaining pins into a small normal heap of their own, directly below
+where they started. Open the compartments one at a time and each makes its own little heap, the
+central ones larger because more shot stopped there. When every compartment has been opened, the
+heaps have added up to exactly the curve the uninterrupted machine would have made.</p>
+
+<p>That is the first thing to try on the board below. Push <em>r</em> to 1, so that the barriers
+hang straight as he drew them &mdash; the board opens with them slanted, which is the later part
+of the story &mdash; then click a single compartment in the upper row and watch its heap. Let the
+rest follow, and watch the sum come out the shape it would have been anyway. A normal population
+is a mixture of normal families, and the mixture gives nothing away about the parts.</p>
+
+<div class="row">
+  <div class="col col-4"><div class="sidebar" id="controls"></div></div>
+  <div class="col col-8" id="figure"></div>
+</div>
+
+<h3>What the barriers cannot do</h3>
+
+<p>Read the machine as heredity and something is wrong with it. Each generation is a whole
+population, spread &sigma;; each family scatters about its parent by the lower bank's own spread
+&sigma;<sub>f</sub>; so the children come out at
+&radic;(&sigma;&sup2;&nbsp;+&nbsp;&sigma;<sub>f</sub>&sup2;), wider than their parents, and wider
+again the generation after, without limit. Set <em>r</em> to 1 so the barriers hang straight
+down, and press <em>Drop a generation</em> a dozen times: the population spreads until the shot
+are piling against the walls of the board. Stature does not do that.</p>
+
+<p>Galton's answer was to set the barriers on a slant. Each carries its compartment's contents a
+fraction 1&nbsp;&minus;&nbsp;<em>r</em> of the way back toward the mean before releasing it, so a
+family whose parent stands <em>d</em> from the mean is centred not on <em>d</em> but on
+<em>r</em>&thinsp;<em>d</em>, and the population comes out at
+&radic;(<em>r</em>&sup2;&sigma;&sup2;&nbsp;+&nbsp;&sigma;<sub>f</sub>&sup2;). Set the lower bank
+to &sigma;<sub>f</sub>&nbsp;=&nbsp;&sigma;&radic;(1&nbsp;&minus;&nbsp;<em>r</em>&sup2;) and the
+two terms cancel exactly: the children are spread precisely as far as their parents were, and the
+machine can be run on its own output for ever &mdash; ticking <em>Hold the population still</em>
+keeps the lower bank at that setting while <em>r</em> moves. Galton called <em>r</em> the
+coefficient of reversion in 1877 and renamed it regression in 1885, putting it near 0.67 for the
+stature of children on their mid-parents. The first slider is that coefficient. At its present
+setting, <span class="live k1" id="live-r">0.67</span>, a compartment
+<span class="live k3" id="live-px">+2.00</span>&thinsp;&sigma; from the mean sends its children
+to <span class="live k3" id="live-cx">+1.34</span>&thinsp;&sigma;, and the population on the
+board stands at <span class="live k2" id="live-sd">1.00</span>&thinsp;&sigma;. With the hold
+ticked, the scatter within families refills the tails exactly as fast as the chutes drain them,
+and that last number stops moving from one generation to the next.</p>
+
+<h3>Which way you read it</h3>
+
+<p>It is tempting to read the fan of chutes as a force: something in the apparatus dragging each
+generation toward the middle. The board refuses the reading, and it refuses it with the barriers
+hanging straight. Set <em>r</em> to 1, drop a generation, and click a compartment in the
+<em>lower</em> row &mdash; the following switches to reading backwards on its own. Its shot fell
+straight down, so nothing regressed on the way; yet the parents they came from lie toward the
+centre of the board, because there were always more shot near the centre to have come from.
+Stigler puts the two questions side by side: where a shot released from A&ndash;A is expected to
+land, and where a shot lying at the bottom is expected to have come from. The first answer is
+&ldquo;directly below&rdquo;. The second is not &ldquo;directly above&rdquo;.</p>
+
+<p>Nothing pulls the shot toward the middle, then: the backward answer lies where it does because
+of where the shot stood before they fell. In the straight machine that is the whole of the
+regression, and it runs backwards only &mdash; forwards, a compartment's children land under it.
+Slant the chutes and it runs both ways at once, and the two readings agree exactly while the
+spread holds still from one generation to the next: children
+<span class="live k3" id="live-ux">+2.00</span>&thinsp;&sigma; from their generation&rsquo;s mean
+come from parents averaging <span class="live k3" id="live-upx">+1.34</span>&thinsp;&sigma; from
+theirs, the same fraction the chutes carry every family back.</p>
+
+<h3>What it says about the mean: nothing</h3>
+
+<p>The chutes are set on the mean of whatever is in the compartments, not on any fixed mark: what
+a family reverts toward is its own population, wherever that population has got to. So the
+apparatus governs the <em>shape</em> of the distribution about the mean and has no purchase on
+the mean itself. Move the <em>environment</em> slider and every child is displaced by the same
+amount before it falls &mdash; better feeding, in Galton's terms, applied to all alike. Run twenty
+generations and the mean walks steadily off across the board while the spread does not move at
+all: the two lines in the lower figure separate completely. A trait can be strongly heritable,
+in exactly the sense the chutes make precise, and still have a mean that goes wherever
+circumstances take it.</p>
+
+<div class="note-block">
+  <p><strong>Reading the apparatus.</strong> The upper bank fills the compartments at A&ndash;A
+  only when you ask for a new population; after that each generation is the one before it, lifted
+  from the lower row into the upper. A compartment that has been opened is left as a pale ghost
+  of what it held, so it is always visible which are still to go. The outline held over the
+  children is their parents&rsquo;, so the two heaps can be compared where they stand.</p>
+  <p>The board has walls. Shot that would land beyond the end compartments pile up in them
+  instead, which is why the histogram grows shoulders once the population outruns the board; the
+  spread and mean reported underneath, and plotted by generation below that, are computed from
+  where the shot would have landed and not from where the walls put them.</p>
+</div>
+
+<div class="footer">
+  <p class="citation">
+  The apparatus and the argument are Galton&rsquo;s. The two-stage quincunx is described in
+  correspondence from 1877 and figured in <em>Natural Inheritance</em> (1889), p. 63; Stigler
+  notes that there is no sign Galton ever built it, and reports that building one that works is
+  very hard indeed. The release of the compartments one at a time is Galton&rsquo;s thought
+  experiment as Stigler reconstructs it; the question asked in both directions is Stigler&rsquo;s
+  way of showing what it proves; any errors in the implementation are this page&rsquo;s own.
+  </p>
+  <p class="citation">
+  Galton, F. (1877), &lsquo;Typical Laws of Heredity&rsquo;, <em>Proceedings of the Royal
+  Institution</em>. Galton, F. (1885), &lsquo;Regression towards Mediocrity in Hereditary
+  Stature&rsquo;, <em>Journal of the Anthropological Institute of Great Britain and
+  Ireland</em>. Galton, F. (1889), <em>Natural Inheritance</em>, Macmillan.
+  </p>
+  <p class="citation">
+  Stigler, S. M. (1999), <em>Statistics on the Table</em>, Harvard University Press, ch. 9,
+  pp. 177&nbsp;ff.
+  </p>
+  <p class="citation">
+  Companion pages: <a href="../severity/">Severity</a> and
+  <a href="../roc-and-hypothesis-testing/">Signal Detection &amp; Hypothesis Testing</a>.
+  </p>
+</div>

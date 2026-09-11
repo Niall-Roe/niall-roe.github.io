@@ -4,7 +4,7 @@ number: 1
 title: "SImple example"
 anchor: "Namely, this will happen when the form about which the individuals of one class cluster is not so unlike the form about which individuals of another class cluster but that variations from each middling form may precisely agree. In such a case, we may know in regard to any intermediate form what proportion of the objects of that form had one purpose and what proportion the other; but unless we have some supplementary information we cannot tell which ones had one purpose and which the other."
 heading: "New example — SImple example"
-status: done
+status: building
 container: example-ex1
 ---
 ### Text
@@ -13,7 +13,7 @@ container: example-ex1
 
 ### Suggestions
 
-None open.
+cut "That is everything the two curves can say. Handed this one mark with no supplementary information — no surrounding word, no column of figures — we know the proportions, but not which ones had one purpose and which the other."
 
 ### Completed
 
