@@ -111,7 +111,7 @@ function puzzleStart(pz){
   $('#z-body').style.display = '';
   $('#z-note').style.display = 'none';
   $('#z-show').style.display = pz.lib ? '' : 'none';
-  stageSvg($('#z-goal'), goal, { shade: true, wobble: true, colourLines: PREFS.colour, maxH: 140 });
+  stageSvg($('#z-goal'), goal, { shade: true, wobble: true, colourLines: PREFS.colour, hand: PREFS.hand, maxH: 140 });
   try { $('#z-goalread').textContent = 'Goal: ' + fmtFull(sugar(readGraph(goal))); } catch(e){}
   drawRender();
   syncScribeBoxes('graph');

@@ -8,11 +8,11 @@
 </header>
 <main>
 <nav class="tabs" role="tablist">
-  <button role="tab" data-tab="translate" aria-selected="true">Translate</button>
+  <button role="tab" data-tab="translate" aria-selected="true">Scribe</button>
+  <button role="tab" data-tab="notes" aria-selected="false">The permissions</button>
   <button role="tab" data-tab="proofs" aria-selected="false">Proofs</button>
-  <button role="tab" data-tab="draw" aria-selected="false">Scribe</button>
+  <button role="tab" data-tab="draw" aria-selected="false">Work it</button>
   <button role="tab" data-tab="prove" aria-selected="false">Find a proof</button>
-  <button role="tab" data-tab="notes" aria-selected="false">Conventions &amp; rules</button>
 </nav>
 
 <!-- ============================ TRANSLATE ============================ -->
@@ -21,7 +21,8 @@
     <div class="card">
       <h2>A proposition in ordinary notation</h2>
       <textarea id="t-in" rows="3" spellcheck="false">Ax (Fx -> Gx)</textarea>
-      <div class="chips" id="t-ex"></div>
+      <div id="t-ex" class="exwall"></div>
+      <p class="note" id="t-exsay" style="min-height:1.2em"></p>
       <div class="btnrow">
         <button class="btn" id="t-draw">Draw it</button>
         <label style="font-size:12.5px;color:var(--ink2);display:flex;gap:5px;align-items:center">
@@ -32,6 +33,7 @@
         <label><input type="checkbox" id="t-wobble" checked> hand-drawn cuts</label>
         <label><input type="checkbox" id="t-hooks" checked> label the hooks</label>
         <label><input type="checkbox" class="pref-colour" checked> colour the lines of identity</label>
+        <label><input type="checkbox" class="pref-hand"> Peirce&rsquo;s hand</label>
       </div>
       <hr class="sep">
       <h2>How to write it</h2>
@@ -63,9 +65,42 @@
       </div>
     </div>
   </div>
+  <div class="card" style="margin-top:18px">
+    <h2>The conventions</h2>
+    <blockquote class="peirce">If the sheet be blank, this blank, whose existence consists in
+    the absence of any scribed graph, is itself a graph.
+    <span class="cite">Peirce, CP 4.397</span></blockquote>
+    <p class="note" style="margin-top:0">What the marks mean. The examples above are set out in
+    this order, so that each one turns on a convention you have already met.</p>
+    <dl class="rules two-col" id="n-conv"></dl>
+  </div>
 </section>
 
 <!-- ============================== PROOFS ============================== -->
+<section class="panel" id="p-notes">
+  <div class="card" style="margin-bottom:18px">
+    <h2>The permissions</h2>
+    <p class="tight">Peirce's own name for the five rules, and his own advice on how to take
+    them: <q>Let [the student] read these permissions and the commentary as he would listen to
+    the rules of a new and intricate game, very closely attentive, but wide awake to the purpose
+    of preparing for a lively and lightsome contest.</q>
+    <span class="cite">Peirce, quoted in Roberts 1973, p. 14</span></p>
+    <p class="note">Each is illustrated below in the fewest marks that show it. Choose an
+    illustration to set it up, then play it. Roberts calls them the rules of transformation
+    (Appendix 3, p. 138); they are the same five.</p>
+  </div>
+  <div class="grid two">
+    <div class="card">
+      <h2>The five permissions</h2>
+      <dl class="rules" id="n-rules"></dl>
+    </div>
+    <div class="card">
+      <h2>About this instrument</h2>
+      <div class="ref" id="n-about"></div>
+    </div>
+  </div>
+</section>
+
 <section class="panel" id="p-proofs">
   <div class="grid side">
     <div class="card">
@@ -89,7 +124,7 @@
           <button class="btn ghost" id="pf-next">forward ▶</button>
           <span class="sp"></span>
           <label class="mono" style="font-size:12px;color:var(--ink3)">speed
-            <input type="range" id="pf-speed" min="500" max="3200" value="1600" step="100" style="vertical-align:middle">
+            <input type="range" id="pf-speed" min="600" max="4200" value="2600" step="100" style="vertical-align:middle">
           </label>
           <label style="font-size:12px;color:var(--ink3);display:flex;gap:5px;align-items:center">
             <input type="checkbox" id="pf-anim" checked> animate</label>
@@ -126,7 +161,9 @@
         <select id="d-start" style="width:100%"></select>
         <p class="note" style="margin-top:6px">A proposition to experiment on. Or write your own below.</p>
         <textarea id="d-from" rows="1" spellcheck="false">P -> Q</textarea>
-        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
+        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button>
+          <label style="font-size:12.5px;color:var(--ink3);display:flex;gap:5px;align-items:center">
+            <input type="checkbox" id="d-live" checked> draw as I type</label></div>
         <details style="margin-top:8px">
           <summary class="note" style="cursor:pointer">Or from the linear notation</summary>
           <textarea id="d-lin" rows="2" spellcheck="false" style="margin-top:6px">( P ( Q ) )</textarea>
@@ -260,22 +297,4 @@ Q -> R</textarea>
 </section>
 
 <!-- =============================== NOTES =============================== -->
-<section class="panel" id="p-notes">
-  <div class="grid two">
-    <div class="card">
-      <h2>The conventions</h2>
-      <dl class="rules" id="n-conv"></dl>
-    </div>
-    <div>
-      <div class="card">
-        <h2>The rules of transformation</h2>
-        <dl class="rules" id="n-rules"></dl>
-      </div>
-      <div class="card" style="margin-top:18px">
-        <h2>About this instrument</h2>
-        <div class="ref" id="n-about"></div>
-      </div>
-    </div>
-  </div>
-</section>
 </main>

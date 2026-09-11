@@ -25,6 +25,81 @@ verified; everything else is written down but not acted on.
   where the sequence is open-ended, as on Translate. Checked at all 226 step
   boundaries in the library: the still before, the first frame, the last frame
   and the still after place every cut and spot identically.
+- A denial of a denial is drawn as a double cut. The compiler collapsed it, so
+  "~~P" scribed a bare P, and the one figure R5 is about could not be written
+  from a formula at all. It no longer does R5's work in advance. Two knock-on
+  corrections: Celarent's conclusion in the library is now stated as "no F is
+  H", which is its traditional form and compiles to the graph the proof
+  actually reaches; and three captions on the example wall that claimed two
+  formulas gave the same graph now say what is true, that they are the same
+  once R5 has removed the double cuts. Every claim the wall makes is checked by
+  machine: two claims of identity, three of identity after R5, three of
+  difference, all hold.
+- Scribing a cut round a whole area leaves the area where it is. The animation
+  matched a newly drawn lone cut against whatever single cut already stood
+  there, so the old cut became the new outer one and everything else appeared
+  to be carried inside it; going from "P and not P" to "not both P and not P"
+  looked like a rearrangement rather than one cut being drawn. The match now
+  walks down the chain of lone cuts and compares at whichever depth accounts
+  for most of the drawing. Measured over eight such changes, every mark of the
+  smaller graph now survives into the larger.
+- The tabs are Scribe, The permissions, Proofs, Work it, Find a proof. The old
+  Translate is Scribe, and carries the conventions; the old Scribe, the board
+  you work on by hand, is Work it until the three proof screens are settled.
+- The rules are called the permissions, which is Peirce's own word for them:
+  "Let [the student] read these permissions and the commentary as he would
+  listen to the rules of a new and intricate game" (quoted in Roberts p. 14).
+  Roberts' "rules of transformation" is noted on the page as the same five.
+- Choosing one of a rule's illustrations now loads it at its first state and
+  leaves it there. One play button sits under each rule and turns into "set it
+  back" once it has run.
+- The wall of examples is set out to be worked through: Alpha under the
+  conventions it turns on, then Beta, forty in all, beginning with the blank
+  sheet, which is now drawn rather than described. Several pairs are the same
+  graph written two ways, so that clicking the second leaves the drawing where
+  it is. Each carries a line saying what it shows.
+- A hand-drawn mode. The cut wanders about twice as far and is laid down twice,
+  the second stroke lighter and just beside the first, which is what gives a
+  nib its weight; the spot letters are set in an italic serif and each glyph
+  sits a degree or two off true. It is a pen imitated, not Peirce's own hand
+  copied: no scan from the Roberts book is reproduced anywhere on the page, and
+  none should be, since that edition is in copyright.
+- Where two lines cross, which one bridges over the other no longer depends on
+  the accident of which happens to be running horizontally there. Each ligature
+  has a rank, the one its colour comes from, and the higher rank always takes
+  the bridge, so a pair crosses the same way every time. A crossing that fell
+  inside a rounded corner used to have its bridge silently dropped, leaving two
+  lines meeting flat; the corner is squared off there instead. Over 73 drawings
+  every one of the 11 crossings is now bridged, and no pair bridges both ways.
+- Both cuts of a double cut are marked when R5 is about to remove them, and a
+  marked cut beats once after the ring appears.
+- Play waits for the step it is playing rather than guessing: the dwell is the
+  animation's own length plus reading time. The speed slider used to run
+  backwards, higher meaning slower; it now means what it says.
+- The finder has a strategy. What a textbook writes as one step, "instantiate
+  the universal premiss at this individual", is three of Peirce's rules in a
+  row: branch the individual's line, extend the branch inwards through the cut,
+  join it to the premiss's line inside. A fourth carries the premiss in by R3
+  first where it lies further out. The sequence is offered whole, and states it
+  proposes are exempt from the beam, which otherwise threw them away for being
+  larger than the goal. Every move in it is an ordinary move, applied and
+  displayed like any other. On a bench of eleven Beta problems this took the
+  finder from five solved to seven: Darii fell in 6,400 transformations where
+  before it ran out at 279,000, and Celarent in 70,000 where before it failed.
+- The Conventions and rules tab sits between Translate and Proofs, and each of
+  the five rules carries canonical illustrations, thirteen in all, drawn from
+  the page's own engine: the rule each one exhibits is recovered from the rules
+  rather than asserted by a caption, and all thirteen come back as intended.
+- Scribe draws as you type, as Translate does, from both the formula box and
+  the linear-notation box.
+- The fifteen classical syllogisms that hold without existential import are set
+  as exercises, each with its medieval name, figure and mood, and the mnemonic
+  explained: the name's vowels give the three propositions, A and I from
+  affirmo, E and O from nego. All fifteen were checked for a countermodel on up
+  to four individuals and none has one; the nine moods left out, which need the
+  further premiss that something is a such-and-such, were checked to be
+  refutable and are refuted. Five of the fifteen the search cannot reach, and
+  those are worked out in the proof library instead.
 - No transformation respawns its graph any more. Two causes. The proof finder
   searches forwards from the premisses and backwards from the conclusion at
   once, and where the halves meet the graph on the far side was built in the
@@ -223,6 +298,44 @@ before it was six, none, none.
 
 # The page as a piece of software
 
+**Peirce's own placement of the hooks is not followed here.** There is a
+convention, and Roberts states it: "The rule for reading the individuals
+denoted by the lines of identity other than the one positioned at 9 o'clock, is
+to take them in their order clockwise" (Roberts 1973, p. 74). So the first hook
+belongs due left of the spot and the rest follow clockwise from it, which for a
+dyad puts the second at 3 o'clock. This page instead stacks every hook down the
+spot's left edge in the order of the lanes the lines run in, which keeps lines
+from crossing but loses the placement that carries the order. The label makes
+the order recoverable — the variable name, with the argument place as a small
+raised figure — but it is a departure, not Peirce's drawing. Doing it properly
+means letting a line reach the right, top and bottom of a spot, which the lane
+router cannot currently do.
+
+**Should the translation be literal throughout?** The compiler no longer
+elides the double cut of a double negation, but it still simplifies three other
+denials as it scribes them: "~(P | Q)" gives two cuts side by side rather than
+a double cut round the disjunction, and likewise "~(P -> Q)" and "~Ax Fx". Each
+of those is also a double cut removed in advance. The choice is between a
+translation that says exactly what the formula says and leaves R5 something to
+do, and one that scribes the tidiest equivalent. Going fully literal is the
+more coherent position and the better teaching, but it changes the graph that
+several library goals compile to, so it wants deciding rather than drifting
+into. This is Niall's call.
+
+**Peirce's actual letterforms.** Niall's wish: a toggle that mimics his hand,
+built from examples of his capitals and his line weight. What is on the page is
+a generic pen, not his. Doing it properly means a source of his letterforms
+that can be redistributed. The Roberts plates cannot be used; the manuscripts
+themselves are out of copyright, being Peirce's own and published before 1929,
+but the photographs of them at Harvard carry their own terms, so the thing to
+find is an openly licensed set of images, or to draw a face from them by hand.
+MS 514 as transcribed by Sowa is already cited on the page and is a starting
+point for the shapes if not for the images.
+
+**The interactive part wants to be direct.** Niall's note: scribing should be
+click and drag rather than buttons and selection. Worth doing before anything
+else is added to the Scribe tab.
+
 **Work it by hand should be a button, not a suggestion.** When no proof is
 found, `app/ui2.js` tells the reader to "work it by hand on the Scribe tab" and
 then leaves them to retype the premisses. It should be a button that carries
@@ -230,6 +343,24 @@ the premisses and the conclusion over, scribes the premisses on the Scribe
 sheet and sets the conclusion as the goal — the puzzle machinery already there.
 Niall's note: the Scribe tab wants reworking around this, so do that first
 rather than bolting the button onto it as it stands.
+
+**Four Beta problems on the bench are still out of reach.** Barbara, the chain
+of two conditionals, the distribution of a universal over a conjunction, and
+the interchange of quantifiers. All four have universal premisses and a
+universal conclusion, and all four need the graph to grow substantially before
+it shrinks. The strategy reaches the right state for Barbara in one move — from
+it the rest is five ordinary moves, measured — but the layer that state sits in
+is too wide to get through inside the time cap. What is wanted is a smaller
+branching factor, not more depth or a wider beam: both were tried and neither
+helped. Weighting the beam's distance so that missing material counts more than
+surplus was also tried; it fixed nothing and broke Celarent, and was reverted.
+
+**Two steps of the generated Calemes proof carry no rule.** The linear notation
+cannot always say which ligature a point belongs to, so replaying those two
+steps from the stored string cannot recover the move, and they animate by shape
+matching with no ring. The same limitation shows in the some-for-all proof. The
+fix is to store the move alongside the string in the library rather than
+re-deriving it.
 
 **Search harder freezes everything for up to thirty seconds.** `app/ui2.js:239`
 runs a 30-second cap synchronously, so nothing responds, including the tab bar.

@@ -27,7 +27,13 @@ function moveFocus(g, mv){
     case 'insert':    { const c = areaCut(mv.area); if (c) f[c] = 'area'; } break;
     case 'dcIn':      (mv.items||[]).forEach(i => f[i] = 'src');
                       { const c = areaCut(mv.area); if (c && !(mv.items||[]).length) f[c] = 'area'; } break;
-    case 'dcOut':     f[mv.cut] = 'del'; break;
+    // both cuts go, so both are marked: the pair is the thing the rule is
+    // about to take off the sheet, and one ring around the outer alone reads
+    // as though the inner were staying
+    case 'dcOut':     { f[mv.cut] = 'del';
+                        const n = g.nodes[mv.cut];
+                        const inner = n && g.areas[n.inner] && g.areas[n.inner].items[0];
+                        if (inner) f[inner] = 'del'; } break;
     // The rules that work on lines act on points, not on graphs, so these mark
     // the points themselves. Without them the steps that do the ligature
     // surgery — Barbara's fourth, fifth and sixth — showed nothing at all.
@@ -141,11 +147,12 @@ function prepareTween(gA, gB, GA, GB, opts){
 
   const LNB = laneMap(gB), LNA = laneMap(gA);
   const colour = opts.colourLines && Math.max(LNA.count, LNB.count) > 1;
-  const lcOf = ln => {
-    if (!colour) return '';
+  const rankOf = ln => {
     const L = LNB.lig[ln] !== undefined ? LNB : LNA;
-    return ' lc' + (L.rank[L.lig[ln]] % 7);
+    const r = L.rank[L.lig[ln]];
+    return r === undefined ? 0 : r;
   };
+  const lcOf = ln => colour ? ' lc' + (rankOf(ln) % 7) : '';
   // The frame each end of the transition would be drawn in on its own, and
   // where the graph sits inside it. A pinned frame makes both ends the same.
   const fr = opts.frame;
@@ -181,7 +188,7 @@ function prepareTween(gA, gB, GA, GB, opts){
     for (const b of bare) if (b.inB && !b.inA) widen(GB.pos[b.l]);
   }
 
-  return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf, FA, FB,
+  return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf, rankOf, FA, FB,
            hasAdd, hasDel, sched, addBox, fromPos, toPos, varsA, varsB,
            W: Math.max(FA.W, FB.W), H: Math.max(FA.H, FB.H) };
 }
@@ -191,7 +198,7 @@ const span = (t, w) => w[1] <= w[0] ? (t >= w[1] ? 1 : 0)
 function tweenFrame(sp, t){
   const { GA, GB, opts } = sp;
   const parts = [];
-  const shade = opts.shade, wobble = opts.wobble !== false;
+  const shade = opts.shade, wobble = opts.wobble !== false, hand = !!opts.hand;
   const S = sp.sched || { out:[0,0.45], geom:[0,1], pulse:null, in:[0.18,1] };
   const outT = span(t, S.out);                   // what goes, goes first
   const inT  = span(t, S.in);                    // what comes, comes last
@@ -209,7 +216,7 @@ function tweenFrame(sp, t){
     const w = lerp(it.a.w, it.b.w, e), h = lerp(it.a.h, it.b.h, e);
     if (it.n.k === 'cut'){
       parts.push(`<path class="cut${raised}${shade && it.odd ? ' odd':''}" opacity="${r2(op)}" d="${
-        cutPath(x, y, w, h, it.n.id, wobble)}"/>`);
+        cutPath(x, y, w, h, it.n.id, wobble, hand)}"/>`);
     } else {
       parts.push(`<g class="spot" opacity="${r2(op)}"><text x="${
         r2(x + w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(y + h/2)}" `+
@@ -233,7 +240,7 @@ function tweenFrame(sp, t){
     : c.fresh ? (c.anchored ? 1 : inT) : 1 }))
                         .filter(x => x.op > 0.01);
   const polys = live.map(x => dedupePts(elbowPoints(x.c.ch, POS)));
-  const hops  = crossingHops(polys);
+  const hops  = crossingHops(polys, live.map(x => sp.rankOf(x.c.ch[0])));
   polys.forEach((pts, i) => {
     const d = roundedPath(pts, 5, hops[i]);
     if (d) parts.push(`<path class="loi${sp.lcOf(live[i].c.ch[0])}" opacity="${
@@ -292,7 +299,7 @@ function hookNumerals(it, e, sp){
 function markFrame(sp, focus, mv){
   const { gA, GA, opts } = sp;
   const parts = [];
-  const shade = opts.shade, wobble = opts.wobble !== false;
+  const shade = opts.shade, wobble = opts.wobble !== false, hand = !!opts.hand;
   const raised = opts.raised === false ? '' : ' raised';
   const sheet = `<rect class="sa" x="0.5" y="0.5" width="${r2(sp.FA.W-1)}" height="${r2(sp.FA.H-1)}" rx="6"/>`;
 
@@ -308,8 +315,9 @@ function markFrame(sp, focus, mv){
     if (!it.inA) continue;
     const op = !dimming || lit.has(it.id) ? 1 : 0.3;
     if (it.n.k === 'cut'){
-      parts.push(`<path class="cut${raised}${shade && it.odd ? ' odd':''}" opacity="${op}" d="${
-        cutPath(it.a.x, it.a.y, it.a.w, it.a.h, it.n.id, wobble)}"/>`);
+      const mk = focus[it.id] ? ' mk-' + focus[it.id] : '';
+      parts.push(`<path class="cut${raised}${shade && it.odd ? ' odd':''}${mk}" opacity="${
+        op}" d="${cutPath(it.a.x, it.a.y, it.a.w, it.a.h, it.n.id, wobble, hand)}"/>`);
     } else {
       parts.push(`<g class="spot" opacity="${op}"><text x="${
         r2(it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(it.a.y + it.a.h/2)}" `+
@@ -321,7 +329,7 @@ function markFrame(sp, focus, mv){
   // the lines, as they stand
   const chainsA = lineChains(gA, GA.pos);
   const polysA = chainsA.map(ch => dedupePts(elbowPoints(ch, GA.pos)));
-  const hopsA = crossingHops(polysA);
+  const hopsA = crossingHops(polysA, chainsA.map(ch => sp.rankOf(ch[0])));
   polysA.forEach((pts,i) => {
     const d = roundedPath(pts, 5, hopsA[i]);
     if (d) parts.push(`<path class="loi${sp.lcOf(chainsA[i][0])}" opacity="${
@@ -367,9 +375,9 @@ function arrowPath(a, b){
 }
 
 /* ---- the player ---------------------------------------------------------- */
-function svgWrap(inner, w, h, scale, pad){
+function svgWrap(inner, w, h, scale, pad, hand){
   pad = pad || 12;
-  return `<svg class="eg" xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${w+2*pad} ${h+2*pad}" `+
+  return `<svg class="eg${hand ? ' hand' : ''}" xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${w+2*pad} ${h+2*pad}" `+
          `width="${(w+2*pad)*scale}" height="${(h+2*pad)*scale}">${inner}</svg>`;
 }
 
@@ -393,7 +401,7 @@ function playTransition(el, gA, gB, mv, opts, done){
   // beat one: mark what the rule is about to act on
   const focus = moveFocus(gA, mv);
   const f0 = markFrame(sp, focus, mv);
-  el.innerHTML = svgWrap(f0.svg, f0.W, f0.H, scaleFor(f0.W, f0.H), pad);
+  el.innerHTML = svgWrap(f0.svg, f0.W, f0.H, scaleFor(f0.W, f0.H), pad, opts.hand);
   markNodes(el, gA, GA, focus);
 
   timer = setTimeout(() => {
@@ -403,14 +411,16 @@ function playTransition(el, gA, gB, mv, opts, done){
       if (cancelled) return;
       const t = Math.min(1, (now - t0) / moveMs);
       const f = tweenFrame(sp, t);
-      el.innerHTML = svgWrap(f.svg, f.W, f.H, scaleFor(f.W, f.H), pad);
+      el.innerHTML = svgWrap(f.svg, f.W, f.H, scaleFor(f.W, f.H), pad, opts.hand);
       if (t < 1) raf = requestAnimationFrame(tick);
       else if (done) done();
     };
     raf = requestAnimationFrame(tick);
   }, markMs);
 
-  return { cancel(){ cancelled = true; cancelAnimationFrame(raf); clearTimeout(timer); } };
+  // how long this step runs, so a player can wait for it rather than guess
+  return { total: markMs + moveMs,
+           cancel(){ cancelled = true; cancelAnimationFrame(raf); clearTimeout(timer); } };
 }
 
 // An overlay ring around the graphs the rule is about to act on.
@@ -454,8 +464,52 @@ function alignGraph(gA, gB){
   const node = {}, area = {}, ln = {};
   area[gB.root] = gA.root;
 
+  /* How much of one area is found again in another: the number of its graphs
+     that have an exact counterpart there. Used to decide whether a lone cut is
+     a cut that has been drawn round everything, or a cut that has moved. */
+  const overlap = (areaA, areaB) => {
+    const taken = new Set();
+    let n = 0;
+    for (const b of gB.areas[areaB].items){
+      const cb = canonNode(gB, b, ligB);
+      const a = gA.areas[areaA].items.find(x => !taken.has(x) && canonNode(gA, x, ligA) === cb);
+      if (a){ taken.add(a); n++; }
+    }
+    return n;
+  };
+
   (function matchArea(aA, aB){
-    const itemsA = gA.areas[aA].items, itemsB = gB.areas[aB].items;
+    /* A cut drawn round the whole of an area, or taken off it, used to be
+       matched against whatever single cut already stood there: the old cut
+       became the new outer one and everything else was carried inside it, so
+       that scribing one cut round "P and not P" appeared to move the graphs
+       about instead of simply enclosing them. Where a lone cut is better
+       accounted for as newly drawn, the comparison goes on beneath it. This
+       changes only which items are compared, never which area is which, so the
+       sheet stays the sheet. */
+    // the chain of areas reached by going in through one lone cut after another
+    const chain = (g, a) => {
+      const out = [a];
+      while (true){
+        const it = g.areas[out[out.length-1]].items;
+        if (it.length !== 1 || g.nodes[it[0]].k !== 'cut') break;
+        out.push(g.nodes[it[0]].inner);
+        if (out.length > 8) break;
+      }
+      return out;
+    };
+    let effA = aA, effB = aB, best = overlap(aA, aB);
+    for (const d of chain(gB, aB).slice(1)){
+      const v = overlap(aA, d);
+      if (v > best){ best = v; effB = d; }
+    }
+    if (effB === aB)
+      for (const d of chain(gA, aA).slice(1)){
+        const v = overlap(d, aB);
+        if (v > best){ best = v; effA = d; }
+      }
+
+    const itemsA = gA.areas[effA].items, itemsB = gB.areas[effB].items;
     const used = new Set();
     const take = (a, b) => {
       node[b] = a; used.add(a);

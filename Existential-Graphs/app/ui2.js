@@ -147,6 +147,27 @@ $('#d-loadlin').onclick = () => {
   catch(e){ $('#d-err').textContent = e.message; }
 };
 ['#d-shade','#d-handles'].forEach(s => $(s).addEventListener('change', drawRender));
+
+/* Drawing as the formula is typed, as on Translate. A half-written formula
+   does not parse, and its error is left to stand quietly until the typing
+   settles rather than being thrown up on every keystroke. */
+const DLIVE = { t: 0 };
+function dLive(box, btn){
+  clearTimeout(DLIVE.t);
+  if (!$('#d-live') || !$('#d-live').checked) return;
+  DLIVE.t = setTimeout(() => {
+    const raw = $(box).value.trim();
+    if (!raw){ $('#d-err').textContent = ''; return; }
+    try {
+      const g = box === '#d-lin' ? parseEG(raw)
+                                 : compileFormula(parseFormula(raw)).graph;
+      if (canonGraph(g) === canonGraph(ED.g)){ $('#d-err').textContent = ''; return; }
+      $(btn).click();
+    } catch(e){ /* still being typed */ }
+  }, 420);
+}
+$('#d-from').addEventListener('input', () => dLive('#d-from','#d-load'));
+$('#d-lin').addEventListener('input', () => dLive('#d-lin','#d-loadlin'));
 // Enter scribes; shift-Enter starts a new line
 [['#d-from','#d-load'], ['#d-lin','#d-loadlin']].forEach(([box, btn]) =>
   $(box).addEventListener('keydown', e => {
@@ -254,7 +275,7 @@ function previewMove(i){
   const k = DMOVES[i];
   if (!k || ED.anim) return;
   const opts = { shade: $('#d-shade').checked, wobble: true,
-                 handles: $('#d-handles').checked, colourLines: PREFS.colour, pad: 14 };
+                 handles: $('#d-handles').checked, colourLines: PREFS.colour, hand: PREFS.hand, pad: 14 };
   const el = $('#d-stage');
   stageSvg(el, ED.g, opts);
   try { markNodes(el, ED.g, geom(ED.g, opts), moveFocus(ED.g, k.mv)); } catch(e){}
@@ -268,7 +289,7 @@ $('#d-moves').addEventListener('click', e => {
   ED.moves++;
   const el = $('#d-stage');
   const opts = { shade: $('#d-shade').checked, wobble: true,
-                 colourLines: PREFS.colour, markMs: 520, moveMs: 620 };
+                 colourLines: PREFS.colour, hand: PREFS.hand, markMs: 520, moveMs: 620 };
   ED.anim = playTransition(el, ED.g, k.h, k.mv, opts, () => {
     ED.anim = null; ED.g = k.h; ED.sel = null; ED.pick = []; drawRender();
   });
@@ -401,11 +422,12 @@ function vShow(i, animate){
   if (VV.anim){ VV.anim.cancel(); VV.anim = null; }
   if (animate && VV.i === from + 1){
     VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], VV.mvs[VV.i],
-      { shade:true, wobble:true, colourLines: PREFS.colour, frame: VV.frame,
+      { shade:true, wobble:true, colourLines: PREFS.colour, hand: PREFS.hand, frame: VV.frame,
         markMs: 620, moveMs: 700 }, () => { VV.anim = null; });
+    VV.dur = VV.anim.total;
   } else if (animate && VV.i === from - 1){
     VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], null,
-      { shade:true, wobble:true, colourLines: PREFS.colour, frame: VV.frame,
+      { shade:true, wobble:true, colourLines: PREFS.colour, hand: PREFS.hand, frame: VV.frame,
         markMs: 0, moveMs: 560 }, () => { VV.anim = null; });
   } else {
     stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true, frame: VV.frame });
@@ -433,7 +455,7 @@ $('#v-play').onclick = () => {
   const advance = () => {
     if (VV.i >= VV.steps.length-1){ vStop(); return; }
     vShow(VV.i+1, true);
-    VV.timer = setTimeout(advance, 1700);
+    VV.timer = setTimeout(advance, (VV.dur || 1320) + 900);
   };
   VV.timer = setTimeout(advance, 300);
 };

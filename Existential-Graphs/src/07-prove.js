@@ -52,11 +52,98 @@ function fingerprint(g){
   f['#ln'] = Object.keys(g.lns).length;
   return f;
 }
+/* A crude distance between two fingerprints, used only to order the beam.
+   Weighting what the state still lacks more heavily than what it has to spare
+   was tried and made things worse, so the two count the same. */
 function fpDist(a, b){
   let d = 0;
   const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
   for (const k of keys) d += Math.abs((a[k]||0) - (b[k]||0));
   return d;
+}
+
+/* ============================================================================
+   STRATEGY.
+   Peirce's rules are fine grained, and the search is otherwise blind: in Beta
+   there is nothing like the truth-value analysis of Alpha to prune with. What
+   a textbook writes as one step — "instantiate the universal premiss at this
+   individual" — is three of Peirce's rules in a row: branch the individual's
+   line (R3a), extend the branch inwards through the cut (R3b), and join it
+   there to the premiss's own line (R2, which is licensed because the inside of
+   that cut is oddly enclosed). None of the three looks like progress on its
+   own, so a blind search must stumble on all three before anything improves.
+   That sequence is offered whole.
+
+   Nothing here licenses a step. Each move in the sequence is an ordinary move,
+   applied by applyMove and recorded and displayed like any other; the strategy
+   only decides which moves are worth trying together.
+   ========================================================================== */
+function instantiations(g, maxNodes){
+  const out = [], seen = new Set();
+  if (Object.keys(g.nodes).length >= maxNodes) return out;   // branch needs the room
+  const universal = id => {
+    const c = g.nodes[id];
+    return c && c.k === 'cut' && g.areas[c.inner].lns.length > 0;
+  };
+  for (const l of Object.keys(g.lns)){
+    const area = g.lns[l].area;
+    // the premiss is already lying beside the individual
+    for (const id of g.areas[area].items){
+      if (!universal(id)) continue;
+      const c = g.nodes[id];
+      if (depthOf(g, c.inner) % 2 !== 1) continue;      // R2 joins only where it is odd
+      for (const t of g.areas[c.inner].lns){
+        if (find2(g, t) === find2(g, l)) continue;      // already one ligature
+        const key = 'h' + find2(g,l) + '>' + id + '>' + find2(g,t);
+        if (seen.has(key)) continue;
+        seen.add(key);
+        out.push({ ln:l, cut:id, target:t });
+      }
+    }
+    // or it is lying further out, and must be carried in first: R3 iterates it
+    // onto the individual's own area, and the copy is what gets applied. This
+    // is the opening of every syllogism with two universal premisses.
+    for (const id of Object.keys(g.nodes)){
+      if (!universal(id)) continue;
+      const c = g.nodes[id];
+      if (c.area === area) continue;
+      if (!contains(g, c.area, area)) continue;
+      if (areasUnder(g, c.inner).includes(area)) continue;   // no iterating into itself
+      if (depthOf(g, area) % 2 !== 0) continue;   // the copy's inside must come out odd
+      const key = 'i' + find2(g,l) + '>' + canonNode(g, id, ligIndex(g)) + '>' + area;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ ln:l, iterate:id, into:area });
+    }
+  }
+  return out;
+}
+function runInstantiation(g, m, palette){
+  const steps = [];
+  let h = g, cut = m.cut, target = m.target;
+  if (m.iterate !== undefined){
+    const was = new Set(h.areas[m.into].items);
+    const mv0 = { op:'iterate', node:m.iterate, target:m.into };
+    h = applyMove(h, mv0, palette); steps.push({ mv:mv0, graph:h });
+    cut = h.areas[m.into].items.find(x => !was.has(x));
+    if (cut === undefined) return null;
+    const inner = h.areas[h.nodes[cut].inner];
+    target = inner.lns.find(t => find2(h, t) !== find2(h, m.ln));
+    if (target === undefined) return null;
+  }
+  let before = new Set(Object.keys(h.lns));
+  let mv = { op:'branch', ln:m.ln };
+  h = applyMove(h, mv, palette); steps.push({ mv, graph:h });
+  const w = Object.keys(h.lns).find(x => !before.has(x));
+  if (!w) return null;
+  before = new Set(Object.keys(h.lns));
+  mv = { op:'extend', ln:w, cut };
+  h = applyMove(h, mv, palette); steps.push({ mv, graph:h });
+  const inner = Object.keys(h.lns).find(x => !before.has(x));
+  if (!inner) return null;
+  mv = { op:'join', a:inner, b:target };
+  h = applyMove(h, mv, palette); steps.push({ mv, graph:h });
+  return steps;
 }
 
 function findProof(premGraphs, goalGraph, opts){
@@ -73,6 +160,7 @@ function findProof(premGraphs, goalGraph, opts){
   const maxNodes = Math.max(graphSize(start), graphSize(goal)) + slack;
 
   const beta = !isAlpha(start) || !isAlpha(goal);
+  const strategy = opts.strategy !== false;
 
   /* Sound pruning, available in Alpha because validity there is decidable.
      Every rule is truth-preserving, so any state the forward search can use
@@ -142,6 +230,27 @@ function findProof(premGraphs, goalGraph, opts){
         if (other.has(k)) return { nq, meet:k, out:false };
         nq.push(k);
       }
+      // and the strategy: whole sequences the rules would take three steps to
+      // reach. Only forwards, where the rule parities suit them.
+      if (!beta || dir !== 'fwd' || !strategy) continue;
+      for (const m of instantiations(rec.graph, maxNodes)){
+        let steps;
+        try { steps = runInstantiation(rec.graph, m, palette); } catch(e){ continue; }
+        if (!steps) continue;
+        let prevKey = key, prevDepth = rec.depth;
+        for (const st of steps){
+          expanded++;
+          if (graphSize(st.graph) > maxNodes + 4) break;
+          if (!keepFwd(st.graph)) break;
+          const k2 = canonGraph(st.graph);
+          if (!map.has(k2)){
+            map.set(k2, { graph:st.graph, prev:prevKey, mv:st.mv, depth:prevDepth+1, strat:true });
+            if (other.has(k2)) return { nq, meet:k2, out:false };
+            nq.push(k2);
+          }
+          prevKey = k2; prevDepth = map.get(k2).depth;
+        }
+      }
     }
     return { nq, meet:null, out:false };
   };
@@ -149,11 +258,18 @@ function findProof(premGraphs, goalGraph, opts){
   // stay reachable without the frontier exploding
   const trim = (keys, map, target) => {
     if (keys.length <= beam) return keys;
-    return keys
+    // A state the strategy proposed is never trimmed. The beam keeps whatever
+    // most resembles the target, and the opening of a syllogism does the
+    // opposite — it carries a premiss inwards and makes the graph larger — so
+    // the one state worth keeping was reliably the first thrown away.
+    const strat = keys.filter(k => map.get(k).strat);
+    const rest  = keys.filter(k => !map.get(k).strat);
+    const room  = Math.max(0, beam - strat.length);
+    return strat.concat(rest
       .map(k => ({ k, d: fpDist(fingerprint(map.get(k).graph), target) }))
       .sort((a,b) => a.d - b.d)
-      .slice(0, beam)
-      .map(x => x.k);
+      .slice(0, room)
+      .map(x => x.k));
   };
   const rank = mv => ({ deiterate:0, dcOut:1, erase:2, eraseEdge:2,
                         dcIn:3, iterate:4, join:5, insert:6 })[mv.op] ?? 9;

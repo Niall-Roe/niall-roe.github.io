@@ -112,7 +112,16 @@ function compileFormula(ast, opts){
     switch (a.t){
       case 'false': return;                                // ¬⊥ asserts nothing
       case 'true': addCut(g, area); return;
-      case 'not': comp(a.a, area); return;                 // the double cut collapses
+      // A denial of a denial is a double cut, and must be drawn as one. It was
+      // collapsed here, so that "~~P" scribed a bare P and the one figure R5
+      // is about could not be written from a formula at all. R5 removes it;
+      // the translation does not do R5's work in advance.
+      case 'not': {
+        const outer = addCut(g, area);
+        const inner = addCut(g, g.nodes[outer].inner);
+        comp(a.a, g.nodes[inner].inner);
+        return;
+      }
       case 'imp':                                          // ¬(A ⊃ B) is A and not-B
         comp(a.a, area);
         compNeg(a.b, area);

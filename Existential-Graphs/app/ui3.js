@@ -21,8 +21,38 @@ $('#n-conv').innerHTML = CONVENTIONS.map(c =>
   '<dt>'+c[0]+'</dt><dd>'+esc(c[1])+' <span class="cite">CP '+c[2]+'</span></dd>').join('') +
   '<dd class="cite" style="margin-top:14px">Quoted from Roberts 1973, Appendix 3, pp. 137–138. ' +
   'Gamma conventions C10 and C11, and the changes occasioned by the tinctures, are not implemented here.</dd>';
+/* A canonical illustration of each rule, in the fewest marks that show it.
+   Each is a pair of graphs in the linear notation; the move between them is
+   recovered from the rules themselves, so the ring that marks what the rule
+   acts on, and the reading underneath, are the page's own and not captions
+   written by hand. */
+const RULE_DEMOS = {
+  R1: [['P Q', 'P', 'Q stands on the sheet, which is evenly enclosed, so it may be erased.'],
+       ['*x F[x] G[x]', '*x F[x]', 'And so may an evenly enclosed graph that carries a line.']],
+  R2: [['( P )', '( P Q )', 'Inside one cut the area is oddly enclosed, so any graph at all may be written there.'],
+       ['( *x *y F[x] G[y] )', '( *x *y x~y F[x] G[y] )', 'And two lines oddly enclosed on one area may be joined.']],
+  R3: [['P ( ( Q ) )', 'P ( ( Q P ) )', 'P is scribed again on an area that its own place contains.'],
+       ['*x F[x] ( G[x] )', '*x *w x~w F[x] ( G[x] )', 'R3(a): a branch with a loose end is added to a line of identity.'],
+       ['*x *w x~w F[x] ( Q )', '*x *w x~w F[x] ( *w Q )', 'R3(b): a loose end is carried inwards through a cut.']],
+  R4: [['P ( Q P )', 'P ( Q )', 'The inner P could have been got by iterating the outer one, so it may be erased.'],
+       ['*x F[x] ( F[x] G[x] )', '*x F[x] ( G[x] )', 'The same, where the graph erased carries a line.'],
+       ['*x *w x~w F[x] ( *w Q )', '*x *w x~w F[x] ( Q )', 'R4(b): a loose end is drawn back out through a cut.']],
+  R5: [['P', '( ( P ) )', 'A double cut may be drawn round anything whatever.'],
+       ['( ( P Q ) )', 'P Q', 'And removed wherever one stands.'],
+       ['*x F[x] ( ( G[x] ) )', '*x F[x] G[x] ', 'A ligature running right through the pair does not prevent it.']]
+};
 $('#n-rules').innerHTML = RULES.map(r =>
-  '<dt>'+r[0]+' — '+esc(r[1])+'</dt><dd>'+esc(r[2])+' <span class="cite">CP '+r[3]+'</span></dd>').join('') +
+  '<dt>'+r[0]+' — '+esc(r[1])+'</dt><dd>'+esc(r[2])+' <span class="cite">CP '+r[3]+'</span>'+
+  (RULE_DEMOS[r[0]] ? '<div class="demo" data-rule="'+r[0]+'">'+
+     (RULE_DEMOS[r[0]].length > 1 ? '<div class="demorow">'+
+       RULE_DEMOS[r[0]].map((d,i) =>
+         '<button class="btn ghost demopick'+(i?'':' on')+'" data-rule="'+r[0]+'" data-i="'+i+
+         '">'+(i+1)+'</button>').join('')+'</div>' : '')+
+     '<div class="stage demostage" id="rd-'+r[0]+'"></div>'+
+     '<p class="note demosay" id="rs-'+r[0]+'"></p>'+
+     '<div class="demorow"><button class="btn ghost demoplay" data-rule="'+r[0]+
+       '">▶ play</button></div></div>' : '')+
+  '</dd>').join('') +
   '<dd class="cite" style="margin-top:14px">Roberts 1973, Appendix 3, p. 138. All five are implemented, '+
   'including clauses (a)–(d) of R3 and (a)–(c) of R4.</dd>';
 
@@ -105,3 +135,61 @@ buildPuzzleList();
 // the Scribe tab opens with something on the sheet rather than a blank
 try { ED.g = compileFormula(parseFormula('P -> Q')).graph; } catch(e){}
 drawRender();
+
+
+/* ---- the rule illustrations, played ------------------------------------- */
+const DEMO = { pick: {}, anim: {}, timer: {} };
+function demoPair(rule){
+  const d = RULE_DEMOS[rule][DEMO.pick[rule] || 0];
+  const h = hydrateChain([parseEG(d[0]), parseEG(d[1])]);
+  return { a: h.graphs[0], b: h.graphs[1], mv: h.mvs[1], say: d[2] };
+}
+function demoStill(rule){
+  const el = $('#rd-'+rule); if (!el) return;
+  if (DEMO.anim[rule]){ DEMO.anim[rule].cancel(); DEMO.anim[rule] = null; }
+  clearTimeout(DEMO.timer[rule]);
+  const { a, b, say } = demoPair(rule);
+  const fr = proofFrame([a, b]);
+  stageSvg(el, a, { shade:true, wobble:true, colourLines: PREFS.colour, hand: PREFS.hand, frame: fr, maxH: 120 });
+  $('#rs-'+rule).innerHTML = esc(say) + ' <span class="cite">' +
+    esc(fmtFull(sugar(readGraph(a)))) + ' &rarr; ' + esc(fmtFull(sugar(readGraph(b)))) + '</span>';
+  demoButton(rule, 'play');
+}
+function demoButton(rule, mode){
+  const b = $('.demoplay[data-rule="'+rule+'"]');
+  if (!b) return;
+  b.dataset.mode = mode;
+  b.textContent = mode === 'reset' ? '↺ set it back' : '▶ play';
+  b.classList.toggle('isreset', mode === 'reset');
+}
+function demoPlay(rule){
+  const el = $('#rd-'+rule); if (!el) return;
+  if (DEMO.anim[rule]){ DEMO.anim[rule].cancel(); DEMO.anim[rule] = null; }
+  clearTimeout(DEMO.timer[rule]);
+  const { a, b, mv } = demoPair(rule);
+  const fr = proofFrame([a, b]);
+  DEMO.anim[rule] = playTransition(el, a, b, mv,
+    { shade:true, wobble:true, colourLines: PREFS.colour, hand: PREFS.hand, frame: fr, maxH: 120,
+      markMs: 820, moveMs: 760 },
+    () => { DEMO.anim[rule] = null; demoButton(rule, 'reset'); });
+}
+$('#n-rules').addEventListener('click', e => {
+  const pick = e.target.closest('.demopick');
+  if (pick){
+    // choosing an illustration loads it at its first state; it does not play
+    const r = pick.dataset.rule;
+    DEMO.pick[r] = +pick.dataset.i;
+    $$('.demopick[data-rule="'+r+'"]').forEach(b => b.classList.toggle('on', b === pick));
+    demoStill(r);
+    return;
+  }
+  const play = e.target.closest('.demoplay');
+  if (play){
+    if (play.dataset.mode === 'reset') demoStill(play.dataset.rule);
+    else demoPlay(play.dataset.rule);
+  }
+});
+function demoDrawAll(){ Object.keys(RULE_DEMOS).forEach(r => { try { demoStill(r); } catch(e){} }); }
+
+// the illustrations are drawn once the whole panel exists
+try { demoDrawAll(); } catch(e){ console.error(e); }

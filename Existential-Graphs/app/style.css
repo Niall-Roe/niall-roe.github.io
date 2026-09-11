@@ -104,6 +104,10 @@ button.btn:disabled{opacity:.42;cursor:default}
 svg.eg{display:block;max-width:100%;height:auto}
 svg.eg .sa{fill:var(--sheet);stroke:var(--rule2);stroke-dasharray:3 4}
 svg.eg .cut{fill:var(--sheet);stroke:var(--ink);stroke-width:1.7;stroke-linejoin:round}
+/* the second stroke of a nib: lighter, laid just beside the first */
+svg.eg .cut.ink{fill:none;stroke-width:1.1;opacity:.55}
+svg.eg.hand .spot text{font-family:var(--serif);font-style:italic}
+svg.eg.hand .loi{stroke-width:3.6}
 svg.eg .cut.raised{filter:drop-shadow(0 1px 1.4px rgba(0,0,0,.16))}
 @media (prefers-color-scheme: dark){ svg.eg .cut.raised{filter:drop-shadow(0 1px 1.6px rgba(0,0,0,.5))} }
 svg.eg .cut.odd{fill:var(--shade)}
@@ -130,6 +134,27 @@ svg.eg .lc6{stroke:#6d1f49} svg.eg circle.lc6{fill:#6d1f49} svg.eg text.lc6{fill
   svg.eg .lc6{stroke:#eaa1c4} svg.eg circle.lc6{fill:#eaa1c4} svg.eg text.lc6{fill:#eaa1c4}
 }
 svg.eg .hooknum{font:italic 600 11px var(--serif);fill:var(--ink2)}
+blockquote.peirce{margin:0 0 12px;padding:8px 0 8px 14px;border-left:3px solid var(--accent);
+  font:italic 14.5px/1.55 var(--serif);color:var(--ink2)}
+blockquote.peirce .cite{display:block;font-style:normal;margin-top:4px}
+.exwall{margin:10px 0 4px}
+.chipgroup h3{font:600 11.5px/1.4 var(--sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink3);margin:12px 0 6px}
+.chipgroup:first-child h3{margin-top:2px}
+.chips button.on{background:var(--accent);color:var(--paper);border-color:transparent}
+.rules.two-col{columns:2;column-gap:26px}
+.rules.two-col dt{break-after:avoid}
+.rules.two-col dd{break-inside:avoid;margin-bottom:10px}
+@media (max-width:820px){ .rules.two-col{columns:1} }
+.demorow .demoplay.isreset{background:transparent;border-style:dashed}
+.vowel{color:var(--accent);font-weight:700}
+.demo{margin:10px 0 4px}
+.demorow{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.demorow .demopick{padding:2px 9px;font-size:12px;min-width:0}
+.demorow .demopick.on{background:var(--accent);color:var(--paper);border-color:transparent}
+.demorow .demoplay{padding:2px 10px;font-size:12px}
+.demostage{min-height:96px;padding:8px;display:flex;align-items:center;justify-content:center}
+.demosay{margin:6px 0 0;font-size:12.5px}
 svg.eg .hookpl{font:400 9px var(--sans);font-style:normal;opacity:.65}
 svg.eg .cut.hl-add,svg.eg .spot.hl-add rect{stroke:var(--hl-add);stroke-width:3}
 svg.eg .spot.hl-add text{fill:var(--hl-add)}
@@ -145,6 +170,11 @@ svg.eg .telegraph-head{fill:var(--accent);opacity:.8}
 svg.eg .newroom{fill:color-mix(in srgb,var(--accent) 12%,transparent);
   stroke:var(--accent);stroke-width:1.6;stroke-dasharray:5 4}
 @media (prefers-reduced-motion: reduce){ svg.eg .newroom{display:none} }
+
+/* a cut the rule is about to act on beats once the ring is around it */
+svg.eg .cut.mk-del,svg.eg .cut.mk-src{animation:cutBeat .62s ease-in-out .22s infinite}
+@keyframes cutBeat{0%,100%{stroke-width:1.7}50%{stroke-width:3.2}}
+@media (prefers-reduced-motion: reduce){ svg.eg .cut.mk-del,svg.eg .cut.mk-src{animation:none} }
 
 /* the ring that marks what a rule is about to act on */
 svg.eg .focus{fill:none;stroke-width:2.6;rx:10}

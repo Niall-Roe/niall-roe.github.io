@@ -219,11 +219,28 @@ function seededRand(seed){
   let s = 0; for (let i=0;i<seed.length;i++) s = (s*31 + seed.charCodeAt(i)) & 0x7fffffff;
   return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return (s / 0x7fffffff); };
 }
-function cutPath(x, y, w, h, seed, wobble){
+/* How unsteady the cut is drawn. A pen held over a sheet does not close a
+   curve on the millimetre, and Peirce's own cuts in the manuscripts wander;
+   `hand` simply widens the wander, and is paired in the drawing with a second
+   stroke laid slightly off the first, which is what gives a nib its weight. */
+/* A written letter is never quite upright and never quite on the line. SVG
+   takes one rotation per glyph, which is enough to make a row of letters look
+   set down by a hand rather than by a press. */
+function handRotate(seed, name){
+  const rnd = seededRand(seed + '#r');
+  return Array.from(name).map(() => r2((rnd() - 0.5) * 11)).join(' ');
+}
+function handShift(seed){
+  const rnd = seededRand(seed + '#y');
+  return (rnd() - 0.5) * 1.8;
+}
+
+function cutPath(x, y, w, h, seed, wobble, hand){
   const r = Math.min(22, h/2, w/2);
   if (!wobble) return roundRect(x,y,w,h,r);
-  const rnd = seededRand(seed);
-  const j = () => (rnd() - 0.5) * 2.4;
+  const rnd = seededRand(seed + (hand ? '~h' : ''));
+  const amp = hand ? 5.2 : 2.4;
+  const j = () => (rnd() - 0.5) * amp;
   const x0=x+j(), y0=y+j(), x1=x+w+j(), y1=y+h+j();
   return `M ${x0+r} ${y0}
     L ${x1-r+j()} ${y0+j()} Q ${x1} ${y0} ${x1+j()} ${y0+r}
@@ -293,9 +310,15 @@ function roundedPath(pts, maxR, hops){
   if (P.length < 2) return null;
   const n = P.length;
   const rad = new Array(n).fill(0);
+  // A crossing that falls inside a rounded corner has no straight run to be
+  // bridged on, and the bridge was simply dropped — two lines met flat on the
+  // page. The corner is squared off instead, which frees the whole segment.
+  const near = [];
+  if (hops) for (const list of hops) if (list) for (const q of list) near.push(q);
   for (let i = 1; i < n-1; i++){
     const d1 = dist(P[i-1], P[i]), d2 = dist(P[i], P[i+1]);
-    const r = Math.min(maxR, d1/2, d2/2);
+    let r = Math.min(maxR, d1/2, d2/2);
+    if (near.some(q => Math.hypot(q.x - P[i].x, q.y - P[i].y) < HOPR + 2.5)) r = 0;
     rad[i] = r < 0.8 ? 0 : r;
   }
   const towards = (p, q, r) => r <= 0 ? { x:p.x, y:p.y }
@@ -315,17 +338,31 @@ function roundedPath(pts, maxR, hops){
   return d;
 }
 const HOPR = 4.2;
-function runWithHops(A, B, xs){
-  if (!xs || !xs.length || Math.abs(A.y - B.y) > 0.5) return ` L ${r2(B.x)} ${r2(B.y)}`;
-  const fwd = B.x > A.x;
-  const lo = Math.min(A.x, B.x) + HOPR + 1, hi = Math.max(A.x, B.x) - HOPR - 1;
-  const use = xs.filter(x => x > lo && x < hi).sort((p,q) => fwd ? p-q : q-p);
-  let d = '';
-  for (const x of use){
-    const x1 = fwd ? x - HOPR : x + HOPR, x2 = fwd ? x + HOPR : x - HOPR;
-    d += ` L ${r2(x1)} ${r2(A.y)} A ${HOPR} ${HOPR} 0 0 ${fwd ? 1 : 0} ${r2(x2)} ${r2(A.y)}`;
+/* The bridge itself. A run may be horizontal or vertical, so the crossings are
+   measured as distances along it rather than as x positions, and the arc is
+   shrunk where the crossing sits close to a corner — a bridge that would not
+   fit used to be dropped, which left two lines meeting flat on the page. The
+   sweep is chosen so that the arc always rises off the same side: upwards on a
+   horizontal run, leftwards on a vertical one. */
+function runWithHops(A, B, pts){
+  const plain = ` L ${r2(B.x)} ${r2(B.y)}`;
+  if (!pts || !pts.length) return plain;
+  const dx = B.x - A.x, dy = B.y - A.y, len = Math.hypot(dx, dy);
+  if (len < 3) return plain;
+  const ux = dx/len, uy = dy/len;
+  const sweep = (ux > 0.5 || uy > 0.5) ? 1 : 0;
+  const at = pts.map(p => (p.x-A.x)*ux + (p.y-A.y)*uy)
+                .filter(t => t > 0.6 && t < len - 0.6)
+                .sort((p,q) => p-q);
+  let d = '', last = 0;
+  for (const t of at){
+    const r = Math.min(HOPR, t - last - 0.4, len - t - 0.4);
+    if (r < 1.2) continue;
+    d += ` L ${r2(A.x + ux*(t-r))} ${r2(A.y + uy*(t-r))}` +
+         ` A ${r2(r)} ${r2(r)} 0 0 ${sweep} ${r2(A.x + ux*(t+r))} ${r2(A.y + uy*(t+r))}`;
+    last = t + r;
   }
-  return d + ` L ${r2(B.x)} ${r2(B.y)}`;
+  return d + plain;
 }
 function dedupePts(pts){
   const P = [];
@@ -339,27 +376,39 @@ function dedupePts(pts){
 const dist = (p,q) => Math.hypot(p.x-q.x, p.y-q.y) || 1e-6;
 
 /* Where one line crosses another, the horizontal one hops over. */
-function crossingHops(polys){
-  const hops = polys.map(p => p.map(() => []));
-  for (let i = 0; i < polys.length; i++){
-    const P = dedupePts(polys[i]);
-    for (let si = 0; si < P.length-1; si++){
-      const a = P[si], b = P[si+1];
-      if (Math.abs(a.y - b.y) > 0.5) continue;            // not horizontal
-      const xlo = Math.min(a.x,b.x), xhi = Math.max(a.x,b.x);
-      for (let j = 0; j < polys.length; j++){
-        if (j === i) continue;
-        const Q = dedupePts(polys[j]);
-        for (let sj = 0; sj < Q.length-1; sj++){
-          const c = Q[sj], e = Q[sj+1];
-          if (Math.abs(c.x - e.x) > 0.5) continue;        // not vertical
-          const ylo = Math.min(c.y,e.y), yhi = Math.max(c.y,e.y);
-          if (c.x > xlo + 2 && c.x < xhi - 2 && a.y > ylo + 2 && a.y < yhi - 2)
-            hops[i][si].push(c.x);
-        }
-      }
+/* Where two lines of identity cross, one is drawn bridging over the other, as
+   Peirce draws it (Ms 455). Which one bridges must not depend on the accident
+   of which happens to be running horizontally there, or the same pair of lines
+   passes over and under each other by turns down the page. Each ligature has a
+   rank already, the one its colour is taken from, and the higher rank always
+   takes the bridge: so a given pair crosses the same way every time, and the
+   line kept whole is the same line throughout the drawing. */
+function crossingHops(polys, keys){
+  const Ps = polys.map(dedupePts);
+  const hops = Ps.map(P => P.map(() => []));
+  const segs = [];
+  Ps.forEach((P, i) => {
+    for (let s = 0; s + 1 < P.length; s++){
+      const a = P[s], b = P[s+1];
+      const horiz = Math.abs(a.y - b.y) <= 0.5, vert = Math.abs(a.x - b.x) <= 0.5;
+      if (horiz === vert) continue;                    // degenerate or diagonal
+      segs.push({ i, s, a, b, horiz });
     }
-  }
+  });
+  const key = i => (keys && keys[i] !== undefined) ? keys[i] : i;
+  for (let m = 0; m < segs.length; m++)
+    for (let n = m + 1; n < segs.length; n++){
+      const A = segs[m], B = segs[n];
+      if (A.i === B.i || A.horiz === B.horiz) continue;
+      const H = A.horiz ? A : B, V = A.horiz ? B : A;
+      const x = V.a.x, y = H.a.y;
+      const xlo = Math.min(H.a.x, H.b.x), xhi = Math.max(H.a.x, H.b.x);
+      const ylo = Math.min(V.a.y, V.b.y), yhi = Math.max(V.a.y, V.b.y);
+      if (!(x > xlo + 0.5 && x < xhi - 0.5 && y > ylo + 0.5 && y < yhi - 0.5)) continue;
+      const kh = key(H.i), kv = key(V.i);
+      const over = (kh === kv ? H.i > V.i : kh > kv) ? H : V;
+      hops[over.i][over.s].push({ x, y });
+    }
   return hops;
 }
 
@@ -385,6 +434,7 @@ function renderGraph(g, opts){
   const parts = [];
   const shade = opts.shade;
   const wobble = opts.wobble !== false;
+  const hand = !!opts.hand;
   const hl = opts.highlight || {};      // {nodeId:'add'|'del'|'move'}
 
   // The frame is the sheet as drawn. Left to itself it is the graph's own size;
@@ -404,12 +454,17 @@ function renderGraph(g, opts){
       if (n.k === 'cut'){
         const d = depthOf(g, n.inner);
         parts.push(`<path class="cut${mark}${raised}${shade && d%2===1 ? ' odd':''}" d="${
-          cutPath(p.x, p.y, p.w, p.h, n.id, wobble)}" data-node="${n.id}" data-area="${n.inner}"/>`);
+          cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand)}" data-node="${n.id}" data-area="${n.inner}"/>`);
+      // a nib lays down a second, lighter line beside the first
+      if (hand) parts.push(`<path class="cut ink" d="${
+        cutPath(p.x + 0.7, p.y + 0.5, p.w, p.h, n.id + 'b', true, true)}"/>`);
         drawArea(n.inner);
       } else {
         parts.push(`<g class="spot${mark}" data-node="${n.id}">`+
           `<rect class="spotbg" x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="5"/>`+
-          `<text x="${p.x + p.w/2 + (n.hooks.length > 1 ? 6 : 0)}" y="${p.y + p.h/2}" `+
+          `<text x="${p.x + p.w/2 + (n.hooks.length > 1 ? 6 : 0)}" y="${
+            r2(p.y + p.h/2 + (hand ? handShift(n.id) : 0))}" `+
+          (hand ? `rotate="${handRotate(n.id, n.name)}" ` : '')+
           `dominant-baseline="central" text-anchor="middle">${esc(n.name)}</text></g>`);
       }
     }
@@ -424,7 +479,7 @@ function renderGraph(g, opts){
   let VARS = {}; try { VARS = lineVars(g); } catch(e){}
   const chains = lineChains(g, pos);
   const polys  = chains.map(ch => dedupePts(elbowPoints(ch, pos)));
-  const hops   = crossingHops(polys);
+  const hops   = crossingHops(polys, chains.map(ch => LN.rank[LN.lig[ch[0]]]));
   polys.forEach((pts, i) => {
     const d = roundedPath(pts, 5, hops[i]);
     if (d) parts.push(`<path class="loi${lc(chains[i][0])}" d="${d}" data-chain="${chains[i].join(',')}"/>`);
@@ -474,6 +529,6 @@ function svgDoc(g, opts){
   opts = opts || {};
   const r = renderGraph(g, opts);
   const pad = opts.pad || 10;
-  return `<svg class="eg" xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${r.w+2*pad} ${r.h+2*pad}" `+
+  return `<svg class="eg${opts && opts.hand ? ' hand' : ''}" xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${r.w+2*pad} ${r.h+2*pad}" `+
          `width="${(r.w+2*pad)*(opts.scale||1)}" height="${(r.h+2*pad)*(opts.scale||1)}">${r.svg}</svg>`;
 }
