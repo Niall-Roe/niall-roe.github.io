@@ -122,9 +122,43 @@
   <div class="grid side">
     <div>
       <div class="card">
+        <h2>Start from</h2>
+        <select id="d-start" style="width:100%"></select>
+        <p class="note" style="margin-top:6px">A proposition to experiment on. Or write your own below.</p>
+        <textarea id="d-from" rows="1" spellcheck="false">P -> Q</textarea>
+        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
+        <details style="margin-top:8px">
+          <summary class="note" style="cursor:pointer">Or from the linear notation</summary>
+          <textarea id="d-lin" rows="2" spellcheck="false" style="margin-top:6px">( P ( Q ) )</textarea>
+          <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
+          <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
+          <code>*x</code> a point of the line <span class="mono">x</span> ·
+          <code>F[x,y]</code> a spot hooked to lines · <code>x~y</code> two lines joined ·
+          <code>"is a catholic"</code> a spot whose name has spaces.</p>
+        </details>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Reach a goal</h2>
+        <select id="z-sel" style="width:100%"></select>
+        <div id="z-body" style="display:none">
+          <div class="stage" id="z-goal" style="min-height:70px;padding:8px;margin-top:10px"></div>
+          <p class="reading" id="z-goalread" style="font-size:13.5px;margin-top:6px"></p>
+          <p id="z-status" style="margin:8px 0 0;font-size:13.5px"></p>
+          <div class="btnrow">
+            <button class="btn ghost" id="z-hint">Hint</button>
+            <button class="btn ghost" id="z-restart">Start again</button>
+            <button class="btn ghost" id="z-show" style="display:none">Show the proof</button>
+            <button class="btn ghost" id="z-quit">Leave the puzzle</button>
+          </div>
+        </div>
+        <p class="note" id="z-note" style="margin-top:8px">Pick a puzzle and the premisses are
+        scribed on the sheet. Transform them, one legal move at a time, until the sheet says
+        the conclusion.</p>
+      </div>
+      <div class="card" style="margin-top:18px">
         <h2>Scribe</h2>
-        <p class="tight">Click a cut to select its area; click the sheet's border to select
-        the sheet itself. Then scribe onto the selected area.</p>
+        <p class="tight">Click a cut to select its area, or the sheet to select the sheet
+        itself. Then scribe onto the selected area.</p>
         <div class="btnrow">
           <button class="btn" id="d-cut">Cut</button>
           <button class="btn" id="d-spot">Spot…</button>
@@ -142,18 +176,6 @@
           <label><input type="checkbox" id="d-handles" checked> show line points</label>
           <label><input type="checkbox" class="pref-colour" checked> colour the lines</label>
         </div>
-      </div>
-      <div class="card" style="margin-top:18px">
-        <h2>Start from a formula</h2>
-        <textarea id="d-from" rows="1" spellcheck="false">Ex (Fx &amp; ~Gx)</textarea>
-        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
-        <h3>Or from linear notation</h3>
-        <textarea id="d-lin" rows="2" spellcheck="false">( *x F[x] ( G[x] ) )</textarea>
-        <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
-        <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
-        <code>*x</code> a point of the line <span class="mono">x</span> ·
-        <code>F[x,y]</code> a spot hooked to lines · <code>x~y</code> two lines joined ·
-        <code>"is a catholic"</code> a spot whose name has spaces.</p>
       </div>
     </div>
     <div>

@@ -17,6 +17,18 @@ verified; everything else is written down but not acted on.
 - The rules that act on lines of identity now mark what they act on.
 - The Scribe transform panel says where each move acts, previews it on hover or
   focus, plays it when clicked, and is reachable by keyboard.
+- The animation no longer stutters at step boundaries. Every still drawing sized
+  itself to its own graph while every transition sized itself to the larger of
+  two, so the frame jumped at the start and end of each step. The frame is now
+  explicit: pinned across a whole proof, sized to its largest step, so nothing
+  rescales or shifts between steps and the stage stays one height; interpolated
+  where the sequence is open-ended, as on Translate. Checked at all 226 step
+  boundaries in the library: the still before, the first frame, the last frame
+  and the still after place every cut and spot identically.
+- Scribe opens with P → Q on the sheet, a list of standard propositions to
+  start from, and a puzzle mode: pick an inference, its premisses are scribed,
+  and the page counts the moves until the sheet says the conclusion. Hints
+  follow the library's own route where there is one.
 
 All 25 library proofs still verify, replay, render and write out; the searches
 still find their proofs.
@@ -258,15 +270,22 @@ is closed for the reader sits at the foot of the third card, a screen below the
 box it is about; the parse error sits in the graph card. Both belong under the
 formula box.
 
-## 3. Scribe opens dead
+## 3. DONE — Scribe opened dead, and now has a goal
 
-The tab arrives on a blank sheet, with a Transform panel offering one move. It
-should open with a graph already loaded — the one last drawn on Translate, or
-`Ax (Fx -> Gx)` — so there is something to transform in the first second. The
-instruction "click the sheet's border" is wrong; clicking anywhere on the sheet
-works.
+The tab arrived on a blank sheet with a panel offering one move. It now opens
+with P → Q on the sheet, a Start-from list of twenty standard propositions, and
+the free formula box beneath. The wrong instruction about the sheet's border is
+gone.
 
-The bigger idea for this tab: give it a goal. Let the reader pick a target — a
+The bigger idea — giving it a goal — is built. Pick a puzzle: seventy-five of
+them, the twenty-five library proofs first, each marked with its step count,
+then the textbook exercises. Its premisses are scribed on the sheet and the
+conclusion is drawn small beside; the page counts applications of the rules
+until the sheet says the conclusion, and compares the count with the library's
+where there is one. A Hint, when the sheet is on the library's route, marks the
+entry in the Transform panel that takes the next step, and says so plainly when
+the sheet has left the route. Undo uncounts a move; free scribing with the Cut
+and Spot buttons is not counted, since it is not a rule. The original idea: Let the reader pick a target — a
 conclusion from the proof library, or one of the textbook exercises — and
 transform the sheet towards it, with the page saying when the goal is reached
 and how many moves it took. That turns the rules from a list into a puzzle,

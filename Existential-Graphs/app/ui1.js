@@ -201,6 +201,7 @@ function pfLoad(i){
   PF.proof = p; PF.i = 0;
   const h = hydrateProof(p);
   PF.graphs = h.graphs; PF.mvs = h.mvs;
+  PF.frame = proofFrame(PF.graphs);
   $('#pf-cite').innerHTML = p.cite ? '<b>'+esc(p.cite)+'</b>' : '';
   $('#pf-note').textContent = p.note || '';
   $('#pf-kv').innerHTML =
@@ -218,6 +219,13 @@ function pfLoad(i){
   pfShow(0);
 }
 function fmtSrc(s){ try { return fmt(parseFormula(s), 0); } catch(e){ return s; } }
+// The sheet a proof is drawn on stays one size from first step to last, sized
+// to the largest step, so the drawing never rescales or shifts between steps.
+function proofFrame(graphs){
+  let W = 0, H = 0;
+  for (const g of graphs){ const G = geom(g, {}); W = Math.max(W, G.W); H = Math.max(H, G.H); }
+  return { W, H };
+}
 function pfShow(i, animate){
   const p = PF.proof; if (!p) return;
   const from = PF.i;
@@ -227,17 +235,17 @@ function pfShow(i, animate){
   const speed = +$('#pf-speed').value;
   if (animate && PF.i === from + 1 && ANIM_ON()){
     PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, PF.mvs[PF.i],
-      { shade:true, wobble:true, colourLines: PREFS.colour,
+      { shade:true, wobble:true, colourLines: PREFS.colour, frame: PF.frame,
         markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
       () => { PF.anim = null; });
   } else if (animate && PF.i === from - 1 && ANIM_ON()){
     // rewinding is not a rule application, so nothing is marked; the drawing
     // simply runs backwards
     PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, null,
-      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 0,
+      { shade:true, wobble:true, colourLines: PREFS.colour, frame: PF.frame, markMs: 0,
         moveMs: Math.round(speed*0.4) }, () => { PF.anim = null; });
   } else {
-    stageSvg($('#pf-stage'), g, { shade:true, wobble:true });
+    stageSvg($('#pf-stage'), g, { shade:true, wobble:true, frame: PF.frame });
   }
   const s = p.steps[PF.i];
   $('#pf-why').innerHTML = '<b>'+esc(s.rule ? s.rule : 'Premiss')+'</b> — '+esc(s.why)+

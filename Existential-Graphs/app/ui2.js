@@ -1,6 +1,12 @@
 /* =============================== SCRIBE ==================================== */
-const ED = { g: newGraph(), sel: null, hist: [], pick: [], anim: null };
-function edPush(){ ED.hist.push(cloneGraph(ED.g)); if (ED.hist.length > 60) ED.hist.shift(); }
+const ED = { g: newGraph(), sel: null, hist: [], pick: [], anim: null,
+             goal: null, moves: 0 };
+// The history records what kind of change is about to be made, so that a
+// puzzle can count only applications of the rules and undo can uncount them.
+function edPush(kind){
+  ED.hist.push({ g: cloneGraph(ED.g), kind: kind || 'edit' });
+  if (ED.hist.length > 60) ED.hist.shift();
+}
 function edSel(kind, id){ ED.sel = { kind, id }; drawRender(); }
 function selArea(){
   if (!ED.sel) return ED.g.root;
@@ -72,6 +78,7 @@ function drawRender(){
 
   drawMoves();
   if (!ED.quiet) syncScribeBoxes('graph');
+  if (typeof puzzleCheck === 'function') puzzleCheck();
 }
 function togglePick(ln){
   const i = ED.pick.indexOf(ln);
@@ -110,7 +117,13 @@ $('#d-del').onclick = () => {
   }
   ED.sel = null; ED.pick = []; drawRender();
 };
-$('#d-undo').onclick = () => { if (ED.hist.length){ ED.g = ED.hist.pop(); ED.sel=null; ED.pick=[]; drawRender(); } };
+$('#d-undo').onclick = () => {
+  if (!ED.hist.length) return;
+  const h = ED.hist.pop();
+  ED.g = h.g; ED.sel = null; ED.pick = [];
+  if (h.kind === 'rule' && ED.moves > 0) ED.moves--;
+  drawRender();
+};
 $('#d-clear').onclick = () => { edPush(); ED.g = newGraph(); ED.sel=null; ED.pick=[]; drawRender(); };
 // Whichever box is used, the other is brought into step, so that the two
 // descriptions of the graph on the sheet always agree.
@@ -251,7 +264,8 @@ function unpreview(){ if (!ED.anim) drawRender(); }
 $('#d-moves').addEventListener('click', e => {
   const b = e.target.closest('button[data-i]'); if (!b) return;
   const k = DMOVES[+b.dataset.i]; if (!k) return;
-  edPush();
+  edPush('rule');
+  ED.moves++;
   const el = $('#d-stage');
   const opts = { shade: $('#d-shade').checked, wobble: true,
                  colourLines: PREFS.colour, markMs: 520, moveMs: 620 };
@@ -372,6 +386,7 @@ function vLoad(steps){
   VV.steps = steps;
   const h = hydrateSteps(steps);
   VV.graphs = h.graphs; VV.mvs = h.mvs; VV.i = 0;
+  VV.frame = proofFrame(VV.graphs);
   $('#v-proofcard').style.display = '';
   $('#v-writ-card').style.display = '';
   $('#v-steps').innerHTML = steps.map((s,k) =>
@@ -386,14 +401,14 @@ function vShow(i, animate){
   if (VV.anim){ VV.anim.cancel(); VV.anim = null; }
   if (animate && VV.i === from + 1){
     VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], VV.mvs[VV.i],
-      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 620, moveMs: 700 },
-      () => { VV.anim = null; });
+      { shade:true, wobble:true, colourLines: PREFS.colour, frame: VV.frame,
+        markMs: 620, moveMs: 700 }, () => { VV.anim = null; });
   } else if (animate && VV.i === from - 1){
     VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], null,
-      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 0, moveMs: 560 },
-      () => { VV.anim = null; });
+      { shade:true, wobble:true, colourLines: PREFS.colour, frame: VV.frame,
+        markMs: 0, moveMs: 560 }, () => { VV.anim = null; });
   } else {
-    stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
+    stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true, frame: VV.frame });
   }
   const s = VV.steps[VV.i];
   $('#v-why').innerHTML = '<b>'+esc(s.rule||'Premiss')+'</b> — '+esc(s.why)+

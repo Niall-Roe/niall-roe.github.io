@@ -100,4 +100,8 @@ enhanceEditor($('#d-lin'), { glyphs: false });
 
 translate(false);
 pfLoad(0);
+buildStartList();
+buildPuzzleList();
+// the Scribe tab opens with something on the sheet rather than a blank
+try { ED.g = compileFormula(parseFormula('P -> Q')).graph; } catch(e){}
 drawRender();

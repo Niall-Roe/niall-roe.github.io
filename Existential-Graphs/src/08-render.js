@@ -376,9 +376,15 @@ function renderGraph(g, opts){
   const wobble = opts.wobble !== false;
   const hl = opts.highlight || {};      // {nodeId:'add'|'del'|'move'}
 
-  // the sheet of assertion
+  // The frame is the sheet as drawn. Left to itself it is the graph's own size;
+  // given a frame it is that size, never smaller than the graph, with the graph
+  // centred in it. A proof pins one frame across all its steps so that nothing
+  // rescales or shifts between them.
+  const FW = opts.frame ? Math.max(opts.frame.W, W) : W;
+  const FH = opts.frame ? Math.max(opts.frame.H, H) : H;
+  const dx = r2((FW - W) / 2), dy = r2((FH - H) / 2);
   const raised = opts.raised === false ? '' : ' raised';
-  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${W-1}" height="${H-1}" rx="6"/>`);
+  const sheet = `<rect class="sa" x="0.5" y="0.5" width="${FW-1}" height="${FH-1}" rx="6"/>`;
 
   function drawArea(areaId){
     for (const id of g.areas[areaId].items){
@@ -444,7 +450,8 @@ function renderGraph(g, opts){
       parts.push(`<circle class="handle" cx="${p.x}" cy="${p.y}" r="3.6" data-ln="${l.id}"/>`);
     }
 
-  return { svg: parts.join('\n'), w: W, h: H, P, pos, M };
+  return { svg: sheet + `<g class="gr" transform="translate(${dx},${dy})">` + parts.join('\n') + '</g>',
+           w: FW, h: FH, dx, dy, P, pos, M };
 }
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }

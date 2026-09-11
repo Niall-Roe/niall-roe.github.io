@@ -198,6 +198,8 @@ code,.mono{font-family:var(--mono);font-size:12.8px}
   font:inherit;color:inherit}
 .moves button.movebtn:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
 .moves button.movebtn:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.moves button.movebtn.hinted{background:color-mix(in srgb,var(--ok) 16%,transparent);
+  box-shadow:inset 3px 0 0 var(--ok)}
 .moves button.movebtn .d{display:block;color:var(--ink2);font-size:12.5px;line-height:1.4}
 .moves button.movebtn .w{display:block;color:var(--ink3);font-size:11.5px;
   font-family:var(--mono);margin-top:1px}
@@ -367,9 +369,43 @@ hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
   <div class="grid side">
     <div>
       <div class="card">
+        <h2>Start from</h2>
+        <select id="d-start" style="width:100%"></select>
+        <p class="note" style="margin-top:6px">A proposition to experiment on. Or write your own below.</p>
+        <textarea id="d-from" rows="1" spellcheck="false">P -> Q</textarea>
+        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
+        <details style="margin-top:8px">
+          <summary class="note" style="cursor:pointer">Or from the linear notation</summary>
+          <textarea id="d-lin" rows="2" spellcheck="false" style="margin-top:6px">( P ( Q ) )</textarea>
+          <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
+          <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
+          <code>*x</code> a point of the line <span class="mono">x</span> ·
+          <code>F[x,y]</code> a spot hooked to lines · <code>x~y</code> two lines joined ·
+          <code>"is a catholic"</code> a spot whose name has spaces.</p>
+        </details>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Reach a goal</h2>
+        <select id="z-sel" style="width:100%"></select>
+        <div id="z-body" style="display:none">
+          <div class="stage" id="z-goal" style="min-height:70px;padding:8px;margin-top:10px"></div>
+          <p class="reading" id="z-goalread" style="font-size:13.5px;margin-top:6px"></p>
+          <p id="z-status" style="margin:8px 0 0;font-size:13.5px"></p>
+          <div class="btnrow">
+            <button class="btn ghost" id="z-hint">Hint</button>
+            <button class="btn ghost" id="z-restart">Start again</button>
+            <button class="btn ghost" id="z-show" style="display:none">Show the proof</button>
+            <button class="btn ghost" id="z-quit">Leave the puzzle</button>
+          </div>
+        </div>
+        <p class="note" id="z-note" style="margin-top:8px">Pick a puzzle and the premisses are
+        scribed on the sheet. Transform them, one legal move at a time, until the sheet says
+        the conclusion.</p>
+      </div>
+      <div class="card" style="margin-top:18px">
         <h2>Scribe</h2>
-        <p class="tight">Click a cut to select its area; click the sheet's border to select
-        the sheet itself. Then scribe onto the selected area.</p>
+        <p class="tight">Click a cut to select its area, or the sheet to select the sheet
+        itself. Then scribe onto the selected area.</p>
         <div class="btnrow">
           <button class="btn" id="d-cut">Cut</button>
           <button class="btn" id="d-spot">Spot…</button>
@@ -387,18 +423,6 @@ hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
           <label><input type="checkbox" id="d-handles" checked> show line points</label>
           <label><input type="checkbox" class="pref-colour" checked> colour the lines</label>
         </div>
-      </div>
-      <div class="card" style="margin-top:18px">
-        <h2>Start from a formula</h2>
-        <textarea id="d-from" rows="1" spellcheck="false">Ex (Fx &amp; ~Gx)</textarea>
-        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
-        <h3>Or from linear notation</h3>
-        <textarea id="d-lin" rows="2" spellcheck="false">( *x F[x] ( G[x] ) )</textarea>
-        <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
-        <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
-        <code>*x</code> a point of the line <span class="mono">x</span> ·
-        <code>F[x,y]</code> a spot hooked to lines · <code>x~y</code> two lines joined ·
-        <code>"is a catholic"</code> a spot whose name has spaces.</p>
       </div>
     </div>
     <div>
@@ -2582,9 +2606,15 @@ function renderGraph(g, opts){
   const wobble = opts.wobble !== false;
   const hl = opts.highlight || {};      // {nodeId:'add'|'del'|'move'}
 
-  // the sheet of assertion
+  // The frame is the sheet as drawn. Left to itself it is the graph's own size;
+  // given a frame it is that size, never smaller than the graph, with the graph
+  // centred in it. A proof pins one frame across all its steps so that nothing
+  // rescales or shifts between them.
+  const FW = opts.frame ? Math.max(opts.frame.W, W) : W;
+  const FH = opts.frame ? Math.max(opts.frame.H, H) : H;
+  const dx = r2((FW - W) / 2), dy = r2((FH - H) / 2);
   const raised = opts.raised === false ? '' : ' raised';
-  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${W-1}" height="${H-1}" rx="6"/>`);
+  const sheet = `<rect class="sa" x="0.5" y="0.5" width="${FW-1}" height="${FH-1}" rx="6"/>`;
 
   function drawArea(areaId){
     for (const id of g.areas[areaId].items){
@@ -2650,7 +2680,8 @@ function renderGraph(g, opts){
       parts.push(`<circle class="handle" cx="${p.x}" cy="${p.y}" r="3.6" data-ln="${l.id}"/>`);
     }
 
-  return { svg: parts.join('\n'), w: W, h: H, P, pos, M };
+  return { svg: sheet + `<g class="gr" transform="translate(${dx},${dy})">` + parts.join('\n') + '</g>',
+           w: FW, h: FH, dx, dy, P, pos, M };
 }
 
 function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
@@ -3001,8 +3032,15 @@ function prepareTween(gA, gB, GA, GB, opts){
     const L = LNB.lig[ln] !== undefined ? LNB : LNA;
     return ' lc' + (L.rank[L.lig[ln]] % 7);
   };
-  return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf,
-           W: Math.max(GA.W, GB.W), H: Math.max(GA.H, GB.H) };
+  // The frame each end of the transition would be drawn in on its own, and
+  // where the graph sits inside it. A pinned frame makes both ends the same.
+  const fr = opts.frame;
+  const FA = { W: fr ? Math.max(fr.W, GA.W) : GA.W, H: fr ? Math.max(fr.H, GA.H) : GA.H };
+  const FB = { W: fr ? Math.max(fr.W, GB.W) : GB.W, H: fr ? Math.max(fr.H, GB.H) : GB.H };
+  FA.dx = (FA.W - GA.W)/2; FA.dy = (FA.H - GA.H)/2;
+  FB.dx = (FB.W - GB.W)/2; FB.dy = (FB.H - GB.H)/2;
+  return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf, FA, FB,
+           W: Math.max(FA.W, FB.W), H: Math.max(FA.H, FB.H) };
 }
 
 function tweenFrame(sp, t){
@@ -3014,7 +3052,9 @@ function tweenFrame(sp, t){
   const e = EASE(t);
 
   const raised = opts.raised === false ? '' : ' raised';
-  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${sp.W-1}" height="${sp.H-1}" rx="6"/>`);
+  const FW = lerp(sp.FA.W, sp.FB.W, e), FH = lerp(sp.FA.H, sp.FB.H, e);
+  const dx = lerp(sp.FA.dx, sp.FB.dx, e), dy = lerp(sp.FA.dy, sp.FB.dy, e);
+  const sheet = `<rect class="sa" x="0.5" y="0.5" width="${r2(FW-1)}" height="${r2(FH-1)}" rx="6"/>`;
 
   for (const it of sp.nodes){
     const op = it.inA && it.inB ? 1 : it.inB ? inT : 1 - outT;
@@ -3055,7 +3095,8 @@ function tweenFrame(sp, t){
     parts.push(`<path class="loi${sp.lcOf(b.l)}" opacity="${r2(op)}" d="M ${r2(p.x)} ${r2(p.y)} L ${
       r2(p.x + LAY.bareW)} ${r2(p.y)}"/>`);
   }
-  return parts.join('\n');
+  return { svg: sheet + `<g class="gr" transform="translate(${r2(dx)},${r2(dy)})">` +
+                parts.join('\n') + '</g>', W: FW, H: FH };
 }
 function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 }; }
 
@@ -3086,7 +3127,7 @@ function markFrame(sp, focus, mv){
   const parts = [];
   const shade = opts.shade, wobble = opts.wobble !== false;
   const raised = opts.raised === false ? '' : ' raised';
-  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${sp.W-1}" height="${sp.H-1}" rx="6"/>`);
+  const sheet = `<rect class="sa" x="0.5" y="0.5" width="${r2(sp.FA.W-1)}" height="${r2(sp.FA.H-1)}" rx="6"/>`;
 
   // anything inside a graph in focus is in focus too
   const lit = new Set(Object.keys(focus));
@@ -3133,7 +3174,8 @@ function markFrame(sp, focus, mv){
     const to = cut ? GA.P[cut] : GA.P[gA.root] || null;
     if (from && to) parts.push(arrowPath(from, to));
   }
-  return parts.join('\n');
+  return { svg: sheet + `<g class="gr" transform="translate(${r2(sp.FA.dx)},${r2(sp.FA.dy)})">` +
+                parts.join('\n') + '</g>', W: sp.FA.W, H: sp.FA.H };
 }
 function arrowPath(a, b){
   const x1 = a.x + a.w/2, y1 = a.y + a.h/2;
@@ -3168,10 +3210,11 @@ function svgWrap(inner, w, h, scale, pad){
 function playTransition(el, gA, gB, mv, opts, done){
   opts = opts || {};
   const GA = geom(gA, opts), GB = geom(gB, opts);
-  const W = Math.max(GA.W, GB.W), H = Math.max(GA.H, GB.H);
   const pad = 12;
   const availW = Math.max(80, el.clientWidth - 34), availH = opts.maxH || 420;
-  const scale = Math.min(availW/(W+2*pad), availH/(H+2*pad), 2.4);
+  // the same formula stageSvg uses, so a frame of the transition is the same
+  // size as the still drawing on either side of it
+  const scaleFor = (W, H) => Math.min(availW/(W+2*pad), availH/(H+2*pad), 2.4);
 
   const markMs = opts.markMs === undefined ? 700 : opts.markMs;
   const moveMs = opts.moveMs === undefined ? 720 : opts.moveMs;
@@ -3180,7 +3223,8 @@ function playTransition(el, gA, gB, mv, opts, done){
 
   // beat one: mark what the rule is about to act on
   const focus = moveFocus(gA, mv);
-  el.innerHTML = svgWrap(markFrame(sp, focus, mv), W, H, scale, pad);
+  const f0 = markFrame(sp, focus, mv);
+  el.innerHTML = svgWrap(f0.svg, f0.W, f0.H, scaleFor(f0.W, f0.H), pad);
   markNodes(el, gA, GA, focus);
 
   timer = setTimeout(() => {
@@ -3189,7 +3233,8 @@ function playTransition(el, gA, gB, mv, opts, done){
     const tick = now => {
       if (cancelled) return;
       const t = Math.min(1, (now - t0) / moveMs);
-      el.innerHTML = svgWrap(tweenFrame(sp, t), W, H, scale, pad);
+      const f = tweenFrame(sp, t);
+      el.innerHTML = svgWrap(f.svg, f.W, f.H, scaleFor(f.W, f.H), pad);
       if (t < 1) raf = requestAnimationFrame(tick);
       else if (done) done();
     };
@@ -3203,6 +3248,7 @@ function playTransition(el, gA, gB, mv, opts, done){
 function markNodes(el, g, G, focus){
   const svg = el.querySelector('svg');
   if (!svg) return;
+  const host = svg.querySelector('g.gr') || svg;
   const ns = 'http://www.w3.org/2000/svg';
   for (const id of Object.keys(focus)){
     const kind = focus[id];
@@ -3214,7 +3260,7 @@ function markNodes(el, g, G, focus){
       r.setAttribute('width', p.w + 2*m); r.setAttribute('height', p.h + 2*m);
       r.setAttribute('rx', 10);
       r.setAttribute('class', 'focus focus-' + kind);
-      svg.appendChild(r);
+      host.appendChild(r);
       continue;
     }
     const q = G.pos && G.pos[id];        // a point of a line of identity
@@ -3222,7 +3268,7 @@ function markNodes(el, g, G, focus){
     const c = document.createElementNS(ns, 'circle');
     c.setAttribute('cx', q.x); c.setAttribute('cy', q.y); c.setAttribute('r', 7);
     c.setAttribute('class', 'focus focus-' + kind);
-    svg.appendChild(c);
+    host.appendChild(c);
   }
 }
 
@@ -3681,6 +3727,7 @@ function pfLoad(i){
   PF.proof = p; PF.i = 0;
   const h = hydrateProof(p);
   PF.graphs = h.graphs; PF.mvs = h.mvs;
+  PF.frame = proofFrame(PF.graphs);
   $('#pf-cite').innerHTML = p.cite ? '<b>'+esc(p.cite)+'</b>' : '';
   $('#pf-note').textContent = p.note || '';
   $('#pf-kv').innerHTML =
@@ -3698,6 +3745,13 @@ function pfLoad(i){
   pfShow(0);
 }
 function fmtSrc(s){ try { return fmt(parseFormula(s), 0); } catch(e){ return s; } }
+// The sheet a proof is drawn on stays one size from first step to last, sized
+// to the largest step, so the drawing never rescales or shifts between steps.
+function proofFrame(graphs){
+  let W = 0, H = 0;
+  for (const g of graphs){ const G = geom(g, {}); W = Math.max(W, G.W); H = Math.max(H, G.H); }
+  return { W, H };
+}
 function pfShow(i, animate){
   const p = PF.proof; if (!p) return;
   const from = PF.i;
@@ -3707,17 +3761,17 @@ function pfShow(i, animate){
   const speed = +$('#pf-speed').value;
   if (animate && PF.i === from + 1 && ANIM_ON()){
     PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, PF.mvs[PF.i],
-      { shade:true, wobble:true, colourLines: PREFS.colour,
+      { shade:true, wobble:true, colourLines: PREFS.colour, frame: PF.frame,
         markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
       () => { PF.anim = null; });
   } else if (animate && PF.i === from - 1 && ANIM_ON()){
     // rewinding is not a rule application, so nothing is marked; the drawing
     // simply runs backwards
     PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, null,
-      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 0,
+      { shade:true, wobble:true, colourLines: PREFS.colour, frame: PF.frame, markMs: 0,
         moveMs: Math.round(speed*0.4) }, () => { PF.anim = null; });
   } else {
-    stageSvg($('#pf-stage'), g, { shade:true, wobble:true });
+    stageSvg($('#pf-stage'), g, { shade:true, wobble:true, frame: PF.frame });
   }
   const s = p.steps[PF.i];
   $('#pf-why').innerHTML = '<b>'+esc(s.rule ? s.rule : 'Premiss')+'</b> — '+esc(s.why)+
@@ -3750,8 +3804,14 @@ $('#pf-play').onclick = () => {
   PF.timer = setTimeout(advance, 300);
 };
 /* =============================== SCRIBE ==================================== */
-const ED = { g: newGraph(), sel: null, hist: [], pick: [], anim: null };
-function edPush(){ ED.hist.push(cloneGraph(ED.g)); if (ED.hist.length > 60) ED.hist.shift(); }
+const ED = { g: newGraph(), sel: null, hist: [], pick: [], anim: null,
+             goal: null, moves: 0 };
+// The history records what kind of change is about to be made, so that a
+// puzzle can count only applications of the rules and undo can uncount them.
+function edPush(kind){
+  ED.hist.push({ g: cloneGraph(ED.g), kind: kind || 'edit' });
+  if (ED.hist.length > 60) ED.hist.shift();
+}
 function edSel(kind, id){ ED.sel = { kind, id }; drawRender(); }
 function selArea(){
   if (!ED.sel) return ED.g.root;
@@ -3823,6 +3883,7 @@ function drawRender(){
 
   drawMoves();
   if (!ED.quiet) syncScribeBoxes('graph');
+  if (typeof puzzleCheck === 'function') puzzleCheck();
 }
 function togglePick(ln){
   const i = ED.pick.indexOf(ln);
@@ -3861,7 +3922,13 @@ $('#d-del').onclick = () => {
   }
   ED.sel = null; ED.pick = []; drawRender();
 };
-$('#d-undo').onclick = () => { if (ED.hist.length){ ED.g = ED.hist.pop(); ED.sel=null; ED.pick=[]; drawRender(); } };
+$('#d-undo').onclick = () => {
+  if (!ED.hist.length) return;
+  const h = ED.hist.pop();
+  ED.g = h.g; ED.sel = null; ED.pick = [];
+  if (h.kind === 'rule' && ED.moves > 0) ED.moves--;
+  drawRender();
+};
 $('#d-clear').onclick = () => { edPush(); ED.g = newGraph(); ED.sel=null; ED.pick=[]; drawRender(); };
 // Whichever box is used, the other is brought into step, so that the two
 // descriptions of the graph on the sheet always agree.
@@ -4002,7 +4069,8 @@ function unpreview(){ if (!ED.anim) drawRender(); }
 $('#d-moves').addEventListener('click', e => {
   const b = e.target.closest('button[data-i]'); if (!b) return;
   const k = DMOVES[+b.dataset.i]; if (!k) return;
-  edPush();
+  edPush('rule');
+  ED.moves++;
   const el = $('#d-stage');
   const opts = { shade: $('#d-shade').checked, wobble: true,
                  colourLines: PREFS.colour, markMs: 520, moveMs: 620 };
@@ -4123,6 +4191,7 @@ function vLoad(steps){
   VV.steps = steps;
   const h = hydrateSteps(steps);
   VV.graphs = h.graphs; VV.mvs = h.mvs; VV.i = 0;
+  VV.frame = proofFrame(VV.graphs);
   $('#v-proofcard').style.display = '';
   $('#v-writ-card').style.display = '';
   $('#v-steps').innerHTML = steps.map((s,k) =>
@@ -4137,14 +4206,14 @@ function vShow(i, animate){
   if (VV.anim){ VV.anim.cancel(); VV.anim = null; }
   if (animate && VV.i === from + 1){
     VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], VV.mvs[VV.i],
-      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 620, moveMs: 700 },
-      () => { VV.anim = null; });
+      { shade:true, wobble:true, colourLines: PREFS.colour, frame: VV.frame,
+        markMs: 620, moveMs: 700 }, () => { VV.anim = null; });
   } else if (animate && VV.i === from - 1){
     VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], null,
-      { shade:true, wobble:true, colourLines: PREFS.colour, markMs: 0, moveMs: 560 },
-      () => { VV.anim = null; });
+      { shade:true, wobble:true, colourLines: PREFS.colour, frame: VV.frame,
+        markMs: 0, moveMs: 560 }, () => { VV.anim = null; });
   } else {
-    stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
+    stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true, frame: VV.frame });
   }
   const s = VV.steps[VV.i];
   $('#v-why').innerHTML = '<b>'+esc(s.rule||'Premiss')+'</b> — '+esc(s.why)+
@@ -4418,6 +4487,191 @@ function bindWrit(prefix, getState){
   };
   return draw;
 }
+/* ============================================================================
+   THE SCRIBE TAB AS A PUZZLE.
+   Pick an inference; its premisses are scribed on the sheet; transform them
+   one legal move at a time until the sheet says the conclusion. The page knows
+   when you have arrived, counts the moves, and can nudge you along the proof
+   the library holds. Where the reader watches on the Proofs tab, here they do
+   the reasoning.
+   ========================================================================== */
+
+/* Propositions to experiment on, for the Start-from list. */
+const START_PROPS = [
+  { group: 'Alpha — propositions', items: [
+    ['P -> Q', 'if P then Q'],
+    ['P & Q', 'P and Q'],
+    ['P | Q', 'P or Q'],
+    ['~P', 'not P'],
+    ['~(P & Q)', 'not both P and Q'],
+    ['P <-> Q', 'P if and only if Q'],
+    ['P -> (Q -> R)', 'if P then, if Q then R'],
+    ['(P -> Q) -> P', 'if P implies Q then P'],
+    ['(P & Q) -> R', 'if P and Q then R'],
+    ['P & (Q | R)', 'P and either Q or R']
+  ]},
+  { group: 'Beta — with lines of identity', items: [
+    ['Ex Fx', 'something is F'],
+    ['Ax Fx', 'everything is F'],
+    ['Ax (Fx -> Gx)', 'all F is G'],
+    ['Ex (Fx & Gx)', 'some F is G'],
+    ['Ex (Fx & ~Gx)', 'some F is not G'],
+    ['~Ex (Fx & Gx)', 'no F is G'],
+    ['Ax Ey Rxy', 'everything bears R to something'],
+    ['Ey Ax Rxy', 'something is borne R by everything'],
+    ['Ex Ey ~(x=y)', 'there are two things'],
+    ['Ax Ey (Cx -> (Axy & Wy))', 'every catholic adores some woman']
+  ]}
+];
+
+function buildStartList(){
+  const sel = $('#d-start');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">—</option>' + START_PROPS.map(g =>
+    '<optgroup label="'+esc(g.group)+'">' +
+    g.items.map(([f,l]) => '<option value="'+esc(f)+'">'+esc(l)+' — '+esc(f)+'</option>').join('') +
+    '</optgroup>').join('');
+  sel.value = 'P -> Q';
+  sel.onchange = () => {
+    if (!sel.value) return;
+    puzzleClear();
+    setEditorValue('#d-from', sel.value);
+    $('#d-load').click();
+  };
+}
+
+/* ---- the puzzles ---------------------------------------------------------- */
+const PUZ = { list: [], cur: null };
+
+function buildPuzzleList(){
+  const sel = $('#z-sel');
+  if (!sel) return;
+  const list = [];
+  // the proof library first: every one comes with a known route
+  PROOFS.forEach((p, i) => list.push({
+    id: 'lib'+i, title: p.title, prem: p.prem.slice(), goal: p.goal,
+    lib: p, steps: p.steps.length - 1
+  }));
+  // then the textbook exercises the search on this page can manage
+  if (typeof BOOK_EXERCISES !== 'undefined')
+    BOOK_EXERCISES.forEach((g, gi) => g.items.forEach(([prem, goal], ii) => {
+      const key = prem + '|' + goal;
+      if (typeof EX_LIBRARY !== 'undefined' && EX_LIBRARY.has(key)) return;   // already above
+      list.push({ id: 'ex'+gi+'.'+ii, prem: prem ? prem.split('\n') : [], goal,
+                  title: (prem ? prem.split('\n').join(', ') + ' ⊢ ' : '⊢ ') + goal,
+                  group: g.group });
+    }));
+  PUZ.list = list;
+  const libOpts = list.filter(x => x.lib).map(x =>
+    '<option value="'+x.id+'">'+esc(x.title)+' ('+x.steps+' step'+(x.steps===1?'':'s')+')</option>').join('');
+  const exOpts = list.filter(x => !x.lib).map(x =>
+    '<option value="'+x.id+'">'+esc(x.title)+'</option>').join('');
+  sel.innerHTML = '<option value="">No puzzle — free play</option>' +
+    '<optgroup label="From the proof library">' + libOpts + '</optgroup>' +
+    '<optgroup label="From forall x: Calgary">' + exOpts + '</optgroup>';
+  sel.onchange = () => {
+    if (!sel.value){ puzzleClear(); return; }
+    const pz = list.find(x => x.id === sel.value);
+    if (pz) puzzleStart(pz);
+  };
+  $('#z-hint').onclick = puzzleHint;
+  $('#z-restart').onclick = () => { if (PUZ.cur) puzzleStart(PUZ.cur); };
+  $('#z-quit').onclick = () => { sel.value = ''; puzzleClear(); };
+  $('#z-show').onclick = () => {
+    if (!PUZ.cur || !PUZ.cur.lib) return;
+    const i = PROOFS.indexOf(PUZ.cur.lib);
+    $$('nav.tabs button').find(b => b.dataset.tab === 'proofs').click();
+    $('#pf-sel').value = i; pfLoad(i);
+  };
+}
+
+function puzzleStart(pz){
+  PUZ.cur = pz;
+  let prems, goal;
+  try {
+    prems = pz.prem.map(f => compileFormula(parseFormula(f)).graph);
+    goal = compileFormula(parseFormula(pz.goal)).graph;
+  } catch(e){ $('#z-status').textContent = 'Could not set this puzzle up: ' + e.message; return; }
+  ED.goal = { graph: goal, canon: canonGraph(goal), reached: false };
+  ED.moves = 0;
+  const start = $('#d-start'); if (start) start.value = '';     // the sheet is the puzzle's now
+  ED.hist = [];
+  ED.g = juxtapose(prems); ED.sel = null; ED.pick = [];
+  $('#z-body').style.display = '';
+  $('#z-note').style.display = 'none';
+  $('#z-show').style.display = pz.lib ? '' : 'none';
+  stageSvg($('#z-goal'), goal, { shade: true, wobble: true, colourLines: PREFS.colour, maxH: 140 });
+  try { $('#z-goalread').textContent = 'Goal: ' + fmtFull(sugar(readGraph(goal))); } catch(e){}
+  drawRender();
+  syncScribeBoxes('graph');
+}
+
+function puzzleClear(){
+  PUZ.cur = null; ED.goal = null; ED.moves = 0;
+  $('#z-body').style.display = 'none';
+  $('#z-note').style.display = '';
+  const sel = $('#z-sel'); if (sel) sel.value = '';
+  $('#z-status').textContent = '';
+}
+
+/* Called after every redraw of the sheet. */
+function puzzleCheck(){
+  if (!ED.goal) return;
+  const st = $('#z-status');
+  const there = canonGraph(ED.g) === ED.goal.canon;
+  const n = ED.moves, mv = n === 1 ? '1 move' : n + ' moves';
+  if (there){
+    if (!ED.goal.reached){ ED.goal.reached = true; }
+    let extra = '';
+    if (PUZ.cur && PUZ.cur.lib){
+      const k = PUZ.cur.steps;
+      extra = n <= k ? (n < k ? ' The library takes '+k+'.' : ' That is as short as the library’s.')
+                     : ' The library does it in '+k+'.';
+    }
+    st.innerHTML = '<span class="pill ok">reached</span> in '+mv+'.'+esc(extra);
+  } else {
+    ED.goal.reached = false;
+    st.innerHTML = '<span class="pill mid">not there yet</span> '+mv+' so far.';
+  }
+}
+
+/* A nudge: if the sheet matches a state on the library's route, point at the
+   entry in the Transform panel that takes the next step of that route. */
+function puzzleHint(){
+  const st = $('#z-status');
+  if (!PUZ.cur || !ED.goal){ return; }
+  if (!PUZ.cur.lib){
+    st.innerHTML = '<span class="pill mid">no route on file</span> This one has no proof in the library to follow; '+
+      'the search on the Find a proof tab may manage it.';
+    return;
+  }
+  const h = hydrateProof(PUZ.cur.lib);
+  const here = canonGraph(ED.g);
+  const at = h.graphs.findIndex(g => canonGraph(g) === here);
+  if (at < 0){
+    st.innerHTML = '<span class="pill mid">off the library’s route</span> Nothing wrong with that, but there is '+
+      'no hint from here. Undo back to a place you recognise, or start again.';
+    return;
+  }
+  if (at === h.graphs.length - 1){ puzzleCheck(); return; }
+  const nextCanon = canonGraph(h.graphs[at+1]);
+  const idx = DMOVES.findIndex(k => canonGraph(k.h) === nextCanon);
+  const rule = PUZ.cur.lib.steps[at+1].rule;
+  if (idx < 0){
+    st.innerHTML = '<span class="pill mid">hint</span> The library’s next step is '+esc(rule)+
+      ', but the panel does not list a matching move here.';
+    return;
+  }
+  const btn = $('#d-moves button[data-i="'+idx+'"]');
+  st.innerHTML = '<span class="pill ok">hint</span> The library’s next step is '+esc(rule)+
+    ' — the entry now marked in the panel.';
+  if (btn){
+    $$('#d-moves button.hinted').forEach(b => b.classList.remove('hinted'));
+    btn.classList.add('hinted');
+    btn.scrollIntoView({ block: 'nearest' });
+    previewMove(idx);
+  }
+}
 /* =========================== CONVENTIONS & RULES =========================== */
 const CONVENTIONS = [
  ['C1','The sheet of assertion in all of its parts is a graph.','4.396, 397'],
@@ -4520,6 +4774,10 @@ enhanceEditor($('#d-lin'), { glyphs: false });
 
 translate(false);
 pfLoad(0);
+buildStartList();
+buildPuzzleList();
+// the Scribe tab opens with something on the sheet rather than a blank
+try { ED.g = compileFormula(parseFormula('P -> Q')).graph; } catch(e){}
 drawRender();
 </script>
 </body></html>

@@ -111,8 +111,15 @@ function prepareTween(gA, gB, GA, GB, opts){
     const L = LNB.lig[ln] !== undefined ? LNB : LNA;
     return ' lc' + (L.rank[L.lig[ln]] % 7);
   };
-  return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf,
-           W: Math.max(GA.W, GB.W), H: Math.max(GA.H, GB.H) };
+  // The frame each end of the transition would be drawn in on its own, and
+  // where the graph sits inside it. A pinned frame makes both ends the same.
+  const fr = opts.frame;
+  const FA = { W: fr ? Math.max(fr.W, GA.W) : GA.W, H: fr ? Math.max(fr.H, GA.H) : GA.H };
+  const FB = { W: fr ? Math.max(fr.W, GB.W) : GB.W, H: fr ? Math.max(fr.H, GB.H) : GB.H };
+  FA.dx = (FA.W - GA.W)/2; FA.dy = (FA.H - GA.H)/2;
+  FB.dx = (FB.W - GB.W)/2; FB.dy = (FB.H - GB.H)/2;
+  return { gA, gB, GA, GB, nodes, chains, bare, opts, lcOf, FA, FB,
+           W: Math.max(FA.W, FB.W), H: Math.max(FA.H, FB.H) };
 }
 
 function tweenFrame(sp, t){
@@ -124,7 +131,9 @@ function tweenFrame(sp, t){
   const e = EASE(t);
 
   const raised = opts.raised === false ? '' : ' raised';
-  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${sp.W-1}" height="${sp.H-1}" rx="6"/>`);
+  const FW = lerp(sp.FA.W, sp.FB.W, e), FH = lerp(sp.FA.H, sp.FB.H, e);
+  const dx = lerp(sp.FA.dx, sp.FB.dx, e), dy = lerp(sp.FA.dy, sp.FB.dy, e);
+  const sheet = `<rect class="sa" x="0.5" y="0.5" width="${r2(FW-1)}" height="${r2(FH-1)}" rx="6"/>`;
 
   for (const it of sp.nodes){
     const op = it.inA && it.inB ? 1 : it.inB ? inT : 1 - outT;
@@ -165,7 +174,8 @@ function tweenFrame(sp, t){
     parts.push(`<path class="loi${sp.lcOf(b.l)}" opacity="${r2(op)}" d="M ${r2(p.x)} ${r2(p.y)} L ${
       r2(p.x + LAY.bareW)} ${r2(p.y)}"/>`);
   }
-  return parts.join('\n');
+  return { svg: sheet + `<g class="gr" transform="translate(${r2(dx)},${r2(dy)})">` +
+                parts.join('\n') + '</g>', W: FW, H: FH };
 }
 function shrink(b){ return { x: b.x + b.w/2 - 2, y: b.y + b.h/2 - 2, w: 4, h: 4 }; }
 
@@ -196,7 +206,7 @@ function markFrame(sp, focus, mv){
   const parts = [];
   const shade = opts.shade, wobble = opts.wobble !== false;
   const raised = opts.raised === false ? '' : ' raised';
-  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${sp.W-1}" height="${sp.H-1}" rx="6"/>`);
+  const sheet = `<rect class="sa" x="0.5" y="0.5" width="${r2(sp.FA.W-1)}" height="${r2(sp.FA.H-1)}" rx="6"/>`;
 
   // anything inside a graph in focus is in focus too
   const lit = new Set(Object.keys(focus));
@@ -243,7 +253,8 @@ function markFrame(sp, focus, mv){
     const to = cut ? GA.P[cut] : GA.P[gA.root] || null;
     if (from && to) parts.push(arrowPath(from, to));
   }
-  return parts.join('\n');
+  return { svg: sheet + `<g class="gr" transform="translate(${r2(sp.FA.dx)},${r2(sp.FA.dy)})">` +
+                parts.join('\n') + '</g>', W: sp.FA.W, H: sp.FA.H };
 }
 function arrowPath(a, b){
   const x1 = a.x + a.w/2, y1 = a.y + a.h/2;
@@ -278,10 +289,11 @@ function svgWrap(inner, w, h, scale, pad){
 function playTransition(el, gA, gB, mv, opts, done){
   opts = opts || {};
   const GA = geom(gA, opts), GB = geom(gB, opts);
-  const W = Math.max(GA.W, GB.W), H = Math.max(GA.H, GB.H);
   const pad = 12;
   const availW = Math.max(80, el.clientWidth - 34), availH = opts.maxH || 420;
-  const scale = Math.min(availW/(W+2*pad), availH/(H+2*pad), 2.4);
+  // the same formula stageSvg uses, so a frame of the transition is the same
+  // size as the still drawing on either side of it
+  const scaleFor = (W, H) => Math.min(availW/(W+2*pad), availH/(H+2*pad), 2.4);
 
   const markMs = opts.markMs === undefined ? 700 : opts.markMs;
   const moveMs = opts.moveMs === undefined ? 720 : opts.moveMs;
@@ -290,7 +302,8 @@ function playTransition(el, gA, gB, mv, opts, done){
 
   // beat one: mark what the rule is about to act on
   const focus = moveFocus(gA, mv);
-  el.innerHTML = svgWrap(markFrame(sp, focus, mv), W, H, scale, pad);
+  const f0 = markFrame(sp, focus, mv);
+  el.innerHTML = svgWrap(f0.svg, f0.W, f0.H, scaleFor(f0.W, f0.H), pad);
   markNodes(el, gA, GA, focus);
 
   timer = setTimeout(() => {
@@ -299,7 +312,8 @@ function playTransition(el, gA, gB, mv, opts, done){
     const tick = now => {
       if (cancelled) return;
       const t = Math.min(1, (now - t0) / moveMs);
-      el.innerHTML = svgWrap(tweenFrame(sp, t), W, H, scale, pad);
+      const f = tweenFrame(sp, t);
+      el.innerHTML = svgWrap(f.svg, f.W, f.H, scaleFor(f.W, f.H), pad);
       if (t < 1) raf = requestAnimationFrame(tick);
       else if (done) done();
     };
@@ -313,6 +327,7 @@ function playTransition(el, gA, gB, mv, opts, done){
 function markNodes(el, g, G, focus){
   const svg = el.querySelector('svg');
   if (!svg) return;
+  const host = svg.querySelector('g.gr') || svg;
   const ns = 'http://www.w3.org/2000/svg';
   for (const id of Object.keys(focus)){
     const kind = focus[id];
@@ -324,7 +339,7 @@ function markNodes(el, g, G, focus){
       r.setAttribute('width', p.w + 2*m); r.setAttribute('height', p.h + 2*m);
       r.setAttribute('rx', 10);
       r.setAttribute('class', 'focus focus-' + kind);
-      svg.appendChild(r);
+      host.appendChild(r);
       continue;
     }
     const q = G.pos && G.pos[id];        // a point of a line of identity
@@ -332,7 +347,7 @@ function markNodes(el, g, G, focus){
     const c = document.createElementNS(ns, 'circle');
     c.setAttribute('cx', q.x); c.setAttribute('cy', q.y); c.setAttribute('r', 7);
     c.setAttribute('class', 'focus focus-' + kind);
-    svg.appendChild(c);
+    host.appendChild(c);
   }
 }
 
