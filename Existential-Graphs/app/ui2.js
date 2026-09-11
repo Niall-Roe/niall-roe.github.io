@@ -209,7 +209,7 @@ function runProof(hard){
   $('#v-verdict').innerHTML = '<span class="spin"></span>searching…';
   setTimeout(() => {
     const beta = prems.some(p=>!isAlpha(p)) || !isAlpha(goal);
-    let head = '';
+    let head = '', settled = false;
     if (!beta){
       const ent = alphaEntails(prems, goal);
       if (ent.decided && !ent.entails){
@@ -222,7 +222,15 @@ function runProof(hard){
           '<p class="mono">A countermodel: '+esc(cm)+'</p>';
         return;
       }
-      head = '<p><span class="pill ok">valid</span> — by the truth-value analysis of Roberts §3.2.</p>';
+      // above eighteen spots the analysis gives up rather than deciding, and a
+      // decision it declined to make is not a decision in favour
+      settled = ent.decided;
+      head = ent.decided
+        ? '<p><span class="pill ok">valid</span> — by the truth-value analysis of Roberts §3.2.</p>'
+        : '<p><span class="pill mid">too many spots to settle by truth-value analysis</span></p>'+
+          '<p>There are more than eighteen distinct spots here, so the table was not '+
+          'built. Whether the inference holds is undecided; a proof, if the search '+
+          'finds one, would settle it.</p>';
     } else {
       const cm = findCountermodel(premAst, goalAst, 3);
       if (cm){
@@ -251,8 +259,10 @@ function runProof(hard){
         '<p><span class="pill mid">no proof found within the bound</span></p>'+
         '<p>The search tried '+res.expanded.toLocaleString()+' transformations and stopped. '+
         (beta ? 'Beta is only semi-decidable, so this settles nothing either way. '
-              : 'The inference is nevertheless valid, and so by the completeness of Alpha '+
-                '(Roberts, Appendix 4) a proof exists. ')+
+              : settled
+              ? 'The inference is nevertheless valid, and so by the completeness of Alpha '+
+                '(Roberts, Appendix 4) a proof exists. '
+              : 'Whether the inference holds is still undecided. ')+
         'Try “search harder”, or work it by hand on the Scribe tab.</p>';
     }
   }, 30);

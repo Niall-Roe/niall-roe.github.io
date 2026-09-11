@@ -1851,18 +1851,11 @@ function applyMove(g0, mv, palette){
       const outer = addCut(g, mv.area), oa = g.nodes[outer].inner;
       const loop  = addCut(g, oa), la = g.nodes[loop].inner;
       for (const id of mv.items) moveNode(g, id, la);
-      // any ligature now running from mv.area into la must be given a point on
-      // the outer close, so that it crosses one cut at a time (R5, Roberts p.59)
-      const insideLa = new Set(g.areas[la].lns);
-      for (const e of Object.values(g.edges).slice()){
-        let inn = null, out = null;
-        if (insideLa.has(e.a) && g.lns[e.b] && g.lns[e.b].area === mv.area){ inn=e.a; out=e.b; }
-        else if (insideLa.has(e.b) && g.lns[e.a] && g.lns[e.a].area === mv.area){ inn=e.b; out=e.a; }
-        if (inn === null) continue;
-        delete g.edges[e.id];
-        const mid = addLn(g, oa);
-        addEdge(g, out, mid); addEdge(g, mid, inn);
-      }
+      // Whatever was moved, any ligature now running from the old area into it
+      // has further to travel; repairEdges marks the point at which it crosses
+      // each new cut. R5 is explicit that a ligature passing from outside the
+      // outer cut to inside the inner one does not prevent the transformation
+      // (Roberts p. 59), so the line must be carried through, not cut.
       break;
     }
     case 'dcOut': {
@@ -1877,8 +1870,41 @@ function applyMove(g0, mv, palette){
     }
     default: throw new Error('unknown move '+mv.op);
   }
+  repairEdges(g);
   fixScrolls(g);
   return g;
+}
+
+/* A line of identity is one graph (C7), and no graph may rest partly on one area
+   and partly on another (Roberts p. 50 n. 1): a line crosses one cut at a time,
+   and the crossing is marked by a point. Moving a graph into a new enclosure
+   gives any line running into it further to travel, so the points it now needs
+   are added here. Without this the line is left spanning two cuts, which the
+   reading takes for two separate lines — and the graph then says something
+   else. */
+function repairEdges(g){
+  for (const e of Object.values(g.edges).slice()){
+    if (!g.edges[e.id]) continue;
+    const la = g.lns[e.a], lb = g.lns[e.b];
+    if (!la || !lb) continue;
+    const aA = la.area, aB = lb.area;
+    if (aA === aB || placeOf(g, aA) === aB || placeOf(g, aB) === aA) continue;
+    let outer, inner, oArea, iArea;
+    if (contains(g, aA, aB)) { outer = e.a; inner = e.b; oArea = aA; iArea = aB; }
+    else if (contains(g, aB, aA)) { outer = e.b; inner = e.a; oArea = aB; iArea = aA; }
+    else continue;                       // unrelated areas: not ours to mend
+    const path = areaPath(g, iArea);
+    const k = path.indexOf(oArea);
+    if (k < 0) continue;
+    delete g.edges[e.id];
+    let prev = outer;
+    for (let i = k + 1; i < path.length - 1; i++){
+      const mid = addLn(g, path[i]);
+      addEdge(g, prev, mid);
+      prev = mid;
+    }
+    addEdge(g, prev, inner);
+  }
 }
 // A cut is the outer cut of a scroll only while its loop is still on its area;
 // the rules may have moved or erased it (C4).
@@ -3187,9 +3213,11 @@ function alignGraph(gA, gB){
     }
   })(gA.root, gB.root);
 
-  // everything else in B gets an identifier of its own, distinct from A's
-  let k = 0;
-  const fresh = () => 'z' + (++k);
+  // Everything else in B gets an identifier of its own. It must come from the
+  // global counter: a counter starting at zero here would mint 'z1' again on
+  // the next call, and the graph being aligned to already carries the 'z1' of
+  // the call before, so one node would silently overwrite another.
+  const fresh = () => uid('z');
   const nid = x => node[x] || (node[x] = fresh());
   const aid = x => area[x] || (area[x] = fresh());
   const lid = x => ln[x]   || (ln[x]   = fresh());
@@ -3473,8 +3501,8 @@ const T_EXAMPLES = [
   ['Ax Ey (Cx -> (Axy & Wy))', 'every catholic adores some woman'],
   ['Ey Ax (Wy & (Cx -> Axy))', 'some woman is adored by every catholic'],
   ['Ex Ey ~(x=y)', 'there are two things'],
-  ['Ax Ay Az ~(x=y & y=z & x=z)', 'three things are not all identical'],
-  ['Ex Ay (Mxy -> Lxy)', 'every mother loves some child of hers'],
+  ['Ex Ey Ez ~(x=y & y=z & x=z)', 'three things are not all identical'],
+  ['Ax Ey (Mxy -> Lxy)', 'every mother loves some child of hers'],
   ['~Ex (Px)', 'it is false that there is a phoenix'],
   ['Ax (Mx -> Dx)', 'every man will die'],
   ['Ex (Mx & ~Dx)', 'there is a man who will not die'],
@@ -3883,7 +3911,7 @@ function runProof(hard){
   $('#v-verdict').innerHTML = '<span class="spin"></span>searching…';
   setTimeout(() => {
     const beta = prems.some(p=>!isAlpha(p)) || !isAlpha(goal);
-    let head = '';
+    let head = '', settled = false;
     if (!beta){
       const ent = alphaEntails(prems, goal);
       if (ent.decided && !ent.entails){
@@ -3896,7 +3924,15 @@ function runProof(hard){
           '<p class="mono">A countermodel: '+esc(cm)+'</p>';
         return;
       }
-      head = '<p><span class="pill ok">valid</span> — by the truth-value analysis of Roberts §3.2.</p>';
+      // above eighteen spots the analysis gives up rather than deciding, and a
+      // decision it declined to make is not a decision in favour
+      settled = ent.decided;
+      head = ent.decided
+        ? '<p><span class="pill ok">valid</span> — by the truth-value analysis of Roberts §3.2.</p>'
+        : '<p><span class="pill mid">too many spots to settle by truth-value analysis</span></p>'+
+          '<p>There are more than eighteen distinct spots here, so the table was not '+
+          'built. Whether the inference holds is undecided; a proof, if the search '+
+          'finds one, would settle it.</p>';
     } else {
       const cm = findCountermodel(premAst, goalAst, 3);
       if (cm){
@@ -3925,8 +3961,10 @@ function runProof(hard){
         '<p><span class="pill mid">no proof found within the bound</span></p>'+
         '<p>The search tried '+res.expanded.toLocaleString()+' transformations and stopped. '+
         (beta ? 'Beta is only semi-decidable, so this settles nothing either way. '
-              : 'The inference is nevertheless valid, and so by the completeness of Alpha '+
-                '(Roberts, Appendix 4) a proof exists. ')+
+              : settled
+              ? 'The inference is nevertheless valid, and so by the completeness of Alpha '+
+                '(Roberts, Appendix 4) a proof exists. '
+              : 'Whether the inference holds is still undecided. ')+
         'Try “search harder”, or work it by hand on the Scribe tab.</p>';
     }
   }, 30);

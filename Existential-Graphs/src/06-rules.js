@@ -402,18 +402,11 @@ function applyMove(g0, mv, palette){
       const outer = addCut(g, mv.area), oa = g.nodes[outer].inner;
       const loop  = addCut(g, oa), la = g.nodes[loop].inner;
       for (const id of mv.items) moveNode(g, id, la);
-      // any ligature now running from mv.area into la must be given a point on
-      // the outer close, so that it crosses one cut at a time (R5, Roberts p.59)
-      const insideLa = new Set(g.areas[la].lns);
-      for (const e of Object.values(g.edges).slice()){
-        let inn = null, out = null;
-        if (insideLa.has(e.a) && g.lns[e.b] && g.lns[e.b].area === mv.area){ inn=e.a; out=e.b; }
-        else if (insideLa.has(e.b) && g.lns[e.a] && g.lns[e.a].area === mv.area){ inn=e.b; out=e.a; }
-        if (inn === null) continue;
-        delete g.edges[e.id];
-        const mid = addLn(g, oa);
-        addEdge(g, out, mid); addEdge(g, mid, inn);
-      }
+      // Whatever was moved, any ligature now running from the old area into it
+      // has further to travel; repairEdges marks the point at which it crosses
+      // each new cut. R5 is explicit that a ligature passing from outside the
+      // outer cut to inside the inner one does not prevent the transformation
+      // (Roberts p. 59), so the line must be carried through, not cut.
       break;
     }
     case 'dcOut': {
@@ -428,8 +421,41 @@ function applyMove(g0, mv, palette){
     }
     default: throw new Error('unknown move '+mv.op);
   }
+  repairEdges(g);
   fixScrolls(g);
   return g;
+}
+
+/* A line of identity is one graph (C7), and no graph may rest partly on one area
+   and partly on another (Roberts p. 50 n. 1): a line crosses one cut at a time,
+   and the crossing is marked by a point. Moving a graph into a new enclosure
+   gives any line running into it further to travel, so the points it now needs
+   are added here. Without this the line is left spanning two cuts, which the
+   reading takes for two separate lines — and the graph then says something
+   else. */
+function repairEdges(g){
+  for (const e of Object.values(g.edges).slice()){
+    if (!g.edges[e.id]) continue;
+    const la = g.lns[e.a], lb = g.lns[e.b];
+    if (!la || !lb) continue;
+    const aA = la.area, aB = lb.area;
+    if (aA === aB || placeOf(g, aA) === aB || placeOf(g, aB) === aA) continue;
+    let outer, inner, oArea, iArea;
+    if (contains(g, aA, aB)) { outer = e.a; inner = e.b; oArea = aA; iArea = aB; }
+    else if (contains(g, aB, aA)) { outer = e.b; inner = e.a; oArea = aB; iArea = aA; }
+    else continue;                       // unrelated areas: not ours to mend
+    const path = areaPath(g, iArea);
+    const k = path.indexOf(oArea);
+    if (k < 0) continue;
+    delete g.edges[e.id];
+    let prev = outer;
+    for (let i = k + 1; i < path.length - 1; i++){
+      const mid = addLn(g, path[i]);
+      addEdge(g, prev, mid);
+      prev = mid;
+    }
+    addEdge(g, prev, inner);
+  }
 }
 // A cut is the outer cut of a scroll only while its loop is still on its area;
 // the rules may have moved or erased it (C4).

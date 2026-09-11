@@ -327,9 +327,11 @@ function alignGraph(gA, gB){
     }
   })(gA.root, gB.root);
 
-  // everything else in B gets an identifier of its own, distinct from A's
-  let k = 0;
-  const fresh = () => 'z' + (++k);
+  // Everything else in B gets an identifier of its own. It must come from the
+  // global counter: a counter starting at zero here would mint 'z1' again on
+  // the next call, and the graph being aligned to already carries the 'z1' of
+  // the call before, so one node would silently overwrite another.
+  const fresh = () => uid('z');
   const nid = x => node[x] || (node[x] = fresh());
   const aid = x => area[x] || (area[x] = fresh());
   const lid = x => ln[x]   || (ln[x]   = fresh());
