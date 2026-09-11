@@ -1,0 +1,3042 @@
+<!doctype html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Existential Graphs of Charles S. Peirce</title>
+<style>
+:root{
+  --paper:#f7f4ec; --card:#fffdf8; --ink:#1b1a17; --ink2:#514c40; --ink3:#857e6d;
+  --rule:#ddd6c4; --rule2:#c9c0aa; --accent:#7a3b1f; --accent2:#a8602f;
+  --ok:#2f6b3d; --bad:#8d2f2f; --hl-add:#2f6b3d; --hl-del:#8d2f2f;
+  --shade:#e7e1d2; --sheet:#fffdf8;
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --serif:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --paper:#171613; --card:#201e1a; --ink:#ece7db; --ink2:#bab3a3; --ink3:#8d8676;
+    --rule:#35322b; --rule2:#4a463c; --accent:#d79a6e; --accent2:#e0b088;
+    --ok:#7fc08c; --bad:#e08a8a; --hl-add:#7fc08c; --hl-del:#e08a8a;
+    --shade:#2e2b24; --sheet:#232019; }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans);
+  -webkit-font-smoothing:antialiased}
+header{padding:22px 26px 0;max-width:1180px;margin:0 auto}
+h1{font:600 25px/1.2 var(--serif);margin:0 0 3px}
+.sub{color:var(--ink2);font-size:13px;margin:0 0 16px;max-width:70ch}
+.sub cite{font-style:italic}
+main{max-width:1180px;margin:0 auto;padding:0 26px 70px}
+
+nav.tabs{display:flex;gap:2px;border-bottom:1px solid var(--rule);margin-bottom:20px;
+  flex-wrap:wrap}
+nav.tabs button{appearance:none;background:none;border:0;border-bottom:2px solid transparent;
+  padding:9px 15px;font:500 14px/1 var(--sans);color:var(--ink2);cursor:pointer;
+  margin-bottom:-1px;border-radius:4px 4px 0 0}
+nav.tabs button:hover{color:var(--ink);background:color-mix(in srgb,var(--rule) 35%,transparent)}
+nav.tabs button[aria-selected="true"]{color:var(--accent);border-bottom-color:var(--accent);font-weight:600}
+.panel{display:none}
+.panel.on{display:block}
+
+.grid{display:grid;gap:18px}
+.grid.two{grid-template-columns:minmax(300px,1fr) minmax(320px,1.15fr)}
+.grid.side{grid-template-columns:minmax(260px,340px) 1fr}
+@media (max-width:900px){.grid.two,.grid.side{grid-template-columns:1fr}}
+
+.card{background:var(--card);border:1px solid var(--rule);border-radius:9px;padding:15px 16px}
+.card h2{font:600 13px/1.2 var(--sans);letter-spacing:.07em;text-transform:uppercase;
+  color:var(--ink3);margin:0 0 11px}
+.card h3{font:600 14px/1.3 var(--sans);margin:15px 0 6px}
+.card p{margin:0 0 9px;color:var(--ink2);font-size:13.5px}
+.card p.tight{margin-bottom:4px}
+
+label.fld{display:block;font-size:12px;color:var(--ink3);margin:0 0 4px;font-weight:500}
+textarea,input[type=text]{width:100%;background:var(--paper);color:var(--ink);
+  border:1px solid var(--rule2);border-radius:6px;padding:8px 10px;
+  font:14px/1.5 var(--mono);resize:vertical}
+textarea:focus,input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent}
+select{background:var(--paper);color:var(--ink);border:1px solid var(--rule2);
+  border-radius:6px;padding:7px 9px;font:14px var(--sans);max-width:100%}
+
+button.btn{appearance:none;background:var(--accent);color:#fff;border:0;border-radius:6px;
+  padding:8px 14px;font:500 13.5px var(--sans);cursor:pointer}
+button.btn:hover{background:var(--accent2)}
+button.btn.ghost{background:none;color:var(--ink2);border:1px solid var(--rule2)}
+button.btn.ghost:hover{background:color-mix(in srgb,var(--rule) 40%,transparent);color:var(--ink)}
+button.btn:disabled{opacity:.42;cursor:default}
+.btnrow{display:flex;gap:7px;flex-wrap:wrap;align-items:center;margin-top:10px}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.chips button{appearance:none;background:none;border:1px solid var(--rule2);border-radius:99px;
+  padding:3px 10px;font:12.5px var(--sans);color:var(--ink2);cursor:pointer}
+.chips button:hover{border-color:var(--accent);color:var(--accent)}
+
+.stage{background:var(--sheet);border:1px solid var(--rule);border-radius:8px;
+  padding:16px;overflow:auto;min-height:150px;display:flex;align-items:center;
+  justify-content:center}
+.stage.left{justify-content:flex-start}
+
+/* the graphs themselves */
+svg.eg{display:block;max-width:100%;height:auto}
+svg.eg .sa{fill:var(--sheet);stroke:var(--rule2);stroke-dasharray:3 4}
+svg.eg .cut{fill:var(--sheet);stroke:var(--ink);stroke-width:1.7;stroke-linejoin:round}
+svg.eg .cut.odd{fill:var(--shade)}
+svg.eg .spotbg{fill:none}
+svg.eg .spot text{font:13px/1 var(--serif);fill:var(--ink)}
+svg.eg .loi{stroke:var(--ink);stroke-width:3.2;fill:none;stroke-linecap:round;stroke-linejoin:round}
+svg.eg .branch{fill:var(--ink)}
+svg.eg .hooknum{font:8px var(--sans);fill:var(--ink3)}
+svg.eg .cut.hl-add,svg.eg .spot.hl-add rect{stroke:var(--hl-add);stroke-width:3}
+svg.eg .spot.hl-add text{fill:var(--hl-add)}
+svg.eg .cut.hl-del,svg.eg .spot.hl-del rect{stroke:var(--hl-del);stroke-width:3}
+svg.eg .spot.hl-del text{fill:var(--hl-del)}
+svg.eg .handle{fill:var(--card);stroke:var(--accent);stroke-width:1.6;cursor:pointer}
+svg.eg .handle.sel{fill:var(--accent)}
+svg.eg .pick{cursor:pointer}
+svg.eg .selarea{fill:none;stroke:var(--accent);stroke-width:2.4;stroke-dasharray:5 3}
+
+.reading{font:15px/1.6 var(--serif);margin:0 0 6px;word-wrap:break-word}
+.gloss{color:var(--ink2);font-size:13px;font-style:italic;margin:0}
+code,.mono{font-family:var(--mono);font-size:12.8px}
+.notation{font-family:var(--mono);font-size:12.8px;color:var(--ink2);
+  background:var(--paper);border:1px solid var(--rule);border-radius:5px;
+  padding:6px 8px;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+.note{font-size:12.5px;color:var(--ink3);margin:8px 0 0;line-height:1.5}
+.err{color:var(--bad);font-size:13px;font-family:var(--mono);white-space:pre-wrap}
+.pill{display:inline-block;padding:2px 8px;border-radius:99px;font-size:11.5px;
+  font-weight:600;letter-spacing:.03em}
+.pill.ok{background:color-mix(in srgb,var(--ok) 18%,transparent);color:var(--ok)}
+.pill.bad{background:color-mix(in srgb,var(--bad) 18%,transparent);color:var(--bad)}
+.pill.mid{background:color-mix(in srgb,var(--ink3) 20%,transparent);color:var(--ink2)}
+
+/* proof player */
+.steps{list-style:none;margin:0;padding:0;max-height:520px;overflow-y:auto}
+.steps li{padding:8px 10px;border-radius:6px;cursor:pointer;display:grid;
+  grid-template-columns:26px 76px 1fr;gap:8px;align-items:baseline;font-size:13px}
+.steps li:hover{background:color-mix(in srgb,var(--rule) 40%,transparent)}
+.steps li.cur{background:color-mix(in srgb,var(--accent) 14%,transparent)}
+.steps li .n{color:var(--ink3);font-family:var(--mono);font-size:12px}
+.steps li .r{font-weight:600;color:var(--accent);font-size:12.5px}
+.steps li .w{color:var(--ink2);font-size:12.5px;line-height:1.45}
+.playbar{display:flex;gap:6px;align-items:center;margin-top:12px;flex-wrap:wrap}
+.playbar .sp{flex:1}
+.why{background:var(--paper);border-left:3px solid var(--accent);border-radius:0 6px 6px 0;
+  padding:9px 12px;margin-top:12px;font-size:13.5px;color:var(--ink2);min-height:42px}
+.why b{color:var(--ink);font-weight:600}
+
+/* transform list */
+.moves{list-style:none;margin:0;padding:0;max-height:330px;overflow-y:auto}
+.moves li{padding:6px 9px;border-radius:5px;cursor:pointer;font-size:13px;
+  display:flex;gap:8px;align-items:baseline}
+.moves li:hover{background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.moves li .r{font-weight:600;color:var(--accent);min-width:56px;font-size:12.5px}
+.moves li .d{color:var(--ink2);font-size:12.5px}
+.movegroup{font:600 11.5px var(--sans);letter-spacing:.06em;text-transform:uppercase;
+  color:var(--ink3);margin:10px 0 3px;padding-left:9px}
+
+table.tt{border-collapse:collapse;font-family:var(--mono);font-size:12px;margin-top:6px}
+table.tt th,table.tt td{border:1px solid var(--rule);padding:2px 8px;text-align:center}
+table.tt th{color:var(--ink3);font-weight:600}
+table.tt td.v1{color:var(--ok)} table.tt td.v2{color:var(--bad)}
+
+.ref{font-size:12.5px;color:var(--ink3);line-height:1.55}
+.ref b{color:var(--ink2)}
+dl.rules{margin:0}
+dl.rules dt{font:600 13.5px var(--sans);color:var(--ink);margin-top:12px}
+dl.rules dd{margin:2px 0 0;font-size:13.5px;color:var(--ink2);line-height:1.55}
+dl.rules dd .cite{color:var(--ink3);font-size:12px}
+.toggles{display:flex;gap:14px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--ink2)}
+.toggles label{display:flex;gap:5px;align-items:center;cursor:pointer}
+hr.sep{border:0;border-top:1px solid var(--rule);margin:16px 0}
+.spin{display:inline-block;width:12px;height:12px;border:2px solid var(--rule2);
+  border-top-color:var(--accent);border-radius:50%;animation:sp .7s linear infinite;
+  vertical-align:-2px;margin-right:6px}
+@keyframes sp{to{transform:rotate(360deg)}}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;font-size:13px;margin:0}
+.kv dt{color:var(--ink3)} .kv dd{margin:0;color:var(--ink2)}
+</style>
+</head><body>
+<header>
+  <h1>The Existential Graphs of Charles S. Peirce</h1>
+  <p class="sub">A working instrument for Peirce's diagrammatic logic: translate ordinary
+  notation into graphs, watch known proofs unfold, scribe graphs and read them back, and
+  set the five rules of transformation to work on a problem of your own. Built on Don D.
+  Roberts, <cite>The Existential Graphs of Charles S. Peirce</cite> (The Hague: Mouton,
+  1973), with Peirce's MS 514 as transcribed by John Sowa.</p>
+</header>
+<main>
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="translate" aria-selected="true">Translate</button>
+  <button role="tab" data-tab="proofs" aria-selected="false">Proofs</button>
+  <button role="tab" data-tab="draw" aria-selected="false">Scribe</button>
+  <button role="tab" data-tab="prove" aria-selected="false">Find a proof</button>
+  <button role="tab" data-tab="notes" aria-selected="false">Conventions &amp; rules</button>
+</nav>
+
+<!-- ============================ TRANSLATE ============================ -->
+<section class="panel on" id="p-translate">
+  <div class="grid two">
+    <div class="card">
+      <h2>A proposition in ordinary notation</h2>
+      <textarea id="t-in" rows="3" spellcheck="false">Ax (Fx -> Gx)</textarea>
+      <div class="chips" id="t-ex"></div>
+      <div class="toggles">
+        <label><input type="checkbox" id="t-shade" checked> shade oddly enclosed areas</label>
+        <label><input type="checkbox" id="t-wobble" checked> hand-drawn cuts</label>
+        <label><input type="checkbox" id="t-hooks" checked> number the hooks</label>
+      </div>
+      <hr class="sep">
+      <h2>How to write it</h2>
+      <p class="tight"><code>~ &amp; | -&gt; &lt;-&gt;</code> for not, and, or, if-then, if-and-only-if.
+      The glyphs <code>¬ ∧ ∨ ⊃ ≡</code> work too.</p>
+      <p class="tight"><code>Ax</code> and <code>Ex</code> for <span class="mono">∀x</span>
+      and <span class="mono">∃x</span>; <code>(x)</code> and <code>(Ex)</code> also work.</p>
+      <p class="tight">Predicates take a capital: <code>Fx</code>, <code>Axy</code>,
+      <code>loves(x,y)</code>. Identity is <code>x=y</code>.</p>
+      <p class="note">Peirce allows no graph with an unoccupied hook, so a free variable
+      cannot be scribed at all (Roberts p. 49). One is closed existentially for you, with
+      a note saying so.</p>
+    </div>
+    <div>
+      <div class="card">
+        <h2>The graph</h2>
+        <div class="stage" id="t-stage"></div>
+        <div id="t-err" class="err"></div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Read back, endoporeutically</h2>
+        <p class="reading" id="t-read"></p>
+        <p class="gloss" id="t-gloss"></p>
+        <div id="t-alt"></div>
+        <h3>In linear notation</h3>
+        <div class="notation" id="t-lin"></div>
+        <div id="t-notes" class="note"></div>
+        <div id="t-val" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PROOFS ============================== -->
+<section class="panel" id="p-proofs">
+  <div class="grid side">
+    <div class="card">
+      <h2>Choose a proof</h2>
+      <select id="pf-sel" style="width:100%"></select>
+      <p class="note" id="pf-cite" style="margin-top:10px"></p>
+      <p class="note" id="pf-note"></p>
+      <hr class="sep">
+      <dl class="kv" id="pf-kv"></dl>
+      <p class="note" id="pf-prov"></p>
+    </div>
+    <div>
+      <div class="card">
+        <h2>The sheet of assertion</h2>
+        <div class="stage" id="pf-stage"></div>
+        <div class="why" id="pf-why"></div>
+        <div class="playbar">
+          <button class="btn ghost" id="pf-first">⏮</button>
+          <button class="btn ghost" id="pf-prev">◀ back</button>
+          <button class="btn" id="pf-play">▶ play</button>
+          <button class="btn ghost" id="pf-next">forward ▶</button>
+          <span class="sp"></span>
+          <label class="mono" style="font-size:12px;color:var(--ink3)">speed
+            <input type="range" id="pf-speed" min="400" max="3000" value="1500" step="100" style="vertical-align:middle">
+          </label>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Steps</h2>
+        <ol class="steps" id="pf-steps"></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== DRAW =============================== -->
+<section class="panel" id="p-draw">
+  <div class="grid side">
+    <div>
+      <div class="card">
+        <h2>Scribe</h2>
+        <p class="tight">Click a cut to select its area; click the sheet's border to select
+        the sheet itself. Then scribe onto the selected area.</p>
+        <div class="btnrow">
+          <button class="btn" id="d-cut">Cut</button>
+          <button class="btn" id="d-spot">Spot…</button>
+          <button class="btn" id="d-line">Line of identity</button>
+        </div>
+        <div class="btnrow">
+          <button class="btn ghost" id="d-join">Join two points</button>
+          <button class="btn ghost" id="d-del">Erase selection</button>
+          <button class="btn ghost" id="d-undo">Undo</button>
+          <button class="btn ghost" id="d-clear">Blank sheet</button>
+        </div>
+        <p class="note" id="d-hint">Selected: the sheet of assertion.</p>
+        <div class="toggles">
+          <label><input type="checkbox" id="d-shade" checked> shade odd areas</label>
+          <label><input type="checkbox" id="d-handles" checked> show line points</label>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Start from a formula</h2>
+        <input type="text" id="d-from" value="Ex (Fx &amp; ~Gx)" spellcheck="false">
+        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
+        <h3>Or from linear notation</h3>
+        <input type="text" id="d-lin" value="( *x F[x] ( G[x] ) )" spellcheck="false">
+        <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
+        <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
+        <code>*x</code> a point of the line <span class="mono">x</span> ·
+        <code>F[x,y]</code> a spot hooked to lines · <code>x~y</code> two lines joined ·
+        <code>"is a catholic"</code> a spot whose name has spaces.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="stage left" id="d-stage"></div>
+        <div id="d-err" class="err"></div>
+      </div>
+      <div class="grid two" style="margin-top:18px">
+        <div class="card">
+          <h2>What it says</h2>
+          <p class="reading" id="d-read"></p>
+          <p class="gloss" id="d-gloss"></p>
+          <div class="notation" id="d-lin2" style="margin-top:8px"></div>
+          <div id="d-val" style="margin-top:10px"></div>
+        </div>
+        <div class="card">
+          <h2>Transform it</h2>
+          <p class="note" style="margin-top:0">Every move below is legal by Peirce's five
+          rules. Applying one is an experiment upon the diagram.</p>
+          <div id="d-moves"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== PROVE =============================== -->
+<section class="panel" id="p-prove">
+  <div class="grid side">
+    <div class="card">
+      <h2>An inference to test</h2>
+      <label class="fld">Premisses, one to a line (leave blank for a theorem)</label>
+      <textarea id="v-prem" rows="4" spellcheck="false">P -> Q
+Q -> R</textarea>
+      <label class="fld" style="margin-top:10px">Conclusion</label>
+      <textarea id="v-goal" rows="2" spellcheck="false">P -> R</textarea>
+      <div class="btnrow">
+        <button class="btn" id="v-go">Search for a proof</button>
+        <button class="btn ghost" id="v-hard">Search harder</button>
+      </div>
+      <div class="chips" id="v-ex"></div>
+      <p class="note">Alpha validity is always decided outright, by the truth-value
+      analysis of Roberts §3.2, whether or not a proof is found. Beta validity is not
+      decidable; there a countermodel refutes, and otherwise the search can only report
+      what it did and did not find.</p>
+    </div>
+    <div>
+      <div class="card">
+        <h2>Verdict</h2>
+        <div id="v-verdict">Press the button.</div>
+      </div>
+      <div class="card" id="v-proofcard" style="margin-top:18px;display:none">
+        <h2>The proof</h2>
+        <div class="stage" id="v-stage"></div>
+        <div class="why" id="v-why"></div>
+        <div class="playbar">
+          <button class="btn ghost" id="v-first">⏮</button>
+          <button class="btn ghost" id="v-prev">◀ back</button>
+          <button class="btn" id="v-play">▶ play</button>
+          <button class="btn ghost" id="v-next">forward ▶</button>
+        </div>
+        <ol class="steps" id="v-steps" style="margin-top:14px"></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== NOTES =============================== -->
+<section class="panel" id="p-notes">
+  <div class="grid two">
+    <div class="card">
+      <h2>The conventions</h2>
+      <dl class="rules" id="n-conv"></dl>
+    </div>
+    <div>
+      <div class="card">
+        <h2>The rules of transformation</h2>
+        <dl class="rules" id="n-rules"></dl>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>About this instrument</h2>
+        <div class="ref" id="n-about"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<script>
+"use strict";
+/* ============================================================================
+   EG CORE — data model for Peirce's existential graphs
+   Follows Roberts (1973), The Existential Graphs of Charles S. Peirce,
+   Ch. 3 (Alpha), Ch. 4 (Beta), Appendix 3 (conventions C1-C9, rules R1-R5).
+
+   A graph is a store of:
+     areas  — the sheet of assertion (root) and the area of every cut
+     nodes  — cuts and spots, each living on exactly one area
+     lns    — "line nodes": points of a line of identity, each on one area
+     edges  — segments joining line nodes. An edge joins two line nodes on the
+              same area, or a line node on area A to a line node on the area of
+              a cut that lies on A (C9: the crossing point counts as outside).
+   ========================================================================== */
+
+let __uid = 0;
+const uid = (p) => p + (++__uid);
+function resetUid(n){ __uid = n||0; }
+
+function newGraph(){
+  const g = { areas:{}, nodes:{}, lns:{}, edges:{}, root:null };
+  g.root = mkArea(g, null);
+  return g;
+}
+function mkArea(g, cutId){
+  const id = uid('a');
+  g.areas[id] = { id, cut: cutId, items: [], lns: [] };
+  return id;
+}
+function addCut(g, areaId){
+  const id = uid('c');
+  const inner = mkArea(g, id);
+  g.nodes[id] = { k:'cut', id, area: areaId, inner };
+  g.areas[areaId].items.push(id);
+  return id;
+}
+function addSpot(g, areaId, name, nhooks){
+  const id = uid('s');
+  const hooks = [];
+  for (let i=0;i<(nhooks||0);i++) hooks.push(addLn(g, areaId));
+  g.nodes[id] = { k:'spot', id, area: areaId, name, hooks };
+  g.areas[areaId].items.push(id);
+  return id;
+}
+function addLn(g, areaId){
+  const id = uid('n');
+  g.lns[id] = { id, area: areaId };
+  g.areas[areaId].lns.push(id);
+  return id;
+}
+function addEdge(g, a, b){
+  if (a === b) return null;
+  for (const e of Object.values(g.edges))
+    if ((e.a===a&&e.b===b)||(e.a===b&&e.b===a)) return e.id;
+  const id = uid('e');
+  g.edges[id] = { id, a, b };
+  return id;
+}
+
+/* --- structural queries -------------------------------------------------- */
+
+// The area on which a cut sits (its "place"), or null for the root.
+function placeOf(g, areaId){
+  const a = g.areas[areaId];
+  if (!a || !a.cut) return null;
+  return g.nodes[a.cut].area;
+}
+// Depth of an area = number of cuts enclosing it. Root = 0.
+function depthOf(g, areaId){
+  let d = 0, cur = areaId;
+  while (g.areas[cur] && g.areas[cur].cut){ d++; cur = g.nodes[g.areas[cur].cut].area; }
+  return d;
+}
+const evenlyEnclosed = (g,areaId) => depthOf(g,areaId) % 2 === 0;
+const oddlyEnclosed  = (g,areaId) => depthOf(g,areaId) % 2 === 1;
+
+// Chain of areas from the root down to areaId, inclusive.
+function areaPath(g, areaId){
+  const out = []; let cur = areaId;
+  while (cur){ out.unshift(cur); cur = placeOf(g, cur); }
+  return out;
+}
+// Does area `anc` contain area `d` (reflexively)? Roberts' relation {anc} ⊇ {d}.
+function contains(g, anc, d){
+  let cur = d;
+  while (cur){ if (cur === anc) return true; cur = placeOf(g, cur); }
+  return false;
+}
+// Every area lying inside a node (for a cut, its own area and all below).
+function areasUnder(g, areaId, acc){
+  acc = acc || [];
+  acc.push(areaId);
+  for (const id of g.areas[areaId].items)
+    if (g.nodes[id].k === 'cut') areasUnder(g, g.nodes[id].inner, acc);
+  return acc;
+}
+function nodesUnder(g, areaId, acc){
+  acc = acc || [];
+  for (const id of g.areas[areaId].items){
+    acc.push(id);
+    if (g.nodes[id].k === 'cut') nodesUnder(g, g.nodes[id].inner, acc);
+  }
+  return acc;
+}
+
+/* --- edges incident on a line node --------------------------------------- */
+function edgesAt(g, lnId){
+  return Object.values(g.edges).filter(e => e.a===lnId || e.b===lnId);
+}
+function neighbours(g, lnId){
+  return edgesAt(g, lnId).map(e => e.a===lnId ? e.b : e.a);
+}
+
+/* Global connected components of the ligature graph. These are the visible
+   "ligatures" — Roberts p.49: the totality of lines of identity that join one
+   another. Used for drawing, NOT for reading (see readArea). */
+function ligatures(g){
+  const seen = new Set(), comps = [];
+  for (const id of Object.keys(g.lns)){
+    if (seen.has(id)) continue;
+    const comp = [], stack = [id]; seen.add(id);
+    while (stack.length){
+      const v = stack.pop(); comp.push(v);
+      for (const w of neighbours(g, v)) if (!seen.has(w)){ seen.add(w); stack.push(w); }
+    }
+    comps.push(comp);
+  }
+  return comps;
+}
+// The least enclosed area a ligature reaches — Roberts p.51, the "principal
+// secret": a line is as much enclosed as its least enclosed part.
+function ligatureHome(g, comp){
+  let best = null, bd = Infinity;
+  for (const n of comp){
+    const d = depthOf(g, g.lns[n].area);
+    if (d < bd){ bd = d; best = g.lns[n].area; }
+  }
+  return best;
+}
+
+/* --- deep copy ----------------------------------------------------------- */
+function cloneGraph(g){
+  const h = { areas:{}, nodes:{}, lns:{}, edges:{}, root:g.root };
+  for (const k in g.areas) h.areas[k] = { id:g.areas[k].id, cut:g.areas[k].cut,
+    items:g.areas[k].items.slice(), lns:g.areas[k].lns.slice() };
+  for (const k in g.nodes){
+    const n = g.nodes[k];
+    h.nodes[k] = n.k==='cut' ? {k:'cut',id:n.id,area:n.area,inner:n.inner,scroll:n.scroll}
+                             : {k:'spot',id:n.id,area:n.area,name:n.name,hooks:n.hooks.slice()};
+  }
+  for (const k in g.lns) h.lns[k] = { id:g.lns[k].id, area:g.lns[k].area };
+  for (const k in g.edges) h.edges[k] = { id:g.edges[k].id, a:g.edges[k].a, b:g.edges[k].b };
+  return h;
+}
+
+/* --- deletion ------------------------------------------------------------ */
+function removeLn(g, lnId){
+  for (const e of Object.values(g.edges))
+    if (e.a===lnId || e.b===lnId) delete g.edges[e.id];
+  const a = g.areas[g.lns[lnId].area];
+  if (a) a.lns = a.lns.filter(x => x!==lnId);
+  delete g.lns[lnId];
+}
+function removeNode(g, nodeId){
+  const n = g.nodes[nodeId];
+  if (!n) return;
+  if (n.k === 'cut'){
+    for (const child of g.areas[n.inner].items.slice()) removeNode(g, child);
+    for (const l of g.areas[n.inner].lns.slice()) removeLn(g, l);
+    delete g.areas[n.inner];
+  } else {
+    for (const h of n.hooks) removeLn(g, h);
+  }
+  const a = g.areas[n.area];
+  if (a) a.items = a.items.filter(x => x!==nodeId);
+  delete g.nodes[nodeId];
+}
+
+/* --- is the graph purely Alpha? ------------------------------------------ */
+function isAlpha(g){
+  return Object.keys(g.lns).length === 0;
+}
+/* ============================================================================
+   PARSER for ordinary logical notation.
+   AST nodes: {t:'atom',name,args:[]} {t:'eq',l,r} {t:'not',a}
+              {t:'and',xs} {t:'or',xs} {t:'imp',a,b} {t:'iff',a,b}
+              {t:'ex',v,a} {t:'all',v,a}
+   ========================================================================== */
+
+const SYN = {
+  not:  ['~','¬','!'],
+  and:  ['&','∧','·','•'],
+  or:   ['|','∨','+'],
+  imp:  ['->','=>','⊃','→'],
+  iff:  ['<->','<=>','≡','↔'],
+  all:  ['∀'],
+  ex:   ['∃']
+};
+
+function tokenize(src){
+  const T = []; let i = 0;
+  const s = src;
+  const isIdStart = c => /[A-Za-z_]/.test(c);
+  const isId = c => /[A-Za-z0-9_']/.test(c);
+  while (i < s.length){
+    const c = s[i];
+    if (/\s/.test(c)){ i++; continue; }
+    // multi-char operators first
+    let matched = false;
+    for (const [k, list] of Object.entries(SYN)){
+      for (const op of list.slice().sort((a,b)=>b.length-a.length)){
+        if (s.startsWith(op, i)){ T.push({t:k, s:op, i}); i += op.length; matched = true; break; }
+      }
+      if (matched) break;
+    }
+    if (matched) continue;
+    if (s.startsWith('<->', i)){ T.push({t:'iff', i}); i+=3; continue; }
+    if (c === '(' || c === '['){ T.push({t:'(', i}); i++; continue; }
+    if (c === ')' || c === ']'){ T.push({t:')', i}); i++; continue; }
+    if (c === ','){ T.push({t:',', i}); i++; continue; }
+    if (c === '='){ T.push({t:'=', i}); i++; continue; }
+    if (c === '-' && s[i+1] !== '>'){ T.push({t:'not', s:'-', i}); i++; continue; }
+    if (isIdStart(c)){
+      let j = i; while (j < s.length && isId(s[j])) j++;
+      T.push({t:'id', v: s.slice(i,j), i}); i = j; continue;
+    }
+    throw new ParseError('Unexpected character ' + JSON.stringify(c), i);
+  }
+  T.push({t:'eof', i: s.length});
+  return T;
+}
+
+function ParseError(msg, at){ this.message = msg; this.at = at; this.name='ParseError'; }
+ParseError.prototype = Object.create(Error.prototype);
+
+// Word forms recognised as operators / quantifiers.
+const WORD = {
+  not:'not', NOT:'not',
+  and:'and', AND:'and',
+  or:'or', OR:'or', v:'or',
+  implies:'imp', IMPLIES:'imp',
+  iff:'iff', IFF:'iff',
+  all:'all', ALL:'all', forall:'all', every:'all', A:'all',
+  exists:'ex', EXISTS:'ex', some:'ex', E:'ex'
+};
+
+function parseFormula(src){
+  const T = tokenize(src);
+  let p = 0;
+  const peek = () => T[p];
+  const at = k => T[p].t === k;
+  const eat = k => { if (!at(k)) throw new ParseError('Expected '+k+' here', T[p].i); return T[p++]; };
+  const isWord = w => T[p].t==='id' && WORD[T[p].v] === w;
+
+  function formula(){ return iff(); }
+
+  function iff(){
+    let a = imp();
+    while (at('iff') || isWord('iff')){ p++; a = {t:'iff', a, b: imp()}; }
+    return a;
+  }
+  function imp(){
+    const a = or();
+    if (at('imp') || isWord('implies')){ p++; return {t:'imp', a, b: imp()}; } // right assoc
+    return a;
+  }
+  function or(){
+    const xs = [and()];
+    while (at('or') || isWord('or')){ p++; xs.push(and()); }
+    return xs.length===1 ? xs[0] : {t:'or', xs};
+  }
+  function and(){
+    const xs = [unary()];
+    while (at('and') || isWord('and')){ p++; xs.push(unary()); }
+    return xs.length===1 ? xs[0] : {t:'and', xs};
+  }
+  // Quantifier written solid: Ax, Ex, A x, exists x, ∀x …
+  const QLET = /^([AE])([a-z][0-9]?'?)$/;
+  const QWORD = { all:'all', All:'all', ALL:'all', forall:'all', Forall:'all',
+                  every:'all', A:'all',
+                  exists:'ex', Exists:'ex', EXISTS:'ex', some:'ex', Some:'ex', E:'ex' };
+
+  function unary(){
+    if (at('not')){ p++; return {t:'not', a: unary()}; }
+    if (T[p].t==='id' && T[p].v==='not'){ p++; return {t:'not', a: unary()}; }
+    // ∀ / ∃ glyph followed by variables
+    if (at('all') || at('ex')){
+      const kind = T[p].t; p++;
+      const vs = varList();
+      return vs.reduceRight((acc,v)=>({t:kind, v, a:acc}), unary());
+    }
+    if (T[p].t === 'id'){
+      const w = T[p].v;
+      // "Ax", "Ey" — quantifier letter fused to its variable
+      const m = QLET.exec(w);
+      if (m){
+        const kind = m[1]==='A' ? 'all' : 'ex';
+        p++;
+        return {t:kind, v:m[2], a: unary()};
+      }
+      // "forall x", "exists x, y", "A x"
+      if (QWORD[w] && T[p+1] && T[p+1].t==='id' && /^[a-z]/.test(T[p+1].v)
+          && !QLET.test(T[p+1].v)){
+        const kind = QWORD[w]; p++;
+        const vs = varList();
+        return vs.reduceRight((acc,v)=>({t:kind, v, a:acc}), unary());
+      }
+    }
+    return primary();
+  }
+  function varList(){
+    const vs = [];
+    for(;;){
+      const tk = eat('id');
+      if (!/^[a-z]/.test(tk.v))
+        throw new ParseError('A quantified variable must start with a lowercase letter; got "'+tk.v+'".', tk.i);
+      vs.push(tk.v);
+      if (at(',')){ p++; continue; }
+      if (at('id') && /^[a-z][0-9]?'?$/.test(T[p].v)) continue;
+      break;
+    }
+    return vs;
+  }
+  function primary(){
+    if (at('(')){
+      // "(x)Fx" — the classical universal prefix
+      if (T[p+1] && T[p+1].t==='id' && /^[a-z][0-9]?'?$/.test(T[p+1].v)
+          && T[p+2] && T[p+2].t===')'){
+        const v = T[p+1].v; p += 3;
+        return {t:'all', v, a: unary()};
+      }
+      // "(Ex)Fx", "(∃x)Fx"
+      {
+        const save = p; p++;
+        let kind = null;
+        if (at('ex')||at('all')){ kind = T[p].t; p++; }
+        else if (T[p].t==='id'){
+          const m = QLET.exec(T[p].v);
+          if (m){ // "(Ex)"
+            kind = m[1]==='A'?'all':'ex';
+            p++;
+            if (at(')')){ p++; return {t:kind, v:m[2], a: unary()}; }
+            p = save;
+          } else if (QWORD[T[p].v]){ kind = QWORD[T[p].v]; p++; }
+        }
+        if (kind && at('id') && /^[a-z]/.test(T[p].v)){
+          const vs = varList();
+          if (at(')')){ p++; return vs.reduceRight((acc,v)=>({t:kind,v,a:acc}), unary()); }
+        }
+        p = save;
+      }
+      p++; const f = formula(); eat(')'); return f;
+    }
+    if (at('id')){
+      const tk = T[p++];
+      let name = tk.v, args = [];
+      if (at('(')){
+        p++;
+        if (!at(')')){
+          for(;;){ const a = eat('id'); args.push(a.v); if (at(',')){p++;continue;} break; }
+        }
+        eat(')');
+      } else if (/^[A-Z]/.test(name) && name.length > 1){
+        // "Fxy" — a predicate letter followed by its variables
+        const m = /^([A-Z][A-Za-z0-9_]*?)((?:[a-z][0-9]?'?)+)$/.exec(name);
+        if (m) { name = m[1]; args = m[2].match(/[a-z][0-9]?'?/g) || []; }
+      }
+      if (at('=')){
+        p++;
+        const r = eat('id');
+        if (args.length) throw new ParseError('Identity joins two individual terms.', tk.i);
+        return {t:'eq', l:name, r:r.v};
+      }
+      if (/^[a-z]/.test(name) && args.length===0)
+        throw new ParseError('"'+name+'" reads as an individual, not a proposition. '+
+          'Use a capital letter for a predicate, e.g. F'+name+'.', tk.i);
+      return {t:'atom', name, args};
+    }
+    throw new ParseError('Expected a formula here.', T[p].i);
+  }
+
+  const f = formula();
+  if (!at('eof')) throw new ParseError('Unexpected extra input', T[p].i);
+  return f;
+}
+
+/* --- pretty-print an AST back to notation --------------------------------- */
+const GL = { not:'¬', and:'∧', or:'∨', imp:'⊃', iff:'≡',
+             all:'∀', ex:'∃' };
+// A spot whose name is an English phrase reads with its hooks in place:
+// "— is a catholic", "— adores —" (Roberts pp. 48-49).
+function spotPhrase(a){
+  if (!a.args.length) return a.name;
+  const phrase = /\s/.test(a.name) || /^[a-z]/.test(a.name);
+  if (!phrase) return a.name+'('+a.args.join(',')+')';
+  if (a.args.length === 1) return a.args[0]+' '+a.name;
+  if (a.args.length === 2) return a.args[0]+' '+a.name+' '+a.args[1];
+  return a.name+'('+a.args.join(',')+')';
+}
+function fmt(a, outerPrec){
+  outerPrec = outerPrec||0;
+  const wrap = (s,p) => p < outerPrec ? '('+s+')' : s;
+  switch(a.t){
+    case 'true':  return '⊤';
+    case 'false': return '⊥';
+    case 'atom': return spotPhrase(a);
+    case 'eq':   return a.l+'='+a.r;
+    case 'not':  return GL.not + fmt(a.a, 5);
+    case 'and':  return wrap(a.xs.map(x=>fmt(x,4)).join(' '+GL.and+' '), 4);
+    case 'or':   return wrap(a.xs.map(x=>fmt(x,3)).join(' '+GL.or+' '), 3);
+    case 'imp':  return wrap(fmt(a.a,3)+' '+GL.imp+' '+fmt(a.b,2), 2);
+    case 'iff':  return wrap(fmt(a.a,2)+' '+GL.iff+' '+fmt(a.b,2), 1);
+    case 'all':  return wrap(GL.all+a.v+' '+fmt(a.a,5), 5);
+    case 'ex':   return wrap(GL.ex+a.v+' '+fmt(a.a,5), 5);
+  }
+  return '?';
+}
+/* ============================================================================
+   COMPILE: logical notation -> existential graph.
+   C4: the scroll (two cuts, one inside the other) is the sign of the
+       conditional de inesse.   C5: the cut precisely denies its contents.
+   C3: juxtaposition is conjunction.
+   Universal quantification is ¬∃¬ — Roberts p.51, Fig. 5.
+   ========================================================================== */
+
+function compileFormula(ast, opts){
+  opts = opts || {};
+  const g = newGraph();
+  const notes = [];
+  // binding: variable -> { homeArea, spine: {areaId -> lnId} }
+  const env = Object.create(null);
+
+  // Existentially close free variables at the sheet: EG admits no graph with
+  // an unoccupied hook (Roberts p.49), so a free variable has no rendering.
+  const free = freeVars(ast);
+  for (const v of free){
+    env[v] = mkBinding(g.root, v);
+    notes.push('"'+v+'" occurred free; closed existentially on the sheet of '+
+               'assertion. Peirce allows no graph with an empty hook '+
+               '(Roberts 1973, p. 49), so a free variable cannot be scribed.');
+  }
+
+  function mkBinding(areaId, name){
+    const ln = addLn(g, areaId);
+    return { home: areaId, name, spine: { [areaId]: ln } };
+  }
+  // Get (creating if need be) the point of v's line of identity on `area`,
+  // extending the line inwards through every intervening cut.
+  function spineAt(b, area){
+    if (b.spine[area]) return b.spine[area];
+    const path = areaPath(g, area);
+    const hi = path.indexOf(b.home);
+    if (hi < 0) throw new Error('variable used outside its scope');
+    let prev = b.spine[b.home];
+    for (let i = hi+1; i < path.length; i++){
+      const a = path[i];
+      if (!b.spine[a]){ b.spine[a] = addLn(g, a); addEdge(g, prev, b.spine[a]); }
+      prev = b.spine[a];
+    }
+    return b.spine[area];
+  }
+
+  function comp(a, area){
+    switch (a.t){
+      case 'atom': {
+        const sid = addSpot(g, area, a.name, a.args.length);
+        const sp = g.nodes[sid];
+        a.args.forEach((v, i) => {
+          const b = env[v];
+          if (!b) throw new Error('unbound variable '+v);
+          addEdge(g, sp.hooks[i], spineAt(b, area));
+        });
+        return;
+      }
+      case 'eq': {
+        const bl = env[a.l], br = env[a.r];
+        if (!bl || !br) throw new Error('unbound variable in identity');
+        addEdge(g, spineAt(bl, area), spineAt(br, area));
+        return;
+      }
+      case 'not': compNeg(a.a, area); return;
+      case 'and': a.xs.forEach(x => comp(x, area)); return;
+      case 'or': {
+        // ¬(¬x₁ ∧ ¬x₂ ∧ …)
+        const c = addCut(g, area), inner = g.nodes[c].inner;
+        a.xs.forEach(x => { const d = addCut(g, inner); comp(x, g.nodes[d].inner); });
+        return;
+      }
+      case 'imp': {
+        // the scroll: antecedent on the outer close, consequent on the inner
+        const outer = addCut(g, area), oa = g.nodes[outer].inner;
+        comp(a.a, oa);
+        const loop = addCut(g, oa);
+        g.nodes[outer].scroll = loop;      // C4: this cut is the outer cut of a scroll
+        comp(a.b, g.nodes[loop].inner);
+        return;
+      }
+      case 'iff':
+        comp({t:'imp', a:a.a, b:a.b}, area);
+        comp({t:'imp', a:a.b, b:a.a}, area);
+        return;
+      case 'ex': {
+        const save = env[a.v];
+        env[a.v] = mkBinding(area, a.v);
+        comp(a.a, area);
+        env[a.v] = save;
+        return;
+      }
+      case 'all': {
+        // ¬∃v¬φ : one cut, the line of identity on its area, and the denial of
+        // φ scribed there — which for φ = A ⊃ B gives Peirce's two-cut figure
+        // for 'All A is B' (Roberts p. 52, Fig. 9).
+        const outer = addCut(g, area), oa = g.nodes[outer].inner;
+        const save = env[a.v];
+        env[a.v] = mkBinding(oa, a.v);
+        g.nodes[outer].quant = a.v;
+        compNeg(a.a, oa);
+        env[a.v] = save;
+        return;
+      }
+    }
+    throw new Error('cannot compile node '+a.t);
+  }
+
+  // scribe the denial of `a` on `area`
+  function compNeg(a, area){
+    switch (a.t){
+      case 'not': comp(a.a, area); return;                 // the double cut collapses
+      case 'imp': {                                        // ¬(A ⊃ B) is A and not-B
+        comp(a.a, area);
+        const c = addCut(g, area);
+        comp(a.b, g.nodes[c].inner);
+        return;
+      }
+      case 'or':                                           // ¬(A ∨ B) is ¬A and ¬B
+        a.xs.forEach(x => compNeg(x, area));
+        return;
+      case 'all': {                                        // ¬∀v φ is ∃v ¬φ
+        const save = env[a.v];
+        env[a.v] = mkBinding(area, a.v);
+        compNeg(a.a, area);
+        env[a.v] = save;
+        return;
+      }
+      default: {
+        const c = addCut(g, area);
+        comp(a, g.nodes[c].inner);
+        return;
+      }
+    }
+  }
+
+  comp(ast, g.root);
+  return { graph: g, notes };
+}
+
+/* Every point of a spine is a genuine part of the line of identity: it is the
+   outermost such point that fixes whether the line reads 'some' or 'any'
+   (Roberts p.51). So nothing here is pruned. */
+function freeVars(ast, bound, out){
+  bound = bound || new Set(); out = out || [];
+  const add = v => { if (!bound.has(v) && !out.includes(v)) out.push(v); };
+  switch(ast.t){
+    case 'atom': ast.args.forEach(add); break;
+    case 'eq': add(ast.l); add(ast.r); break;
+    case 'not': freeVars(ast.a, bound, out); break;
+    case 'and': case 'or': ast.xs.forEach(x=>freeVars(x,bound,out)); break;
+    case 'imp': case 'iff': freeVars(ast.a,bound,out); freeVars(ast.b,bound,out); break;
+    case 'ex': case 'all': {
+      const b2 = new Set(bound); b2.add(ast.v);
+      freeVars(ast.a, b2, out); break;
+    }
+  }
+  return out;
+}
+/* ============================================================================
+   READ: existential graph -> logical notation, endoporeutically.
+   "The interpretation of existential graphs is endoporeutic, that is proceeds
+   inwardly" (Peirce, Ms 650, quoted Roberts p.39 n.13).
+
+   Each area is read as a conjunction; the lines of identity whose outermost
+   part lies on that area contribute the quantifiers, and each cut contributes
+   a negation of the reading of its own area. A line that runs out of an area
+   and back in again therefore lands its two ends in an enclosed area as an
+   identity — which the cut denies. That is how Peirce's "line through an empty
+   cut" (Roberts p.53, Fig. 13) comes out as non-identity.
+   ========================================================================== */
+
+const VARNAMES = ['x','y','z','u','v','w','s','t','p','q','r'];
+
+function readGraph(g){
+  const st = { n: 0 };
+  const ast = readArea(g, g.root, {}, st);
+  return ast;
+}
+function freshVar(st){
+  const i = st.n++;
+  return i < VARNAMES.length ? VARNAMES[i] : 'x'+(i+1);
+}
+
+function readArea(g, areaId, inherited, st){
+  const area = g.areas[areaId];
+  const lns = area.lns;
+
+  /* 1. components of the line-of-identity graph *on this area* */
+  const parent = {};
+  const find = a => { while (parent[a] !== a) { parent[a] = parent[parent[a]]; a = parent[a]; } return a; };
+  const union = (a,b) => { a=find(a); b=find(b); if (a!==b) parent[a]=b; };
+  lns.forEach(l => parent[l] = l);
+  const here = new Set(lns);
+  for (const e of Object.values(g.edges))
+    if (here.has(e.a) && here.has(e.b)) union(e.a, e.b);
+
+  /* 2. assign a variable to each component */
+  const compVars = {};       // root -> variable name
+  const compInherited = {};  // root -> [variables arriving from outside]
+  for (const l of lns){
+    const r = find(l);
+    if (!compInherited[r]) compInherited[r] = [];
+    if (inherited[l] !== undefined && !compInherited[r].includes(inherited[l]))
+      compInherited[r].push(inherited[l]);
+  }
+  const fresh = [], eqs = [];
+  for (const l of lns){
+    const r = find(l);
+    if (compVars[r] !== undefined) continue;
+    const inh = compInherited[r] || [];
+    if (inh.length === 0){ const v = freshVar(st); compVars[r] = v; fresh.push(v); }
+    else {
+      compVars[r] = inh[0];
+      for (let i=1;i<inh.length;i++) eqs.push({t:'eq', l: inh[0], r: inh[i]});
+    }
+  }
+  const varOf = l => compVars[find(l)];
+
+  /* 3. conjuncts */
+  const conj = [];
+  for (const id of area.items){
+    const n = g.nodes[id];
+    if (n.k === 'spot'){
+      conj.push({t:'atom', name: n.name, args: n.hooks.map(varOf)});
+    }
+  }
+  conj.push(...eqs);
+  for (const id of area.items){
+    const n = g.nodes[id];
+    if (n.k !== 'cut') continue;
+    // what does this cut inherit? every edge from this area into its area
+    const childInh = {};
+    const inSet = new Set(g.areas[n.inner].lns);
+    for (const e of Object.values(g.edges)){
+      if (here.has(e.a) && inSet.has(e.b)) childInh[e.b] = varOf(e.a);
+      else if (here.has(e.b) && inSet.has(e.a)) childInh[e.a] = varOf(e.b);
+    }
+    const negNode = {t:'not', a: readArea(g, n.inner, childInh, st)};
+    const owner = area.cut ? g.nodes[area.cut] : null;
+    if (owner && owner.scroll === n.id) negNode.loop = true;   // C4: this is the loop
+    conj.push(negNode);
+  }
+
+  /* 4. a bare line of identity with nothing on it still asserts existence (C6) */
+  let body = conj.length === 0 ? {t:'true'}
+           : conj.length === 1 ? conj[0]
+           : {t:'and', xs: conj};
+  for (let i = fresh.length-1; i>=0; i--) body = {t:'ex', v: fresh[i], a: body};
+  return body;
+}
+
+/* --- turn the raw ¬/∧ reading into familiar connectives ------------------- */
+function sugar(a){
+  if (!a) return a;
+  switch (a.t){
+    case 'and': {
+      const xs = a.xs.map(sugar).filter(x => x.t !== 'true');
+      if (!xs.length) return {t:'true'};
+      return xs.length===1 ? xs[0] : {t:'and', xs: flat(xs,'and')};
+    }
+    case 'not': {
+      const inner = a.a;
+      if (inner.t === 'true')  return {t:'false'};   // C5: the empty cut is the pseudograph
+      if (inner.t === 'not')   return sugar(inner.a); // the double cut
+      if (inner.t === 'ex')    return {t:'all', v: inner.v, a: sugar({t:'not', a: inner.a})};
+      if (inner.t === 'and'){
+        const xs = inner.xs;
+        // A scroll laid down by the compiler names its own loop.
+        const li = xs.findIndex(x => x.loop);
+        if (li >= 0){
+          const rest = xs.filter((_,i)=>i!==li);
+          const ant = rest.length === 0 ? {t:'true'}
+                    : rest.length === 1 ? sugar(rest[0])
+                    : {t:'and', xs: flat(rest.map(sugar),'and')};
+          const cons = sugar(xs[li].a);
+          return ant.t === 'true' ? cons : {t:'imp', a: ant, b: cons};
+        }
+        const negs = xs.filter(x => x.t === 'not');
+        const pos  = xs.filter(x => x.t !== 'not');
+        if (negs.length && pos.length === 0)
+          return {t:'or', xs: flat(negs.map(x=>sugar(x.a)),'or')};
+        if (negs.length){
+          const ant  = pos.length===1 ? sugar(pos[0]) : {t:'and', xs: flat(pos.map(sugar),'and')};
+          const cons = negs.length===1 ? sugar(negs[0].a)
+                                       : {t:'or', xs: flat(negs.map(x=>sugar(x.a)),'or')};
+          return {t:'imp', a: ant, b: cons};
+        }
+      }
+      return {t:'not', a: sugar(inner)};
+    }
+    case 'ex': return {t:'ex', v:a.v, a: sugar(a.a)};
+    case 'all': return {t:'all', v:a.v, a: sugar(a.a)};
+    default: return a;
+  }
+}
+function flat(xs, t){
+  const out = [];
+  for (const x of xs){ if (x.t === t) out.push(...x.xs); else out.push(x); }
+  return out;
+}
+
+/* --- formatting, including the two degenerate graphs ---------------------- */
+function fmtFull(a){
+  if (!a) return '—';
+  if (a.t === 'true')  return '⊤';
+  if (a.t === 'false') return '⊥';
+  return fmt(a, 0);
+}
+
+/* --- a plodding, literal English gloss ------------------------------------ */
+function gloss(a, depth){
+  depth = depth||0;
+  switch(a.t){
+    case 'true': return 'the blank sheet (nothing is asserted)';
+    case 'false': return 'the pseudograph (the absurd)';
+    case 'atom':
+      if (!a.args.length) return a.name;
+      if (/\s/.test(a.name) || /^[a-z]/.test(a.name)) return spotPhrase(a);
+      return a.name+' holds of '+a.args.join(' and ');
+    case 'eq': return a.l+' is the very same individual as '+a.r;
+    case 'and': return a.xs.map(x=>gloss(x,depth+1)).join(', and ');
+    case 'or': return 'either '+a.xs.map(x=>gloss(x,depth+1)).join(', or ');
+    case 'not': return 'it is false that '+gloss(a.a, depth+1);
+    case 'imp': return 'if '+gloss(a.a,depth+1)+', then '+gloss(a.b,depth+1);
+    case 'iff': return gloss(a.a,depth+1)+' just in case '+gloss(a.b,depth+1);
+    case 'ex': return 'something, '+a.v+', is such that '+gloss(a.a,depth+1);
+    case 'all': return 'anything you please, '+a.v+', is such that '+gloss(a.a,depth+1);
+  }
+  return '?';
+}
+/* ============================================================================
+   SEMANTICS.
+   Alpha: Roberts §3.2 — "Let 1 and 2 represent the truth-values truth and
+   falsehood".  The value of an area is the value of the conjunction of all the
+   graphs scribed on it; the value of an enclosure is 2 if the value of its
+   area is 1, and 1 if the value of its area is 2 (C5).
+   ========================================================================== */
+
+function alphaAtoms(g){
+  const s = new Set();
+  for (const n of Object.values(g.nodes)) if (n.k==='spot') s.add(n.name);
+  return [...s].sort();
+}
+
+// Returns {areaVal:{areaId:1|2}, cutVal:{cutId:1|2}, value:1|2}
+function valuate(g, assign){
+  const areaVal = {}, cutVal = {};
+  function valArea(areaId){
+    let v = 1;                                    // the blank sheet has the value 1
+    for (const id of g.areas[areaId].items){
+      const n = g.nodes[id];
+      let nv;
+      if (n.k === 'spot') nv = assign[n.name] ? 1 : 2;
+      else { const inner = valArea(n.inner); nv = inner === 1 ? 2 : 1; cutVal[id] = nv; }
+      if (nv === 2) v = 2;                        // a single 2 gives the area the value 2
+    }
+    areaVal[areaId] = v;
+    return v;
+  }
+  const value = valArea(g.root);
+  return { areaVal, cutVal, value };
+}
+
+// Full truth table over the atoms. Returns {atoms, rows, tautology, contradiction}
+function truthTable(g, cap){
+  const atoms = alphaAtoms(g);
+  cap = cap || 14;
+  if (atoms.length > cap) return { atoms, rows: null, tooBig: true };
+  const rows = [];
+  let taut = true, contra = true;
+  for (let m = 0; m < (1 << atoms.length); m++){
+    const assign = {};
+    atoms.forEach((a,i) => assign[a] = !!(m & (1 << i)));
+    const v = valuate(g, assign).value;
+    rows.push({ assign, value: v });
+    if (v !== 1) taut = false;
+    if (v !== 2) contra = false;
+  }
+  return { atoms, rows, tautology: taut, contradiction: contra };
+}
+
+/* --- Alpha consequence: does the conjunction of premisses entail the goal? -- */
+function alphaEntails(prems, goal){
+  const atoms = new Set();
+  [...prems, goal].forEach(g => alphaAtoms(g).forEach(a => atoms.add(a)));
+  const A = [...atoms];
+  if (A.length > 18) return { decided:false };
+  for (let m = 0; m < (1 << A.length); m++){
+    const assign = {};
+    A.forEach((a,i) => assign[a] = !!(m & (1 << i)));
+    const premTrue = prems.every(p => valuate(p, assign).value === 1);
+    if (premTrue && valuate(goal, assign).value !== 1)
+      return { decided:true, entails:false, countermodel: assign };
+  }
+  return { decided:true, entails:true };
+}
+
+/* ============================================================================
+   Beta: evaluate the endoporeutic reading over a finite model.
+   A model is { n, preds: { "Name/arity": Set of "i,j" } }.
+   ========================================================================== */
+
+function evalAst(a, model, asg){
+  switch(a.t){
+    case 'true':  return true;
+    case 'false': return false;
+    case 'atom': {
+      const key = a.name+'/'+a.args.length;
+      const S = model.preds[key];
+      if (!S) return false;
+      return S.has(a.args.map(v => asg[v]).join(','));
+    }
+    case 'eq':  return asg[a.l] === asg[a.r];
+    case 'not': return !evalAst(a.a, model, asg);
+    case 'and': return a.xs.every(x => evalAst(x, model, asg));
+    case 'or':  return a.xs.some(x => evalAst(x, model, asg));
+    case 'imp': return !evalAst(a.a, model, asg) || evalAst(a.b, model, asg);
+    case 'iff': return evalAst(a.a, model, asg) === evalAst(a.b, model, asg);
+    case 'ex':  {
+      for (let i=0;i<model.n;i++){ const s = Object.assign({}, asg); s[a.v]=i;
+        if (evalAst(a.a, model, s)) return true; }
+      return false;
+    }
+    case 'all': {
+      for (let i=0;i<model.n;i++){ const s = Object.assign({}, asg); s[a.v]=i;
+        if (!evalAst(a.a, model, s)) return false; }
+      return true;
+    }
+  }
+  throw new Error('cannot evaluate '+a.t);
+}
+
+function signatureOf(asts){
+  const sig = {};
+  (function walk(a){
+    if (!a) return;
+    if (a.t==='atom') sig[a.name+'/'+a.args.length] = a.args.length;
+    if (a.a) walk(a.a); if (a.b) walk(a.b);
+    if (a.xs) a.xs.forEach(walk);
+  });
+  const w = a => {
+    if (!a) return;
+    if (a.t==='atom') sig[a.name+'/'+a.args.length] = a.args.length;
+    if (a.a) w(a.a); if (a.b) w(a.b); if (a.xs) a.xs.forEach(w);
+  };
+  asts.forEach(w);
+  return sig;
+}
+
+/* Search for a finite countermodel to "premisses ⊨ goal", domains 1..maxN.
+   Beta validity is not decidable, so a failure here settles nothing; finding a
+   countermodel, on the other hand, is conclusive. */
+function findCountermodel(premAsts, goalAst, maxN, budget){
+  maxN = maxN || 3; budget = budget || 200000;
+  const sig = signatureOf([...premAsts, goalAst]);
+  const keys = Object.keys(sig);
+  for (let n = 1; n <= maxN; n++){
+    // all tuples for each predicate
+    const slots = keys.map(k => {
+      const ar = sig[k];
+      let tuples = [[]];
+      for (let i=0;i<ar;i++){
+        const nxt = [];
+        for (const t of tuples) for (let d=0; d<n; d++) nxt.push(t.concat(d));
+        tuples = nxt;
+      }
+      return { key:k, tuples: tuples.map(t=>t.join(',')) };
+    });
+    const total = slots.reduce((acc,s)=>acc * Math.pow(2, s.tuples.length), 1);
+    if (!isFinite(total) || total > budget) continue;
+    for (let m = 0; m < total; m++){
+      let rest = m;
+      const preds = {};
+      for (const s of slots){
+        const bits = Math.pow(2, s.tuples.length);
+        const mask = rest % bits; rest = Math.floor(rest / bits);
+        const S = new Set();
+        s.tuples.forEach((t,i) => { if (mask & (1<<i)) S.add(t); });
+        preds[s.key] = S;
+      }
+      const model = { n, preds };
+      if (premAsts.every(p => evalAst(p, model, {})) && !evalAst(goalAst, model, {}))
+        return { model, n, preds: Object.fromEntries(keys.map(k=>[k,[...preds[k]]])) };
+    }
+  }
+  return null;
+}
+/* ============================================================================
+   THE RULES OF TRANSFORMATION  (Roberts, Appendix 3; §3.2 and §4.2)
+
+   R1  erasure     Any evenly enclosed graph and any evenly enclosed portion of
+                   a line of identity may be erased.
+   R2  insertion   Any graph may be scribed on any oddly enclosed area, and two
+                   lines of identity oddly enclosed on the same area may be
+                   joined.
+   R3  iteration   If a graph P occurs on SA or in a nest of cuts, it may be
+                   scribed on any area not part of P which is contained by {P}.
+   R4  deiteration Any graph whose occurrence could be the result of iteration
+                   may be erased.
+   R5  double cut  The double cut may be inserted around or removed from any
+                   graph on any area; ligatures may pass through it.
+   ========================================================================== */
+
+const RULE_NAME = {
+  R1:'R1 erasure', R1L:'R1 erasure (line)',
+  R2:'R2 insertion', R2J:'R2 insertion (join)',
+  R3:'R3 iteration', R4:'R4 deiteration',
+  R5in:'R5 double cut, inserted', R5out:'R5 double cut, removed'
+};
+
+/* --- ligature labelling, for structural comparison ------------------------ */
+function ligIndex(g){
+  const comps = ligatures(g), map = {};
+  comps.forEach((c,i) => c.forEach(l => map[l] = i));
+  return map;
+}
+// Canonical string for a node. Two nodes with the same canon are the same
+// graph — and, in Beta, their lines join the corresponding hooks (Roberts p.57).
+function canonNode(g, id, lig){
+  const n = g.nodes[id];
+  if (n.k === 'spot') return 'S:' + n.name + '[' + n.hooks.map(h => lig[h]).join(',') + ']';
+  return 'C{' + canonAreaBody(g, n.inner, lig) + '}';
+}
+function canonAreaBody(g, areaId, lig){
+  const parts = g.areas[areaId].items.map(i => canonNode(g, i, lig)).sort();
+  const here = new Set(g.areas[areaId].lns);
+  const es = [];
+  for (const e of Object.values(g.edges))
+    if (here.has(e.a) && here.has(e.b)) es.push([lig[e.a], lig[e.b]].sort().join('~'));
+  const bare = g.areas[areaId].lns.map(l => lig[l]).sort();
+  return parts.join('|') + ';' + es.sort().join(',') + ';' + bare.join(',');
+}
+/* Ligatures have to be labelled canonically, or else two drawings of the very
+   same graph would compare as different merely because their lines were made
+   in a different order. Components are first sorted by an invariant — where
+   their points lie, and which hooks of which spots they occupy — and any that
+   tie are settled by trying the orderings and keeping the least. */
+function ligInvariant(h, comp){
+  const hookOf = {};
+  for (const n of Object.values(h.nodes))
+    if (n.k === 'spot') n.hooks.forEach((x,i) => hookOf[x] = n.name+'#'+i);
+  const marks = comp.map(l => (hookOf[l] || '*') + '@' + depthOf(h, h.lns[l].area)).sort();
+  return marks.join(',') + '|' + comp.length;
+}
+function canonGraph(g){
+  const h = normalizeLines(cloneGraph(g));
+  const comps = ligatures(h);
+  if (!comps.length) return canonAreaBody(h, h.root, {});
+  const tagged = comps.map(c => ({ c, inv: ligInvariant(h, c) }));
+  tagged.sort((a,b) => a.inv < b.inv ? -1 : a.inv > b.inv ? 1 : 0);
+  // tie groups
+  const groups = [];
+  for (const t of tagged){
+    const g0 = groups[groups.length-1];
+    if (g0 && g0[0].inv === t.inv) g0.push(t); else groups.push([t]);
+  }
+  const orderings = [[]];
+  let blown = false;
+  for (const grp of groups){
+    if (grp.length > 4){ blown = true; }
+    const perms = blown ? [grp] : permute(grp);
+    const next = [];
+    for (const base of orderings) for (const p of perms) next.push(base.concat(p));
+    if (next.length > 120){ orderings.length = 0; orderings.push(next[0]); blown = true; }
+    else { orderings.length = 0; orderings.push(...next); }
+  }
+  let best = null;
+  for (const ord of orderings){
+    const lig = {};
+    ord.forEach((t,i) => t.c.forEach(l => lig[l] = i));
+    const s = canonAreaBody(h, h.root, lig);
+    if (best === null || s < best) best = s;
+  }
+  return best;
+}
+function permute(xs){
+  if (xs.length <= 1) return [xs.slice()];
+  const out = [];
+  for (let i=0;i<xs.length;i++){
+    const rest = xs.slice(0,i).concat(xs.slice(i+1));
+    for (const p of permute(rest)) out.push([xs[i]].concat(p));
+  }
+  return out;
+}
+
+/* A point in the middle of a line of identity is not a separate thing: the line
+   is one graph, however many points we happen to have marked on it (C7). So
+   before comparing two graphs we drop the points that merely mark a passage
+   along a line, keeping every loose end, every branch, and every point whose
+   removal would take the line out of an area it occupies. */
+function normalizeLines(g){
+  const hooks = new Set();
+  for (const n of Object.values(g.nodes))
+    if (n.k === 'spot') n.hooks.forEach(h => hooks.add(h));
+  let changed = true;
+  while (changed){
+    changed = false;
+    for (const id of Object.keys(g.lns)){
+      if (hooks.has(id)) continue;
+      const nb = neighbours(g, id);
+      if (nb.length !== 2) continue;
+      const A = g.lns[id].area;
+      const [u, v] = nb;
+      const au = g.lns[u].area, av = g.lns[v].area;
+      // keep the point unless the line still occupies A without it
+      if (au !== A && av !== A) continue;
+      // the edge that replaces it must still join one area to itself or to the
+      // area of a cut upon it
+      const ok = au === av || placeOf(g, au) === av || placeOf(g, av) === au;
+      if (!ok) continue;
+      removeLn(g, id);
+      addEdge(g, u, v);
+      changed = true;
+    }
+  }
+  return g;
+}
+
+/* --- copying a subgraph --------------------------------------------------- */
+// Thread a line of identity inwards from `fromLn` to `targetArea` (R3(b)).
+function threadTo(g, fromLn, targetArea){
+  const src = g.lns[fromLn].area;
+  if (src === targetArea) return fromLn;
+  const path = areaPath(g, targetArea);
+  const i = path.indexOf(src);
+  if (i < 0) return null;                     // not contained: cannot extend
+  let prev = fromLn;
+  for (let k = i+1; k < path.length; k++){
+    const ln = addLn(g, path[k]);
+    addEdge(g, prev, ln);
+    prev = ln;
+  }
+  return prev;
+}
+// Copy node `id` into `targetArea`. External ligature attachments are re-made
+// by extending the same ligature inwards (R3(c)).
+function copyNodeInto(g, id, targetArea){
+  const srcArea = g.nodes[id].area;
+  const inside = new Set();                   // lns belonging to the subgraph
+  (function collect(nid){
+    const n = g.nodes[nid];
+    if (n.k === 'spot') n.hooks.forEach(h => inside.add(h));
+    else {
+      g.areas[n.inner].lns.forEach(l => inside.add(l));
+      g.areas[n.inner].items.forEach(collect);
+    }
+  })(id);
+
+  const lnMap = {};
+  function cp(nid, into){
+    const n = g.nodes[nid];
+    if (n.k === 'spot'){
+      const sid = addSpot(g, into, n.name, n.hooks.length);
+      n.hooks.forEach((h,i) => lnMap[h] = g.nodes[sid].hooks[i]);
+      return sid;
+    }
+    const cid = addCut(g, into), ia = g.nodes[cid].inner;
+    // a spot's hooks are made by addSpot below; copying them here as well would
+    // leave stray points on the line
+    const hookHere = new Set();
+    for (const ch of g.areas[n.inner].items)
+      if (g.nodes[ch].k === 'spot') g.nodes[ch].hooks.forEach(h => hookHere.add(h));
+    g.areas[n.inner].lns.forEach(l => { if (!hookHere.has(l)) lnMap[l] = addLn(g, ia); });
+    g.areas[n.inner].items.forEach(ch => cp(ch, ia));
+    return cid;
+  }
+  const newId = cp(id, targetArea);
+
+  // internal edges
+  for (const e of Object.values(g.edges).slice()){
+    if (inside.has(e.a) && inside.has(e.b) && lnMap[e.a] && lnMap[e.b])
+      addEdge(g, lnMap[e.a], lnMap[e.b]);
+  }
+  // edges leaving the subgraph: rejoin the copy to the very same ligature
+  for (const e of Object.values(g.edges).slice()){
+    let inn = null, out = null;
+    if (inside.has(e.a) && !inside.has(e.b)){ inn = e.a; out = e.b; }
+    else if (inside.has(e.b) && !inside.has(e.a)){ inn = e.b; out = e.a; }
+    if (inn === null || !lnMap[inn]) continue;
+    const anchor = threadTo(g, out, g.lns[lnMap[inn]].area);
+    if (anchor !== null) addEdge(g, anchor, lnMap[inn]);
+  }
+  return newId;
+}
+
+/* --- enumerating the legal moves ------------------------------------------
+   Erasure and insertion are the only rules whose parity flips when a proof is
+   read backwards: what R1 erases from an evenly enclosed area, R2 could have
+   scribed on an oddly enclosed one. Iteration/deiteration and the double cut
+   are available in both directions, being each other's converse.
+   `palette` holds the graphs that may be scribed; in a search it is drawn from
+   the premisses and the conclusion. -------------------------------------- */
+
+function legalMoves(g, opts){
+  opts = opts || {};
+  const dir = opts.dir || 'fwd';
+  const fwd = dir === 'fwd';
+  const eraseParity  = fwd ? 0 : 1;
+  const insertParity = fwd ? 1 : 0;
+  const out = [];
+  const areasAll = areasUnder(g, g.root);
+  const maxNodes = opts.maxNodes || Infinity;
+  const size = Object.keys(g.nodes).length;
+
+  /* erasure */
+  for (const id of Object.keys(g.nodes))
+    if (depthOf(g, g.nodes[id].area) % 2 === eraseParity)
+      out.push({ op:'erase', node:id });
+  for (const e of Object.values(g.edges)){
+    const da = depthOf(g, g.lns[e.a].area), db = depthOf(g, g.lns[e.b].area);
+    if (da % 2 === eraseParity && db % 2 === eraseParity)
+      out.push({ op:'eraseEdge', edge:e.id });
+  }
+  /* insertion */
+  if (size < maxNodes && opts.palette && opts.palette.length){
+    for (const a of areasAll){
+      if (depthOf(g, a) % 2 !== insertParity) continue;
+      opts.palette.forEach((p,i) => out.push({ op:'insert', area:a, pat:i }));
+    }
+  }
+  for (const a of areasAll){
+    if (depthOf(g, a) % 2 !== insertParity) continue;
+    const ls = g.areas[a].lns;
+    for (let i=0;i<ls.length;i++) for (let j=i+1;j<ls.length;j++){
+      if (find2(g, ls[i]) === find2(g, ls[j])) continue;
+      out.push({ op:'join', a:ls[i], b:ls[j] });
+    }
+  }
+  /* iteration — both directions */
+  if (size < maxNodes)
+  for (const id of Object.keys(g.nodes)){
+    const n = g.nodes[id];
+    const banned = n.k==='cut' ? new Set(areasUnder(g, n.inner)) : new Set();
+    for (const b of areasAll){
+      if (!contains(g, n.area, b)) continue;
+      if (banned.has(b)) continue;
+      out.push({ op:'iterate', node:id, target:b });
+    }
+  }
+  /* deiteration — both directions */
+  const lig = ligIndex(g);
+  const canon = {};
+  for (const id of Object.keys(g.nodes)) canon[id] = canonNode(g, id, lig);
+  for (const m of Object.keys(g.nodes)){
+    for (const n of Object.keys(g.nodes)){
+      if (m === n || canon[m] !== canon[n]) continue;
+      const N = g.nodes[n];
+      if (!contains(g, N.area, g.nodes[m].area)) continue;
+      if (N.k === 'cut' && areasUnder(g, N.inner).includes(g.nodes[m].area)) continue;
+      out.push({ op:'deiterate', node:m, witness:n });
+      break;
+    }
+  }
+  /* lines of identity ------------------------------------------------------
+     C6 licenses an unattached line on the sheet of assertion outright; R2
+     licenses one on any oddly enclosed area. R3(a),(b) and R4(a),(b) let a
+     loose end be branched, extended inwards, retracted or withdrawn. */
+  if (opts.beta){
+    const isHook = new Set();
+    for (const n of Object.values(g.nodes))
+      if (n.k==='spot') n.hooks.forEach(h => isHook.add(h));
+    const looseEnd = l => !isHook.has(l) && neighbours(g, l).length <= 1;
+
+    if (size < maxNodes){
+      for (const a of areasAll)
+        if (a === g.root || depthOf(g, a) % 2 === insertParity)
+          out.push({ op:'addLine', area:a });
+    }
+    for (const l of Object.keys(g.lns)){
+      const nb = neighbours(g, l);
+      const myArea = g.lns[l].area;
+      if (nb.length === 0 && !isHook.has(l) &&
+          (myArea === g.root || depthOf(g, myArea) % 2 === eraseParity))
+        out.push({ op:'delLine', ln:l });
+      if (size < maxNodes){
+        // R3(a): a branch with a loose end, no cut crossed
+        out.push({ op:'branch', ln:l });
+        // R3(b): extend a loose end inwards through a cut
+        if (looseEnd(l))
+          for (const id of g.areas[myArea].items)
+            if (g.nodes[id].k === 'cut') out.push({ op:'extend', ln:l, cut:id });
+      }
+      // R4(a)/(b): retract a loose end
+      if (looseEnd(l) && nb.length === 1){
+        const wArea = g.lns[nb[0]].area;
+        if (wArea === myArea || wArea === placeOf(g, myArea))
+          out.push({ op:'retract', ln:l });
+      }
+    }
+  }
+
+  /* the double cut — both directions */
+  if (size < maxNodes)
+  for (const a of areasAll){
+    const items = g.areas[a].items;
+    // "around any graph on any area" — and any several graphs juxtaposed on one
+    // area are themselves a graph (C3), so every selection of them counts
+    if (items.length <= 4){
+      for (let m = 0; m < (1 << items.length); m++)
+        out.push({ op:'dcIn', area:a, items: items.filter((_,i) => m & (1<<i)) });
+    } else {
+      out.push({ op:'dcIn', area:a, items:[] });
+      for (const i of items) out.push({ op:'dcIn', area:a, items:[i] });
+      for (let i=0;i+1<items.length;i++) out.push({ op:'dcIn', area:a, items:[items[i],items[i+1]] });
+      out.push({ op:'dcIn', area:a, items:items.slice() });
+    }
+  }
+  for (const id of Object.keys(g.nodes)){
+    const n = g.nodes[id];
+    if (n.k !== 'cut') continue;
+    const inner = g.areas[n.inner];
+    if (inner.items.length !== 1) continue;
+    const d = g.nodes[inner.items[0]];
+    if (!d || d.k !== 'cut') continue;
+    // R5 tolerates ligatures passing right through, but nothing may rest on
+    // the outer area (Roberts p.59).
+    // R5 tolerates ligatures passing from outside the outer cut to inside the
+    // inner one; what it forbids is any graph *resting* on the outer area
+    // (Roberts p.59). So every component of line on that area must run right
+    // through: out through the outer cut and in through the loop.
+    const passes = componentsOn(g, n.inner).every(comp => {
+      const out_ = comp.some(l => neighbours(g,l).some(w => g.lns[w].area === n.area));
+      const in_  = comp.some(l => neighbours(g,l).some(w => g.lns[w].area === d.inner));
+      return out_ && in_;
+    });
+    if (!passes) continue;
+    out.push({ op:'dcOut', cut:id });
+  }
+  return out;
+}
+// connected components of the line points lying on one area
+function componentsOn(g, areaId){
+  const here = new Set(g.areas[areaId].lns);
+  const seen = new Set(), out = [];
+  for (const l of g.areas[areaId].lns){
+    if (seen.has(l)) continue;
+    const comp = [], st = [l]; seen.add(l);
+    while (st.length){
+      const v = st.pop(); comp.push(v);
+      for (const w of neighbours(g, v))
+        if (here.has(w) && !seen.has(w)){ seen.add(w); st.push(w); }
+    }
+    out.push(comp);
+  }
+  return out;
+}
+
+// quick union-find over the whole ligature graph, for the join test
+function find2(g, l){
+  const seen = new Set([l]); const st=[l]; let min=l;
+  while (st.length){ const v=st.pop(); for (const w of neighbours(g,v)) if(!seen.has(w)){seen.add(w);st.push(w); if(w<min) min=w;} }
+  return min;
+}
+
+/* The Peirce rule a move exhibits, given the direction it was found in.
+   A backward step T→S is justified by the forward rule that carries T to S. */
+function ruleOf(op, fwd){
+  switch(op){
+    case 'erase': case 'eraseEdge': return fwd ? 'R1' : 'R2';
+    case 'insert': case 'join':     return fwd ? 'R2' : 'R1';
+    case 'iterate':                 return fwd ? 'R3' : 'R4';
+    case 'deiterate':               return fwd ? 'R4' : 'R3';
+    case 'dcIn': case 'dcOut':      return 'R5';
+    case 'addLine':                 return fwd ? 'C6/R2' : 'R1';
+    case 'delLine':                 return fwd ? 'R1' : 'C6/R2';
+    case 'branch':                  return fwd ? 'R3(a)' : 'R4(a)';
+    case 'extend':                  return fwd ? 'R3(b)' : 'R4(b)';
+    case 'retract':                 return fwd ? 'R4(a,b)' : 'R3(a,b)';
+  }
+  return '?';
+}
+
+/* --- apply a move --------------------------------------------------------- */
+function applyMove(g0, mv, palette){
+  const g = cloneGraph(g0);
+  switch (mv.op){
+    case 'erase':     removeNode(g, mv.node); break;
+    case 'eraseEdge': delete g.edges[mv.edge]; break;
+    case 'insert':    spliceIn(g, palette[mv.pat], mv.area); break;
+    case 'join':      addEdge(g, mv.a, mv.b); break;
+    case 'iterate':   copyNodeInto(g, mv.node, mv.target); break;
+    case 'deiterate': removeNode(g, mv.node); break;
+    case 'addLine':  addLn(g, mv.area); break;
+    case 'delLine':  removeLn(g, mv.ln); break;
+    case 'branch':   { const nl = addLn(g, g.lns[mv.ln].area); addEdge(g, mv.ln, nl); break; }
+    case 'extend':   { const nl = addLn(g, g.nodes[mv.cut].inner); addEdge(g, mv.ln, nl); break; }
+    case 'retract':  removeLn(g, mv.ln); break;
+    case 'dcIn': {
+      const outer = addCut(g, mv.area), oa = g.nodes[outer].inner;
+      const loop  = addCut(g, oa), la = g.nodes[loop].inner;
+      for (const id of mv.items) moveNode(g, id, la);
+      // any ligature now running from mv.area into la must be given a point on
+      // the outer close, so that it crosses one cut at a time (R5, Roberts p.59)
+      const insideLa = new Set(g.areas[la].lns);
+      for (const e of Object.values(g.edges).slice()){
+        let inn = null, out = null;
+        if (insideLa.has(e.a) && g.lns[e.b] && g.lns[e.b].area === mv.area){ inn=e.a; out=e.b; }
+        else if (insideLa.has(e.b) && g.lns[e.a] && g.lns[e.a].area === mv.area){ inn=e.b; out=e.a; }
+        if (inn === null) continue;
+        delete g.edges[e.id];
+        const mid = addLn(g, oa);
+        addEdge(g, out, mid); addEdge(g, mid, inn);
+      }
+      break;
+    }
+    case 'dcOut': {
+      const n = g.nodes[mv.cut];
+      const d = g.nodes[g.areas[n.inner].items[0]];
+      const dest = n.area;
+      for (const id of g.areas[d.inner].items.slice()) moveNode(g, id, dest);
+      for (const l of g.areas[d.inner].lns.slice()) moveLn(g, l, dest);
+      for (const l of g.areas[n.inner].lns.slice()) moveLn(g, l, dest);
+      removeNode(g, mv.cut);
+      break;
+    }
+    default: throw new Error('unknown move '+mv.op);
+  }
+  fixScrolls(g);
+  return g;
+}
+// A cut is the outer cut of a scroll only while its loop is still on its area;
+// the rules may have moved or erased it (C4).
+function fixScrolls(g){
+  for (const n of Object.values(g.nodes)){
+    if (n.k !== 'cut' || n.scroll === undefined) continue;
+    const loop = g.nodes[n.scroll];
+    if (!loop || loop.area !== n.inner) delete n.scroll;
+  }
+}
+
+// Move an existing node (with everything under it) to another area.
+function moveNode(g, id, destArea){
+  const n = g.nodes[id];
+  const old = g.areas[n.area];
+  old.items = old.items.filter(x => x !== id);
+  n.area = destArea;
+  g.areas[destArea].items.push(id);
+  if (n.k === 'spot') n.hooks.forEach(h => moveLn(g, h, destArea));
+}
+function moveLn(g, id, destArea){
+  const old = g.areas[g.lns[id].area];
+  old.lns = old.lns.filter(x => x !== id);
+  g.lns[id].area = destArea;
+  g.areas[destArea].lns.push(id);
+}
+// Scribe a copy of graph `p` (a whole graph object) onto `area` of g.
+function spliceIn(g, p, area){
+  if (!p) return;
+  const map = {};
+  (function cp(srcArea, dstArea){
+    const hookHere = new Set();
+    for (const id of p.areas[srcArea].items)
+      if (p.nodes[id].k === 'spot') p.nodes[id].hooks.forEach(h => hookHere.add(h));
+    for (const l of p.areas[srcArea].lns) if (!hookHere.has(l)) map[l] = addLn(g, dstArea);
+    for (const id of p.areas[srcArea].items){
+      const n = p.nodes[id];
+      if (n.k === 'spot'){
+        const sid = addSpot(g, dstArea, n.name, n.hooks.length);
+        n.hooks.forEach((h,i) => map[h] = g.nodes[sid].hooks[i]);
+      } else {
+        const cid = addCut(g, dstArea);
+        cp(n.inner, g.nodes[cid].inner);
+      }
+    }
+  })(p.root, area);
+  for (const e of Object.values(p.edges))
+    if (map[e.a] && map[e.b]) addEdge(g, map[e.a], map[e.b]);
+}
+
+/* --- human-readable justification ----------------------------------------- */
+function describeMove(g, mv, fwd){
+  fwd = fwd !== false;
+  const nm = id => {
+    const n = g.nodes[id];
+    if (!n) return 'the graph';
+    return n.k === 'spot' ? '“'+n.name+'”' : 'the enclosure';
+  };
+  const par = id => g.nodes[id] ? (evenlyEnclosed(g, g.nodes[id].area) ? 'evenly' : 'oddly') : '';
+  switch (mv.op){
+    case 'erase': return fwd
+      ? 'R1, erasure: '+nm(mv.node)+' is '+par(mv.node)+' enclosed, so it may be erased.'
+      : 'R2, insertion: '+nm(mv.node)+' stands on an oddly enclosed area, where any graph may be scribed.';
+    case 'eraseEdge': return fwd
+      ? 'R1, erasure: an evenly enclosed portion of a line of identity is erased.'
+      : 'R2, insertion: two oddly enclosed lines on the same area are joined.';
+    case 'insert': return fwd
+      ? 'R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it.'
+      : 'R1, erasure: the graph is evenly enclosed, so it may be erased.';
+    case 'join': return fwd
+      ? 'R2, insertion: two lines of identity oddly enclosed on the same area are joined.'
+      : 'R1, erasure: an evenly enclosed portion of a line of identity is erased.';
+    case 'iterate': return fwd
+      ? 'R3, iteration: '+nm(mv.node)+' is scribed again on an area contained by its own place.'
+      : 'R4, deiteration: the copy could have been got by iteration, so it may be erased.';
+    case 'deiterate': return fwd
+      ? 'R4, deiteration: '+nm(mv.node)+' could have been got by iterating '+nm(mv.witness)+
+        ', which is less enclosed, so it may be erased.'
+      : 'R3, iteration: the graph is scribed again on an area contained by its own place.';
+    case 'addLine': return fwd
+      ? 'C6: an unattached line of identity may always be scribed — "something exists".'
+      : 'R1, erasure: an evenly enclosed line of identity is erased.';
+    case 'delLine': return fwd
+      ? 'R1, erasure: an evenly enclosed line of identity is erased.'
+      : 'C6: an unattached line of identity may always be scribed.';
+    case 'branch': return fwd
+      ? 'R3(a), iteration: a branch with a loose end is added to a line of identity.'
+      : 'R4(a), deiteration: a branch with a loose end is retracted into the line.';
+    case 'extend': return fwd
+      ? 'R3(b), iteration: a loose end of the ligature is extended inwards through a cut.'
+      : 'R4(b), deiteration: a loose end of the ligature is retracted outwards through a cut.';
+    case 'retract': return fwd
+      ? 'R4(a,b), deiteration: a loose end is retracted.'
+      : 'R3(a,b), iteration: a loose end is extended.';
+    case 'dcIn':  return fwd ? 'R5: a double cut is inserted.' : 'R5: a double cut is removed.';
+    case 'dcOut': return fwd ? 'R5: a double cut is removed.'  : 'R5: a double cut is inserted.';
+  }
+  return mv.op;
+}
+/* ============================================================================
+   THE PROOF FINDER.
+   A bidirectional search over Peirce's five rules. The forward half starts from
+   the premisses scribed on the sheet of assertion; the backward half starts
+   from the conclusion and runs the rules in reverse. Where the two halves meet
+   we have a transformation of the premisses into the conclusion.
+
+   For Alpha the question of validity is settled independently by Roberts'
+   truth-value analysis (§3.2), so a failed search is reported as a failed
+   search and never as a disproof. Beta validity is not decidable at all; there
+   we can refute by finite countermodel, and otherwise only search.
+   ========================================================================== */
+
+// juxtapose several graphs on one sheet — C3, juxtaposition is conjunction
+function juxtapose(graphs){
+  const g = newGraph();
+  graphs.forEach(p => spliceIn(g, p, g.root));
+  return g;
+}
+
+// every subgraph of g, as a standalone graph, for the insertion palette
+function subgraphPalette(graphs){
+  const out = [], seen = new Set();
+  for (const g of graphs){
+    for (const id of Object.keys(g.nodes)){
+      const h = newGraph();
+      copyNodeAcross(g, id, h, h.root);
+      const key = canonGraph(h);
+      if (seen.has(key)) continue;
+      seen.add(key); out.push(h);
+    }
+  }
+  return out;
+}
+function copyNodeAcross(src, id, dst, area){
+  const n = src.nodes[id];
+  if (n.k === 'spot'){ addSpot(dst, area, n.name, n.hooks.length); return; }
+  const c = addCut(dst, area);
+  for (const ch of src.areas[n.inner].items) copyNodeAcross(src, ch, dst, dst.nodes[c].inner);
+}
+
+function graphSize(g){ return Object.keys(g.nodes).length + Object.keys(g.lns).length; }
+
+/* A crude structural fingerprint: which spots occur, and how deeply. Used only
+   to order the search; it never licenses or blocks a step. */
+function fingerprint(g){
+  const f = {};
+  for (const n of Object.values(g.nodes)){
+    const key = (n.k==='spot' ? n.name : '()') + '@' + depthOf(g, n.area);
+    f[key] = (f[key]||0) + 1;
+  }
+  f['#ln'] = Object.keys(g.lns).length;
+  return f;
+}
+function fpDist(a, b){
+  let d = 0;
+  const keys = new Set([...Object.keys(a), ...Object.keys(b)]);
+  for (const k of keys) d += Math.abs((a[k]||0) - (b[k]||0));
+  return d;
+}
+
+function findProof(premGraphs, goalGraph, opts){
+  opts = opts || {};
+  const maxDepth = opts.maxDepth || 6;
+  const budget   = opts.budget   || 60000;
+  const t0 = Date.now();
+  const timeCap = opts.timeCap || 8000;
+
+  const start = juxtapose(premGraphs);
+  const goal  = cloneGraph(goalGraph);
+  const palette = subgraphPalette([start, goal]);
+  const slack = opts.slack || 3;
+  const maxNodes = Math.max(graphSize(start), graphSize(goal)) + slack;
+
+  const beta = !isAlpha(start) || !isAlpha(goal);
+
+  /* Sound pruning, available in Alpha because validity there is decidable.
+     Every rule is truth-preserving, so any state the forward search can use
+     must still entail the conclusion, and any state the backward search can
+     use must still be entailed by the premisses. Roberts proves the rules
+     truth-preserving in §3.2 and Appendix 4. */
+  const atoms = new Set();
+  [start, goal].forEach(x => alphaAtoms(x).forEach(a => atoms.add(a)));
+  const A = [...atoms];
+  const usePrune = !beta && A.length <= 10;
+  const rows = [];
+  if (usePrune)
+    for (let m = 0; m < (1 << A.length); m++){
+      const asg = {}; A.forEach((a,i) => asg[a] = !!(m & (1<<i)));
+      rows.push(asg);
+    }
+  const startVals = usePrune ? rows.map(r => valuate(start, r).value) : null;
+  const goalVals  = usePrune ? rows.map(r => valuate(goal,  r).value) : null;
+  // forward states must entail the goal; backward states must be entailed by
+  // the premisses
+  function keepFwd(h){
+    if (!usePrune) return true;
+    for (let i=0;i<rows.length;i++)
+      if (valuate(h, rows[i]).value === 1 && goalVals[i] !== 1) return false;
+    return true;
+  }
+  function keepBwd(h){
+    if (!usePrune) return true;
+    for (let i=0;i<rows.length;i++)
+      if (startVals[i] === 1 && valuate(h, rows[i]).value !== 1) return false;
+    return true;
+  }
+
+  const kStart = canonGraph(start), kGoal = canonGraph(goal);
+  if (kStart === kGoal)
+    return { found:true, steps:[{graph:start, rule:null, why:'The conclusion is already scribed.'}], expanded:0 };
+
+  // frontier records: key -> {graph, prev, mv, depth, fwd}
+  const fpGoal = fingerprint(goal), fpStart = fingerprint(start);
+  const beam = opts.beam || 600;
+
+  const F = new Map(), B = new Map();
+  F.set(kStart, { graph:start, prev:null, mv:null, depth:0 });
+  B.set(kGoal,  { graph:goal,  prev:null, mv:null, depth:0 });
+  let Fq = [kStart], Bq = [kGoal];
+  let expanded = 0;
+
+  const expand = (side, q, map, other, dir) => {
+    const nq = [];
+    for (const key of q){
+      const rec = map.get(key);
+      if (Date.now() - t0 > timeCap || expanded > budget) return { nq, meet:null, out:true };
+      const mvs = legalMoves(rec.graph, { dir, palette, maxNodes, beta });
+      // cheap moves first: they shrink or keep the graph
+      mvs.sort((a,b) => rank(a) - rank(b));
+      for (const mv of mvs){
+        expanded++;
+        if (expanded > budget) return { nq, meet:null, out:true };
+        let h;
+        try { h = applyMove(rec.graph, mv, palette); } catch(e){ continue; }
+        if (graphSize(h) > maxNodes + 4) continue;
+        if (dir === 'fwd' ? !keepFwd(h) : !keepBwd(h)) continue;
+        const k = canonGraph(h);
+        if (map.has(k)) continue;
+        const entry = { graph:h, prev:key, mv, depth:rec.depth+1 };
+        map.set(k, entry);
+        if (other.has(k)) return { nq, meet:k, out:false };
+        nq.push(k);
+      }
+    }
+    return { nq, meet:null, out:false };
+  };
+  // beam: keep the most promising states in each layer, so that long proofs
+  // stay reachable without the frontier exploding
+  const trim = (keys, map, target) => {
+    if (keys.length <= beam) return keys;
+    return keys
+      .map(k => ({ k, d: fpDist(fingerprint(map.get(k).graph), target) }))
+      .sort((a,b) => a.d - b.d)
+      .slice(0, beam)
+      .map(x => x.k);
+  };
+  const rank = mv => ({ deiterate:0, dcOut:1, erase:2, eraseEdge:2,
+                        dcIn:3, iterate:4, join:5, insert:6 })[mv.op] ?? 9;
+
+  for (let d = 0; d < maxDepth; d++){
+    // always grow the smaller frontier
+    const growF = Fq.length <= Bq.length;
+    const r = growF ? expand('F', Fq, F, B, 'fwd') : expand('B', Bq, B, F, 'bwd');
+    if (growF) Fq = trim(r.nq, F, fpGoal); else Bq = trim(r.nq, B, fpStart);
+    if (r.meet) return assemble(F, B, r.meet, expanded, palette);
+    if (r.out) break;
+    if (!Fq.length && !Bq.length) break;
+  }
+  return { found:false, expanded, exhausted: Fq.length===0 && Bq.length===0 };
+}
+
+function assemble(F, B, meetKey, expanded, palette){
+  // forward chain: start ... meet
+  const fwd = [];
+  let k = meetKey;
+  while (k && F.has(k)){ const r = F.get(k); fwd.unshift({ key:k, rec:r }); k = r.prev; }
+  // backward chain from meet to goal, read forwards
+  const bwd = [];
+  k = meetKey;
+  while (k && B.has(k)){ const r = B.get(k); bwd.push({ key:k, rec:r }); k = r.prev; }
+
+  const steps = [];
+  steps.push({ graph: fwd[0].rec.graph, rule:null, why:'The premisses, scribed on the sheet of assertion.' });
+  for (let i = 1; i < fwd.length; i++){
+    const r = fwd[i].rec;
+    steps.push({ graph:r.graph, rule: ruleOf(r.mv.op, true), mv:r.mv,
+                 why: describeMove(fwd[i-1].rec.graph, r.mv, true) });
+  }
+  for (let i = 1; i < bwd.length; i++){
+    const r = bwd[i-1].rec;                       // the move that took bwd[i] -> bwd[i-1]
+    steps.push({ graph: bwd[i].rec.graph, rule: ruleOf(r.mv.op, false), mv:r.mv,
+                 why: describeMove(bwd[i-1].rec.graph, r.mv, false) });
+  }
+  return { found:true, steps, expanded };
+}
+/* ============================================================================
+   LAYOUT AND RENDERING.
+   Cuts nest as closed curves; graphs on one area are stacked, juxtaposition
+   being conjunction (C3). Every area keeps a left margin in which the points
+   of its lines of identity sit, so a ligature runs down the inside of the
+   enclosures it occupies and reaches rightwards to each hook — the shape of
+   Peirce's own drawings (Roberts, Figs. 6-9, p. 51).
+   ========================================================================== */
+
+const LAY = {
+  padX: 16, padY: 12,       // inside a cut
+  leftM: 20,                // left margin of an area, where the lines run
+  gap: 9,                   // between graphs on one area
+  spotH: 22, spotPadX: 9,
+  charW: 7.1, minSpotW: 26,
+  hookGap: 11,
+  bareW: 26, bareH: 16,
+  laneW: 9
+};
+
+function textWidth(s){ return Math.max(LAY.minSpotW, s.length * LAY.charW + 2*LAY.spotPadX); }
+
+/* Does anything on or under this area carry a line of identity? Where lines
+   are involved the graphs are stacked, so that each spot's hooks face the
+   margin the line runs down; where they are not, graphs sit side by side, as
+   Peirce scribes them (Roberts p. 46). */
+function areaHasLines(g, areaId){
+  if (g.areas[areaId].lns.length) return true;
+  for (const id of g.areas[areaId].items){
+    const n = g.nodes[id];
+    if (n.k === 'spot'){ if (n.hooks.length) return true; }
+    else if (areaHasLines(g, n.inner)) return true;
+  }
+  return false;
+}
+
+/* Each ligature that runs down an area's margin gets its own lane, so that two
+   distinct lines of identity on one area never appear to join. */
+function laneMap(g){
+  const lig = ligIndex(g);
+  const hooks = new Set();
+  for (const n of Object.values(g.nodes))
+    if (n.k === 'spot') n.hooks.forEach(h => hooks.add(h));
+  const lanes = {};
+  for (const a in g.areas) lanes[a] = {};
+  for (const l of Object.values(g.lns)){
+    if (hooks.has(l.id)) continue;
+    const m = lanes[l.area];
+    if (m[lig[l.id]] === undefined) m[lig[l.id]] = Object.keys(m).length;
+  }
+  return { lanes, lig, hooks };
+}
+
+/* ---- measure: bottom-up sizes ------------------------------------------- */
+function measure(g, areaId, M, maxRow, LN){
+  maxRow = maxRow || 560;
+  const area = g.areas[areaId];
+  const horiz = !areaHasLines(g, areaId);
+  const sizes = [];
+  for (const id of area.items){
+    const n = g.nodes[id];
+    let bw, bh;
+    if (n.k === 'spot'){
+      bw = textWidth(n.name);
+      bh = Math.max(LAY.spotH, n.hooks.length * LAY.hookGap + 8);
+    } else {
+      const m = measure(g, n.inner, M, maxRow, LN);
+      bw = m.w; bh = m.h;
+    }
+    M[id] = { w: bw, h: bh };
+    sizes.push({ id, w: bw, h: bh });
+  }
+
+  const rows = [];
+  if (horiz){
+    let cur = [], cw = 0;
+    for (const it of sizes){
+      if (cur.length && cw + LAY.gap + it.w > maxRow){ rows.push(cur); cur = []; cw = 0; }
+      cur.push(it); cw += (cur.length>1 ? LAY.gap : 0) + it.w;
+    }
+    if (cur.length) rows.push(cur);
+  } else {
+    for (const it of sizes) rows.push([it]);
+  }
+
+  let w = 0, h = 0;
+  for (const r of rows){
+    let rw = 0, rh = 0;
+    r.forEach((it,i) => { rw += (i?LAY.gap:0) + it.w; rh = Math.max(rh, it.h); });
+    r.h = rh; r.w = rw;
+    w = Math.max(w, rw); h += rh + LAY.gap;
+  }
+  if (rows.length) h -= LAY.gap;
+
+  if (area.lns.length && !rows.length){ w = Math.max(w, LAY.bareW); h = Math.max(h, LAY.bareH); }
+  if (!rows.length && !area.lns.length){ w = Math.max(w, 30); h = Math.max(h, 16); }
+  const nLanes = LN ? Object.keys(LN.lanes[areaId]).length : (area.lns.length ? 1 : 0);
+  const lm = nLanes ? 8 + nLanes * LAY.laneW + 6 : LAY.padX;
+  const box = { w: lm + w + LAY.padX, h: h + 2*LAY.padY, contentW: w, leftM: lm, rows, horiz };
+  M[areaId] = box;
+  return box;
+}
+
+/* ---- place: top-down positions ------------------------------------------ */
+function place(g, areaId, x, y, M, P){
+  const box = M[areaId];
+  P[areaId] = { x, y, w: box.w, h: box.h };
+  let cy = y + LAY.padY;
+  const cx0 = x + box.leftM;
+  for (const r of box.rows){
+    let cx = cx0;
+    for (const it of r){
+      const n = g.nodes[it.id];
+      P[it.id] = { x: cx, y: cy + (r.h - it.h)/2, w: it.w, h: it.h };
+      if (n.k === 'cut') place(g, n.inner, P[it.id].x, P[it.id].y, M, P);
+      cx += it.w + LAY.gap;
+    }
+    cy += r.h + LAY.gap;
+  }
+}
+
+/* ---- hook points --------------------------------------------------------- */
+function hookPoints(g, spotId, P){
+  const n = g.nodes[spotId], p = P[spotId];
+  const k = n.hooks.length, out = {};
+  if (!k) return out;
+  const span = (k-1) * LAY.hookGap;
+  let y0 = p.y + p.h/2 - span/2;
+  n.hooks.forEach((h,i) => out[h] = { x: p.x, y: y0 + i*LAY.hookGap, i });
+  return out;
+}
+
+/* ---- positions for the points of the lines of identity ------------------- */
+function placeLines(g, P, LN){
+  const pos = {}, fixed = {};
+  for (const n of Object.values(g.nodes)){
+    if (n.k !== 'spot') continue;
+    const hp = hookPoints(g, n.id, P);
+    for (const h in hp){ pos[h] = { x: hp[h].x, y: hp[h].y }; fixed[h] = true; }
+  }
+  // spine points sit in their own area's margin, each ligature in its own lane
+  for (const l of Object.values(g.lns)){
+    if (fixed[l.id]) continue;
+    const a = P[l.area];
+    const lane = LN ? (LN.lanes[l.area][LN.lig[l.id]] || 0) : 0;
+    pos[l.id] = { x: a.x + 8 + lane * LAY.laneW, y: a.y + a.h/2 };
+  }
+  // relax towards the neighbours, clamped inside the owning area
+  for (let it = 0; it < 60; it++){
+    for (const l of Object.values(g.lns)){
+      if (fixed[l.id]) continue;
+      const nb = neighbours(g, l.id);
+      if (!nb.length) continue;
+      const a = P[l.area];
+      let sy = 0; nb.forEach(w => sy += pos[w].y);
+      let y = sy / nb.length;
+      y = Math.max(a.y + 7, Math.min(a.y + a.h - 7, y));
+      pos[l.id].y = pos[l.id].y * 0.4 + y * 0.6;
+    }
+  }
+  // spread coincident points on one area so the spine reads as a line
+  const byArea = {};
+  for (const l of Object.values(g.lns)){
+    if (fixed[l.id]) continue;
+    const key = l.area + '/' + (LN ? LN.lig[l.id] : 0);
+    (byArea[key] = byArea[key] || []).push(l.id);
+  }
+  for (const a in byArea){
+    const ls = byArea[a].sort((p,q) => pos[p].y - pos[q].y);
+    for (let i=1;i<ls.length;i++)
+      if (pos[ls[i]].y - pos[ls[i-1]].y < 6) pos[ls[i]].y = pos[ls[i-1]].y + 6;
+  }
+  return pos;
+}
+
+/* ---- a hand-drawn closed curve for a cut --------------------------------- */
+function seededRand(seed){
+  let s = 0; for (let i=0;i<seed.length;i++) s = (s*31 + seed.charCodeAt(i)) & 0x7fffffff;
+  return () => { s = (s * 1103515245 + 12345) & 0x7fffffff; return (s / 0x7fffffff); };
+}
+function cutPath(x, y, w, h, seed, wobble){
+  const r = Math.min(22, h/2, w/2);
+  if (!wobble) return roundRect(x,y,w,h,r);
+  const rnd = seededRand(seed);
+  const j = () => (rnd() - 0.5) * 2.4;
+  const x0=x+j(), y0=y+j(), x1=x+w+j(), y1=y+h+j();
+  return `M ${x0+r} ${y0}
+    L ${x1-r+j()} ${y0+j()} Q ${x1} ${y0} ${x1+j()} ${y0+r}
+    L ${x1+j()} ${y1-r+j()} Q ${x1} ${y1} ${x1-r+j()} ${y1}
+    L ${x0+r+j()} ${y1+j()} Q ${x0} ${y1} ${x0+j()} ${y1-r}
+    L ${x0+j()} ${y0+r+j()} Q ${x0} ${y0} ${x0+r} ${y0} Z`;
+}
+function roundRect(x,y,w,h,r){
+  return `M ${x+r} ${y} H ${x+w-r} Q ${x+w} ${y} ${x+w} ${y+r}
+          V ${y+h-r} Q ${x+w} ${y+h} ${x+w-r} ${y+h}
+          H ${x+r} Q ${x} ${y+h} ${x} ${y+h-r}
+          V ${y+r} Q ${x} ${y} ${x+r} ${y} Z`;
+}
+
+/* ---- the renderer -------------------------------------------------------- */
+function renderGraph(g, opts){
+  opts = opts || {};
+  const M = {}, P = {};
+  const LN = laneMap(g);
+  measure(g, g.root, M, opts.maxRow, LN);
+  place(g, g.root, 0, 0, M, P);
+  const pos = placeLines(g, P, LN);
+  const W = M[g.root].w, H = M[g.root].h;
+  const parts = [];
+  const shade = opts.shade;
+  const wobble = opts.wobble !== false;
+  const hl = opts.highlight || {};      // {nodeId:'add'|'del'|'move'}
+
+  // the sheet of assertion
+  parts.push(`<rect class="sa" x="0.5" y="0.5" width="${W-1}" height="${H-1}" rx="6"/>`);
+
+  function drawArea(areaId){
+    for (const id of g.areas[areaId].items){
+      const n = g.nodes[id], p = P[id];
+      const mark = hl[id] ? ' hl-'+hl[id] : '';
+      if (n.k === 'cut'){
+        const d = depthOf(g, n.inner);
+        parts.push(`<path class="cut${mark}${shade && d%2===1 ? ' odd':''}" d="${
+          cutPath(p.x, p.y, p.w, p.h, n.id, wobble)}" data-node="${n.id}" data-area="${n.inner}"/>`);
+        drawArea(n.inner);
+      } else {
+        parts.push(`<g class="spot${mark}" data-node="${n.id}">`+
+          `<rect class="spotbg" x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="5"/>`+
+          `<text x="${p.x + p.w/2}" y="${p.y + p.h/2}" dominant-baseline="central" text-anchor="middle">${
+            esc(n.name)}</text></g>`);
+      }
+    }
+  }
+  drawArea(g.root);
+
+  // lines of identity, drawn heavy (C6-C8)
+  const segs = [];
+  for (const e of Object.values(g.edges)){
+    const a = pos[e.a], b = pos[e.b];
+    if (!a || !b) continue;
+    segs.push({ e, a, b });
+  }
+  for (const s of segs){
+    const {a, b} = s;
+    let d;
+    if (Math.abs(a.y - b.y) < 1.5) d = `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
+    else if (Math.abs(a.x - b.x) < 1.5) d = `M ${a.x} ${a.y} L ${b.x} ${b.y}`;
+    else {
+      // an elbow: run out to the shared margin, then across
+      const mx = Math.min(a.x, b.x);
+      d = `M ${a.x} ${a.y} L ${mx+0.01} ${a.y} Q ${mx} ${a.y} ${mx} ${a.y + Math.sign(b.y-a.y)*3}`+
+          ` L ${mx} ${b.y - Math.sign(b.y-a.y)*3} Q ${mx} ${b.y} ${mx+3} ${b.y} L ${b.x} ${b.y}`;
+    }
+    parts.push(`<path class="loi" d="${d}" data-edge="${s.e.id}"/>`);
+  }
+  // a ligature with a single point and no edge is the bare line of C6
+  for (const l of Object.values(g.lns)){
+    if (neighbours(g, l.id).length) continue;
+    const isHook = Object.values(g.nodes).some(n => n.k==='spot' && n.hooks.includes(l.id));
+    if (isHook) continue;
+    const p = pos[l.id];
+    parts.push(`<path class="loi" d="M ${p.x} ${p.y} L ${p.x + LAY.bareW} ${p.y}" data-ln="${l.id}"/>`);
+  }
+  // branch points
+  for (const l of Object.values(g.lns)){
+    if (neighbours(g, l.id).length >= 3){
+      const p = pos[l.id];
+      parts.push(`<circle class="branch" cx="${p.x}" cy="${p.y}" r="2.6"/>`);
+    }
+  }
+  // hook numerals, so the order of a spot's hooks can be read off
+  if (opts.hookNumbers !== false)
+  for (const n of Object.values(g.nodes)){
+    if (n.k !== 'spot' || n.hooks.length < 2) continue;
+    const hp = hookPoints(g, n.id, P);
+    n.hooks.forEach((h,i) => {
+      const q = hp[h];
+      parts.push(`<text class="hooknum" x="${q.x+5}" y="${q.y-4}">${i+1}</text>`);
+    });
+  }
+
+  // small grips on the points of the lines, for the editor
+  if (opts.handles)
+    for (const l of Object.values(g.lns)){
+      const p = pos[l.id]; if (!p) continue;
+      parts.push(`<circle class="handle" cx="${p.x}" cy="${p.y}" r="3.6" data-ln="${l.id}"/>`);
+    }
+
+  return { svg: parts.join('\n'), w: W, h: H, P, pos, M };
+}
+
+function esc(s){ return String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+function svgDoc(g, opts){
+  opts = opts || {};
+  const r = renderGraph(g, opts);
+  const pad = opts.pad || 10;
+  return `<svg class="eg" xmlns="http://www.w3.org/2000/svg" viewBox="${-pad} ${-pad} ${r.w+2*pad} ${r.h+2*pad}" `+
+         `width="${(r.w+2*pad)*(opts.scale||1)}" height="${(r.h+2*pad)*(opts.scale||1)}">${r.svg}</svg>`;
+}
+/* ============================================================================
+   A LINEAR NOTATION FOR GRAPHS, so that a graph can be written down exactly.
+
+     P Q            two graphs juxtaposed on one area  (C3: conjunction)
+     ( X )          a cut with X on its area            (C5)
+     ( )            the empty cut, the pseudograph
+     Name           a spot with no hooks
+     Name[a,b]      a spot whose hooks lie on the ligatures a and b
+     *a             a point of the ligature a on this area
+     a~b            the ligatures a and b joined on this area
+
+   A ligature named in a nested area is threaded inwards from its outermost
+   occurrence, which is what fixes whether it reads 'some' or 'any' (Roberts
+   p. 51).
+   ========================================================================== */
+
+function parseEG(src){
+  const g = newGraph();
+  const lig = Object.create(null);      // name -> { home, spine:{area:ln} }
+  let i = 0;
+
+  function ws(){ while (i < src.length && /\s/.test(src[i])) i++; }
+  function ident(){
+    // a spot whose name has spaces in it — "is a catholic" — is quoted
+    if (src[i] === '"'){
+      const j = src.indexOf('"', i+1);
+      if (j < 0) throw new Error('unclosed quotation at '+i);
+      const t = src.slice(i+1, j); i = j+1; return t;
+    }
+    const m = /^[A-Za-z_][A-Za-z0-9_'.\-]*/.exec(src.slice(i));
+    if (!m) throw new Error('expected a name at '+i);
+    i += m[0].length;
+    return m[0];
+  }
+  function ligName(){
+    const m = /^[a-z][A-Za-z0-9_]*/.exec(src.slice(i));
+    if (!m) throw new Error('expected a ligature name at '+i);
+    i += m[0].length; return m[0];
+  }
+  function ensure(name, area){
+    let b = lig[name];
+    if (!b){ b = lig[name] = { home: area, spine: {} }; b.spine[area] = addLn(g, area); return b.spine[area]; }
+    if (b.spine[area]) return b.spine[area];
+    const path = areaPath(g, area);
+    const hi = path.indexOf(b.home);
+    if (hi < 0) throw new Error('ligature "'+name+'" used outside the area it starts on');
+    let prev = b.spine[b.home];
+    for (let k = hi+1; k < path.length; k++){
+      const a = path[k];
+      if (!b.spine[a]){ b.spine[a] = addLn(g, a); addEdge(g, prev, b.spine[a]); }
+      prev = b.spine[a];
+    }
+    return b.spine[area];
+  }
+
+  function body(area){
+    for(;;){
+      ws();
+      if (i >= src.length) return;
+      const c = src[i];
+      if (c === ')' || c === '}' || c === '|') return;
+      if (c === '"'){
+        const name = ident();
+        let args = [];
+        ws();
+        if (src[i] === '['){
+          i++;
+          for(;;){ ws(); if (src[i]===']'){i++;break;} args.push(ligName()); ws();
+            if (src[i]===','){i++;continue;} if (src[i]===']'){i++;break;}
+            throw new Error('expected , or ] at '+i); }
+        }
+        const sid = addSpot(g, area, name, args.length);
+        args.forEach((a,k) => addEdge(g, g.nodes[sid].hooks[k], ensure(a, area)));
+        continue;
+      }
+      if (c === '('){
+        i++;
+        const cut = addCut(g, area);
+        body(g.nodes[cut].inner);
+        ws();
+        if (src[i] !== ')') throw new Error('missing ) at '+i);
+        i++;
+        continue;
+      }
+      if (c === '{'){          // { A | B } — a scroll: A on the outer close,
+        i++;                   // B on the loop (C4)
+        const outer = addCut(g, area), oa = g.nodes[outer].inner;
+        body(oa);
+        ws();
+        if (src[i] !== '|') throw new Error('a scroll needs | between antecedent and consequent, at '+i);
+        i++;
+        const loop = addCut(g, oa);
+        g.nodes[outer].scroll = loop;
+        body(g.nodes[loop].inner);
+        ws();
+        if (src[i] !== '}') throw new Error('missing } at '+i);
+        i++;
+        continue;
+      }
+      if (c === '*'){ i++; ensure(ligName(), area); continue; }
+      // "a~b" — a join
+      const jm = /^([a-z][A-Za-z0-9_]*)\s*~\s*([a-z][A-Za-z0-9_]*)/.exec(src.slice(i));
+      if (jm){ i += jm[0].length; addEdge(g, ensure(jm[1], area), ensure(jm[2], area)); continue; }
+      const name = ident();
+      let args = [];
+      ws();
+      if (src[i] === '['){
+        i++;
+        for(;;){
+          ws();
+          if (src[i] === ']'){ i++; break; }
+          args.push(ligName());
+          ws();
+          if (src[i] === ','){ i++; continue; }
+          if (src[i] === ']'){ i++; break; }
+          throw new Error('expected , or ] at '+i);
+        }
+      }
+      const sid = addSpot(g, area, name, args.length);
+      args.forEach((a,k) => addEdge(g, g.nodes[sid].hooks[k], ensure(a, area)));
+    }
+  }
+  body(g.root);
+  ws();
+  if (i < src.length) throw new Error('unexpected "'+src[i]+'" at '+i);
+  return g;
+}
+
+/* --- and back again -------------------------------------------------------- */
+function qname(s){ return /^[A-Za-z_][A-Za-z0-9_'.\-]*$/.test(s) ? s : '"'+s+'"'; }
+function writeEG(g, plain){
+  // Names are assigned area by area, exactly as the endoporeutic reading
+  // assigns variables, so that a line running out of an area and back in is
+  // written as two ligatures joined on the inner area.
+  const st = { n: 0 };
+  const alpha = 'abcdefghijklmnopqrstuvwxyz';
+  const fresh = () => alpha[st.n++ % 26] + (st.n > 26 ? String(Math.floor(st.n/26)) : '');
+  const hooks = new Set();
+  for (const n of Object.values(g.nodes))
+    if (n.k === 'spot') n.hooks.forEach(h => hooks.add(h));
+
+  function areaX(aid, inherited, skip){
+    const A = g.areas[aid], here = new Set(A.lns);
+    const parent = {};
+    const find = x => { while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; };
+    const union = (x,y) => { x=find(x); y=find(y); if (x!==y) parent[x]=y; };
+    A.lns.forEach(l => parent[l] = l);
+    for (const e of Object.values(g.edges))
+      if (here.has(e.a) && here.has(e.b)) union(e.a, e.b);
+
+    const inh = {}, nameOfComp = {};
+    for (const l of A.lns){
+      const r = find(l);
+      if (!inh[r]) inh[r] = [];
+      if (inherited[l] !== undefined && !inh[r].includes(inherited[l])) inh[r].push(inherited[l]);
+    }
+    const out = [], joins = [], news = [];
+    for (const l of A.lns){
+      const r = find(l);
+      if (nameOfComp[r] !== undefined) continue;
+      const got = inh[r] || [];
+      if (!got.length){ nameOfComp[r] = fresh(); news.push(nameOfComp[r]); }
+      else {
+        nameOfComp[r] = got[0];
+        for (let i=1;i<got.length;i++) joins.push(got[0]+'~'+got[i]);
+      }
+    }
+    const nm = l => nameOfComp[find(l)];
+    // a point is worth writing only if it carries no hook
+    const shown = new Set();
+    for (const l of A.lns){
+      if (hooks.has(l)) continue;
+      const k = nm(l);
+      if (!shown.has(k)){ shown.add(k); out.push('*'+k); }
+    }
+    out.push(...joins);
+    for (const id of A.items){
+      if (id === skip) continue;
+      const n = g.nodes[id];
+      if (n.k === 'spot'){
+        out.push(qname(n.name) + (n.hooks.length ? '['+n.hooks.map(nm).join(',')+']' : ''));
+        continue;
+      }
+      const childInh = {};
+      const inSet = new Set(g.areas[n.inner].lns);
+      for (const e of Object.values(g.edges)){
+        if (here.has(e.a) && inSet.has(e.b)) childInh[e.b] = nm(e.a);
+        else if (here.has(e.b) && inSet.has(e.a)) childInh[e.a] = nm(e.b);
+      }
+      if (!plain && n.scroll && g.nodes[n.scroll] && g.nodes[n.scroll].area === n.inner){
+        const loop = n.scroll;
+        const sub = areaX(n.inner, childInh, loop);      // the outer close
+        const loopSet = new Set(g.areas[g.nodes[loop].inner].lns);
+        const oaSet = new Set(g.areas[n.inner].lns);
+        const loopInh = {};
+        for (const e of Object.values(g.edges)){
+          if (oaSet.has(e.a) && loopSet.has(e.b)) loopInh[e.b] = sub.nm(e.a);
+          else if (oaSet.has(e.b) && loopSet.has(e.a)) loopInh[e.a] = sub.nm(e.b);
+        }
+        out.push('{ ' + sub.text + ' | ' + areaX(g.nodes[loop].inner, loopInh).text + ' }');
+      } else {
+        out.push('( ' + areaX(n.inner, childInh).text + ' )');
+      }
+    }
+    return { text: out.join(' '), nm };
+  }
+  return areaX(g.root, {}).text;
+}
+/* --- the verified proof library --- */
+const PROOFS = [
+{ id:"mp", title:"Modus ponens", cite:"Roberts 1973, §3.3(1), p. 45", note:"Peirce’s own illustration. Roberts works on an iterated copy so that the premisses stay on the sheet as a record; here the premisses themselves are transformed, the shorter route he says students prefer.", prem:["P","P -> Q"], goal:"Q", found:"book", steps:[{"eg":"P { P | Q }","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"P ( ( Q ) )","rule":"R4","why":"R4, deiteration: “P” could have been got by iterating “P”, which is less enclosed, so it may be erased."},{"eg":"P Q","rule":"R5","why":"R5: a double cut is removed."},{"eg":"Q","rule":"R1","why":"R1, erasure: “P” is evenly enclosed, so it may be erased."}] },
+{ id:"em", title:"The excluded middle", cite:"", note:"A theorem: it is proved from the blank sheet of assertion, which by C1 is itself a graph.", prem:[], goal:"P | ~P", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( P ) ( ( P ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."}] },
+{ id:"hs", title:"Hypothetical syllogism", cite:"", note:"Chaining two conditionals.", prem:["P -> Q","Q -> R"], goal:"P -> R", found:"machine", steps:[{"eg":"( P ( Q ) ) ( Q ( R ) )","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( P ( Q ) ( R ) ) ( Q ( R ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( P ( Q ( R ) ) ( R ) ) ( Q ( R ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( P ( R ) ) ( Q ( R ) )","rule":"R4","why":"R4, deiteration: the copy could have been got by iteration, so it may be erased."},{"eg":"( P ( R ) )","rule":"R1","why":"R1, erasure: the graph is evenly enclosed, so it may be erased."}] },
+{ id:"dm", title:"De Morgan", cite:"", note:"The denial of a disjunction.", prem:["~(P | Q)"], goal:"~P & ~Q", found:"machine", steps:[{"eg":"( P ) ( Q )","rule":null,"why":"The conclusion is already scribed."}] },
+{ id:"pl", title:"Peirce’s law", cite:"", note:"The law that marks classical logic off from intuitionistic logic. It is not in Roberts, but it falls to the same five rules.", prem:[], goal:"((P -> Q) -> P) -> P", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ) ) ( P ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( ( P ( Q ) ) ) ( P ) )","rule":"R2","why":"R2, insertion: the graph stands on an oddly enclosed area, where any graph may be scribed."},{"eg":"( ( ( P ( Q ) ) ( P ) ) ( P ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."}] },
+{ id:"p1", title:"Church’s axiom P1", cite:"Roberts 1973, Appendix 4, p. 140", note:"Roberts proves Alpha deductively complete by deriving the axioms of Church’s system P. This is the first.", prem:[], goal:"P -> (Q -> P)", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) P )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( (  ) P Q )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( P ( ( Q (  ) ) ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( P ( ( Q ( P ) ) ) )","rule":"R3","why":"R3, iteration: the graph is scribed again on an area contained by its own place."}] },
+{ id:"p2", title:"The self-distributive law", cite:"Roberts 1973, §3.3(2), p. 46; Appendix 4, p. 140", note:"Church’s P2. Roberts gives a seven-step proof at p. 46; the sequence here was found by the machine and is of the same length.", prem:[], goal:"(P -> (Q -> R)) -> ((P -> Q) -> (P -> R))", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ( ( Q ( R ) ) ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ( ( Q ( R ) ) ) ) ) ( P ( ( Q ( R ) ) ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( ( P ( ( Q ( R ) ) P ) ) ) ( P ( ( Q ( R ) ) ) ) )","rule":"R3","why":"R3, iteration: “P” is scribed again on an area contained by its own place."},{"eg":"( ( ( P ( ( Q ( R ) ) P ) ( R ) ) ) ( P ( ( Q ( R ) ) ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( P ( ( Q ( R ) ) ) ) ( ( ( P ( Q ) ) P ( R ) ) ) )","rule":"R4","why":"R4, deiteration: the copy could have been got by iteration, so it may be erased."},{"eg":"( ( P ( ( Q ( R ) ) ) ) ( ( ( P ( Q ) ) ( ( P ( R ) ) ) ) ) )","rule":"R5","why":"R5: a double cut is inserted."}] },
+{ id:"p3", title:"Church’s axiom P3", cite:"Roberts 1973, Appendix 4, p. 140", note:"The third axiom of Church’s system P.", prem:[], goal:"(~P -> ~Q) -> (Q -> P)", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( ( P ) ( ( Q ) ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( ( P ) ( ( Q ) ) ) ) ( ( P ) ( ( Q ) ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( ( P ) ( ( Q ) ) ) ( ( Q ( P ) ) ) )","rule":"R5","why":"R5: a double cut is removed."}] },
+{ id:"prae", title:"Leibniz’s praeclarum theorema", cite:"Peirce, MS 514, with Sowa’s commentary", note:"Sowa notes that Whitehead and Russell need 43 steps and five axioms for this; Peirce needs seven from a blank sheet, and no axioms at all.", prem:[], goal:"((P -> R) & (Q -> S)) -> ((P & Q) -> (R & S))", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( (  ) ( P ( R ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ( R ) ) ) ( P ( R ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( ( P ( R ) ) ) ( P ( R ) ) ( Q ( S ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ( R ) Q ) ) ( P ( R ) ) ( Q ( S ) ) )","rule":"R2","why":"R2, insertion: the area is oddly enclosed, so any graph whatever may be scribed on it."},{"eg":"( ( ( P ( R ( Q ( S ) ) ) Q ) ) ( P ( R ) ) ( Q ( S ) ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( ( P ( R ) ) ( Q ( S ) ) ( ( P Q ( R ( ( S ) ) ) ) ) )","rule":"R4","why":"R4, deiteration: the copy could have been got by iteration, so it may be erased."},{"eg":"( ( P ( R ) ) ( Q ( S ) ) ( ( P Q ( R S ) ) ) )","rule":"R5","why":"R5: a double cut is removed."}] },
+{ id:"barbara", title:"The syllogism Barbara", cite:"Roberts 1973, §4.3(2), p. 61", note:"Peirce’s favourite. The rule at each step is the one Roberts gives, including the surgery on the lines of identity at steps 4 to 6.", prem:["Ax (Fx -> Gx)","Ax (Gx -> Hx)"], goal:"Ax (Fx -> Hx)", found:"book", steps:[{"eg":"( *x F[x] ( G[x] ) ) ( *y G[y] ( H[y] ) )","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( *x F[x] ( G[x] ( *y G[y] ( H[y] ) ) ) ) ( *z G[z] ( H[z] ) )","rule":"R3","why":"R3, iteration: the enclosure is scribed again on an area contained by its own place."},{"eg":"( *x F[x] ( G[x] ( *y G[y] ( H[y] ) ) ) )","rule":"R1","why":"R1, erasure: the enclosure is evenly enclosed, so it may be erased."},{"eg":"( *x F[x] ( G[x] *w x~w ( *y G[y] ( H[y] ) ) ) )","rule":"R3(a)","why":"R3(a), iteration: a branch with a loose end is added to a line of identity."},{"eg":"( *x F[x] ( G[x] *w x~w ( *w *y G[y] ( H[y] ) ) ) )","rule":"R3(b)","why":"R3(b), iteration: a loose end of the ligature is extended inwards through a cut."},{"eg":"( *x F[x] ( G[x] *w x~w ( *w *y w~y G[y] ( H[y] ) ) ) )","rule":"R2","why":"R2, insertion: two lines of identity oddly enclosed on the same area are joined."},{"eg":"( *x F[x] ( G[x] *w x~w ( *w *y w~y ( H[y] ) ) ) )","rule":"R4","why":"R4, deiteration: “G” could have been got by iterating “G”, which is less enclosed, so it may be erased."},{"eg":"( *x F[x] ( G[x] H[x] ) )","rule":"R5","why":"R5: a double cut is removed."},{"eg":"( *x F[x] ( H[x] ) )","rule":"R1","why":"R1, erasure: “G” is evenly enclosed, so it may be erased."}] },
+{ id:"selfid", title:"Everything is identical to itself", cite:"Roberts 1973, §4.3(3), p. 62", note:"The first of the two axioms of identity. In Peirce’s hands identity is not a predicate but the line itself, so the proof is a matter of scribing a line and closing it into a cycle.", prem:[], goal:"Ax (x=x)", found:"machine", steps:[{"eg":"","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"( (  ) )","rule":"R5","why":"R5: a double cut is inserted."},{"eg":"( *a (  ) )","rule":"C6/R2","why":"C6: an unattached line of identity may always be scribed — \"something exists\"."},{"eg":"( *a ( *a ) )","rule":"R3(a,b)","why":"R3(a,b), iteration: a loose end is extended."}] },
+{ id:"exgen", title:"Existential generalisation", cite:"", note:"From ‘everything is F’ to ‘something is F’. The step that supplies the existence is C6: an unattached line may always be scribed on the sheet.", prem:["Ax Fx"], goal:"Ex Fx", found:"machine", steps:[{"eg":"( *a ( *a F[a] ) )","rule":null,"why":"The premisses, scribed on the sheet of assertion."},{"eg":"*a ( *b ( *b F[b] ) )","rule":"C6/R2","why":"C6: an unattached line of identity may always be scribed — \"something exists\"."},{"eg":"*a ( *b *a ( *b F[b] ) )","rule":"R3(b)","why":"R3(b), iteration: a loose end of the ligature is extended inwards through a cut."},{"eg":"*a ( *a ( *a F[a] ) )","rule":"R2","why":"R2, insertion: two lines of identity oddly enclosed on the same area are joined."},{"eg":"*a F[a]","rule":"R5","why":"R5: a double cut is removed."}] },
+{ id:"conv", title:"Conversion", cite:"", note:"A trivial Beta inference, given to show the rules working on lines of identity.", prem:["Ex (Fx & Gx)"], goal:"Ex (Gx & Fx)", found:"machine", steps:[{"eg":"*a F[a] G[a]","rule":null,"why":"The conclusion is already scribed."}] },
+];
+/* ============================================================================
+   THE APPLICATION
+   ========================================================================== */
+const $  = s => document.querySelector(s);
+const $$ = s => [...document.querySelectorAll(s)];
+
+/* ---- tabs ---------------------------------------------------------------- */
+$$('nav.tabs button').forEach(b => b.onclick = () => {
+  $$('nav.tabs button').forEach(x => x.setAttribute('aria-selected', x === b));
+  $$('.panel').forEach(p => p.classList.toggle('on', p.id === 'p-'+b.dataset.tab));
+  refresh(b.dataset.tab);
+});
+// a panel that was hidden had no width to size its drawing to
+function refresh(tab){
+  if (tab === 'translate') translate();
+  else if (tab === 'proofs' && PF.proof) pfShow(PF.i);
+  else if (tab === 'draw') drawRender();
+  else if (tab === 'prove' && VV.steps) vShow(VV.i);
+}
+let __rz;
+window.addEventListener('resize', () => {
+  clearTimeout(__rz);
+  __rz = setTimeout(() => {
+    const b = $('nav.tabs button[aria-selected="true"]');
+    if (b) refresh(b.dataset.tab);
+  }, 150);
+});
+
+/* ---- shared rendering helpers -------------------------------------------- */
+function stageSvg(el, g, opts){
+  el.innerHTML = svgDoc(g, Object.assign({ pad: 12, scale: 1 }, opts||{}));
+  const svg = el.querySelector('svg');
+  if (svg){
+    const w = parseFloat(svg.getAttribute('width'));
+    const h = parseFloat(svg.getAttribute('height'));
+    const availW = Math.max(80, el.clientWidth - 34);
+    const availH = (opts && opts.maxH) || 420;
+    const k = Math.min(availW / w, availH / h, 2.4);
+    svg.setAttribute('width', w * k);
+    svg.setAttribute('height', h * k);
+  }
+  return svg;
+}
+// three readings of one graph, as Peirce gives three of his Fig. 5 (Roberts p. 39-40)
+function readings(g){
+  const raw = readGraph(g);
+  return { plain: fmtFull(sugar(raw)), literal: fmtFull(raw), gloss: gloss(sugar(raw)) };
+}
+function valuationBadge(g){
+  if (!isAlpha(g)) return '<span class="pill mid">Beta — a finite check only</span>';
+  const tt = truthTable(g, 12);
+  if (tt.tooBig) return '<span class="pill mid">too many spots to tabulate</span>';
+  if (tt.tautology) return '<span class="pill ok">a theorem — true on every assignment</span>';
+  if (tt.contradiction) return '<span class="pill bad">absurd — false on every assignment</span>';
+  return '<span class="pill mid">contingent</span>';
+}
+
+/* ============================ TRANSLATE ==================================== */
+const T_EXAMPLES = [
+  ['P -> Q', 'if P then Q'],
+  ['~(P & ~Q)', 'the same, denied'],
+  ['P | Q', 'either P or Q'],
+  ['(P -> (Q -> R)) -> ((P->Q)->(P->R))', 'self-distribution'],
+  ['Ex Fx', 'something is F'],
+  ['Ax Fx', 'everything is F'],
+  ['Ax (Fx -> Gx)', 'all F is G'],
+  ['Ex (Gx & ~Ux)', 'some good thing is not ugly'],
+  ['Ax Ey (Cx -> (Axy & Wy))', 'every catholic adores some woman'],
+  ['Ey Ax (Wy & (Cx -> Axy))', 'some woman is adored by every catholic'],
+  ['Ex Ey ~(x=y)', 'there are two things'],
+  ['Ax Ay Az ~(x=y & y=z & x=z)', 'three things are not all identical'],
+  ['Ex Ay (Mxy -> Lxy)', 'every mother loves some child of hers'],
+  ['~Ex (Px)', 'it is false that there is a phoenix'],
+  ['Ax (Mx -> Dx)', 'every man will die'],
+  ['Ex (Mx & ~Dx)', 'there is a man who will not die'],
+  ['Ex Ey (Mx & My & Exy)', 'some man eats a man']
+];
+function tOpts(){ return { shade: $('#t-shade').checked, wobble: $('#t-wobble').checked,
+                           hookNumbers: $('#t-hooks').checked }; }
+function translate(){
+  const src = $('#t-in').value.trim();
+  $('#t-err').textContent = '';
+  if (!src){ $('#t-stage').innerHTML = '<em style="color:var(--ink3)">the blank sheet</em>';
+    $('#t-read').textContent = ''; $('#t-gloss').textContent = '';
+    $('#t-lin').textContent = ''; $('#t-alt').innerHTML=''; $('#t-val').innerHTML=''; return; }
+  let ast, r;
+  try { ast = parseFormula(src); r = compileFormula(ast); }
+  catch (e){
+    $('#t-err').textContent = e.message + (e.at !== undefined ? '\n' + ' '.repeat(e.at) + '↑' : '');
+    return;
+  }
+  const g = r.graph;
+  stageSvg($('#t-stage'), g, tOpts());
+  const rd = readings(g);
+  $('#t-read').textContent = rd.plain;
+  $('#t-gloss').textContent = rd.gloss;
+  $('#t-alt').innerHTML = rd.literal !== rd.plain
+    ? '<p class="note" style="margin-top:2px">Taking every cut as a bare denial: '+
+      '<span class="mono">'+esc(rd.literal)+'</span></p>' : '';
+  $('#t-lin').textContent = writeEG(g);
+  $('#t-notes').innerHTML = r.notes.map(n => '<div>'+esc(n)+'</div>').join('');
+  $('#t-val').innerHTML = valuationBadge(g);
+}
+$('#t-in').addEventListener('input', translate);
+['#t-shade','#t-wobble','#t-hooks'].forEach(s => $(s).addEventListener('change', translate));
+$('#t-ex').innerHTML = T_EXAMPLES.map((e,i) =>
+  '<button data-i="'+i+'" title="'+esc(e[0])+'">'+esc(e[1])+'</button>').join('');
+$('#t-ex').onclick = ev => {
+  const b = ev.target.closest('button'); if (!b) return;
+  $('#t-in').value = T_EXAMPLES[+b.dataset.i][0]; translate();
+};
+
+/* ============================== PROOFS ===================================== */
+const PF = { proof: null, i: 0, timer: null };
+$('#pf-sel').innerHTML = PROOFS.map((p,i) => '<option value="'+i+'">'+esc(p.title)+'</option>').join('');
+function pfLoad(i){
+  const p = PROOFS[i];
+  PF.proof = p; PF.i = 0;
+  PF.graphs = p.steps.map(s => parseEG(s.eg));
+  $('#pf-cite').innerHTML = p.cite ? '<b>'+esc(p.cite)+'</b>' : '';
+  $('#pf-note').textContent = p.note || '';
+  $('#pf-kv').innerHTML =
+    (p.prem.length ? '<dt>premisses</dt><dd>'+p.prem.map(x=>esc(fmtSrc(x))).join('<br>')+'</dd>'
+                   : '<dt>from</dt><dd>the blank sheet of assertion</dd>') +
+    '<dt>conclusion</dt><dd>'+esc(fmtSrc(p.goal))+'</dd>' +
+    '<dt>steps</dt><dd>'+(p.steps.length-1)+'</dd>';
+  $('#pf-prov').textContent = p.found === 'book'
+    ? 'Each step here is the one printed in the source, and each has been checked against the rules.'
+    : 'This sequence was found by the proof finder in this page, and each step checked against the rules.';
+  $('#pf-steps').innerHTML = p.steps.map((s,k) =>
+    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
+    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  pfShow(0);
+}
+function fmtSrc(s){ try { return fmt(parseFormula(s), 0); } catch(e){ return s; } }
+function pfShow(i){
+  const p = PF.proof; if (!p) return;
+  PF.i = Math.max(0, Math.min(p.steps.length-1, i));
+  const g = PF.graphs[PF.i];
+  const hl = {};
+  stageSvg($('#pf-stage'), g, { shade:true, wobble:true, highlight: hl });
+  const s = p.steps[PF.i];
+  $('#pf-why').innerHTML = '<b>'+esc(s.rule ? s.rule : 'Premiss')+'</b> — '+esc(s.why)+
+    '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
+    esc(fmtFull(sugar(readGraph(g))))+'</span>';
+  $$('#pf-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === PF.i));
+  const cur = $('#pf-steps li.cur'); if (cur) cur.scrollIntoView({block:'nearest'});
+}
+$('#pf-sel').onchange = e => { pfStop(); pfLoad(+e.target.value); };
+$('#pf-steps').onclick = e => { const li = e.target.closest('li'); if (li){ pfStop(); pfShow(+li.dataset.k); } };
+$('#pf-next').onclick = () => { pfStop(); pfShow(PF.i+1); };
+$('#pf-prev').onclick = () => { pfStop(); pfShow(PF.i-1); };
+$('#pf-first').onclick = () => { pfStop(); pfShow(0); };
+function pfStop(){ if (PF.timer){ clearInterval(PF.timer); PF.timer = null; $('#pf-play').textContent = '▶ play'; } }
+$('#pf-play').onclick = () => {
+  if (PF.timer){ pfStop(); return; }
+  if (PF.i >= PF.proof.steps.length-1) PF.i = -1;
+  $('#pf-play').textContent = '❚❚ pause';
+  const tick = () => {
+    if (PF.i >= PF.proof.steps.length-1){ pfStop(); return; }
+    pfShow(PF.i+1);
+  };
+  PF.timer = setInterval(tick, +$('#pf-speed').value);
+  tick();
+};
+$('#pf-speed').oninput = () => { if (PF.timer){ clearInterval(PF.timer);
+  PF.timer = setInterval(() => { if (PF.i >= PF.proof.steps.length-1){ pfStop(); return; }
+    pfShow(PF.i+1); }, +$('#pf-speed').value); } };
+/* =============================== SCRIBE ==================================== */
+const ED = { g: newGraph(), sel: null, hist: [], pick: [] };
+function edPush(){ ED.hist.push(cloneGraph(ED.g)); if (ED.hist.length > 60) ED.hist.shift(); }
+function edSel(kind, id){ ED.sel = { kind, id }; drawRender(); }
+function selArea(){
+  if (!ED.sel) return ED.g.root;
+  if (ED.sel.kind === 'area') return ED.sel.id;
+  const n = ED.g.nodes[ED.sel.id];
+  return n ? n.area : ED.g.root;
+}
+function drawRender(){
+  const el = $('#d-stage');
+  const opts = { shade: $('#d-shade').checked, wobble: true,
+                 handles: $('#d-handles').checked, pad: 14 };
+  let svg;
+  try { svg = stageSvg(el, ED.g, opts); }
+  catch(e){ $('#d-err').textContent = 'could not draw: '+e.message; return; }
+  $('#d-err').textContent = '';
+
+  // selection ring
+  if (svg && ED.sel){
+    if (ED.sel.kind === 'area'){
+      const p = svg.querySelector('[data-area="'+ED.sel.id+'"]');
+      if (p) p.classList.add('hl-add');
+      else {
+        const sa = svg.querySelector('.sa');
+        if (sa && ED.sel.id === ED.g.root) sa.setAttribute('stroke','var(--accent)');
+      }
+    } else {
+      const p = svg.querySelector('[data-node="'+ED.sel.id+'"]');
+      if (p) p.classList.add('hl-add');
+    }
+  }
+  if (svg){
+    svg.querySelectorAll('[data-node]').forEach(el2 => {
+      el2.classList.add('pick');
+      el2.onclick = ev => { ev.stopPropagation();
+        const id = el2.dataset.node;
+        edSel(ED.g.nodes[id].k === 'cut' ? 'area' : 'node',
+              ED.g.nodes[id].k === 'cut' ? ED.g.nodes[id].inner : id); };
+    });
+    svg.querySelectorAll('.handle').forEach(h => {
+      h.onclick = ev => { ev.stopPropagation(); togglePick(h.dataset.ln); };
+      if (ED.pick.includes(h.dataset.ln)) h.classList.add('sel');
+    });
+    const sa = svg.querySelector('.sa');
+    if (sa){ sa.classList.add('pick'); sa.onclick = () => edSel('area', ED.g.root); }
+    svg.onclick = () => edSel('area', ED.g.root);
+  }
+
+  // what it says
+  try {
+    const rd = readings(ED.g);
+    $('#d-read').textContent = rd.plain;
+    $('#d-gloss').textContent = rd.gloss;
+    $('#d-lin2').textContent = writeEG(ED.g) || '(the blank sheet)';
+    $('#d-val').innerHTML = valuationBadge(ED.g);
+  } catch(e){ $('#d-read').textContent = '—'; }
+
+  // where we are
+  const s = ED.sel;
+  let hint = 'Selected: the sheet of assertion.';
+  if (s && s.kind === 'area' && s.id !== ED.g.root)
+    hint = 'Selected: the area of a cut, '+depthOf(ED.g, s.id)+' cut'+
+      (depthOf(ED.g,s.id)===1?'':'s')+' in — '+
+      (evenlyEnclosed(ED.g, s.id) ? 'evenly' : 'oddly')+' enclosed.';
+  else if (s && s.kind === 'node')
+    hint = 'Selected: the spot “'+ED.g.nodes[s.id].name+'”.';
+  if (ED.pick.length) hint += '  ('+ED.pick.length+' line point'+(ED.pick.length===1?'':'s')+' picked)';
+  $('#d-hint').textContent = hint;
+
+  drawMoves();
+}
+function togglePick(ln){
+  const i = ED.pick.indexOf(ln);
+  if (i >= 0) ED.pick.splice(i,1); else ED.pick.push(ln);
+  if (ED.pick.length > 2) ED.pick.shift();
+  drawRender();
+}
+$('#d-cut').onclick = () => { edPush(); addCut(ED.g, selArea()); drawRender(); };
+$('#d-spot').onclick = () => {
+  const name = prompt('The spot — a word or phrase, as Peirce writes “is a catholic”:', 'F');
+  if (name === null) return;
+  const nh = prompt('How many hooks? (0 for a proposition, 1 for “—is a man”, 2 for “—loves—”)', '0');
+  if (nh === null) return;
+  edPush(); addSpot(ED.g, selArea(), name.trim() || 'F', Math.max(0, Math.min(6, parseInt(nh)||0)));
+  drawRender();
+};
+$('#d-line').onclick = () => { edPush(); addLn(ED.g, selArea()); drawRender(); };
+$('#d-join').onclick = () => {
+  if (ED.pick.length !== 2){ alert('Pick two line points first, by clicking the small circles on the lines.'); return; }
+  const [a,b] = ED.pick;
+  const aa = ED.g.lns[a].area, ab = ED.g.lns[b].area;
+  if (!(aa === ab || placeOf(ED.g, aa) === ab || placeOf(ED.g, ab) === aa)){
+    alert('No graph may rest partly on one area and partly on another (Roberts p. 50 n. 1).\n'+
+          'Two points can be joined only on one area, or across a single cut.');
+    return;
+  }
+  edPush(); addEdge(ED.g, a, b); ED.pick = []; drawRender();
+};
+$('#d-del').onclick = () => {
+  if (!ED.sel) return;
+  edPush();
+  if (ED.sel.kind === 'node') removeNode(ED.g, ED.sel.id);
+  else if (ED.sel.id !== ED.g.root){
+    const cut = ED.g.areas[ED.sel.id].cut;
+    removeNode(ED.g, cut);
+  }
+  ED.sel = null; ED.pick = []; drawRender();
+};
+$('#d-undo').onclick = () => { if (ED.hist.length){ ED.g = ED.hist.pop(); ED.sel=null; ED.pick=[]; drawRender(); } };
+$('#d-clear').onclick = () => { edPush(); ED.g = newGraph(); ED.sel=null; ED.pick=[]; drawRender(); };
+$('#d-load').onclick = () => {
+  try { edPush(); ED.g = compileFormula(parseFormula($('#d-from').value)).graph;
+        ED.sel=null; ED.pick=[]; drawRender(); }
+  catch(e){ $('#d-err').textContent = e.message; }
+};
+$('#d-loadlin').onclick = () => {
+  try { edPush(); ED.g = parseEG($('#d-lin').value); ED.sel=null; ED.pick=[]; drawRender(); }
+  catch(e){ $('#d-err').textContent = e.message; }
+};
+['#d-shade','#d-handles'].forEach(s => $(s).addEventListener('change', drawRender));
+
+/* --- the legal moves, offered for experiment ------------------------------ */
+function drawMoves(){
+  let mvs;
+  try { mvs = legalMoves(ED.g, { dir:'fwd', palette: [], beta: !isAlpha(ED.g), maxNodes: 40 }); }
+  catch(e){ $('#d-moves').innerHTML = '<p class="note">—</p>'; return; }
+  // keep the list readable: dedupe by resulting graph
+  const seen = new Set(), keep = [];
+  for (const mv of mvs){
+    let h; try { h = applyMove(ED.g, mv, []); } catch(e){ continue; }
+    const k = canonGraph(h);
+    if (seen.has(k)) continue;
+    seen.add(k);
+    keep.push({ mv, h, rule: ruleOf(mv.op, true), why: describeMove(ED.g, mv, true) });
+  }
+  if (!keep.length){ $('#d-moves').innerHTML = '<p class="note">No rule applies to the blank sheet but R5 and C6.</p>'; return; }
+  const order = ['R1','R2','R3','R3(a)','R3(b)','R4','R4(a)','R4(a,b)','R5','C6/R2'];
+  keep.sort((a,b) => (order.indexOf(a.rule)+99*(order.indexOf(a.rule)<0)) -
+                     (order.indexOf(b.rule)+99*(order.indexOf(b.rule)<0)));
+  const groups = {};
+  keep.forEach((k,i) => (groups[k.rule] = groups[k.rule] || []).push({k,i}));
+  DMOVES = keep;
+  $('#d-moves').innerHTML = Object.keys(groups).map(r =>
+    '<div class="movegroup">'+esc(r)+'</div><ul class="moves">'+
+    groups[r].map(({k,i}) => '<li data-i="'+i+'"><span class="d">'+esc(shortWhy(k.why))+'</span></li>').join('')+
+    '</ul>').join('');
+}
+let DMOVES = [];
+function shortWhy(w){ return w.replace(/^R\d[^:]*:\s*/, '').replace(/^C6:\s*/,''); }
+$('#d-moves').onclick = e => {
+  const li = e.target.closest('li[data-i]'); if (!li) return;
+  const k = DMOVES[+li.dataset.i]; if (!k) return;
+  edPush(); ED.g = k.h; ED.sel = null; ED.pick = []; drawRender();
+};
+
+/* ============================== FIND A PROOF =============================== */
+const V_EXAMPLES = [
+  [['P','P -> Q'],'Q','modus ponens'],
+  [['P -> Q','Q -> R'],'P -> R','hypothetical syllogism'],
+  [[], '((P -> Q) -> P) -> P', "Peirce's law"],
+  [[], '((P -> R) & (Q -> S)) -> ((P & Q) -> (R & S))', 'praeclarum theorema'],
+  [['P | Q','~P'],'Q','disjunctive syllogism'],
+  [['Ax Fx'],'Ex Fx','existential generalisation'],
+  [['Ex (Fx & Gx)'],'Ex Gx','a Beta inference'],
+  [['P -> Q'],'Q -> P','invalid — look for the countermodel'],
+  [['Ax Ey Rxy'],'Ey Ax Rxy','invalid — order of selection matters']
+];
+$('#v-ex').innerHTML = V_EXAMPLES.map((e,i)=>'<button data-i="'+i+'">'+esc(e[2])+'</button>').join('');
+$('#v-ex').onclick = e => {
+  const b = e.target.closest('button'); if (!b) return;
+  const ex = V_EXAMPLES[+b.dataset.i];
+  $('#v-prem').value = ex[0].join('\n'); $('#v-goal').value = ex[1];
+};
+const VV = { steps: null, graphs: null, i: 0, timer: null };
+function runProof(hard){
+  const premSrc = $('#v-prem').value.split('\n').map(s=>s.trim()).filter(Boolean);
+  const goalSrc = $('#v-goal').value.trim();
+  $('#v-proofcard').style.display = 'none';
+  if (!goalSrc){ $('#v-verdict').textContent = 'Give a conclusion.'; return; }
+  let prems, goal, premAst, goalAst;
+  try {
+    premAst = premSrc.map(parseFormula); goalAst = parseFormula(goalSrc);
+    prems = premAst.map(a => compileFormula(a).graph);
+    goal = compileFormula(goalAst).graph;
+  } catch(e){ $('#v-verdict').innerHTML = '<span class="err">'+esc(e.message)+'</span>'; return; }
+
+  $('#v-verdict').innerHTML = '<span class="spin"></span>searching…';
+  setTimeout(() => {
+    const beta = prems.some(p=>!isAlpha(p)) || !isAlpha(goal);
+    let head = '';
+    if (!beta){
+      const ent = alphaEntails(prems, goal);
+      if (ent.decided && !ent.entails){
+        const cm = Object.keys(ent.countermodel).map(a =>
+          a+' = '+(ent.countermodel[a] ? 'true' : 'false')).join(', ');
+        $('#v-verdict').innerHTML =
+          '<p><span class="pill bad">not valid</span></p>'+
+          '<p>The inference fails, so no sequence of the five rules can produce it — '+
+          'the rules are truth-preserving (Roberts, Appendix 4).</p>'+
+          '<p class="mono">A countermodel: '+esc(cm)+'</p>';
+        return;
+      }
+      head = '<p><span class="pill ok">valid</span> — by the truth-value analysis of Roberts §3.2.</p>';
+    } else {
+      const cm = findCountermodel(premAst, goalAst, 3);
+      if (cm){
+        $('#v-verdict').innerHTML =
+          '<p><span class="pill bad">not valid</span></p>'+
+          '<p>A countermodel on '+cm.n+' individual'+(cm.n===1?'':'s')+':</p>'+
+          '<p class="mono">'+esc(Object.keys(cm.preds).map(k =>
+            k.split('/')[0]+' holds of {'+(cm.preds[k].join('; ')||'nothing')+'}').join('  ·  '))+'</p>'+
+          '<p class="note">Individuals are numbered from 0.</p>';
+        return;
+      }
+      head = '<p><span class="pill mid">no countermodel on up to three individuals</span></p>';
+    }
+    const opts = hard ? { timeCap: 30000, budget: 1200000, maxDepth: 14, slack: 6, beam: 700 }
+                      : { timeCap: 6000,  budget: 150000,  maxDepth: 12, slack: 4, beam: 400 };
+    let res;
+    try { res = findProof(prems, goal, opts); }
+    catch(e){ $('#v-verdict').innerHTML = head + '<span class="err">'+esc(e.message)+'</span>'; return; }
+    if (res.found){
+      $('#v-verdict').innerHTML = head +
+        '<p><span class="pill ok">proof found</span> — '+(res.steps.length-1)+
+        ' step'+(res.steps.length===2?'':'s')+', '+res.expanded.toLocaleString()+' transformations tried.</p>';
+      vLoad(res.steps);
+    } else {
+      $('#v-verdict').innerHTML = head +
+        '<p><span class="pill mid">no proof found within the bound</span></p>'+
+        '<p>The search tried '+res.expanded.toLocaleString()+' transformations and stopped. '+
+        (beta ? 'Beta is only semi-decidable, so this settles nothing either way. '
+              : 'The inference is nevertheless valid, and so by the completeness of Alpha '+
+                '(Roberts, Appendix 4) a proof exists. ')+
+        'Try “search harder”, or work it by hand on the Scribe tab.</p>';
+    }
+  }, 30);
+}
+$('#v-go').onclick = () => runProof(false);
+$('#v-hard').onclick = () => runProof(true);
+function vLoad(steps){
+  VV.steps = steps; VV.graphs = steps.map(s => s.graph); VV.i = 0;
+  $('#v-proofcard').style.display = '';
+  $('#v-steps').innerHTML = steps.map((s,k) =>
+    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
+    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  vShow(0);
+}
+function vShow(i){
+  if (!VV.steps) return;
+  VV.i = Math.max(0, Math.min(VV.steps.length-1, i));
+  stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true });
+  const s = VV.steps[VV.i];
+  $('#v-why').innerHTML = '<b>'+esc(s.rule||'Premiss')+'</b> — '+esc(s.why)+
+    '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
+    esc(fmtFull(sugar(readGraph(VV.graphs[VV.i]))))+'</span>';
+  $$('#v-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === VV.i));
+}
+function vStop(){ if (VV.timer){ clearInterval(VV.timer); VV.timer=null; $('#v-play').textContent='▶ play'; } }
+$('#v-next').onclick = ()=>{ vStop(); vShow(VV.i+1); };
+$('#v-prev').onclick = ()=>{ vStop(); vShow(VV.i-1); };
+$('#v-first').onclick = ()=>{ vStop(); vShow(0); };
+$('#v-steps').onclick = e => { const li = e.target.closest('li'); if (li){ vStop(); vShow(+li.dataset.k); } };
+$('#v-play').onclick = () => {
+  if (VV.timer){ vStop(); return; }
+  if (VV.i >= VV.steps.length-1) VV.i = -1;
+  $('#v-play').textContent = '❚❚ pause';
+  VV.timer = setInterval(() => {
+    if (VV.i >= VV.steps.length-1){ vStop(); return; } vShow(VV.i+1);
+  }, 1400);
+};
+/* =========================== CONVENTIONS & RULES =========================== */
+const CONVENTIONS = [
+ ['C1','The sheet of assertion in all of its parts is a graph.','4.396, 397'],
+ ['C2','Whatever is scribed on the sheet of assertion is asserted to be true of the universe represented by that sheet.','4.397'],
+ ['C3','Graphs scribed on different parts of the sheet of assertion are all asserted to be true.','4.433'],
+ ['C4','The scroll is the sign of a conditional proposition de inesse.','4.401, 435, 437'],
+ ['C5','The empty cut is the pseudograph; and the cut precisely denies its contents.','4.467'],
+ ['C6','The scribing of a heavy dot or unattached line on the sheet of assertion denotes the existence of a single, individual (but otherwise undesignated) object in the universe of discourse. And it is always permitted to scribe such a dot or line on the sheet.','4.404, 405, 417, 559, 567'],
+ ['C7','A heavy line, called a line of identity, shall be a graph asserting the numerical identity of the individuals denoted by its two extremities.','4.406, 444'],
+ ['C8','A branching line of identity with n number of branches will be used to express the identity of the n individuals denoted by its n extremities.','4.446, 561'],
+ ['C9','Points on a cut shall be considered to lie outside the area of that cut.','4.407, 450']
+];
+const RULES = [
+ ['R1','The rule of erasure.','Any evenly enclosed graph and any evenly enclosed portion of a line of identity may be erased.','4.492(1), 505'],
+ ['R2','The rule of insertion.','Any graph may be scribed on any oddly enclosed area, and two lines of identity (or portions of lines) oddly enclosed on the same area, may be joined.','4.492(1), 505'],
+ ['R3','The rule of iteration.','If a graph P occurs on SA or in a nest of cuts, it may be scribed on any area not part of P, which is contained by {P}. Consequently, (a) a branch with a loose end may be added to any line of identity, provided that no crossing of cuts results from this addition; (b) any loose end of a ligature may be extended inwards through cuts; (c) any ligature thus extended may be joined to the corresponding ligature of an iterated instance of a graph; and (d) a cycle may be formed by joining, by inward extensions, the two loose ends that are the innermost parts of a ligature.','4.492(2), 506'],
+ ['R4','The rule of deiteration.','Any graph whose occurrence could be the result of iteration may be erased. Consequently, (a) a branch with a loose end may be retracted into any line of identity, provided that no crossing of cuts occurs in the retraction; (b) any loose end of a ligature may be retracted outwards through cuts; and (c) any cyclical part of a ligature may be cut at its inmost part.','4.492(2), 506'],
+ ['R5','The rule of the double cut.','The double cut may be inserted around or removed (where it occurs) from any graph on any area. And these transformations will not be prevented by the presence of ligatures passing from outside the outer cut to inside the inner cut.','4.492(4), 508, 567']
+];
+$('#n-conv').innerHTML = CONVENTIONS.map(c =>
+  '<dt>'+c[0]+'</dt><dd>'+esc(c[1])+' <span class="cite">CP '+c[2]+'</span></dd>').join('') +
+  '<dd class="cite" style="margin-top:14px">Quoted from Roberts 1973, Appendix 3, pp. 137–138. ' +
+  'Gamma conventions C10 and C11, and the changes occasioned by the tinctures, are not implemented here.</dd>';
+$('#n-rules').innerHTML = RULES.map(r =>
+  '<dt>'+r[0]+' — '+esc(r[1])+'</dt><dd>'+esc(r[2])+' <span class="cite">CP '+r[3]+'</span></dd>').join('') +
+  '<dd class="cite" style="margin-top:14px">Roberts 1973, Appendix 3, p. 138. All five are implemented, '+
+  'including clauses (a)–(d) of R3 and (a)–(c) of R4.</dd>';
+
+$('#n-about').innerHTML = [
+ '<p><b>Reading a graph.</b> The interpretation is <i>endoporeutic</i>: it proceeds inwards, ',
+ 'so that "a nest sucks the meaning from without inwards unto its centre, as a sponge absorbs ',
+ 'water" (Peirce, Ms 650, quoted Roberts p. 39 n. 13). Each area is read as a conjunction; ',
+ 'each cut denies its contents; and a line of identity is as much enclosed as its least ',
+ 'enclosed part, so that an evenly enclosed line reads <i>some</i> and an oddly enclosed one ',
+ '<i>any</i> (Roberts p. 51).</p>',
+ '<p><b>Shading.</b> Shading the oddly enclosed areas is Peirce\'s own device in MS 514, and ',
+ 'it is offered here as an aid rather than as part of the formation rules. Nothing in the ',
+ 'logic depends on it.</p>',
+ '<p><b>Hook numerals.</b> Peirce distinguishes the hooks of a spot by where the line meets ',
+ 'it. Since this page lays every hook on the left edge, the small numerals give the order of ',
+ 'the places instead. They are an artefact of this drawing, not of the system.</p>',
+ '<p><b>What the proof finder does.</b> It searches forwards from the premisses and backwards ',
+ 'from the conclusion at the same time, using nothing but the five rules, and reports a ',
+ 'proof when the two halves meet. For Alpha it also decides validity outright by truth-value ',
+ 'analysis, so a failed search is never reported as a disproof. Alpha is complete and ',
+ 'decidable (Roberts, Appendix 4), so where a valid Alpha inference defeats the search, the ',
+ 'fault is the search\'s and not the system\'s. Beta validity is not decidable at all: there a ',
+ 'countermodel on a small domain refutes an inference conclusively, but no amount of ',
+ 'searching can establish validity by failing.</p>',
+ '<p><b>Deeper Beta proofs.</b> The syllogism Barbara is beyond the present search, which is ',
+ 'why it is given on the Proofs tab in the form Roberts prints, each of its eight steps ',
+ 'checked against the rules by this page.</p>',
+ '<p><b>What is not here.</b> Gamma — the broken cut, graphs of graphs, the potentials, ',
+ 'modality — and the tinctured graphs of 1906. Roberts, chapters 5 and 6.</p>',
+ '<hr class="sep"><p><b>Sources.</b> Don D. Roberts, <i>The Existential Graphs of Charles S. ',
+ 'Peirce</i> (The Hague: Mouton, 1973), chapters 3 and 4 and Appendices 3 and 4. ',
+ 'Charles S. Peirce, MS 514 (1909), transcribed with commentary by John F. Sowa, ',
+ 'jfsowa.com/peirce/ms514.htm. References of the form 4.492 are to the ',
+ '<i>Collected Papers</i>.</p>'
+].join('');
+
+/* ---- go ------------------------------------------------------------------ */
+translate();
+pfLoad(0);
+drawRender();
+</script>
+</body></html>

@@ -1,0 +1,220 @@
+<header>
+  <h1>The Existential Graphs of Charles S. Peirce</h1>
+  <p class="sub">A working instrument for Peirce's diagrammatic logic: translate ordinary
+  notation into graphs, watch known proofs unfold, scribe graphs and read them back, and
+  set the five rules of transformation to work on a problem of your own. Built on Don D.
+  Roberts, <cite>The Existential Graphs of Charles S. Peirce</cite> (The Hague: Mouton,
+  1973), with Peirce's MS 514 as transcribed by John Sowa.</p>
+</header>
+<main>
+<nav class="tabs" role="tablist">
+  <button role="tab" data-tab="translate" aria-selected="true">Translate</button>
+  <button role="tab" data-tab="proofs" aria-selected="false">Proofs</button>
+  <button role="tab" data-tab="draw" aria-selected="false">Scribe</button>
+  <button role="tab" data-tab="prove" aria-selected="false">Find a proof</button>
+  <button role="tab" data-tab="notes" aria-selected="false">Conventions &amp; rules</button>
+</nav>
+
+<!-- ============================ TRANSLATE ============================ -->
+<section class="panel on" id="p-translate">
+  <div class="grid two">
+    <div class="card">
+      <h2>A proposition in ordinary notation</h2>
+      <textarea id="t-in" rows="3" spellcheck="false">Ax (Fx -> Gx)</textarea>
+      <div class="chips" id="t-ex"></div>
+      <div class="toggles">
+        <label><input type="checkbox" id="t-shade" checked> shade oddly enclosed areas</label>
+        <label><input type="checkbox" id="t-wobble" checked> hand-drawn cuts</label>
+        <label><input type="checkbox" id="t-hooks" checked> number the hooks</label>
+      </div>
+      <hr class="sep">
+      <h2>How to write it</h2>
+      <p class="tight"><code>~ &amp; | -&gt; &lt;-&gt;</code> for not, and, or, if-then, if-and-only-if.
+      The glyphs <code>¬ ∧ ∨ ⊃ ≡</code> work too.</p>
+      <p class="tight"><code>Ax</code> and <code>Ex</code> for <span class="mono">∀x</span>
+      and <span class="mono">∃x</span>; <code>(x)</code> and <code>(Ex)</code> also work.</p>
+      <p class="tight">Predicates take a capital: <code>Fx</code>, <code>Axy</code>,
+      <code>loves(x,y)</code>. Identity is <code>x=y</code>.</p>
+      <p class="note">Peirce allows no graph with an unoccupied hook, so a free variable
+      cannot be scribed at all (Roberts p. 49). One is closed existentially for you, with
+      a note saying so.</p>
+    </div>
+    <div>
+      <div class="card">
+        <h2>The graph</h2>
+        <div class="stage" id="t-stage"></div>
+        <div id="t-err" class="err"></div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Read back, endoporeutically</h2>
+        <p class="reading" id="t-read"></p>
+        <p class="gloss" id="t-gloss"></p>
+        <div id="t-alt"></div>
+        <h3>In linear notation</h3>
+        <div class="notation" id="t-lin"></div>
+        <div id="t-notes" class="note"></div>
+        <div id="t-val" style="margin-top:12px"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== PROOFS ============================== -->
+<section class="panel" id="p-proofs">
+  <div class="grid side">
+    <div class="card">
+      <h2>Choose a proof</h2>
+      <select id="pf-sel" style="width:100%"></select>
+      <p class="note" id="pf-cite" style="margin-top:10px"></p>
+      <p class="note" id="pf-note"></p>
+      <hr class="sep">
+      <dl class="kv" id="pf-kv"></dl>
+      <p class="note" id="pf-prov"></p>
+    </div>
+    <div>
+      <div class="card">
+        <h2>The sheet of assertion</h2>
+        <div class="stage" id="pf-stage"></div>
+        <div class="why" id="pf-why"></div>
+        <div class="playbar">
+          <button class="btn ghost" id="pf-first">⏮</button>
+          <button class="btn ghost" id="pf-prev">◀ back</button>
+          <button class="btn" id="pf-play">▶ play</button>
+          <button class="btn ghost" id="pf-next">forward ▶</button>
+          <span class="sp"></span>
+          <label class="mono" style="font-size:12px;color:var(--ink3)">speed
+            <input type="range" id="pf-speed" min="400" max="3000" value="1500" step="100" style="vertical-align:middle">
+          </label>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Steps</h2>
+        <ol class="steps" id="pf-steps"></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== DRAW =============================== -->
+<section class="panel" id="p-draw">
+  <div class="grid side">
+    <div>
+      <div class="card">
+        <h2>Scribe</h2>
+        <p class="tight">Click a cut to select its area; click the sheet's border to select
+        the sheet itself. Then scribe onto the selected area.</p>
+        <div class="btnrow">
+          <button class="btn" id="d-cut">Cut</button>
+          <button class="btn" id="d-spot">Spot…</button>
+          <button class="btn" id="d-line">Line of identity</button>
+        </div>
+        <div class="btnrow">
+          <button class="btn ghost" id="d-join">Join two points</button>
+          <button class="btn ghost" id="d-del">Erase selection</button>
+          <button class="btn ghost" id="d-undo">Undo</button>
+          <button class="btn ghost" id="d-clear">Blank sheet</button>
+        </div>
+        <p class="note" id="d-hint">Selected: the sheet of assertion.</p>
+        <div class="toggles">
+          <label><input type="checkbox" id="d-shade" checked> shade odd areas</label>
+          <label><input type="checkbox" id="d-handles" checked> show line points</label>
+        </div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Start from a formula</h2>
+        <input type="text" id="d-from" value="Ex (Fx &amp; ~Gx)" spellcheck="false">
+        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button></div>
+        <h3>Or from linear notation</h3>
+        <input type="text" id="d-lin" value="( *x F[x] ( G[x] ) )" spellcheck="false">
+        <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
+        <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
+        <code>*x</code> a point of the line <span class="mono">x</span> ·
+        <code>F[x,y]</code> a spot hooked to lines · <code>x~y</code> two lines joined ·
+        <code>"is a catholic"</code> a spot whose name has spaces.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="stage left" id="d-stage"></div>
+        <div id="d-err" class="err"></div>
+      </div>
+      <div class="grid two" style="margin-top:18px">
+        <div class="card">
+          <h2>What it says</h2>
+          <p class="reading" id="d-read"></p>
+          <p class="gloss" id="d-gloss"></p>
+          <div class="notation" id="d-lin2" style="margin-top:8px"></div>
+          <div id="d-val" style="margin-top:10px"></div>
+        </div>
+        <div class="card">
+          <h2>Transform it</h2>
+          <p class="note" style="margin-top:0">Every move below is legal by Peirce's five
+          rules. Applying one is an experiment upon the diagram.</p>
+          <div id="d-moves"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== PROVE =============================== -->
+<section class="panel" id="p-prove">
+  <div class="grid side">
+    <div class="card">
+      <h2>An inference to test</h2>
+      <label class="fld">Premisses, one to a line (leave blank for a theorem)</label>
+      <textarea id="v-prem" rows="4" spellcheck="false">P -> Q
+Q -> R</textarea>
+      <label class="fld" style="margin-top:10px">Conclusion</label>
+      <textarea id="v-goal" rows="2" spellcheck="false">P -> R</textarea>
+      <div class="btnrow">
+        <button class="btn" id="v-go">Search for a proof</button>
+        <button class="btn ghost" id="v-hard">Search harder</button>
+      </div>
+      <div class="chips" id="v-ex"></div>
+      <p class="note">Alpha validity is always decided outright, by the truth-value
+      analysis of Roberts §3.2, whether or not a proof is found. Beta validity is not
+      decidable; there a countermodel refutes, and otherwise the search can only report
+      what it did and did not find.</p>
+    </div>
+    <div>
+      <div class="card">
+        <h2>Verdict</h2>
+        <div id="v-verdict">Press the button.</div>
+      </div>
+      <div class="card" id="v-proofcard" style="margin-top:18px;display:none">
+        <h2>The proof</h2>
+        <div class="stage" id="v-stage"></div>
+        <div class="why" id="v-why"></div>
+        <div class="playbar">
+          <button class="btn ghost" id="v-first">⏮</button>
+          <button class="btn ghost" id="v-prev">◀ back</button>
+          <button class="btn" id="v-play">▶ play</button>
+          <button class="btn ghost" id="v-next">forward ▶</button>
+        </div>
+        <ol class="steps" id="v-steps" style="margin-top:14px"></ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =============================== NOTES =============================== -->
+<section class="panel" id="p-notes">
+  <div class="grid two">
+    <div class="card">
+      <h2>The conventions</h2>
+      <dl class="rules" id="n-conv"></dl>
+    </div>
+    <div>
+      <div class="card">
+        <h2>The rules of transformation</h2>
+        <dl class="rules" id="n-rules"></dl>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>About this instrument</h2>
+        <div class="ref" id="n-about"></div>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
