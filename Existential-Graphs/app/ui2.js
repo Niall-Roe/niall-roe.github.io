@@ -59,9 +59,7 @@ function drawRender(){
   try {
     const rd = readings(ED.g);
     $('#d-read').textContent = rd.plain;
-    $('#d-gloss').textContent = rd.gloss;
     $('#d-lin2').textContent = writeEG(ED.g) || '(the blank sheet)';
-    $('#d-val').innerHTML = valuationBadge(ED.g);
   } catch(e){ $('#d-read').textContent = '—'; }
 
   // where we are
@@ -76,7 +74,8 @@ function drawRender(){
   if (ED.pick.length) hint += '  ('+ED.pick.length+' line point'+(ED.pick.length===1?'':'s')+' picked)';
   $('#d-hint').textContent = hint;
 
-  drawMoves();
+  if (typeof drawRuleCards === 'function') drawRuleCards(); else drawMoves();
+  if (typeof armSheet === 'function') armSheet(svg);
   if (!ED.quiet) syncScribeBoxes('graph');
   if (typeof puzzleCheck === 'function') puzzleCheck();
 }
@@ -128,6 +127,7 @@ $('#d-clear').onclick = () => { edPush(); ED.g = newGraph(); ED.sel=null; ED.pic
 // Whichever box is used, the other is brought into step, so that the two
 // descriptions of the graph on the sheet always agree.
 function syncScribeBoxes(from){
+  if (!$('#d-lin')) return;      // the merged tab has no such boxes
   try {
     if (from !== 'lin') setEditorValue('#d-lin', writeEG(ED.g) || '');
     if (from !== 'formula'){
@@ -136,12 +136,12 @@ function syncScribeBoxes(from){
     }
   } catch(e){ /* a graph with no formula of its own is left alone */ }
 }
-$('#d-load').onclick = () => {
+if ($('#d-load')) $('#d-load').onclick = () => {
   try { edPush(); ED.g = compileFormula(parseFormula($('#d-from').value)).graph;
         ED.sel=null; ED.pick=[]; drawRender(); syncScribeBoxes('formula'); }
   catch(e){ $('#d-err').textContent = e.message; }
 };
-$('#d-loadlin').onclick = () => {
+if ($('#d-loadlin')) $('#d-loadlin').onclick = () => {
   try { edPush(); ED.g = parseEG($('#d-lin').value); ED.sel=null; ED.pick=[];
         drawRender(); syncScribeBoxes('lin'); }
   catch(e){ $('#d-err').textContent = e.message; }
@@ -166,11 +166,11 @@ function dLive(box, btn){
     } catch(e){ /* still being typed */ }
   }, 420);
 }
-$('#d-from').addEventListener('input', () => dLive('#d-from','#d-load'));
-$('#d-lin').addEventListener('input', () => dLive('#d-lin','#d-loadlin'));
+if ($('#d-from')) $('#d-from').addEventListener('input', () => dLive('#d-from','#d-load'));
+if ($('#d-lin')) $('#d-lin').addEventListener('input', () => dLive('#d-lin','#d-loadlin'));
 // Enter scribes; shift-Enter starts a new line
 [['#d-from','#d-load'], ['#d-lin','#d-loadlin']].forEach(([box, btn]) =>
-  $(box).addEventListener('keydown', e => {
+  $(box) && $(box).addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); $(btn).click(); }
   }));
 
@@ -225,49 +225,86 @@ function whereOf(g, mv){
 let DMOVES = [];
 function shortWhy(w){ return w.replace(/^R\d[^:]*:\s*/, '').replace(/^C6[^:]*:\s*/,''); }
 
-function drawMoves(){
+/* The six permissions, each with whatever it allows here.
+
+   Every rule is named and shown, including the ones that happen to allow
+   nothing at this moment, so that the reader sees the whole set rather than a
+   list that silently shrinks. R2 is given something to insert — the subgraphs
+   of the sheet and of the goal — since a rule that lets you scribe any graph
+   whatever is useless with nothing to scribe. Drawing a double cut and taking
+   one off are listed apart, as R5 and R6, because a reader looking for the
+   second should not have to find it among the first. */
+const RULE_GROUPS = [
+  ['R1',  'erasure',      'Anything evenly enclosed may go.'],
+  ['R2',  'insertion',    'Anything whatever may be scribed on an oddly enclosed area.'],
+  ['R3',  'iteration',    'A graph may be scribed again on an area its own place contains.'],
+  ['R4',  'deiteration',  'A copy that could have been got by iteration may be erased.'],
+  ['R5', 'the double cut drawn',   'A double cut may be drawn round anything, anywhere.'],
+  ['R6', 'the double cut removed', 'And taken off wherever one stands.']
+];
+function ruleBucket(mv){
+  const r = ruleOf(mv.op, true);
+  if (mv.op === 'dcIn') return 'R5';
+  if (mv.op === 'dcOut') return 'R6';
+  if (r.slice(0,2) === 'R3' || mv.op === 'branch' || mv.op === 'extend') return 'R3';
+  if (r.slice(0,2) === 'R4' || mv.op === 'retract') return 'R4';
+  if (r.slice(0,2) === 'R1' || mv.op === 'delLine' || mv.op === 'eraseEdge') return 'R1';
+  if (r.slice(0,2) === 'R2' || mv.op === 'join' || mv.op === 'addLine') return 'R2';
+  return r;
+}
+function drawMoveList(){
   let mvs;
-  try { mvs = legalMoves(ED.g, { dir:'fwd', palette: [], beta: !isAlpha(ED.g), maxNodes: 40 }); }
-  catch(e){ $('#d-moves').innerHTML = '<p class="note">—</p>'; return; }
+  // something to insert: the graphs already in play, and those of the goal
+  let pal = [];
+  try {
+    const gs = [ED.g];
+    if (ED.goal && ED.goal.graph) gs.push(ED.goal.graph);
+    pal = subgraphPalette(gs);
+  } catch(e){ pal = []; }
+  try { mvs = legalMoves(ED.g, { dir:'fwd', palette: pal, beta: !isAlpha(ED.g), maxNodes: 40 }); }
+  catch(e){ return; }
   const seen = new Set(), keep = [];
   for (const mv of mvs){
-    let h; try { h = applyMove(ED.g, mv, []); } catch(e){ continue; }
-    const k = canonGraph(h);
-    if (seen.has(k)) continue;                 // same result by another route
+    let h; try { h = applyMove(ED.g, mv, pal); } catch(e){ continue; }
+    // the same result by another route is dropped, but only within one rule:
+    // R1 can erase a double cut and R6 can remove it, and to a reader learning
+    // the rules those are two different moves that happen to agree
+    const bucket = ruleBucket(mv);
+    const k = bucket + '|' + canonGraph(h);
+    if (seen.has(k)) continue;
     seen.add(k);
-    keep.push({ mv, h, rule: ruleOf(mv.op, true),
+    keep.push({ mv, h, rule: bucket,
                 why: shortWhy(describeMove(ED.g, mv, true)),
                 where: whereOf(ED.g, mv) });
   }
-  if (!keep.length){
-    $('#d-moves').innerHTML = '<p class="note">No rule applies to the blank sheet but R5 and C6.</p>';
-    return;
-  }
-  const order = ['R1','R2','R3','R3(a)','R3(b)','R4','R4(a)','R4(a,b)','R5','C6/R2'];
-  const rank = r => { const i = order.indexOf(r); return i < 0 ? 99 : i; };
-  keep.sort((a,b) => rank(a.rule) - rank(b.rule));
   const counts = {};
-  keep.forEach(k => { const key = k.why+'|'+k.where; counts[key] = (counts[key]||0)+1; });
+  keep.forEach(k => { const key = k.rule+'|'+k.why+'|'+k.where; counts[key] = (counts[key]||0)+1; });
   const seenLabel = {};
   keep.forEach(k => {
-    const key = k.why+'|'+k.where;
+    const key = k.rule+'|'+k.why+'|'+k.where;
     if (counts[key] > 1){
       seenLabel[key] = (seenLabel[key]||0)+1;
       k.where = (k.where ? k.where+' ' : '') + '(' + seenLabel[key] + ' of ' + counts[key] + ')';
     }
   });
-  const groups = {};
-  keep.forEach((k,i) => (groups[k.rule] = groups[k.rule] || []).push({k,i}));
   DMOVES = keep;
-  $('#d-moves').innerHTML = Object.keys(groups).map(r =>
-    '<div class="movegroup">'+esc(r)+'</div><ul class="moves">'+
-    groups[r].map(({k,i}) =>
+  const by = {};
+  keep.forEach((k,i) => (by[k.rule] = by[k.rule] || []).push({k,i}));
+  const host = $('#d-movelist') || $('#d-moves');
+  host.innerHTML = RULE_GROUPS.map(([id, name, gloss]) => {
+    const here = by[id] || [];
+    const head = '<div class="movegroup">'+esc(id.replace('+','').replace('-',''))+
+      ' — '+esc(name)+'<span class="gloss">'+esc(gloss)+'</span></div>';
+    if (!here.length)
+      return head + '<p class="note none">Nothing on the sheet to which this applies just now.</p>';
+    return head + '<ul class="moves">'+ here.map(({k,i}) =>
       '<li><button type="button" class="movebtn" data-i="'+i+'">'+
       '<span class="d">'+esc(k.why)+'</span>'+
       (k.where ? '<span class="w">'+esc(k.where)+'</span>' : '')+
-      '</button></li>').join('')+
-    '</ul>').join('');
+      '</button></li>').join('') + '</ul>';
+  }).join('');
 }
+
 
 /* Hovering or focusing an entry marks, on the drawing, what that move would act
    on — which is what tells the eight double-cut entries apart at a glance. */
@@ -285,14 +322,8 @@ function unpreview(){ if (!ED.anim) drawRender(); }
 $('#d-moves').addEventListener('click', e => {
   const b = e.target.closest('button[data-i]'); if (!b) return;
   const k = DMOVES[+b.dataset.i]; if (!k) return;
-  edPush('rule');
-  ED.moves++;
-  const el = $('#d-stage');
-  const opts = { shade: $('#d-shade').checked, wobble: true,
-                 colourLines: PREFS.colour, hand: PREFS.hand, markMs: 520, moveMs: 620 };
-  ED.anim = playTransition(el, ED.g, k.h, k.mv, opts, () => {
-    ED.anim = null; ED.g = k.h; ED.sel = null; ED.pick = []; drawRender();
-  });
+  // the cards own this now, and commit the move before the animation runs
+  if (typeof applyRuleMove === 'function'){ applyRuleMove({ mv: k.mv }); return; }
 });
 $('#d-moves').addEventListener('mouseover', e => {
   const b = e.target.closest('button[data-i]'); if (b) previewMove(+b.dataset.i);
@@ -319,19 +350,23 @@ const V_EXAMPLES = [
   [['P -> Q'],'Q -> P','invalid — look for the countermodel'],
   [['Ax Ey Rxy'],'Ey Ax Rxy','invalid — order of selection matters']
 ];
+if ($('#v-ex')){
 $('#v-ex').innerHTML = V_EXAMPLES.map((e,i)=>'<button data-i="'+i+'">'+esc(e[2])+'</button>').join('');
-$('#v-ex').onclick = e => {
-  const b = e.target.closest('button'); if (!b) return;
-  const ex = V_EXAMPLES[+b.dataset.i];
-  setEditorValue('#v-prem', ex[0].join('\n'));
-  setEditorValue('#v-goal', ex[1]);
-};
-const VV = { steps: null, graphs: null, i: 0, timer: null };
+  $('#v-ex').onclick = e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const ex = V_EXAMPLES[+b.dataset.i];
+    setEditorValue('#v-prem', ex[0].join('\n'));
+    setEditorValue('#v-goal', ex[1]);
+  };
+}
+
+const VV = { steps: null, graphs: null, i: 0, timer: null, run: 0 };
 function runProof(hard){
+  VV.run++;                                  // anything still running is stale
   const premSrc = $('#v-prem').value.split('\n').map(s=>s.trim()).filter(Boolean);
   const goalSrc = $('#v-goal').value.trim();
-  $('#v-proofcard').style.display = 'none';
-  $('#v-writ-card').style.display = 'none';
+  if ($('#v-proofcard')) $('#v-proofcard').style.display = 'none';
+  if ($('#v-writ-card')) $('#v-writ-card').style.display = 'none';
   if (!goalSrc){ $('#v-verdict').textContent = 'Give a conclusion.'; return; }
   let prems, goal, premAst, goalAst;
   try {
@@ -339,6 +374,7 @@ function runProof(hard){
     prems = premAst.map(a => compileFormula(a).graph);
     goal = compileFormula(goalAst).graph;
   } catch(e){ $('#v-verdict').innerHTML = '<span class="err">'+esc(e.message)+'</span>'; return; }
+  if (typeof pfKvFromBoxes === 'function') pfKvFromBoxes(null);
 
   $('#v-verdict').innerHTML = '<span class="spin"></span>searching…';
   setTimeout(() => {
@@ -351,7 +387,7 @@ function runProof(hard){
           a+' = '+(ent.countermodel[a] ? 'true' : 'false')).join(', ');
         $('#v-verdict').innerHTML =
           '<p><span class="pill bad">not valid</span></p>'+
-          '<p>The inference fails, so no sequence of the five rules can produce it — '+
+          '<p>The inference fails, so no sequence of the rules can produce it — '+
           'the rules are truth-preserving (Roberts, Appendix 4).</p>'+
           '<p class="mono">A countermodel: '+esc(cm)+'</p>';
         return;
@@ -366,7 +402,13 @@ function runProof(hard){
           'built. Whether the inference holds is undecided; a proof, if the search '+
           'finds one, would settle it.</p>';
     } else {
-      const cm = findCountermodel(premAst, goalAst, 3);
+      /* The countermodel is looked for in what is actually scribed, not in what
+         was typed: a free variable cannot be scribed at all, so the page closes
+         it existentially, and a check run on the typed formula would be
+         answering a different question. */
+      let premRead = premAst, goalRead = goalAst;
+      try { premRead = prems.map(readGraph); goalRead = readGraph(goal); } catch(e){}
+      const cm = findCountermodel(premRead, goalRead, 3);
       if (cm){
         $('#v-verdict').innerHTML =
           '<p><span class="pill bad">not valid</span></p>'+
@@ -379,83 +421,58 @@ function runProof(hard){
       head = '<p><span class="pill mid">no countermodel on up to three individuals</span></p>';
     }
     const opts = hard ? { timeCap: 30000, budget: 1200000, maxDepth: 14, slack: 6, beam: 700 }
-                      : { timeCap: 6000,  budget: 150000,  maxDepth: 12, slack: 4, beam: 400 };
-    let res;
-    try { res = findProof(prems, goal, opts); }
+                      : { timeCap: 9000,  budget: 300000,  maxDepth: 12, slack: 4, beam: 400 };
+    /* The search is run a slice at a time, so that the page keeps drawing and
+       the count of transformations tried can be watched going up. A search
+       started later takes over: an older one notices its tag is stale on its
+       next slice and stops without reporting. */
+    const tag = VV.run;
+    let it;
+    try { it = searchProof(prems, goal, opts); }
     catch(e){ $('#v-verdict').innerHTML = head + '<span class="err">'+esc(e.message)+'</span>'; return; }
-    if (res.found){
-      $('#v-verdict').innerHTML = head +
-        '<p><span class="pill ok">proof found</span> — '+(res.steps.length-1)+
-        ' step'+(res.steps.length===2?'':'s')+', '+res.expanded.toLocaleString()+' transformations tried.</p>';
-      vLoad(res.steps);
-    } else {
-      $('#v-verdict').innerHTML = head +
-        '<p><span class="pill mid">no proof found within the bound</span></p>'+
-        '<p>The search tried '+res.expanded.toLocaleString()+' transformations and stopped. '+
-        (beta ? 'Beta is only semi-decidable, so this settles nothing either way. '
-              : settled
-              ? 'The inference is nevertheless valid, and so by the completeness of Alpha '+
-                '(Roberts, Appendix 4) a proof exists. '
-              : 'Whether the inference holds is still undecided. ')+
-        'Try “search harder”, or work it by hand on the Scribe tab.</p>';
-    }
+    $('#v-verdict').innerHTML = head +
+      '<p><span class="spin"></span>searching &mdash; <span id="v-count" class="mono">0</span>'+
+      ' transformations tried</p>';
+    const step = paused => {
+      if (tag !== VV.run) return;
+      let r;
+      try { r = it.next(paused); }
+      catch(e){ $('#v-verdict').innerHTML = head + '<span class="err">'+esc(e.message)+'</span>'; return; }
+      if (!r.done){
+        const c = $('#v-count');
+        if (c) c.textContent = (r.value.expanded||0).toLocaleString();
+        const t = Date.now();
+        setTimeout(() => step(Date.now() - t), 0);
+        return;
+      }
+      const res = r.value;
+      if (res.found){
+        $('#v-verdict').innerHTML = head +
+          '<p><span class="pill ok">proof found</span> &mdash; '+(res.steps.length-1)+
+          ' step'+(res.steps.length===2?'':'s')+', '+res.expanded.toLocaleString()+
+          ' transformations tried.</p>'+
+          (res.assumed ? '<p class="note">Found by assuming the antecedent: the search proved '+
+            'the consequent from it, and the proof of the whole conditional is built round '+
+            'that, starting from a double cut on the blank sheet.</p>' : '');
+        pfLoadFound(res.steps, prems, goal);
+      } else {
+        $('#v-verdict').innerHTML = head +
+          '<p><span class="pill mid">no proof found within the bound</span></p>'+
+          '<p>The search tried '+res.expanded.toLocaleString()+' transformations and stopped. '+
+          (beta ? 'Beta is only semi-decidable, so this settles nothing either way. '
+                : settled
+                ? 'The inference is nevertheless valid, and so by the completeness of Alpha '+
+                  '(Roberts, Appendix 4) a proof exists. '
+                : 'Whether the inference holds is still undecided. ')+
+          'Try “search harder”, or work it yourself below.</p>';
+        if (typeof proveModes === 'function'){ PF.proof = null; proveModes(); proveMode('work'); }
+      }
+    };
+    step(0);
   }, 30);
 }
 $('#v-go').onclick = () => runProof(false);
 $('#v-hard').onclick = () => runProof(true);
-function vLoad(steps){
-  VV.steps = steps;
-  const h = hydrateSteps(steps);
-  VV.graphs = h.graphs; VV.mvs = h.mvs; VV.i = 0;
-  VV.frame = proofFrame(VV.graphs);
-  $('#v-proofcard').style.display = '';
-  $('#v-writ-card').style.display = '';
-  $('#v-steps').innerHTML = steps.map((s,k) =>
-    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
-    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
-  vShow(0);
-}
-function vShow(i, animate){
-  if (!VV.steps) return;
-  const from = VV.i;
-  VV.i = Math.max(0, Math.min(VV.steps.length-1, i));
-  if (VV.anim){ VV.anim.cancel(); VV.anim = null; }
-  if (animate && VV.i === from + 1){
-    VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], VV.mvs[VV.i],
-      { shade:true, wobble:true, colourLines: PREFS.colour, hand: PREFS.hand, frame: VV.frame,
-        markMs: 620, moveMs: 700 }, () => { VV.anim = null; });
-    VV.dur = VV.anim.total;
-  } else if (animate && VV.i === from - 1){
-    VV.anim = playTransition($('#v-stage'), VV.graphs[from], VV.graphs[VV.i], null,
-      { shade:true, wobble:true, colourLines: PREFS.colour, hand: PREFS.hand, frame: VV.frame,
-        markMs: 0, moveMs: 560 }, () => { VV.anim = null; });
-  } else {
-    stageSvg($('#v-stage'), VV.graphs[VV.i], { shade:true, wobble:true, frame: VV.frame });
-  }
-  const s = VV.steps[VV.i];
-  $('#v-why').innerHTML = '<b>'+esc(s.rule||'Premiss')+'</b> — '+esc(s.why)+
-    '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
-    esc(fmtFull(sugar(readGraph(VV.graphs[VV.i]))))+'</span>';
-  $$('#v-steps li').forEach(li => li.classList.toggle('cur', +li.dataset.k === VV.i));
-  if (WRIT.v) WRIT.v();
-}
-function vStop(){
-  if (VV.timer){ clearTimeout(VV.timer); VV.timer=null; }
-  if (VV.anim){ VV.anim.cancel(); VV.anim=null; }
-  $('#v-play').textContent='▶ play';
-}
-$('#v-next').onclick = ()=>{ vStop(); vShow(VV.i+1, true); };
-$('#v-prev').onclick = ()=>{ vStop(); vShow(VV.i-1, true); };
-$('#v-first').onclick = ()=>{ vStop(); vShow(0); };
-$('#v-steps').onclick = e => { const li = e.target.closest('li'); if (li){ vStop(); vShow(+li.dataset.k); } };
-$('#v-play').onclick = () => {
-  if (VV.timer || VV.anim){ vStop(); return; }
-  if (VV.i >= VV.steps.length-1) vShow(0);
-  $('#v-play').textContent = '❚❚ pause';
-  const advance = () => {
-    if (VV.i >= VV.steps.length-1){ vStop(); return; }
-    vShow(VV.i+1, true);
-    VV.timer = setTimeout(advance, (VV.dur || 1320) + 900);
-  };
-  VV.timer = setTimeout(advance, 300);
-};
+/* The found-proof player is gone: one player now serves both, in ui1. What
+   is left here is the search itself and its verdict. */
+

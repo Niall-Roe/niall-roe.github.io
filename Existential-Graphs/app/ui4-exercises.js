@@ -3,7 +3,7 @@
    These are the arguments and theorems set for natural deduction in
    forall x: Calgary, by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and
    Richard Zach (CC BY 4.0, forallx.openlogicproject.org). They are reproduced
-   here under that licence, to be worked instead by Peirce's five rules.
+   here under that licence, to be worked instead by Peirce's rules.
    Where the book uses A as a one-place predicate the letter is changed, since
    "Ax" reads as the universal quantifier in the notation of this page.
    ========================================================================== */
@@ -171,43 +171,56 @@ BOOK_EXERCISES.push({ group: 'The classical syllogisms',
         'It is worked out step by step on the Proofs tab, under “' + s.name + ' — figure ' + s.fig + '”.</p>'
       : ''), SYLL_LIBRARY.has(s.name)]) });
 
-(function buildExerciseList(){
-  const sel = $('#v-book');
-  if (!sel) return;
-  let html = '<option value="">Pick an exercise…</option>';
-  BOOK_EXERCISES.forEach((g, gi) => {
-    html += '<optgroup label="'+esc(g.group)+'">';
-    g.items.forEach(([prem, goal, name], ii) => {
-      const label = name || ((prem ? prem.split('\n').join(', ')+' ⊢ ' : '⊢ ') + goal);
-      html += '<option value="'+gi+'.'+ii+'">'+esc(label)+'</option>';
-    });
-    html += '</optgroup>';
-  });
-  sel.innerHTML = html;
-  sel.onchange = () => {
-    if (!sel.value) return;
-    const [gi, ii] = sel.value.split('.').map(Number);
-    const [prem, goal, name, note, inLibrary] = BOOK_EXERCISES[gi].items[ii];
-    setEditorValue('#v-prem', prem);
-    setEditorValue('#v-goal', goal);
-    const key = prem+'|'+goal;
-    if (note){
-      $('#v-booknote').innerHTML = note;
-      // no point running a search that is known not to finish
-      if (!inLibrary) runProof(true);
-      return;
-    }
-    $('#v-booknote').innerHTML = EX_LIBRARY.has(key)
-      ? 'The search on this page cannot reach this one. It is worked out in full on the Proofs tab.'
-      : EX_HARDER.has(key)
-      ? 'This one needs “search harder”.'
-      : 'Set in <i>forall x: Calgary</i> (CC BY 4.0) for natural deduction.';
-    runProof(EX_HARDER.has(key));
-  };
-  $('#v-booknote').innerHTML =
-    'From <i>forall x: Calgary</i> by P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and '+
-    'Richard Zach, CC BY 4.0. Choosing one fills the boxes and runs the search.';
-})();
+/* ============================================================================
+   FURTHER THEOREMS TO PROVE.
+   Standard results from the usual logic courses, set here as things to reach
+   by scribing and erasing. Every one was checked: the Alpha ones are
+   tautologies by truth-value analysis, and the Beta ones have no countermodel
+   on up to four individuals. Which of them the search on this page reaches was
+   measured, not guessed, and the ones it cannot are marked.
+   ========================================================================== */
+const MORE_THEOREMS = [
+  ['((P -> Q) -> P) -> P', 'Peirce’s law'],
+  ['(P -> Q) | (Q -> P)', 'one conditional or the other always holds'],
+  ['~(P <-> ~P)', 'nothing is equivalent to its own denial'],
+  ['((P -> Q) & (~P -> Q)) -> Q', 'proof by cases'],
+  ['(P & Q) -> P', 'simplification'],
+  ['P -> (Q -> P)', 'a truth follows from anything'],
+  ['(P -> Q) -> (~Q -> ~P)', 'contraposition'],
+  ['(~Q -> ~P) -> (P -> Q)', 'contraposition, the other way'],
+  ['((P | Q) & ~P) -> Q', 'the disjunctive syllogism'],
+  ['((P -> Q) & (R -> S) & (P | R)) -> (Q | S)', 'the constructive dilemma'],
+  ['~(P & Q) -> (~P | ~Q)', 'de Morgan'],
+  ['(P | (Q & R)) -> ((P | Q) & (P | R))', 'or distributes over and'],
+  ['(P -> (P -> Q)) -> (P -> Q)', 'contraction'],
+  ['((P & ~Q) -> R) -> ((P & ~R) -> Q)', 'antilogism'],
+  ['Ax (Fx -> Gx) -> (Ex Fx -> Ex Gx)', 'a universal carries into an existential'],
+  ['Ax (Fx & Gx) -> (Ax Fx & Ax Gx)', 'a universal distributes over and'],
+  ['(Ex Fx | Ex Gx) -> Ex (Fx | Gx)', 'an existential distributes over or'],
+  ['Ex (Fx & Gx) -> (Ex Fx & Ex Gx)', 'some F that is G gives some F and some G'],
+  ['Ax Fx -> Ex Fx', 'from all to some'],
+  ['~Ax Fx -> Ex ~Fx', 'a denied universal'],
+  ['Ax Ay Rxy -> Ay Ax Rxy', 'two universals commute'],
+  ['Ex Ey Rxy -> Ey Ex Rxy', 'two existentials commute'],
+  ['(Ax Fx & Ex Gx) -> Ex (Fx & Gx)', 'all F, and some G, so some F that is G']
+];
+// measured: these two are beyond the search here, whatever the setting. The
+// others on this list were too, until the search learnt to assume the
+// antecedent; they are reached now.
+const THEOREM_HARD = new Set([
+  '(Ex Fx | Ex Gx) -> Ex (Fx | Gx)',
+  'Ax Fx -> Ex Fx'
+]);
+BOOK_EXERCISES.push({ group: 'Further theorems', items: MORE_THEOREMS.map(([f, name]) =>
+  ['', f, name,
+   '<p style="margin:0 0 6px"><b>' + name + '</b></p>' +
+   '<p class="cite" style="margin:0">Proved from the blank sheet of assertion, which by C1 is '+
+   'itself a graph. ' + (THEOREM_HARD.has(f)
+     ? 'The search on this page does not reach this one; it is set as something to work by hand.'
+     : 'The search on this page reaches this one.') + '</p>',
+   THEOREM_HARD.has(f)]) });
+
+/* The exercises are listed on the Prove it tab now, beside the worked proofs. */
 
 /* ---- drawing as a pen would, shared by every panel ------------------------ */
 (function bindHandPref(){

@@ -16,9 +16,11 @@ cd "$(dirname "$0")"
   echo '"use strict";'
   cat src/01-core.js src/02-parse.js src/03-compile.js src/04-read.js \
       src/05-semantics.js src/06-rules.js src/07-prove.js src/08-render.js src/09-egnotation.js src/11-anim.js
+  echo '/* --- Peirce'"'"'s letterforms, cut from the manuscripts --- */'
+  cat src/12-hand.js
   echo '/* --- the verified proof library --- */'
   cat src/10-library.js
-  cat app/ui0-editor.js app/ui1.js app/ui2.js app/ui4-exercises.js app/ui5-writ.js app/ui6-puzzle.js app/ui3.js
+  cat app/ui0-editor.js app/ui1.js app/ui2.js app/ui4-exercises.js app/ui5-writ.js app/ui6-puzzle.js app/ui7-prove.js app/ui8-rules.js app/ui3.js
   echo '</script>'
   echo '</body></html>'
 } > index.html

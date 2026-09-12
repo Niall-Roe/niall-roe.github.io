@@ -14,7 +14,8 @@ const LAY = {
   spotH: 24, spotPadX: 7,
   charW: 7.1, minSpotW: 24,
   hookGap: 16,
-  bareW: 26, bareH: 16,
+  bareW: 26, bareH: 16, stub: 18,
+  cutW: 1.15, loiW: 2.4,      // the drawn widths, in the hand
   laneW: 15
 };
 
@@ -199,6 +200,30 @@ function placeLines(g, P, LN){
       pos[l.id].y = pos[l.id].y * 0.4 + y * 0.6;
     }
   }
+  /* A branch with a loose end (R3a) is a graph in its own right and has to be
+     seen as one. Left to relax towards its only neighbour it converged onto
+     it and disappeared, so R3(a) drew nothing at all. Only a point hanging off
+     a line is moved: the free end of an ordinary line, whose neighbour is
+     itself an end, is left where the relaxation put it. */
+  for (const l of Object.values(g.lns)){
+    if (fixed[l.id]) continue;
+    const nb = neighbours(g, l.id);
+    if (nb.length !== 1 || neighbours(g, nb[0]).length < 2) continue;
+    // A branch added by R3(a) lies on the same area as the line it comes off.
+    // An ordinary line's outer end sits on a different area from the point it
+    // runs to, and must be left alone: treating those as stubs stacked every
+    // point of "there are three things" on one spot.
+    if (g.lns[nb[0]].area !== g.lns[l.id].area) continue;
+    const a = P[l.area], q = pos[nb[0]];
+    let y = q.y + LAY.stub;
+    if (y > a.y + a.h - 7) y = q.y - LAY.stub;
+    if (y < a.y + 7 || y > a.y + a.h - 7)
+      pos[l.id] = { x: Math.min(q.x + LAY.stub, a.x + a.w - 7), y: q.y };
+    else
+      pos[l.id] = { x: q.x, y };
+    fixed[l.id] = true;
+  }
+
   // spread coincident points on one area so the spine reads as a line
   const byArea = {};
   for (const l of Object.values(g.lns)){
@@ -230,24 +255,119 @@ function handRotate(seed, name){
   const rnd = seededRand(seed + '#r');
   return Array.from(name).map(() => r2((rnd() - 0.5) * 11)).join(' ');
 }
+/* A name set in Peirce's own letterforms, where they have been harvested.
+   The table is optional: with none present, or with any letter of this name
+   missing from it, nothing is written here and the ordinary face is used
+   instead, since a name half in his hand and half in type reads as a fault
+   rather than as a limitation. */
+function writtenName(name, cx, cy, seed){
+  const T = typeof PEIRCE_HAND !== 'undefined' ? PEIRCE_HAND : null;
+  if (!T || !T.glyphs) return null;
+  const marks = [];
+  for (const ch of name){
+    if (ch === ' '){ marks.push(null); continue; }
+    const v = T.glyphs[ch];
+    if (!v || !v.length) return null;          // one gap and the whole name goes
+    marks.push(v);
+  }
+  const size = LAY.spotH * 0.55;               // the drawn face, in page units
+  const k = size / T.em;
+  const rnd = seededRand(seed + '#w');
+  const pick = [];
+  let w = 0;
+  for (const v of marks){
+    if (!v){ w += size * 0.3; pick.push(null); continue; }
+    const g = v[Math.floor(rnd() * v.length) % v.length];
+    pick.push(g); w += g.a * k;
+  }
+  let x = cx - w/2;
+  const y = cy + size * 0.32;                  // sit the writing line under the middle
+  const out = [];
+  for (const g of pick){
+    if (!g){ x += size * 0.3; continue; }
+    const tilt = (rnd() - 0.5) * 7;
+    out.push(`<path class="written" transform="translate(${r2(x)},${r2(y)}) scale(${
+      r2(k)}) rotate(${r2(tilt)})" d="${g.d}"/>`);
+    x += g.a * k;
+  }
+  return out.join('');
+}
+
 function handShift(seed){
   const rnd = seededRand(seed + '#y');
   return (rnd() - 0.5) * 1.8;
+}
+
+/* Drawing with ink rather than with a pen of one width.
+
+   Measured on the centrelines of nineteen of Peirce's own figures, about
+   90,000 samples: the stroke runs from roughly half its median width to about
+   1.6 times it, a coefficient of variation near 0.5. And it does not flicker —
+   two points stay alike over some four stroke widths and have drifted apart by
+   sixteen. Both of those are ratios, so they carry to any scale.
+
+   A single SVG path cannot change width along itself, so the stroke is drawn
+   as a row of overlapping pieces cut out of the same path with a dash window,
+   each piece carrying its own width from a smooth walk of that spread and that
+   length. Round caps make the joins invisible. */
+function inkRuns(len, baseW, seed){
+  const rnd = seededRand(seed + '#ink');
+  const run = Math.max(5, baseW * 4);
+  const n = Math.max(1, Math.min(60, Math.round(len / run)));
+  if (n < 2) return [{ w: baseW, dash: null }];
+  const step = len / n;
+  const out = [];
+  let g = 0;
+  for (let i = 0; i < n; i++){
+    g = g * 0.5 + (rnd() + rnd() + rnd() - 1.5) * 0.95;
+    // the walk's own spread is about 0.55; 0.80 takes the width to the
+    // measured coefficient of variation of 0.5, and the floor keeps the
+    // thinnest run from breaking the line
+    const lap = step * 0.4;
+    const from = Math.max(0, i * step - lap);
+    const to = Math.min(len, (i + 1) * step + lap);
+    out.push({ w: r2(Math.max(baseW * 0.5, baseW * Math.exp(g * 0.80))),
+               dash: `${r2(to - from)} ${r2(len * 2 + 20)}`,
+               off: r2(-from) });
+  }
+  return out;
+}
+function inkStroke(cls, d, len, baseW, seed){
+  const runs = inkRuns(len, baseW, seed);
+  if (runs.length < 2) return `<path class="${cls}" d="${d}"/>`;
+  return runs.map(r => `<path class="${cls}" style="stroke-width:${r.w}px" `+
+    `stroke-dasharray="${r.dash}" stroke-dashoffset="${r.off}" d="${d}"/>`).join('');
+}
+function polyLen(pts){
+  let L = 0;
+  for (let i = 1; i < pts.length; i++) L += dist(pts[i-1], pts[i]);
+  return L;
 }
 
 function cutPath(x, y, w, h, seed, wobble, hand){
   const r = Math.min(22, h/2, w/2);
   if (!wobble) return roundRect(x,y,w,h,r);
   const rnd = seededRand(seed + (hand ? '~h' : ''));
-  const amp = hand ? 5.2 : 2.4;
+  /* How far the curve wanders off a true ellipse. In the manuscripts this was
+     measured at a median 0.074 of the cut's own width, so it scales with the
+     cut rather than being a fixed number of pixels: a large cut wanders more
+     than a small one, which is what a hand does. */
+  const amp = hand ? Math.max(2.2, Math.min(w, h) * 0.074) : 2.4;
   const j = () => (rnd() - 0.5) * amp;
   const x0=x+j(), y0=y+j(), x1=x+w+j(), y1=y+h+j();
-  return `M ${x0+r} ${y0}
+  const body = `M ${x0+r} ${y0}
     L ${x1-r+j()} ${y0+j()} Q ${x1} ${y0} ${x1+j()} ${y0+r}
     L ${x1+j()} ${y1-r+j()} Q ${x1} ${y1} ${x1-r+j()} ${y1}
     L ${x0+r+j()} ${y1+j()} Q ${x0} ${y1} ${x0+j()} ${y1-r}
-    L ${x0+j()} ${y0+r+j()} Q ${x0} ${y0} ${x0+r} ${y0} Z`;
+    L ${x0+j()} ${y0+r+j()} Q ${x0} ${y0} ${x0+r} ${y0}`;
+  /* Peirce's own cuts often overshoot and cross at the join rather than
+     closing, but an open curve on a screen reads as a mistake rather than as a
+     hand, and a cut that does not enclose is the one thing in this notation
+     that must never be in doubt. So the curve is closed, and what is kept of
+     the finding is the wander, which is measured. */
+  return body + ' Z';
 }
+
 function roundRect(x,y,w,h,r){
   return `M ${x+r} ${y} H ${x+w-r} Q ${x+w} ${y} ${x+w} ${y+r}
           V ${y+h-r} Q ${x+w} ${y+h} ${x+w-r} ${y+h}
@@ -407,7 +527,11 @@ function crossingHops(polys, keys){
       if (!(x > xlo + 0.5 && x < xhi - 0.5 && y > ylo + 0.5 && y < yhi - 0.5)) continue;
       const kh = key(H.i), kv = key(V.i);
       const over = (kh === kv ? H.i > V.i : kh > kv) ? H : V;
-      hops[over.i][over.s].push({ x, y });
+      // one ligature is drawn as several chains, so the same place on the page
+      // can be found twice; it is one crossing and takes one bridge
+      const here = hops[over.i][over.s];
+      if (here.some(q => Math.abs(q.x - x) < 0.01 && Math.abs(q.y - y) < 0.01)) continue;
+      here.push({ x, y });
     }
   return hops;
 }
@@ -455,17 +579,20 @@ function renderGraph(g, opts){
         const d = depthOf(g, n.inner);
         parts.push(`<path class="cut${mark}${raised}${shade && d%2===1 ? ' odd':''}" d="${
           cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand)}" data-node="${n.id}" data-area="${n.inner}"/>`);
-      // a nib lays down a second, lighter line beside the first
-      if (hand) parts.push(`<path class="cut ink" d="${
-        cutPath(p.x + 0.7, p.y + 0.5, p.w, p.h, n.id + 'b', true, true)}"/>`);
+      if (hand) parts.push(inkStroke('cut ink', cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand),
+        2*(p.w + p.h), LAY.cutW, n.id));
         drawArea(n.inner);
       } else {
+        const cx = p.x + p.w/2 + (n.hooks.length > 1 ? 6 : 0);
+        const cy = p.y + p.h/2;
+        const written = hand ? writtenName(n.name, cx, cy, n.id) : null;
         parts.push(`<g class="spot${mark}" data-node="${n.id}">`+
           `<rect class="spotbg" x="${p.x}" y="${p.y}" width="${p.w}" height="${p.h}" rx="5"/>`+
-          `<text x="${p.x + p.w/2 + (n.hooks.length > 1 ? 6 : 0)}" y="${
-            r2(p.y + p.h/2 + (hand ? handShift(n.id) : 0))}" `+
+          (written || (`<text x="${cx}" y="${
+            r2(cy + (hand ? handShift(n.id) : 0))}" `+
           (hand ? `rotate="${handRotate(n.id, n.name)}" ` : '')+
-          `dominant-baseline="central" text-anchor="middle">${esc(n.name)}</text></g>`);
+          `dominant-baseline="central" text-anchor="middle">${esc(n.name)}</text>`))+
+          `</g>`);
       }
     }
   }
@@ -482,7 +609,11 @@ function renderGraph(g, opts){
   const hops   = crossingHops(polys, chains.map(ch => LN.rank[LN.lig[ch[0]]]));
   polys.forEach((pts, i) => {
     const d = roundedPath(pts, 5, hops[i]);
-    if (d) parts.push(`<path class="loi${lc(chains[i][0])}" d="${d}" data-chain="${chains[i].join(',')}"/>`);
+    if (!d) return;
+    const cls = 'loi' + lc(chains[i][0]);
+    parts.push(hand
+      ? inkStroke(cls, d, polyLen(pts), LAY.loiW, chains[i][0])
+      : `<path class="${cls}" d="${d}" data-chain="${chains[i].join(',')}"/>`);
   });
   // a ligature with a single point and no edge is the bare line of C6
   for (const l of Object.values(g.lns)){

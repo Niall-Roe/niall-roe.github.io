@@ -1,6 +1,6 @@
 /* ============================================================================
    THE PROOF FINDER.
-   A bidirectional search over Peirce's five rules. The forward half starts from
+   A bidirectional search over Peirce's rules. The forward half starts from
    the premisses scribed on the sheet of assertion; the backward half starts
    from the conclusion and runs the rules in reverse. Where the two halves meet
    we have a transformation of the premisses into the conclusion.
@@ -18,19 +18,41 @@ function juxtapose(graphs){
   return g;
 }
 
-// every subgraph of g, as a standalone graph, for the insertion palette
+/* every subgraph of g, as a standalone graph, for the insertion palette.
+   Where a graph has lines of identity in it, lifting a part of it off only
+   makes sense if no line crosses the edge of that part; where one does, the
+   part is taken without its lines, which is still a graph and still something
+   R2 permits scribing. */
 function subgraphPalette(graphs){
   const out = [], seen = new Set();
   for (const g of graphs){
     for (const id of Object.keys(g.nodes)){
-      const h = newGraph();
-      copyNodeAcross(g, id, h, h.root);
+      let h = nodeAsGraph(g, id);
+      if (!h){ h = newGraph(); copyNodeAcross(g, id, h, h.root); }
       const key = canonGraph(h);
       if (seen.has(key)) continue;
       seen.add(key); out.push(h);
     }
   }
   return out;
+}
+// one node and everything under it, standing on a sheet of its own — null if a
+// line of identity runs across the boundary, so that it cannot be lifted off
+function nodeAsGraph(src, id){
+  const n = src.nodes[id];
+  const inside = new Set();
+  if (n.k === 'spot') n.hooks.forEach(l => inside.add(l));
+  else for (const a of areasUnder(src, n.inner))
+    for (const l of src.areas[a].lns) inside.add(l);
+  if (!inside.size) return null;                 // no lines: the plain copy does
+  for (const e of Object.values(src.edges))
+    if (inside.has(e.a) !== inside.has(e.b)) return null;
+  const h = cloneGraph(src);
+  moveNode(h, id, h.root);
+  for (const x of h.areas[h.root].items.slice()) if (x !== id) removeNode(h, x);
+  for (const l of h.areas[h.root].lns.slice()) if (!inside.has(l)) removeLn(h, l);
+  repairEdges(h);
+  return h;
 }
 function copyNodeAcross(src, id, dst, area){
   const n = src.nodes[id];
@@ -146,12 +168,101 @@ function runInstantiation(g, m, palette){
   return steps;
 }
 
+/* The same thought in Alpha. What a textbook writes as one step — "P, and if
+   P then Q, so Q" — is not one of Peirce's rules either, and when the P in
+   question is sitting inside a cut it is three: iterate the conditional in
+   beside it (R3), deiterate the antecedent against the copy already there
+   (R4), and take off the double cut that is left (R6). The middle of that
+   sequence is a larger graph than either end, so a search that judges a state
+   by how much it looks like the conclusion throws the opening away. This is
+   what the constructive dilemma turns on, and every argument by cases with it.
+
+   As with the Beta sequence, nothing here licenses a step: each move is an
+   ordinary move, applied and displayed like any other. */
+function subtreeHasLines(g, cutId){
+  for (const a of areasUnder(g, g.nodes[cutId].inner))
+    if (g.areas[a].lns.length) return true;
+  return false;
+}
+function detachments(g, maxNodes){
+  const out = [];
+  if (Object.keys(g.nodes).length >= maxNodes) return out;
+  const lig = ligIndex(g);
+  const canon = {};
+  for (const id of Object.keys(g.nodes)) canon[id] = canonNode(g, id, lig);
+  const areasAll = areasUnder(g, g.root);
+  for (const id of Object.keys(g.nodes)){
+    const c = g.nodes[id];
+    if (c.k !== 'cut') continue;
+    if (g.areas[c.inner].lns.length || subtreeHasLines(g, id)) continue;
+    const items = g.areas[c.inner].items;
+    if (items.length < 2) continue;
+    const banned = new Set(areasUnder(g, c.inner));
+    for (const d of items){
+      if (g.nodes[d].k !== 'cut') continue;        // the consequent is what the cut denies
+      const ante = items.filter(x => x !== d);
+      for (const t of areasAll){
+        if (t === c.area || banned.has(t)) continue;
+        if (!contains(g, c.area, t)) continue;
+        const there = g.areas[t].items.map(x => canon[x]);
+        if (!ante.every(x => there.includes(canon[x]))) continue;
+        out.push({ node:id, keep:d, into:t });
+      }
+    }
+  }
+  return out;
+}
+function runDetachment(g, m, palette){
+  const steps = [];
+  const was = new Set(g.areas[m.into].items);
+  let mv = { op:'iterate', node:m.node, target:m.into };
+  let h = applyMove(g, mv, palette); steps.push({ mv, graph:h });
+  const c2 = h.areas[m.into].items.find(x => !was.has(x));
+  if (c2 === undefined) return null;
+  const inner = h.nodes[c2].inner;
+  for (let guard = 0; guard < 8; guard++){
+    const lig = ligIndex(h);
+    const outside = h.areas[m.into].items.filter(x => x !== c2)
+      .map(x => canonNode(h, x, lig));
+    let pick = null;
+    for (const x of h.areas[inner].items)
+      if (outside.includes(canonNode(h, x, lig))){ pick = x; break; }
+    if (pick === null) break;
+    const w = h.areas[m.into].items.find(y => y !== c2 &&
+      canonNode(h, y, ligIndex(h)) === canonNode(h, pick, ligIndex(h)));
+    if (w === undefined) break;
+    mv = { op:'deiterate', node:pick, witness:w };
+    h = applyMove(h, mv, palette); steps.push({ mv, graph:h });
+  }
+  const rest = h.areas[inner].items;
+  if (rest.length !== 1 || h.nodes[rest[0]].k !== 'cut') return null;
+  mv = { op:'dcOut', cut:c2 };
+  h = applyMove(h, mv, palette); steps.push({ mv, graph:h });
+  return steps;
+}
+
+/* The search is written as a generator so that it can be run in slices: the
+   page drives it a few dozen milliseconds at a time, paints the count of
+   transformations tried, and comes back. Everything else — the tests, the
+   library generator — calls findProof and gets the same answer in one go.
+   What is yielded is the running count; what is sent back in is how long the
+   caller paused, which is discounted from the time cap so that a search run
+   in slices does no less work than one run straight through. */
 function findProof(premGraphs, goalGraph, opts){
+  const it = searchProof(premGraphs, goalGraph, opts);
+  let r = it.next();
+  while (!r.done) r = it.next(0);
+  return r.value;
+}
+function* searchProof(premGraphs, goalGraph, opts){
   opts = opts || {};
   const maxDepth = opts.maxDepth || 6;
   const budget   = opts.budget   || 60000;
   const t0 = Date.now();
   const timeCap = opts.timeCap || 8000;
+  const sliceMs = opts.sliceMs || 90;
+  let paused = 0, mark = Date.now();
+  const spent = () => Date.now() - t0 - paused;
 
   const start = juxtapose(premGraphs);
   const goal  = cloneGraph(goalGraph);
@@ -194,6 +305,16 @@ function findProof(premGraphs, goalGraph, opts){
     return true;
   }
 
+  /* If the thing to prove is a conditional standing on the blank sheet, there
+     is a second way in (below), and it is usually the one that works. So the
+     ordinary search is given part of the time and the fallback the rest,
+     rather than the fallback waiting out a search that was never going to
+     finish. */
+  const canAssume = opts.deduction !== false && !premGraphs.length &&
+                    scrollSplits(goal).length > 0;
+  let mainCap    = canAssume ? Math.max(1500, Math.round(timeCap * 0.45)) : timeCap;
+  let mainBudget = canAssume ? Math.round(budget * 0.45) : budget;
+
   const kStart = canonGraph(start), kGoal = canonGraph(goal);
   if (kStart === kGoal)
     return { found:true, steps:[{graph:start, rule:null, why:'The conclusion is already scribed.'}], expanded:0 };
@@ -202,23 +323,32 @@ function findProof(premGraphs, goalGraph, opts){
   const fpGoal = fingerprint(goal), fpStart = fingerprint(start);
   const beam = opts.beam || 600;
 
+  const badMeets = new Set();
   const F = new Map(), B = new Map();
   F.set(kStart, { graph:start, prev:null, mv:null, depth:0 });
   B.set(kGoal,  { graph:goal,  prev:null, mv:null, depth:0 });
   let Fq = [kStart], Bq = [kGoal];
   let expanded = 0;
 
-  const expand = (side, q, map, other, dir) => {
+  function* expand(side, q, map, other, dir){
     const nq = [];
     for (const key of q){
       const rec = map.get(key);
-      if (Date.now() - t0 > timeCap || expanded > budget) return { nq, meet:null, out:true };
+      if (spent() > mainCap || expanded > mainBudget) return { nq, meet:null, out:true };
+      if (Date.now() - mark > sliceMs){
+        const waited = yield { expanded, found:false };
+        // a page in a background tab has its timers slowed to a crawl; only so
+        // much of each gap is given back, so that a search there does less work
+        // rather than running on for minutes of the reader's time
+        if (typeof waited === 'number') paused += Math.min(waited, sliceMs * 3);
+        mark = Date.now();
+      }
       const mvs = legalMoves(rec.graph, { dir, palette, maxNodes, beta });
       // cheap moves first: they shrink or keep the graph
       mvs.sort((a,b) => rank(a) - rank(b));
       for (const mv of mvs){
         expanded++;
-        if (expanded > budget) return { nq, meet:null, out:true };
+        if (expanded > mainBudget) return { nq, meet:null, out:true };
         let h;
         try { h = applyMove(rec.graph, mv, palette); } catch(e){ continue; }
         if (graphSize(h) > maxNodes + 4) continue;
@@ -227,33 +357,43 @@ function findProof(premGraphs, goalGraph, opts){
         if (map.has(k)) continue;
         const entry = { graph:h, prev:key, mv, depth:rec.depth+1 };
         map.set(k, entry);
-        if (other.has(k)) return { nq, meet:k, out:false };
+        if (other.has(k) && !badMeets.has(k)) return { nq, meet:k, out:false };
         nq.push(k);
       }
       // and the strategy: whole sequences the rules would take three steps to
       // reach. Only forwards, where the rule parities suit them.
-      if (!beta || dir !== 'fwd' || !strategy) continue;
-      for (const m of instantiations(rec.graph, maxNodes)){
+      if (dir !== 'fwd' || !strategy) continue;
+      const plans = [];
+      if (beta) for (const m of instantiations(rec.graph, maxNodes))
+        plans.push(() => runInstantiation(rec.graph, m, palette));
+      for (const m of detachments(rec.graph, maxNodes))
+        plans.push(() => runDetachment(rec.graph, m, palette));
+      for (const plan of plans){
         let steps;
-        try { steps = runInstantiation(rec.graph, m, palette); } catch(e){ continue; }
+        try { steps = plan(); } catch(e){ continue; }
         if (!steps) continue;
-        let prevKey = key, prevDepth = rec.depth;
+        /* Only where the sequence ends is a state worth going on from: the
+           states in the middle of it are recorded so that the proof can be
+           read back, but putting them in the frontier as well crowds out the
+           ordinary search, which is what actually finishes these proofs. */
+        let prevKey = key, prevDepth = rec.depth, lastKey = null, fresh = false;
         for (const st of steps){
           expanded++;
-          if (graphSize(st.graph) > maxNodes + 4) break;
-          if (!keepFwd(st.graph)) break;
+          if (graphSize(st.graph) > maxNodes + 4){ lastKey = null; break; }
+          if (!keepFwd(st.graph)){ lastKey = null; break; }
           const k2 = canonGraph(st.graph);
-          if (!map.has(k2)){
-            map.set(k2, { graph:st.graph, prev:prevKey, mv:st.mv, depth:prevDepth+1, strat:true });
-            if (other.has(k2)) return { nq, meet:k2, out:false };
-            nq.push(k2);
+          fresh = !map.has(k2);
+          if (fresh){
+            map.set(k2, { graph:st.graph, prev:prevKey, mv:st.mv, depth:prevDepth+1 });
+            if (other.has(k2) && !badMeets.has(k2)) return { nq, meet:k2, out:false };
           }
-          prevKey = k2; prevDepth = map.get(k2).depth;
+          prevKey = k2; prevDepth = map.get(k2).depth; lastKey = k2;
         }
+        if (lastKey && fresh){ map.get(lastKey).strat = true; nq.push(lastKey); }
       }
     }
     return { nq, meet:null, out:false };
-  };
+  }
   // beam: keep the most promising states in each layer, so that long proofs
   // stay reachable without the frontier exploding
   const trim = (keys, map, target) => {
@@ -262,7 +402,8 @@ function findProof(premGraphs, goalGraph, opts){
     // most resembles the target, and the opening of a syllogism does the
     // opposite — it carries a premiss inwards and makes the graph larger — so
     // the one state worth keeping was reliably the first thrown away.
-    const strat = keys.filter(k => map.get(k).strat);
+    // and the exempt states take at most half the beam between them
+    const strat = keys.filter(k => map.get(k).strat).slice(0, Math.max(1, beam >> 1));
     const rest  = keys.filter(k => !map.get(k).strat);
     const room  = Math.max(0, beam - strat.length);
     return strat.concat(rest
@@ -274,16 +415,175 @@ function findProof(premGraphs, goalGraph, opts){
   const rank = mv => ({ deiterate:0, dcOut:1, erase:2, eraseEdge:2,
                         dcIn:3, iterate:4, join:5, insert:6 })[mv.op] ?? 9;
 
-  for (let d = 0; d < maxDepth; d++){
-    // always grow the smaller frontier
-    const growF = Fq.length <= Bq.length;
-    const r = growF ? expand('F', Fq, F, B, 'fwd') : expand('B', Bq, B, F, 'bwd');
-    if (growF) Fq = trim(r.nq, F, fpGoal); else Bq = trim(r.nq, B, fpStart);
-    if (r.meet) return assemble(F, B, r.meet, expanded, palette);
-    if (r.out) break;
-    if (!Fq.length && !Bq.length) break;
+  let done = false;
+  for (let attempt = 0; attempt < 2 && !done; attempt++){
+    for (let d = 0; d < maxDepth; d++){
+      // always grow the smaller frontier
+      const growF = Fq.length <= Bq.length;
+      const r = growF ? yield* expand('F', Fq, F, B, 'fwd') : yield* expand('B', Bq, B, F, 'bwd');
+      if (growF) Fq = trim(r.nq, F, fpGoal); else Bq = trim(r.nq, B, fpStart);
+      if (r.meet){
+        const got = assemble(F, B, r.meet, expanded, palette);
+        if (soundChain(got.steps)) return got;
+        badMeets.add(r.meet);          // a false meeting: go on looking
+        continue;
+      }
+      if (r.out) break;
+      if (!Fq.length && !Bq.length){ done = true; break; }
+    }
+    if (attempt || !canAssume) break;
+    const dt = yield* assumeAntecedent(goal, Object.assign({}, opts,
+      { timeCap: Math.max(1200, timeCap - spent()), budget: Math.max(20000, budget - expanded) }));
+    if (dt) return { found:true, steps:dt.steps, expanded: expanded + dt.expanded, assumed:true };
+    // the other way in came to nothing, so the rest of the time goes back to
+    // the ordinary search, which picks up where it stopped
+    mainCap = timeCap; mainBudget = budget;
   }
   return { found:false, expanded, exhausted: Fq.length===0 && Bq.length===0 };
+}
+
+/* ============================================================================
+   ASSUMING THE ANTECEDENT.
+   A theorem of the form "if A then B" is scribed as a scroll: A between two
+   cuts, B inside the inner one. Proving it from the blank sheet is much harder
+   than proving B from A, because nothing on a blank sheet suggests where to
+   start. What a textbook does instead is assume A, derive B, and discharge the
+   assumption. The same thing can be done here with the rules themselves:
+
+     draw a double cut on the blank sheet                            (R5)
+     write A in the oddly enclosed area between the two cuts         (R2)
+     iterate A into the inner cut                                    (R3)
+     work the proof of B from A there, inside the inner cut
+
+   The last part is sound because Peirce's rules turn on whether a place is
+   evenly or oddly enclosed, and the inside of the inner cut is evenly enclosed
+   like the sheet itself: every step of the inner proof is permitted in its new
+   place for the same reason it was permitted on the sheet. What is left when
+   the inner proof ends is A between the cuts and B inside, which is the
+   theorem. Only Alpha is treated this way; a line of identity on the sheet is
+   licensed by C1 rather than by parity, so the mapping would not be safe. */
+function scrollSplits(goal){
+  const root = goal.areas[goal.root];
+  if (root.items.length !== 1 || root.lns.length) return [];
+  const C = root.items[0];
+  const c = goal.nodes[C];
+  if (c.k !== 'cut') return [];
+  const M = c.inner;
+  // a line resting between the two cuts would tie the antecedent to the
+  // consequent, and then neither can be lifted off on its own
+  if (goal.areas[M].lns.length) return [];
+  const items = goal.areas[M].items;
+  if (items.length < 2) return [];
+  // any cut inside can be read as the consequent, but the one written last is
+  // the one the notation meant, so it is tried first
+  return items.filter(d => goal.nodes[d].k === 'cut').reverse()
+              .map(d => ({ C, M, cons:d, ante: items.filter(x => x !== d) }));
+}
+/* The antecedent, or any part of it, standing on a sheet of its own. */
+function liftAnte(src, sp, keep){
+  const h = cloneGraph(src);
+  for (const id of h.areas[sp.M].items.slice())
+    if (keep.indexOf(id) < 0) removeNode(h, id);
+  for (const id of h.areas[sp.M].items.slice()) moveNode(h, id, h.root);
+  for (const l of h.areas[sp.M].lns.slice()) moveLn(h, l, h.root);
+  removeNode(h, sp.C);
+  repairEdges(h);
+  return h;
+}
+/* And the consequent, likewise. */
+function liftCons(src, sp){
+  const h = cloneGraph(src);
+  const I = h.nodes[sp.cons].inner;
+  for (const id of h.areas[I].items.slice()) moveNode(h, id, h.root);
+  for (const l of h.areas[I].lns.slice()) moveLn(h, l, h.root);
+  removeNode(h, sp.cons);
+  for (const id of h.areas[sp.M].items.slice()) removeNode(h, id);
+  removeNode(h, sp.C);
+  repairEdges(h);
+  return h;
+}
+// ( A ( X ) ) — the scroll with A between the cuts and X inside the inner one
+function scrollOf(A, X){
+  const g = newGraph();
+  const c = addCut(g, g.root);
+  spliceIn(g, A, g.nodes[c].inner);
+  const d = addCut(g, g.nodes[c].inner);
+  spliceIn(g, X, g.nodes[d].inner);
+  return g;
+}
+/* Every step of the inner proof has to stay legal two cuts further in. Peirce's
+   rules turn on whether a place is evenly or oddly enclosed, and the inside of
+   the inner cut is evenly enclosed like the sheet, so almost all of them do.
+   The exception is the bare line of identity: C1 licenses one on the sheet of
+   assertion outright, and the inside of the inner cut is not the sheet. A proof
+   that puts down or takes up a line on that ground is not transplanted. */
+function transplantable(sub){
+  for (let i = 1; i < sub.steps.length; i++){
+    const mv = sub.steps[i].mv;
+    if (!mv) return false;
+    if (mv.op === 'addLine' || mv.op === 'delLine') return false;
+  }
+  return true;
+}
+function* assumeAntecedent(goal, opts){
+  let used = 0;
+  const splits = scrollSplits(goal);
+  // the first reading gets the time; a second one gets what is left of it
+  const cap = opts.timeCap || 8000, t0 = Date.now();
+  for (const sp of splits){
+    const per = Math.max(900, cap - (Date.now() - t0));
+    const A = liftAnte(goal, sp, sp.ante);
+    const B = liftCons(goal, sp);
+    const sub = yield* searchProof([A], B,
+      Object.assign({}, opts, { deduction:false, timeCap: per }));
+    used += sub.expanded || 0;
+    if (!sub.found) continue;
+    const steps = [];
+    let outer = newGraph();
+    steps.push({ graph: newGraph(), rule:null,
+                 why:'The blank sheet of assertion, which is itself a graph (C1).' });
+    steps.push({ graph: scrollOf(outer, newGraph()), rule:'R5',
+                 why:'R5: a double cut is drawn on the blank sheet.' });
+    for (let k = 1; k <= sp.ante.length; k++){
+      outer = liftAnte(goal, sp, sp.ante.slice(0, k));
+      steps.push({ graph: scrollOf(outer, newGraph()), rule:'R2',
+                   why:'R2, insertion: the area between the two cuts is oddly enclosed, so what is supposed may be scribed there.' });
+    }
+    for (let k = 1; k <= sp.ante.length; k++)
+      steps.push({ graph: scrollOf(outer, liftAnte(goal, sp, sp.ante.slice(0, k))), rule:'R3',
+                   why:'R3, iteration: the supposition is scribed again inside the inner cut, which its own place contains.' });
+    for (let i = 1; i < sub.steps.length; i++)
+      steps.push({ graph: scrollOf(outer, sub.steps[i].graph),
+                   rule: sub.steps[i].rule, why: sub.steps[i].why });
+    if (!transplantable(sub)) continue;
+    if (canonGraph(steps[steps.length-1].graph) !== canonGraph(goal)) continue;
+    return { steps, expanded: used };
+  }
+  return null;
+}
+
+
+/* A last check on the answer. The search treats two graphs as the same state
+   when they have the same canonical form, and for Beta that form is not quite
+   fine enough: two graphs that say different things can share one. Where that
+   happens the two halves of the search meet at what is not really one graph,
+   and the chain they make is not a proof. So every chain is model-checked step
+   by step before it is offered, and one that fails is thrown away and the
+   search goes on. Alpha is settled by truth-value analysis, Beta by looking
+   for a countermodel on one or two individuals. */
+function soundChain(steps){
+  for (let i = 1; i < steps.length; i++){
+    const a = steps[i-1].graph, b = steps[i].graph;
+    try {
+      if (isAlpha(a) && isAlpha(b)){
+        const e = alphaEntails([a], b);
+        if (e.decided && !e.entails) return false;
+      } else {
+        if (findCountermodel([readGraph(a)], readGraph(b), 2, 20000)) return false;
+      }
+    } catch(e){ /* a graph the reading cannot handle is left to the rules */ }
+  }
+  return true;
 }
 
 function assemble(F, B, meetKey, expanded, palette){

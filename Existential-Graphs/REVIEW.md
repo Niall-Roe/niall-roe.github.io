@@ -25,6 +25,75 @@ verified; everything else is written down but not acted on.
   where the sequence is open-ended, as on Translate. Checked at all 226 step
   boundaries in the library: the still before, the first frame, the last frame
   and the still after place every cut and spot identically.
+- The machinery for writing spot names in Peirce's own letterforms is built and
+  tested, and carries no manuscript data. `tools/hand-glyphs.py` turns the
+  harvest into a table of outlines, each with its baseline at y=0; the renderer
+  draws from that table when one is present and uses the ordinary face when it
+  is not. If any one letter of a name is missing, the whole name falls back, so
+  no name is ever drawn half in his hand and half in type. Tested end to end
+  against the real letterforms served locally: Peirce's own S and C stood in a
+  cut on the page. The table itself was deleted from the working copy in the
+  same session and nothing scan-derived is in the repository.
+- The generator gates on geometry, not just on the harvest's own confidence. A
+  capital has no descender, so ink below the writing line means the baseline
+  was mismeasured; and a mark far from the height its case implies is usually a
+  joined pair read as one letter. Of 69 marks that the harvest rated good with
+  a confident baseline, 37 failed one of those two checks and are refused. That
+  has gone back to the harvester, along with the observation that five bad C
+  come from a single page, which looks like one bad line fit rather than five
+  bad marks.
+- The hand is drawn from measurements of the manuscripts rather than invented.
+  Three things changed, and the third changes the look most. The cut wanders in
+  proportion to its own width, at the measured median of 0.074, so a large cut
+  wanders more than a small one, where before it wandered a fixed number of
+  pixels whatever its size. The cut stroke and the line of identity are set to
+  the measured ratio of about 2.1, both held a little above the measured 0.087
+  of x-height, which would be a hairline at screen size. And the cuts no longer
+  close: only seven of nineteen cuts measured enclose a single area, the rest
+  having ends that run past each other and cross, so the stroke is now carried
+  past where it began instead of being shut. A doubled "nib" stroke I had
+  invented is gone, the measurements saying one thin line. Checked over 376
+  renders: every cut open in the hand, every cut shut in type.
+- The mark on a prohibition was showing on every illustration. Giving it a
+  `display` overrode the browser's own rule for `hidden`, so hiding it did
+  nothing. A prohibition's number stays in its button and the mark sits beside
+  it, rather than replacing it.
+- The permissions carry 29 illustrations. A prohibition is now played like any
+  other, so you watch the move that is not allowed actually being made, with
+  the mark held over the drawing throughout. R5 gained a second prohibition:
+  two cuts with something standing between them may not be taken off, any more
+  than they may be put on.
+- Further theorems, 23 of them, set as exercises: Peirce's law, the dilemma,
+  contraposition both ways, contraction, antilogism, the quantifier
+  distributions and commutations, and the rest. Each was checked — the Alpha
+  ones are tautologies by truth-value analysis, the Beta ones have no
+  countermodel on up to four individuals — and which of them the search reaches
+  was measured rather than guessed. Eighteen it reaches; the five it does not
+  are marked as such on the page.
+- Peirce on what the graphs are, over the proof stage: "a moving picture of the
+  action of the mind in thought". The line is not in Roberts; it comes by way
+  of Sowa, who has it from Pietarinen's paper on the magic lantern of logic,
+  and the page says so rather than inventing a Collected Papers number.
+- The permissions carry 28 illustrations, verified. Each one that is permitted
+  was checked to be a single application of its own rule and nothing else; each
+  one marked "not permitted" was checked against every move the rules allow
+  from its starting graph, and none of them is reachable by any rule at all.
+  R1 now shows that erasure reaches an evenly enclosed graph however deep, and
+  that it does not reach inside a cut, nor take a cut away from its contents.
+  R2 shows a denial being inserted, a large graph being inserted whole, and
+  that nothing may be inserted on the sheet. R3 works one starting graph,
+  P and (Q) and (R(S)) and an empty cut on an odd area, to show what counts as
+  a graph that may be iterated: the whole items may, one cut in or two, but Q
+  by itself may not, and nothing may be carried outwards. R5 begins with the
+  double cut drawn on the blank sheet, and shows that two cuts with something
+  standing between them are not a double cut.
+- A branch with a loose end is visible. Left to relax towards its only
+  neighbour the loose end converged onto it, so R3(a) drew nothing at all; a
+  point hanging off a line is now set a stub's length away. The free end of an
+  ordinary line is left where it was.
+- The same crossing is no longer bridged twice. One ligature is drawn as
+  several chains, so a place where two lines meet could be found more than
+  once; it is one crossing and takes one bridge.
 - A denial of a denial is drawn as a double cut. The compiler collapsed it, so
   "~~P" scribed a bare P, and the one figure R5 is about could not be written
   from a formula at all. It no longer does R5's work in advance. Two knock-on
@@ -311,7 +380,30 @@ raised figure — but it is a departure, not Peirce's drawing. Doing it properly
 means letting a line reach the right, top and bottom of a spot, which the lane
 router cannot currently do.
 
-**Should the translation be literal throughout?** The compiler no longer
+**Literal translation. DONE for the denial.** A denial is now a cut round
+whatever is denied and nothing else, so the notation reads from the outside in:
+the "~" is the cut, and what it governs is drawn inside it whole. "~(Q -> P)"
+scribes a cut round the scroll, ( ( Q ( P ) ) ), where it used to scribe the
+tidied Q ( P ). The two say the same thing and R5 takes the outer pair off in
+one step, but that step belongs to the reader.
+
+One thing had to be kept back. "Ax φ" is not a cut anyone wrote, it is a
+quantifier, and its graph is the figure Peirce draws: the scroll with the line
+running through it. Making its denial literal too put a double cut inside every
+universal on the page. The rewriting compNeg used to do for everything is kept
+for that one place, under its own name, and the explicit "~" is literal.
+
+**Was: literal translation, with a tidying step.** Niall's
+call: scribe what the formula says, and then offer to take off the double cuts
+that are not doing any work — the ones that are not there because something of
+the form "not not" is being proved. So "~(P | Q)" would be drawn as a double
+cut round the disjunction, as it is written, and a clean-up would reduce it to
+two cuts side by side. That wants: the three remaining elisions in compNeg
+removed, a reduction pass that removes double cuts, a control on the Scribe
+page to run it, and a check of every library goal, since several compile to
+graphs that would change. Not started.
+
+**Was: should the translation be literal throughout?** The compiler no longer
 elides the double cut of a double negation, but it still simplifies three other
 denials as it scribes them: "~(P | Q)" gives two cuts side by side rather than
 a double cut round the disjunction, and likewise "~(P -> Q)" and "~Ax Fx". Each
@@ -321,6 +413,118 @@ do, and one that scribes the tidiest equivalent. Going fully literal is the
 more coherent position and the better teaching, but it changes the graph that
 several library goals compile to, so it wants deciding rather than drifting
 into. This is Niall's call.
+
+**Peirce's hand is on the page.** The letterforms are built into index.html —
+78 marks over 34 characters, 92 KB — and every spot name the page draws is set
+in them rather than in type. Niall has cleared the rights question.
+
+Three things had to be fixed before it was worth anything. The letterforms were
+never in the build, so the mode was only a wobblier cut and an italic face; the
+table generator now writes `src/12-hand.js` and build.sh includes it. The
+animated renderer drew its own spots and had never been taught to write, so the
+Translate tab, which animates by default, always showed the typeface no matter
+what the still renderer did. And the cuts are closed again: his own overshoot
+and cross, but an open curve on a screen reads as a mistake, and a cut that
+does not enclose is the one thing in this notation that must never be in doubt.
+What is kept of that finding is the wander, which is measured.
+
+**Was: the whole page draws in Peirce's own hand.** Every spot name it ever writes
+— all 30 library proofs, all 39 examples on the Scribe wall, all 90 exercises
+and theorems — can be set in marks cut from the manuscripts. 78 marks over 34
+characters, 92 KB, which a single-file page carries comfortably. The geometry
+gate now refuses nothing: the harvest's own quality and this check have
+converged, and it stands as a guard against regression rather than a filter.
+
+The last gap was instructive rather than a gap. Four marks whose recorded
+baseline did not match their traced outline turned out to share one cause: when
+the harvest was patched to record which method had measured a baseline, the
+label was written but the number was left as it had been, so seven marks
+carried a line-profile measurement under a label saying it was the ink bottom.
+Reported, and fixed at the source; the check now says no non-descending mark
+hangs below its stated line.
+
+**Was: nearly the whole page draws in Peirce's own hand.** 30 of 30 library proofs,
+38 of 39 Scribe examples, 84 of 90 exercises. One letter, U, is held up by a
+mark whose recorded baseline does not match its traced outline; six more, B J K
+N Y Z, are wanted only by the textbook exercise set. The table is 65 KB over 27
+characters.
+
+The generator also cleans the crops. A crop often catches a fragment of the
+neighbouring line, a comma or the foot of an ascender, which traces as its own
+detached blob. The letter is the tallest piece of ink, so anything lying wholly
+above or below it came off another line and is dropped. Where the stray is
+joined to the letter in one stroke nothing can be done on this side, and those
+marks are reported back rather than drawn.
+
+**Was: every proof in the library draws in Peirce's own hand.** Q and R were the
+last blockers and they came off one manuscript line, "P, Q, R, really lie in
+the straight line". All 30 library proofs now write every spot name from the
+marks; 32 of the 39 examples on the Scribe wall do too. Four letters are still
+wanted anywhere on the page: D, L, U and W. The table is 61 KB over 23
+characters, a comfortable weight for a single file.
+
+Getting there cost several corrections on both sides, and every one was settled
+by opening the image rather than by reasoning about the number. The common
+shape: a good measurement of the wrong quantity. A height check applied to a
+mark that had never been scaled; a baseline fitted on a crop holding two lines;
+a descender tolerance shorter than his Q; a label recording a method the number
+did not use; and, in this generator, a list of acceptable characters that was
+right when written and silently stopped matching the page as it grew, and a
+width rule set at a round number that turned out to be narrower than Peirce's
+capital E, which carries a long horizontal flourish and runs 1.8 ems wide as a
+single letter. Thresholds are now calibrated on the marks themselves. Capital
+G descends in this hand. The absolute-height check assumed a scaling that marks
+without a measurable x-height never had, and was discarding clean capitals for
+being small crops. His capital Q carries a tail a third of its height, longer
+than my descender tolerance. And an ordinary capital R kicks its leg under the
+line, which is a pen and not a mismeasurement, so the tolerance for letters
+that do not descend was tighter than a hand. The rule I have taken from it: a
+measurement is evidence about a measurement, not about a mark.
+
+**Was: Barbara draws in Peirce's own hand; half the library still cannot.** The
+second harvest brought F, G and H, so the syllogisms are drawable, and 15 of
+the 30 proofs now write every spot name from the manuscripts. The other 15 fall
+back for two letters: Q, whose sixteen marks are all the capital-I misread, and
+R, which has one unreviewed mark. Since every Alpha proof is P, Q and R, those
+two would take the library to nearly all of it, and they have been asked for.
+
+Two corrections to my own gate came out of this, both from looking at the marks
+instead of trusting a measurement. Peirce's capital G descends, so rejecting it
+for having ink below the writing line was wrong; the gate now takes that
+judgement from the harvest rather than making a conflicting one. And the
+absolute-height check assumed every mark had been scaled to a common x-height,
+which a mark with no measurable x-height cannot be — it was throwing away clean
+capitals for being small crops. Each mark is now scaled by its own ink height
+above the line, and joined pairs are caught by width instead. That took the
+table from 32 marks over 15 characters to 52 over 21.
+
+**Was: the letterforms are harvested but cannot yet be used.** Of the 32 characters
+the page draws, twelve are drawable after the geometry gate: A C H M O P S X r
+t x z. F and G are the blockers — the syllogisms are built on F, G, H and M,
+and G turned out to be a misread: all 43 of them are Peirce's capital I, which
+a reader takes for G, Q or 9. A second harvest has been asked for, aimed at F
+and G, then more x y z, then L N J q u v w.
+
+**Was: the letterforms are harvested but cannot yet be used.** 762 marks across 39
+characters are in ~/Documents/Peirce-hand, each a transparent PNG and a traced
+SVG with reel, frame, Robin number and a baseline. The page draws 32 characters
+inside a graph, and of those only six are both eye-checked good and confidently
+measured: A, C, P, S, X, t. Twelve are absent altogether — F, H, J, L, M, N, O,
+q, r, u, v, w — and F, H and M are three of the four letters the syllogisms are
+built on. Fourteen more are present but rated mixed, poor or unreviewed,
+including the variables x, y and z that label every Beta line. A mode falling
+back to a typeface for two thirds of its letters would look worse than none, so
+the glyphs wait on a second pass, which has been asked for.
+
+**The rights on the scans are unresolved, and this repository is the live site.**
+Peirce died in 1914 so the writing is out of copyright, but the images are the
+Houghton microfilm and redistribution rights for those digitisations are not
+settled. A traced outline is a weaker claim on the digitiser's work than a
+photographic crop, which is an argument for publishing the SVGs rather than the
+PNGs if anything is published at all. Nothing derived from the scans is on the
+page: not the glyphs, and not the nineteen figures, which are good. The
+measurements are facts about the manuscripts and carry no such question, which
+is why they are what went in. This is Niall's decision and probably Houghton's.
 
 **Peirce's actual letterforms.** Niall's wish: a toggle that mimics his hand,
 built from examples of his capitals and his line weight. What is on the page is
@@ -704,3 +908,353 @@ a one-line `$` helper.
 Worth recording separately, and not caused by this page: the four concept apps
 that carry a local `src/03_lib.js` have already forked it four ways, and none of
 the four matches `shared/lib.js`.
+
+## The three tabs are one — done
+
+Proofs, Work it and Find a proof are a single tab, Prove it. Niall's shape, not
+the four-tab one I proposed: one list, two boxes, and then the same proof
+either played or handed over.
+
+- **One list.** Every worked proof and every exercise in one dropdown, 120 of
+  them, the worked proofs first in order of how many steps they take, then the
+  exercises in the order the books set them. Choosing anything fills the boxes.
+- **Two boxes**, premisses above and conclusion below, with the search beneath.
+- **Two buttons once there is a proof**: play it, or work it yourself. The
+  first shows the stage, the steps and the writing; the second swaps in the
+  sheet, the goal and the rules.
+- **One player.** The library and the search had a player each, sharing all
+  their machinery and none of their code. The search now dresses its result as
+  a library entry and the one player serves both; the second is deleted.
+- **The controls are the five permissions.** Each rule is named with a gloss
+  and shows what it allows here, including the rules that allow nothing at the
+  moment, so the set is always visible rather than a list that silently
+  shrinks. R5 is split into the double cut drawn and the double cut removed.
+
+Two things had been quietly broken and this surfaced them. R2 was given an
+empty palette, so the rule that lets you scribe any graph whatever could never
+be applied: it now draws on the subgraphs of the sheet and of the goal. And the
+move list deduplicated by result across rules, so R5's removal of a double cut
+was hidden behind R1's erasure of the same thing. Two rules reaching one graph
+are two moves to someone learning the rules, and the dedupe is now per rule.
+
+The search runs on its own: as soon as anything is chosen, and again a moment
+after the boxes stop changing. Whatever was found is dropped the instant the
+inference changes, so Automate never offers a proof of something the reader has
+stopped asking about, and it says "looking…" while it works.
+
+Automate was greyed out for a reason that took a moment to see: the page opens
+on the simplest thing in the list, which is a proof of no steps at all, and the
+test for "is there a proof" demanded at least one step. A proof of no steps is
+still a proof — the conclusion was already scribed — and the pill now says so.
+
+The two ways on are now equally weighted and sit under the one heading: the
+sheet of assertion is named whichever mode you are in, with Automate and Work
+it yourself beneath it. Automate is greyed until there is something to watch.
+When a proof is found the search buttons are replaced by a green pill saying so
+and how many steps it took, with a way back to searching.
+
+One thing I broke in the merge and fixed: a stray closing tag carried over from
+the old board's markup collapsed the two-column grid, so the sheet of assertion
+fell below the chooser instead of standing beside it. The goal card also kept a
+puzzle dropdown that no longer has anything to pick, the proof being chosen
+above it; the card now just shows the goal, and the hint and move count compare
+against whichever proof is chosen, worked or found.
+
+### The controls, as six cards
+
+The move list told the reader what was possible and nothing about which rule
+they were using. Each rule now has a card, and the sheet and the cards talk to
+each other in both directions.
+
+- **Pick a graph, and the rules that can act on it light up**, with a count of
+  what each offers here. Picking the outer of two copies lights deiteration,
+  and so does picking the inner one, since the rule concerns the pair.
+- **Pick a rule, and the places it can act are marked on the sheet** as you
+  pass over them; clicking one applies it. With a graph already picked, only
+  its own moves are marked, so arming iteration on a chosen P shows just the
+  areas that P could go into.
+- **Insertion opens a box** when the area picked is oddly enclosed, and what is
+  typed is scribed there whole. A conjunction typed as one graph goes in as one
+  graph: the palette holds subgraphs, so the typed graph is added to it entire.
+- A rule with nothing to do is drawn dim rather than hidden, so the set of five
+  is always in view. The full list of every legal move is still there, folded
+  away beneath.
+
+Nothing in the cards decides what is legal. Each asks legalMoves what it may do
+and shows that, so the panel cannot drift from the rules.
+
+### What working three proofs through by hand turned up
+
+Driving the board myself, rather than testing the pieces, found four faults. The
+first three were invisible from the outside and would have looked like the page
+ignoring the reader.
+
+- **Double cut elimination did nothing.** A cut is drawn as a single element
+  carrying two names, the cut and the area inside it, and the hit test looked
+  only at the area. R5 aims at the cut, so the click matched nothing and fell
+  through in silence. Any rule aiming at a cut rather than its area was dead.
+- **A move was only committed when its animation finished.** Interrupt the
+  animation — switch tab, click again, a machine that never runs the frames —
+  and the move was lost while still being counted, so the move count and the
+  sheet disagreed. The sheet now changes first and the animation only shows
+  what changed, with a watchdog in case it never reports back.
+- **Settling left the animation running.** Its next frame painted over the
+  drawn sheet, and since animation frames carry no identifiers the drawing
+  stopped answering clicks altogether. Settling now cancels.
+- **A click during an animation was dropped without a word.** Anyone working at
+  a normal pace loses moves that way. A new move now cuts the running animation
+  short and goes on top of it.
+
+The panel also says in words what is picked and what a rule will do with it,
+which is what the rings alone could not: "Picked: “P”, on the sheet of
+assertion", then "Iterating “P” — 3 places marked in green", and on hovering
+one of them the exact sentence for that move. Modus ponens now goes through in
+three moves by hand, which the status line reports as matching the library.
+
+### Insertion, and two bugs in it
+
+- **"( P )" scribed P.** In the linear notation that is a cut round P; in
+  ordinary notation the brackets only group, so it is plain P. The box guessed,
+  tried the formula reading first, and got it wrong exactly when the reader was
+  thinking in the notation the page prints everywhere. The box now says which
+  notation it is reading, and shows what it is about to scribe, in both the
+  linear form and the reading, before anything is scribed.
+- **Clicking an area with insertion armed scribed something at random.** With
+  nothing chosen to insert, the click applied whichever move headed the list,
+  which was usually a copy of what the reader had just clicked on. Insertion is
+  never applied by a click on the sheet now: the click says where, and the box
+  says what.
+
+### The goal, and the hint
+
+The space beside the mode switch belongs to whichever mode is showing: the
+conclusion you are trying to reach while you work, which turns green the moment
+you reach it, and Peirce's line about a moving picture of thought while you
+watch. The list opens on modus ponens rather than on a proof of no steps, which
+showed nothing being done.
+
+The hint gives away as little as it can and more each time it is asked: once,
+which rule; twice, and which graph on the sheet it acts on; three times, and
+the rule armed with the place to click marked. The count resets after every
+move, so each step is asked for afresh rather than the reader being handed the
+rest of the proof.
+
+### More from working it
+
+- **Watching after working showed the machine's proof, not yours.** The mode
+  switch played whatever the player happened to hold. It now plays what you
+  did, and says so, with a link to the found proof when there is one. The
+  source is passed in explicitly rather than set after the fact, which is what
+  had let a recursive load overwrite it.
+- **A double cut can be drawn round a graph.** It could only be drawn on an
+  empty patch of an area, so wrapping something meant scribing the pair beside
+  it and then iterating it in. Where the move encloses exactly one graph, that
+  graph is now what you click, and picking a graph and pressing the rule wraps
+  it in one go.
+
+### The board, worked over again
+
+- **A rule with nothing left to choose now just does it.** Pick a graph, press
+  erasure or deiteration or the double cut removed, and it happens; the
+  animation shows which higher copy the erased one answered to. Demanding a
+  second click for a rule that has no choice to make read as the page refusing
+  to work, and for the double cut there was nothing further to click at all.
+  Insertion still asks, because what to scribe is not on the sheet to point at.
+- **The rules run across the panel**, six abreast where there is room, and the
+  "what it says" card is gone. The reading and the linear notation sit under
+  the sheet instead and follow it live.
+- **What you have done is written down as you do it**, rule by rule, in the
+  same form as a machine proof's steps, with an undo; and when you are finished
+  you can step through your own proof in the player, premisses first.
+- The space beside the switch carries Peirce's full remark to Kehler, with the
+  source on hover: "At great pains, I learned to think in diagrams… It consists
+  in thinking in stereoscopic moving pictures" (MS L 231, 22 June 1911), by way
+  of Pietarinen's 2011 paper.
+
+### Which proof watching shows
+
+Switching to watching used to play whatever the reader had done, finished or
+not, which meant an unfinished attempt was played back instead of a proof.
+Watching now shows a completed attempt, and otherwise the found proof, with the
+other one click away either way and named for what it is: "your proof" when it
+reaches the conclusion, "how far you got" when it does not. The button under
+the record says the same.
+
+The Prove tab also opens on the board rather than on the player, and a proof
+turning up from the search no longer pulls the reader off the board to watch
+it. The point is to try it first.
+
+### Iteration in either order
+
+Picking the graph and then the rule always worked; picking the rule first did
+not, because the rule had no way to ask which graph. It now asks. With
+iteration armed and nothing chosen, the graphs that can be copied are marked
+and the prompt says "First pick the graph to copy". Once one is chosen it stays
+marked, the prompt becomes "Copying P. Now pick where it goes", and passing
+over a destination draws the same dashed arrow the animation uses, from the
+graph to the place it would land, so the click is visible before it is made.
+
+The sheet itself is now markable as a destination. It is drawn as the backing
+rectangle rather than as a cut, so it had no name for the marker to find, and
+the count said three places while two were lit.
+
+### What R6 actually says
+
+The illustration claimed a double cut may be taken off "wherever such a pair
+stands", which is not the rule. The two cuts come off when nothing stands
+between them. What is inside the inner cut makes no difference, and a line of
+identity passing through the pair does not prevent it. Both the rule text and
+the examples now say that, and there are two prohibitions: a graph sitting
+between the cuts, and a second cut sitting there.
+
+### Numbering, and the copy
+
+The double cut removed is R6. Roberts counts five rules, treating the double
+cut as one read both ways; the page says so. Six is how many things there are
+to reach for when you are working, and it makes the shape of the set visible:
+three operations, each with a direction in and a direction out. R1 erases and
+R2 writes; R3 copies inwards and R4 erases such a copy; R5 draws a double cut
+and R6 takes one off. A cut is a graph like any other, so its pair behaves like
+the other two.
+
+Every rule now carries examples, 39 in all, each checked to be a single
+application of its own rule, with the moves it does not allow marked as such
+and checked to be unreachable by any rule.
+
+The About card is gone. How to read a graph sits on the Scribe page, where you
+are reading graphs; how the finder works sits on the Prove page, folded into a
+card you open if you want it; and what is left beside the rules is Peirce on
+the Graphist and the Interpreter, what is not here, and the sources.
+
+The prose I wrote has been rewritten plainly. Framing sentences round Peirce's
+quotations are gone — the quotations stand on their own — and the claims on the
+Scribe page now carry citations from the Collected Papers rather than being
+asserted: juxtaposition asserts both (4.398), the cut severs what it encloses
+(4.399), a heavy point denotes one individual without saying which (4.405), a
+line asserts the identity of what its ends denote (4.406).
+
+### Gamma — for later
+
+Peirce went on to a third part after Alpha and Beta. Gamma carries the broken
+cut for modality, graphs about graphs, the potentials, and the tinctures of the
+1906 Prolegomena; Roberts gives it chapters 5 and 6. None of it is on the page,
+which says so plainly in the new note on Alpha and Beta rather than leaving the
+reader to assume the two parts are the whole system. Adding even the broken cut
+would mean a second kind of cut in the engine, a modal reading, and rules that
+are not among the five, so it is a project rather than an afternoon.
+
+### Still to do here
+
+The board is where the direct-manipulation work belongs, now that it has a
+permanent home. (The thirty-second freeze on "search harder" is fixed: see the
+session notes at the end.)
+
+
+# This session: the search, the headings, and two unsound things
+
+## Where things are said
+
+How to read a graph is now a card at the head of the Scribe tab, with Peirce's
+sponge line above it, in the same shape as the permissions card on Manipulate.
+It used to be buried at the foot of the conventions card, below everything it
+was meant to help with.
+
+The heading that said five permissions says six. On the Prove tab "Transform
+it" is "Rules of manipulation", matching the language everywhere else, and the
+drawing tools, which used to sit in the left column under the bare heading
+"Scribe", are called "Scribing marks by hand" and stand under the rules they
+serve. They are the marks R2 lets you write in an oddly enclosed place, so that
+is what the card now says.
+
+The About-these-rules card is gone. Peirce on the Graphist and the Interpreter
+has moved up beside the permissions, and the sources are a footer, visible from
+every tab rather than filed under one of them. The rule examples now have the
+width of the page.
+
+Double cut removal is R6 everywhere, not only on the cards: in the rule the
+engine reports, in the sentence under each step, and in the thirteen places in
+the proof library where a stored step said R5 for a removal.
+
+## What the finder does while it searches
+
+It no longer freezes the page. The search is a generator, driven ninety
+milliseconds at a time, and the count of transformations tried goes up under
+the buttons while it runs. The thirty-second "search harder" was the worst of
+it and is now just a longer wait with something to watch. Time spent painting
+is given back to the search, so a sliced search does as much work as a blocking
+one; a search in a background tab, where timers are slowed to a crawl, is
+capped instead of running on for minutes.
+
+The premisses and conclusion under the buttons are rewritten the moment the
+target changes, with the step count left blank until there is a proof. Before,
+they went on describing the last thing found.
+
+## Making it smarter
+
+Three things the search now knows to try. Each is offered as a whole sequence;
+none of them licenses a step, and every move in them is an ordinary move.
+
+*Applying a universal to an individual* was already there: branch, carry in,
+join.
+
+*Detaching a consequent* is new. Where a conditional stands outside a place
+that already holds its antecedent, iterate it in (R3), deiterate the antecedent
+against the copy already there (R4), take off the double cut (R6). The middle
+of that is a bigger graph than either end, so a search ranking states by
+resemblance to the conclusion throws the opening away.
+
+*Assuming the antecedent* is new, and is the deduction theorem done in the
+rules themselves: to prove a conditional from the blank sheet, draw a double
+cut (R5), write the antecedent between the cuts, which is oddly enclosed (R2),
+iterate it inside (R3), and work the proof of the consequent there. It is sound
+because the rules turn on even and odd enclosure, and the inside of the inner
+cut is evenly enclosed like the sheet. The exception is the bare line of
+identity, licensed on the sheet by C1 and nowhere else; a sub-proof that puts
+one down is not transplanted, and that is checked move by move.
+
+The insertion palette also stopped mangling Beta. A subgraph with a line of
+identity in it used to be copied without the line; now it is lifted whole when
+no line crosses its edge. That alone reaches two theorems the search had never
+got, and it is why the steps of an assumed proof resolve to rules.
+
+Measured over the whole list of 90 exercises: 77 found, where before the same
+list gave 71. The constructive dilemma, which is what prompted this, is found
+in about eight seconds of JavaScriptCore and under three in a browser. Four of
+the 77 proofs contain a step the page cannot match to a single rule; the page
+says so on those rather than claiming every step was checked.
+
+Still beyond it: Barbara, Celarent, Cesare, Camestres and Calemes; the
+hypothetical syllogism in Beta; two distribution theorems; and four of the
+textbook exercises.
+
+## FIXED — erasing a spot could sever a ligature
+
+Removing a spot removed its hooks, and a hook may be the point at which several
+points of one line meet. Taking it away broke the line, so the rest of the
+graph said something else. Read forwards that is only a weakening, which is why
+it went unnoticed; read backwards, where the search runs the rules in reverse,
+it made deiteration stop being the inverse of iteration, and the page would
+report a proof of *Ex Fx therefore Ax Fx*. A hook that two or more points meet
+at is now left behind as an ordinary point of the line, which is what erasing
+one spot does.
+
+## FIXED — a false meeting could be reported as a proof
+
+The search treats two graphs as one state when their canonical forms agree, and
+for Beta that form is not quite fine enough: two graphs that say different
+things can share one. The two halves of the search then meet at what is not
+really one graph. Every assembled chain is now model-checked step by step —
+Alpha by truth-value analysis, Beta by looking for a countermodel on one or two
+individuals — and a chain that fails is thrown away, that meeting-point struck
+off, and the search goes on. All 158 steps of the 30 library proofs pass the
+same check, and so does every proof the search returns over the 90 exercises.
+
+The canonical form itself is still too coarse. Strengthening it is the real
+fix; the check is a net under it.
+
+## FIXED — a countermodel was looked for in the wrong formula
+
+A free variable cannot be scribed, so the page closes it existentially. The
+countermodel search was still reading the typed formula, so *Fa therefore Ax
+Fx* came back as having no countermodel on three individuals. It now reads the
+graphs.

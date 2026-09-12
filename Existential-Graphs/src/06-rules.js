@@ -10,15 +10,18 @@
                    scribed on any area not part of P which is contained by {P}.
    R4  deiteration Any graph whose occurrence could be the result of iteration
                    may be erased.
-   R5  double cut  The double cut may be inserted around or removed from any
-                   graph on any area; ligatures may pass through it.
+   R5  double cut drawn    The double cut may be drawn round any graph on any
+                   area; ligatures may pass through it.
+   R6  double cut removed  And it may be taken off wherever two cuts stand one
+                   immediately inside the other with nothing between them.
+                   Roberts counts these two as one rule read both ways.
    ========================================================================== */
 
 const RULE_NAME = {
   R1:'R1 erasure', R1L:'R1 erasure (line)',
   R2:'R2 insertion', R2J:'R2 insertion (join)',
   R3:'R3 iteration', R4:'R4 deiteration',
-  R5in:'R5 double cut, inserted', R5out:'R5 double cut, removed'
+  R5in:'R5 double cut, drawn', R5out:'R6 double cut, removed'
 };
 
 /* --- ligature labelling, for structural comparison ------------------------ */
@@ -373,7 +376,8 @@ function ruleOf(op, fwd){
     case 'insert': case 'join':     return fwd ? 'R2' : 'R1';
     case 'iterate':                 return fwd ? 'R3' : 'R4';
     case 'deiterate':               return fwd ? 'R4' : 'R3';
-    case 'dcIn': case 'dcOut':      return 'R5';
+    case 'dcIn':                    return fwd ? 'R5' : 'R6';
+    case 'dcOut':                   return fwd ? 'R6' : 'R5';
     case 'addLine':                 return fwd ? 'C6/R2' : 'R1';
     case 'delLine':                 return fwd ? 'R1' : 'C6/R2';
     case 'branch':                  return fwd ? 'R3(a)' : 'R4(a)';
@@ -550,8 +554,8 @@ function describeMove(g, mv, fwd){
     case 'retract': return fwd
       ? 'R4(a,b), deiteration: a loose end is retracted.'
       : 'R3(a,b), iteration: a loose end is extended.';
-    case 'dcIn':  return fwd ? 'R5: a double cut is inserted.' : 'R5: a double cut is removed.';
-    case 'dcOut': return fwd ? 'R5: a double cut is removed.'  : 'R5: a double cut is inserted.';
+    case 'dcIn':  return fwd ? 'R5: a double cut is drawn.' : 'R6: a double cut is removed.';
+    case 'dcOut': return fwd ? 'R6: a double cut is removed.' : 'R5: a double cut is drawn.';
   }
   return mv.op;
 }

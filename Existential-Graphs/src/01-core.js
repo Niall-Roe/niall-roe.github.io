@@ -168,7 +168,17 @@ function removeNode(g, nodeId){
     for (const l of g.areas[n.inner].lns.slice()) removeLn(g, l);
     delete g.areas[n.inner];
   } else {
-    for (const h of n.hooks) removeLn(g, h);
+    /* A hook is a point of a line of identity, and erasing the spot does not
+       erase the line. Where the hook is a junction — two or more points of the
+       line meet at it — taking it away would sever the ligature and change
+       what the rest of the graph says, which is not what erasing one spot
+       does. Such a hook is left behind as an ordinary point of the line; a
+       hook with nothing or one thing on it goes with the spot, since dropping
+       it disconnects nothing. */
+    for (const h of n.hooks){
+      if (g.lns[h] && neighbours(g, h).length >= 2) continue;
+      removeLn(g, h);
+    }
   }
   const a = g.areas[n.area];
   if (a) a.items = a.items.filter(x => x!==nodeId);

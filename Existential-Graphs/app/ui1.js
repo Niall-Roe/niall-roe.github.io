@@ -15,9 +15,11 @@ $$('nav.tabs button').forEach(b => b.onclick = () => {
 // a panel that was hidden had no width to size its drawing to
 function refresh(tab){
   if (tab === 'translate') translate(false);
-  else if (tab === 'proofs' && PF.proof) pfShow(PF.i);
-  else if (tab === 'draw') drawRender();
-  else if (tab === 'prove' && VV.steps) vShow(VV.i);
+  else if (tab === 'proofs'){
+    const w = $('#work-view');
+    if (w && w.style.display !== 'none') drawRender();
+    else if (PF.proof) pfShow(PF.i);
+  }
   else if (tab === 'notes' && typeof demoDrawAll === 'function') demoDrawAll();
 }
 let __rz;
@@ -75,12 +77,12 @@ const T_EXAMPLES = [
    ['P',           'P',                      'C2: scribed on the sheet, it is asserted.'],
    ['P & Q',       'P and Q',                'C3: two graphs side by side are both asserted. There is no sign for "and".'],
    ['~P',          'not P',                  'C5: the cut denies precisely what it encloses.'],
-   ['~~P',         'not not P',              'The double cut, drawn as written. R5 removes it, and what is left is P.'],
+   ['~~P',         'not not P',              'The double cut, drawn as written. R6 removes it, and what is left is P.'],
    ['P & ~P',      'P and not P',            'Absurd, and the drawing shows it: P both on the sheet and denied.'],
    ['~(P & ~P)',   'not both P and not P',   'The law of contradiction.'],
    ['P | ~P',      'P or not P',             'The excluded middle. Worked out in full on the Proofs tab.'],
    ['~(P & Q)',    'not both P and Q',       'One cut round the pair.'],
-   ['~P | ~Q',     'not P or not Q',         'De Morgan. The same as the last once R5 has taken off the two double cuts.'],
+   ['~P | ~Q',     'not P or not Q',         'De Morgan. The same as the last once R6 has taken off the two double cuts.'],
    ['P -> Q',      'if P then Q',            'C4: the scroll. The antecedent on the outer area, the consequent in the inner.'],
    ['~(P & ~Q)',   'not both P and not Q',   'The same graph again: a conditional is a scroll however it is written.'],
    ['P | Q',       'either P or Q',          'A cut round each, and both inside one more.'],
@@ -137,7 +139,9 @@ function drawTranslated(g, animate){
   TR.graph = aligned;
   TR.anim = playTransition(el, prev, aligned, null,
     Object.assign({ markMs: 0, moveMs: 620 }, tOpts()),
-    () => { TR.anim = null; });
+    // the moving drawing is stroked plainly, for speed; once it settles the
+    // still is drawn again so that the ink comes back
+    () => { TR.anim = null; stageSvg(el, aligned, tOpts()); });
 }
 function translate(animate){
   const src = $('#t-in').value.trim();
@@ -244,22 +248,11 @@ function hydrateSteps(steps){ return hydrateChain(steps.map(s => s.graph)); }
 
 /* ============================== PROOFS ===================================== */
 const PF = { proof: null, i: 0, timer: null, anim: null };
-// group the list: propositional graphs first, then those with lines of identity
-(function(){
-  const alpha = [], beta = [];
-  PROOFS.forEach((p,i) => {
-    let isBeta = false;
-    try { isBeta = !isAlpha(parseEG(p.steps[p.steps.length-1].eg)) ||
-                   p.prem.some(f => !isAlpha(compileFormula(parseFormula(f)).graph)); } catch(e){}
-    (isBeta ? beta : alpha).push('<option value="'+i+'">'+esc(p.title)+'</option>');
-  });
-  $('#pf-sel').innerHTML =
-    '<optgroup label="Alpha — the logic of truth functions">'+alpha.join('')+'</optgroup>'+
-    '<optgroup label="Beta — lines of identity and quantification">'+beta.join('')+'</optgroup>';
-})();
+// the list is built on the Prove it tab, in ui7
 function pfLoad(i){
   const p = PROOFS[i];
   PF.proof = p; PF.i = 0;
+  PF.source = 'lib'; PF.found = p;
   const h = hydrateProof(p);
   PF.graphs = h.graphs; PF.mvs = h.mvs;
   PF.frame = proofFrame(PF.graphs);
@@ -288,6 +281,52 @@ function proofFrame(graphs){
   return { W, H };
 }
 const pfStepMs = () => 4800 - (+$('#pf-speed').value || 2600);
+/* A proof the finder has just produced, played by the same machinery as a
+   worked one. The step list the search returns already carries graphs, so it
+   is hydrated once and handed over. */
+function pfLoadFound(steps, premGraphs, goalGraph, src){
+  const prem = $('#v-prem').value.split('\n').map(x => x.trim()).filter(Boolean);
+  const p = { id:'found', title:'A proof found here', cite:'', note:'',
+              prem: prem, goal: $('#v-goal').value.trim(), found:'machine',
+              steps: steps.map(s => ({ eg: writeEG(s.graph, true), rule: s.rule, why: s.why })) };
+  p._h = hydrateSteps(steps);
+  PF.proof = p; PF.i = 0;
+  PF.graphs = p._h.graphs; PF.mvs = p._h.mvs;
+  PF.frame = proofFrame(PF.graphs);
+  $('#pf-cite').innerHTML = '';
+  $('#pf-note').textContent = '';
+  $('#pf-kv').innerHTML =
+    (prem.length ? '<dt>premisses</dt><dd>'+prem.map(x=>esc(fmtSrc(x))).join('<br>')+'</dd>'
+                 : '<dt>from</dt><dd>the blank sheet of assertion</dd>') +
+    '<dt>conclusion</dt><dd>'+esc(fmtSrc(p.goal))+'</dd>' +
+    '<dt>steps</dt><dd>'+(steps.length-1)+'</dd>';
+  // the page checks its own answer: every step is matched against the rules by
+  // hydrateSteps, and where one cannot be matched it says so rather than not
+  const loose = p._h.mvs.filter((m, i) => i > 0 && !m).length;
+  const mine = (src || 'machine') === 'you';
+  $('#pf-prov').textContent = loose
+    ? (mine ? 'This is what you did on the board. ' : 'Found by the proof finder in this page just now. ') +
+      loose + ' of its steps ' + (loose === 1 ? 'is' : 'are') +
+      ' not matched to a single rule by the check that runs here.'
+    : mine
+      ? 'This is what you did on the board, each step checked against the rules.'
+      : 'Found by the proof finder in this page just now, and each step checked against the rules.';
+  $('#pf-steps').innerHTML = p.steps.map((s,k) =>
+    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
+    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  pfShow(0);
+  PF.source = src || 'machine';
+  // the machine's answer is kept, so the reader can come back to it after
+  // watching their own; their own is not kept here, it is rebuilt from the trail
+  if (PF.source === 'machine') PF.found = p;
+  if (typeof proveModes === 'function'){
+    proveModes();
+    // a proof turning up does not take the reader off the board
+    if (PF.source === 'machine' && $('#play-view').style.display !== 'none') proveMode('play');
+    else if (PF.source === 'machine') proveMode('work');
+  }
+}
+
 function pfShow(i, animate){
   const p = PF.proof; if (!p) return;
   const from = PF.i;
@@ -301,14 +340,15 @@ function pfShow(i, animate){
     PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, PF.mvs[PF.i],
       { shade:true, wobble:true, colourLines: PREFS.colour, hand: PREFS.hand, frame: PF.frame,
         markMs: Math.round(speed*0.42), moveMs: Math.round(speed*0.48) },
-      () => { PF.anim = null; });
+      () => { PF.anim = null; stageSvg($('#pf-stage'), g, { shade:true, wobble:true, frame: PF.frame }); });
     PF.dur = PF.anim.total;
   } else if (animate && PF.i === from - 1 && ANIM_ON()){
     // rewinding is not a rule application, so nothing is marked; the drawing
     // simply runs backwards
     PF.anim = playTransition($('#pf-stage'), PF.graphs[from], g, null,
       { shade:true, wobble:true, colourLines: PREFS.colour, hand: PREFS.hand, frame: PF.frame, markMs: 0,
-        moveMs: Math.round(speed*0.4) }, () => { PF.anim = null; });
+        moveMs: Math.round(speed*0.4) }, () => { PF.anim = null;
+        stageSvg($('#pf-stage'), g, { shade:true, wobble:true, frame: PF.frame }); });
   } else {
     stageSvg($('#pf-stage'), g, { shade:true, wobble:true, frame: PF.frame });
   }

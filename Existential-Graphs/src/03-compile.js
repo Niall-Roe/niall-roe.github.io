@@ -99,7 +99,7 @@ function compileFormula(ast, opts){
         const save = env[a.v];
         env[a.v] = mkBinding(oa, a.v);
         g.nodes[outer].quant = a.v;
-        compNeg(a.a, oa);
+        compDenial(a.a, oa);
         env[a.v] = save;
         return;
       }
@@ -108,31 +108,31 @@ function compileFormula(ast, opts){
   }
 
   // scribe the denial of `a` on `area`
-  function compNeg(a, area){
+  /* The denial that the universal quantifier is built out of.
+
+     "Ax φ" is not a cut the reader wrote; it is a quantifier, and its graph is
+     the figure Peirce draws for it — the scroll with the line of identity
+     running through, ( *x F ( G ) ) for "all F is G" (Roberts p. 52, Fig. 9).
+     Getting there from ¬∃x¬φ means scribing the denial of φ in its tidy form
+     rather than enclosing φ whole, which would leave a double cut inside every
+     universal on the page. This is the rewriting that compNeg used to do for
+     everything, kept for the one place it belongs. */
+  function compDenial(a, area){
     switch (a.t){
       case 'false': return;                                // ¬⊥ asserts nothing
       case 'true': addCut(g, area); return;
-      // A denial of a denial is a double cut, and must be drawn as one. It was
-      // collapsed here, so that "~~P" scribed a bare P and the one figure R5
-      // is about could not be written from a formula at all. R5 removes it;
-      // the translation does not do R5's work in advance.
-      case 'not': {
-        const outer = addCut(g, area);
-        const inner = addCut(g, g.nodes[outer].inner);
-        comp(a.a, g.nodes[inner].inner);
-        return;
-      }
+      case 'not': comp(a.a, area); return;
       case 'imp':                                          // ¬(A ⊃ B) is A and not-B
         comp(a.a, area);
-        compNeg(a.b, area);
+        compDenial(a.b, area);
         return;
       case 'or':                                           // ¬(A ∨ B) is ¬A and ¬B
-        a.xs.forEach(x => compNeg(x, area));
+        a.xs.forEach(x => compDenial(x, area));
         return;
       case 'all': {                                        // ¬∀v φ is ∃v ¬φ
         const save = env[a.v];
         env[a.v] = mkBinding(area, a.v);
-        compNeg(a.a, area);
+        compDenial(a.a, area);
         env[a.v] = save;
         return;
       }
@@ -143,6 +143,22 @@ function compileFormula(ast, opts){
       }
     }
   }
+
+  /* A denial is a cut round whatever is denied, and nothing else.
+
+     The notation is read from the outside in: the "~" is the cut, and what it
+     governs is drawn inside it whole. So "~(Q -> P)" is a cut round the scroll
+     for Q ⊃ P, which is ( ( Q ( P ) ) ), not the graph for Q ∧ ¬P. The two say
+     the same thing, and R5 will take the outer pair off in one step, but that
+     step belongs to the reader and not to the translation. Every case that
+     used to be rewritten on the way in — a denied conditional, a denied
+     disjunction, a denied universal, a denial of a denial — is now simply
+     enclosed. */
+  function compNeg(a, area){
+    const c = addCut(g, area);
+    comp(a, g.nodes[c].inner);
+  }
+
 
   comp(ast, g.root);
   return { graph: g, notes };

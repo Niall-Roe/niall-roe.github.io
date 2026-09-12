@@ -2,21 +2,26 @@
   <h1>The Existential Graphs of Charles S. Peirce</h1>
   <p class="sub">A working instrument for Peirce's diagrammatic logic: translate ordinary
   notation into graphs, watch known proofs unfold, scribe graphs and read them back, and
-  set the five rules of transformation to work on a problem of your own. Built on Don D.
+  set the rules of transformation to work on a problem of your own. Built on Don D.
   Roberts, <cite>The Existential Graphs of Charles S. Peirce</cite> (The Hague: Mouton,
   1973), with Peirce's MS 514 as transcribed by John Sowa.</p>
 </header>
 <main>
 <nav class="tabs" role="tablist">
-  <button role="tab" data-tab="translate" aria-selected="true">Scribe</button>
-  <button role="tab" data-tab="notes" aria-selected="false">The permissions</button>
-  <button role="tab" data-tab="proofs" aria-selected="false">Proofs</button>
-  <button role="tab" data-tab="draw" aria-selected="false">Work it</button>
-  <button role="tab" data-tab="prove" aria-selected="false">Find a proof</button>
+  <button role="tab" data-tab="translate" aria-selected="true">Scribe a Graph</button>
+  <button role="tab" data-tab="notes" aria-selected="false">Manipulate a Graph</button>
+  <button role="tab" data-tab="proofs" aria-selected="false">Prove with Graphs</button>
 </nav>
 
 <!-- ============================ TRANSLATE ============================ -->
 <section class="panel on" id="p-translate">
+  <div class="card" style="margin-bottom:18px">
+    <h2>How to read a graph</h2>
+    <blockquote class="peirce">A nest sucks the meaning from without inwards unto its centre,
+    as a sponge absorbs water.<span class="cite">Peirce, Ms 650, quoted in Roberts 1973,
+    p. 39 n. 13</span></blockquote>
+    <div id="n-reading"></div>
+  </div>
   <div class="grid two">
     <div class="card">
       <h2>A proposition in ordinary notation</h2>
@@ -67,11 +72,31 @@
   </div>
   <div class="card" style="margin-top:18px">
     <h2>The conventions</h2>
-    <blockquote class="peirce">If the sheet be blank, this blank, whose existence consists in
-    the absence of any scribed graph, is itself a graph.
-    <span class="cite">Peirce, CP 4.397</span></blockquote>
-    <p class="note" style="margin-top:0">What the marks mean. The examples above are set out in
-    this order, so that each one turns on a convention you have already met.</p>
+    <blockquote class="peirce">&hellip; this act, called scribing a graph on the sheet of
+    assertion, shall be understood to constitute the assertion of the truth of the graph
+    scribed.<span class="cite">Peirce, CP 4.397</span></blockquote>
+    <p class="tight">Writing something on the sheet asserts it. The blank sheet asserts
+    nothing, but it is still a graph.</p>
+    <h3 style="margin-top:14px">Alpha and Beta</h3>
+    <p class="tight"><b>Alpha</b> uses two marks. Write two graphs side by side and you have
+    asserted both: <q>Two graphs scribed on the sheet are, both of them, asserted</q>
+    (CP 4.398). Draw a cut round a graph and you have denied it; the cut <q>severs all that it
+    encloses</q> from the sheet it stands on (CP 4.399). Those two marks handle every truth
+    function. Whether an Alpha inference holds can always be settled by checking every
+    assignment, so this page never has to guess.</p>
+    <p class="tight"><b>Beta</b> adds one more mark, the heavy line. Every heavily marked point
+    <q>shall denote a single individual, without in itself indicating what individual it is</q>
+    (CP 4.405), and a line joining two such points asserts <q>precisely the identity of the
+    individuals denoted by its extremities</q> (CP 4.406). That gives you relations and
+    quantifiers. A line in an evenly enclosed place says <i>some</i>; the same line oddly
+    enclosed says <i>any</i>. Where a line crosses a cut, the scope of the quantifier is drawn
+    on the page instead of being fixed by an ordering convention. Beta is undecidable, so here
+    a countermodel can show an inference fails, but a search that finds nothing proves
+    nothing.</p>
+    <p class="note">Peirce went further, to <b>Gamma</b>: modality, the broken cut, graphs about
+    graphs. That part is not on this page.</p>
+    <p class="note" style="margin-top:0">What the marks mean. The examples above are in this
+    order so that each one uses only conventions you have already seen.</p>
     <dl class="rules two-col" id="n-conv"></dl>
   </div>
 </section>
@@ -79,42 +104,114 @@
 <!-- ============================== PROOFS ============================== -->
 <section class="panel" id="p-notes">
   <div class="card" style="margin-bottom:18px">
-    <h2>The permissions</h2>
-    <p class="tight">Peirce's own name for the five rules, and his own advice on how to take
-    them: <q>Let [the student] read these permissions and the commentary as he would listen to
-    the rules of a new and intricate game, very closely attentive, but wide awake to the purpose
-    of preparing for a lively and lightsome contest.</q>
-    <span class="cite">Peirce, quoted in Roberts 1973, p. 14</span></p>
-    <p class="note">Each is illustrated below in the fewest marks that show it. Choose an
-    illustration to set it up, then play it. Roberts calls them the rules of transformation
-    (Appendix 3, p. 138); they are the same five.</p>
+    <h2>The rules of manipulation</h2>
+    <blockquote class="peirce">Let [the student] read these permissions and the commentary as he
+    would listen to the rules of a new and intricate game, very closely attentive, but wide awake
+    to the purpose of preparing for a lively and lightsome contest.
+    <span class="cite">Peirce, quoted in Roberts 1973, p. 14</span></blockquote>
+    <p class="tight">There are three things you can do, and you can do each of them in two
+    directions. R1 erases, R2 scribes. R3 copies a graph inwards, R4 erases such a copy. R5
+    draws a double cut, R6 takes one off. A cut is a graph like any other, so the pair that
+    draws and removes it works like the other two pairs.</p>
+    <p class="note">Roberts counts five rules, treating the double cut as one rule read both
+    ways (Appendix 3, p. 138). They are numbered as six here because when you are working, they
+    are six different things to reach for. Each rule below has examples, including moves the
+    rule does not allow.</p>
+    <p class="tight" style="margin-top:12px">Peirce describes two people at work: a
+    <i>Graphist</i>, who writes down what is granted at the start, and an <i>Interpreter</i>,
+    who changes the graph by the rules to see what follows. Here you are both.
+    <span class="cite">Reasoning is nothing but the discourse of the mind to its future self
+    &mdash; Peirce, Ms 450, p. 3, quoted in Roberts 1973, p. 92</span></p>
   </div>
-  <div class="grid two">
-    <div class="card">
-      <h2>The five permissions</h2>
-      <dl class="rules" id="n-rules"></dl>
-    </div>
-    <div class="card">
-      <h2>About this instrument</h2>
-      <div class="ref" id="n-about"></div>
-    </div>
+  <div class="card">
+    <h2>The six permissions</h2>
+    <dl class="rules" id="n-rules"></dl>
   </div>
 </section>
 
 <section class="panel" id="p-proofs">
   <div class="grid side">
-    <div class="card">
-      <h2>Choose a proof</h2>
-      <select id="pf-sel" style="width:100%"></select>
-      <p class="note" id="pf-cite" style="margin-top:10px"></p>
-      <p class="note" id="pf-note"></p>
-      <hr class="sep">
-      <dl class="kv" id="pf-kv"></dl>
-      <p class="note" id="pf-prov"></p>
-    </div>
     <div>
       <div class="card">
-        <h2>The sheet of assertion</h2>
+        <h2>Choose a proof</h2>
+        <select id="pf-sel" style="width:100%"></select>
+        <p class="note" style="margin:8px 0 0">Or set your own. The premisses go on the sheet.
+        The conclusion is what you are trying to reach.</p>
+        <label class="fld" style="margin-top:10px">Premisses, one to a line (leave blank for a theorem)</label>
+        <textarea id="v-prem" rows="3" spellcheck="false">P -> Q
+Q -> R</textarea>
+        <label class="fld" style="margin-top:8px">Conclusion</label>
+        <textarea id="v-goal" rows="2" spellcheck="false">P -> R</textarea>
+        <div class="btnrow" id="v-searchrow">
+          <button class="btn" id="v-go">Search for a proof</button>
+          <button class="btn ghost" id="v-hard">Search harder</button>
+        </div>
+        <div class="btnrow" id="v-foundrow" style="display:none">
+          <span class="pill ok big" id="v-foundpill">Proof found</span>
+          <button class="btn ghost" id="v-again">Search again</button>
+        </div>
+        <div id="v-verdict" class="note" style="margin-top:10px"></div>
+        <p class="note" id="pf-cite" style="margin-top:10px"></p>
+        <p class="note" id="pf-note"></p>
+        <dl class="kv" id="pf-kv"></dl>
+        <p class="note" id="pf-prov"></p>
+        <p class="note" id="v-booknote"></p>
+      </div>
+      <details class="card" id="finder-card" style="margin-top:18px">
+        <summary><b>How the proof finder works</b></summary>
+        <div id="n-finder" style="margin-top:10px"></div>
+      </details>
+      <div id="work-side" style="display:none">
+<div class="card" style="margin-top:18px">
+        <h2>The goal</h2>
+        <div id="z-body" style="display:none">
+          <p id="z-status" style="margin:8px 0 0;font-size:13.5px"></p>
+          <div class="btnrow">
+            <button class="btn ghost" id="z-hint">Hint</button>
+            <button class="btn ghost" id="z-restart">Start again</button>
+            <button class="btn ghost" id="z-show" style="display:none">Show the proof</button>
+            <button class="btn ghost" id="z-quit">Leave the puzzle</button>
+          </div>
+        </div>
+        <p class="note" id="z-note" style="margin-top:8px">The premisses are on the sheet.
+        Change them one rule at a time until the sheet says the conclusion.</p>
+      </div>
+      </div>
+    </div>
+    <div>
+      <div class="card" id="sheet-head">
+        <div class="headrow">
+          <div class="headleft">
+            <h2 style="margin:0 0 10px">The sheet of assertion</h2>
+            <div class="modebar">
+              <div class="modeswitch" role="group" aria-label="how to go on">
+                <button type="button" id="pv-work" class="on">Work it yourself</button>
+                <button type="button" id="pv-play">Watch it done</button>
+              </div>
+            </div>
+            <p class="note" id="pv-say" style="margin:8px 0 0"></p>
+          </div>
+          <div class="headright">
+            <div id="goal-inline">
+              <div class="goallabel">What you are trying to reach</div>
+              <div class="stage goalstage" id="z-goal"></div>
+              <div class="goalread" id="z-goalread"></div>
+            </div>
+            <div id="quote-inline" style="display:none">
+              <blockquote class="peirce" style="margin:0">At great pains, I learned to think in
+              diagrams, which is a much superior method [to algebraic symbols]. I am convinced that
+              there is a far better one, capable of wonders; but the great cost of the apparatus
+              forbids my learning it. It consists in thinking in stereoscopic moving pictures.
+              <span class="cite src" tabindex="0">Peirce to Kehler, MS L 231, 22 June 1911
+              <span class="srcpop">Quoted in A.-V. Pietarinen, &lsquo;Existential Graphs: What a
+              Diagrammatic Logic of Cognition Might Look Like&rsquo;, <i>History and Philosophy of
+              Logic</i> 32:3 (2011), 265&ndash;281.</span></span></blockquote>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="play-view">
+      <div class="card" style="margin-top:18px">
         <div class="stage" id="pf-stage"></div>
         <div class="why" id="pf-why"></div>
         <div class="playbar">
@@ -148,54 +245,26 @@
         <div id="pf-writ"></div>
         <p class="note" id="pf-writnote"></p>
       </div>
-    </div>
-  </div>
-</section>
-
-<!-- =============================== DRAW =============================== -->
-<section class="panel" id="p-draw">
-  <div class="grid side">
-    <div>
+      </div>
+      <div id="work-view" style="display:none">
       <div class="card">
-        <h2>Start from</h2>
-        <select id="d-start" style="width:100%"></select>
-        <p class="note" style="margin-top:6px">A proposition to experiment on. Or write your own below.</p>
-        <textarea id="d-from" rows="1" spellcheck="false">P -> Q</textarea>
-        <div class="btnrow"><button class="btn ghost" id="d-load">Scribe it</button>
-          <label style="font-size:12.5px;color:var(--ink3);display:flex;gap:5px;align-items:center">
-            <input type="checkbox" id="d-live" checked> draw as I type</label></div>
-        <details style="margin-top:8px">
-          <summary class="note" style="cursor:pointer">Or from the linear notation</summary>
-          <textarea id="d-lin" rows="2" spellcheck="false" style="margin-top:6px">( P ( Q ) )</textarea>
-          <div class="btnrow"><button class="btn ghost" id="d-loadlin">Scribe it</button></div>
-          <p class="note"><code>( )</code> a cut · <code>{ A | B }</code> a scroll ·
-          <code>*x</code> a point of the line <span class="mono">x</span> ·
-          <code>F[x,y]</code> a spot hooked to lines · <code>x~y</code> two lines joined ·
-          <code>"is a catholic"</code> a spot whose name has spaces.</p>
-        </details>
-      </div>
-      <div class="card" style="margin-top:18px">
-        <h2>Reach a goal</h2>
-        <select id="z-sel" style="width:100%"></select>
-        <div id="z-body" style="display:none">
-          <div class="stage" id="z-goal" style="min-height:70px;padding:8px;margin-top:10px"></div>
-          <p class="reading" id="z-goalread" style="font-size:13.5px;margin-top:6px"></p>
-          <p id="z-status" style="margin:8px 0 0;font-size:13.5px"></p>
-          <div class="btnrow">
-            <button class="btn ghost" id="z-hint">Hint</button>
-            <button class="btn ghost" id="z-restart">Start again</button>
-            <button class="btn ghost" id="z-show" style="display:none">Show the proof</button>
-            <button class="btn ghost" id="z-quit">Leave the puzzle</button>
-          </div>
+        <div class="stage left" id="d-stage"></div>
+        <div id="d-err" class="err"></div>
+        <div class="saysrow">
+          <p class="reading" id="d-read"></p>
+          <div class="notation" id="d-lin2"></div>
         </div>
-        <p class="note" id="z-note" style="margin-top:8px">Pick a puzzle and the premisses are
-        scribed on the sheet. Transform them, one legal move at a time, until the sheet says
-        the conclusion.</p>
       </div>
       <div class="card" style="margin-top:18px">
-        <h2>Scribe</h2>
-        <p class="tight">Click a cut to select its area, or the sheet to select the sheet
-        itself. Then scribe onto the selected area.</p>
+        <h2>Rules of manipulation</h2>
+        <div id="d-moves"></div>
+      </div>
+      <div class="card" style="margin-top:18px">
+        <h2>Scribing marks by hand</h2>
+        <p class="tight">Insertion in an oddly enclosed place lets you write whatever you
+        like, and in Beta what you write may be a line of identity or a spot with hooks.
+        These draw such a graph. Click a cut to select its area, or the sheet to select the
+        sheet itself, then scribe onto the selected area.</p>
         <div class="btnrow">
           <button class="btn" id="d-cut">Cut</button>
           <button class="btn" id="d-spot">Spot…</button>
@@ -214,87 +283,30 @@
           <label><input type="checkbox" class="pref-colour" checked> colour the lines</label>
         </div>
       </div>
-    </div>
-    <div>
-      <div class="card">
-        <div class="stage left" id="d-stage"></div>
-        <div id="d-err" class="err"></div>
+      <div class="card" id="trail-card" style="margin-top:18px;display:none">
+        <h2>What you have done</h2>
+        <ol class="steps" id="d-trail"></ol>
+        <div class="btnrow">
+          <button class="btn" id="d-replay">Step through it</button>
+          <button class="btn ghost" id="d-undo2">Undo the last move</button>
+        </div>
       </div>
-      <div class="grid two" style="margin-top:18px">
-        <div class="card">
-          <h2>What it says</h2>
-          <p class="reading" id="d-read"></p>
-          <p class="gloss" id="d-gloss"></p>
-          <div class="notation" id="d-lin2" style="margin-top:8px"></div>
-          <div id="d-val" style="margin-top:10px"></div>
-        </div>
-        <div class="card">
-          <h2>Transform it</h2>
-          <p class="note" style="margin-top:0">Every move below is legal by Peirce's five
-          rules. Applying one is an experiment upon the diagram.</p>
-          <div id="d-moves"></div>
-        </div>
       </div>
     </div>
   </div>
 </section>
 
+<!-- =============================== DRAW =============================== -->
+
 <!-- =============================== PROVE =============================== -->
-<section class="panel" id="p-prove">
-  <div class="grid side">
-    <div class="card">
-      <h2>An inference to test</h2>
-      <label class="fld">Premisses, one to a line (leave blank for a theorem)</label>
-      <textarea id="v-prem" rows="4" spellcheck="false">P -> Q
-Q -> R</textarea>
-      <label class="fld" style="margin-top:10px">Conclusion</label>
-      <textarea id="v-goal" rows="2" spellcheck="false">P -> R</textarea>
-      <div class="btnrow">
-        <button class="btn" id="v-go">Search for a proof</button>
-        <button class="btn ghost" id="v-hard">Search harder</button>
-      </div>
-      <div class="chips" id="v-ex"></div>
-      <hr class="sep">
-      <h2>Exercises from the open textbooks</h2>
-      <select id="v-book" style="width:100%"></select>
-      <p class="note" id="v-booknote" style="margin-top:8px"></p>
-      <p class="note">Alpha validity is always decided outright, by the truth-value
-      analysis of Roberts §3.2, whether or not a proof is found. Beta validity is not
-      decidable; there a countermodel refutes, and otherwise the search can only report
-      what it did and did not find.</p>
-    </div>
-    <div>
-      <div class="card">
-        <h2>Verdict</h2>
-        <div id="v-verdict">Press the button.</div>
-      </div>
-      <div class="card" id="v-proofcard" style="margin-top:18px;display:none">
-        <h2>The proof</h2>
-        <div class="stage" id="v-stage"></div>
-        <div class="why" id="v-why"></div>
-        <div class="playbar">
-          <button class="btn ghost" id="v-first">⏮</button>
-          <button class="btn ghost" id="v-prev">◀ back</button>
-          <button class="btn" id="v-play">▶ play</button>
-          <button class="btn ghost" id="v-next">forward ▶</button>
-        </div>
-        <ol class="steps" id="v-steps" style="margin-top:14px"></ol>
-      </div>
-      <div class="card" id="v-writ-card" style="margin-top:18px;display:none">
-        <h2>The proof in writing</h2>
-        <div class="btnrow" style="margin-top:0">
-          <button class="btn ghost seg on" data-form="linear">Linear notation</button>
-          <button class="btn ghost seg" data-form="formula">Ordinary notation</button>
-          <button class="btn ghost seg" data-form="both">Both</button>
-          <span class="sp" style="flex:1"></span>
-          <button class="btn ghost" id="v-copy">Copy</button>
-        </div>
-        <div id="v-writ"></div>
-        <p class="note" id="v-writnote"></p>
-      </div>
-    </div>
-  </div>
-</section>
 
 <!-- =============================== NOTES =============================== -->
 </main>
+<footer class="page">
+  <p><b>Sources.</b> Don D. Roberts, <i>The Existential Graphs of Charles S. Peirce</i>
+  (The Hague: Mouton, 1973), chapters 3 and 4 and Appendices 3 and 4. Charles S. Peirce,
+  MS 514 (1909), transcribed with commentary by John F. Sowa, jfsowa.com/peirce/ms514.htm.
+  P. D. Magnus, Tim Button, Aaron Thomas-Bolduc and Richard Zach, <i>forall x: Calgary. An
+  Introduction to Formal Logic</i>, CC BY 4.0. References of the form 4.492 are to the
+  <i>Collected Papers</i>.</p>
+</footer>

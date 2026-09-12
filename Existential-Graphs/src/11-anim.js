@@ -218,9 +218,12 @@ function tweenFrame(sp, t){
       parts.push(`<path class="cut${raised}${shade && it.odd ? ' odd':''}" opacity="${r2(op)}" d="${
         cutPath(x, y, w, h, it.n.id, wobble, hand)}"/>`);
     } else {
-      parts.push(`<g class="spot" opacity="${r2(op)}"><text x="${
-        r2(x + w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(y + h/2)}" `+
-        `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+      // the moving drawing writes the name the same way the still one does
+      const cx = x + w/2 + (it.n.hooks.length>1?6:0), cy = y + h/2;
+      const written = hand ? writtenName(it.n.name, cx, cy, it.n.id) : null;
+      parts.push(`<g class="spot" opacity="${r2(op)}">`+
+        (written || (`<text x="${r2(cx)}" y="${r2(cy)}" `+
+        `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text>`))+'</g>');
       if (opts.hookNumbers !== false && it.n.hooks.length > 1)
         parts.push(hookNumerals(it, e, sp));
     }
@@ -319,9 +322,11 @@ function markFrame(sp, focus, mv){
       parts.push(`<path class="cut${raised}${shade && it.odd ? ' odd':''}${mk}" opacity="${
         op}" d="${cutPath(it.a.x, it.a.y, it.a.w, it.a.h, it.n.id, wobble, hand)}"/>`);
     } else {
-      parts.push(`<g class="spot" opacity="${op}"><text x="${
-        r2(it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0))}" y="${r2(it.a.y + it.a.h/2)}" `+
-        `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text></g>`);
+      const mcx = it.a.x + it.a.w/2 + (it.n.hooks.length>1?6:0), mcy = it.a.y + it.a.h/2;
+      const mwritten = hand ? writtenName(it.n.name, mcx, mcy, it.n.id) : null;
+      parts.push(`<g class="spot" opacity="${op}">`+
+        (mwritten || (`<text x="${r2(mcx)}" y="${r2(mcy)}" `+
+        `dominant-baseline="central" text-anchor="middle">${esc(it.n.name)}</text>`))+'</g>');
       if (opts.hookNumbers !== false && it.n.hooks.length > 1)
         parts.push(hookNumerals(it, 0, sp));
     }
