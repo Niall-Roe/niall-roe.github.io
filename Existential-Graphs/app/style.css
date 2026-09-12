@@ -154,7 +154,6 @@ blockquote.peirce .cite{display:block;font-style:normal;margin-top:4px}
 .rules.two-col dt{break-after:avoid}
 .rules.two-col dd{break-inside:avoid;margin-bottom:10px}
 @media (max-width:820px){ .rules.two-col{columns:1} }
-.demorow .demoplay.isreset{background:transparent;border-style:dashed}
 /* an illustration of what a rule does not allow: the move is played, with the
    mark held over the drawing the whole time */
 .nomark.forbid{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
@@ -182,7 +181,19 @@ blockquote.peirce .cite{display:block;font-style:normal;margin-top:4px}
 .demorow .demopick.notallowed .nomark{width:11px;height:11px;border-width:1.8px;vertical-align:0}
 .demorow .demopick.notallowed .nomark::after{width:1.8px;height:11px;top:-1.8px}
 .demorow .demopick.on{background:var(--accent);color:var(--paper);border-color:transparent}
-.demorow .demoplay{padding:2px 10px;font-size:12px}
+/* Playing the illustration is the thing to do on this page, so the button says
+   so: a light green, larger than the numbered picks beside it. Setting it back
+   is the quiet twin. */
+button.btn.ghost.demoplay{padding:5px 15px;font-size:13px;font-weight:600;
+  background:color-mix(in srgb,var(--ok) 15%,var(--card));
+  border:1px solid color-mix(in srgb,var(--ok) 38%,var(--rule));
+  color:var(--ok)}
+button.btn.ghost.demoplay:hover{background:color-mix(in srgb,var(--ok) 27%,var(--card));
+  border-color:var(--ok);color:var(--ok)}
+button.btn.ghost.demoplay.isreset{background:transparent;border-style:dashed;
+  border-color:var(--rule2);color:var(--ink2);font-weight:500}
+button.btn.ghost.demoplay.isreset:hover{color:var(--ink);
+  background:color-mix(in srgb,var(--rule) 40%,transparent)}
 .demostage{min-height:96px;padding:8px;display:flex;align-items:center;justify-content:center}
 .demosay{margin:6px 0 0;font-size:12.5px}
 svg.eg .hookpl{font:400 9px var(--sans);font-style:normal;opacity:.65}
