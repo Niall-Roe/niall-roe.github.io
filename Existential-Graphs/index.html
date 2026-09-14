@@ -20,6 +20,7 @@
     --shade:#2e2b24; --sheet:#232019; }
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans);
   -webkit-font-smoothing:antialiased}
@@ -403,15 +404,59 @@ footer.page{max-width:1180px;margin:0 auto;padding:0 26px 40px;
   font-size:12.5px;color:var(--ink3);line-height:1.55}
 footer.page p{margin:0;border-top:1px solid var(--rule);padding-top:14px;max-width:90ch}
 footer.page b{color:var(--ink2)}
+
+/* How to read a graph: the text, and beside it a small sheet that draws
+   whatever highlighted words were last clicked */
+header h1{margin-bottom:16px}
+.readgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+.readtext p{margin:0 0 11px;line-height:1.62;max-width:74ch}
+.readtext blockquote.peirce{max-width:66ch}
+.readside{position:sticky;top:14px;border:1px solid var(--rule);border-radius:10px;
+  padding:10px 10px 8px;background:var(--paper)}
+.rdstage{min-height:160px;display:flex;align-items:center;justify-content:center;padding:6px}
+.rdsay{font:14px/1.4 var(--serif);text-align:center;margin:9px 4px 2px;min-height:1.4em;color:var(--ink)}
+.rdhint{text-align:center;margin:2px 0 0}
+button.rdlink{appearance:none;border:0;font:inherit;color:inherit;cursor:pointer;
+  padding:0 3px;margin:0 -1px;border-radius:4px;line-height:inherit;
+  background:color-mix(in srgb,var(--accent) 11%,transparent);
+  box-shadow:inset 0 -1.5px 0 color-mix(in srgb,var(--accent) 55%,transparent)}
+button.rdlink:hover{background:color-mix(in srgb,var(--accent) 20%,transparent)}
+button.rdlink.on{background:color-mix(in srgb,var(--accent) 26%,transparent)}
+button.rdlink:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.rdformula{white-space:nowrap;font-weight:600}
+@media (max-width:860px){ .readgrid{grid-template-columns:1fr} .readside{position:static} }
+.modeswitch.tmode{margin:0 0 10px}
+
+/* a cut tied by colour to the part of a formula it stands for */
+.tint0{color:#9a2a2a} .tint1{color:#1d6b3a} .tint2{color:#2350a0} .tint3{color:#8a5a12}
+svg.eg:not(.hand) .cut.tint0, svg.eg.hand .cut.ink.tint0{stroke:#9a2a2a}
+svg.eg:not(.hand) .cut.tint1, svg.eg.hand .cut.ink.tint1{stroke:#1d6b3a}
+svg.eg:not(.hand) .cut.tint2, svg.eg.hand .cut.ink.tint2{stroke:#2350a0}
+svg.eg:not(.hand) .cut.tint3, svg.eg.hand .cut.ink.tint3{stroke:#8a5a12}
+svg.eg:not(.hand) .cut[class*="tint"]{stroke-width:2.3}
+@media (prefers-color-scheme: dark){
+  .tint0{color:#e79191} .tint1{color:#8fd0a1} .tint2{color:#94b8ec} .tint3{color:#e3b978}
+  svg.eg:not(.hand) .cut.tint0, svg.eg.hand .cut.ink.tint0{stroke:#e79191}
+  svg.eg:not(.hand) .cut.tint1, svg.eg.hand .cut.ink.tint1{stroke:#8fd0a1}
+  svg.eg:not(.hand) .cut.tint2, svg.eg.hand .cut.ink.tint2{stroke:#94b8ec}
+  svg.eg:not(.hand) .cut.tint3, svg.eg.hand .cut.ink.tint3{stroke:#e3b978}
+}
+
+/* the Rearrange step: not a rule, so it is set apart from them */
+ol.steps li.rearr .r{font-style:italic;color:var(--ink3)}
+ol.steps li.rearr .n{color:var(--ink3)}
+ol.steps li.rearr .w{color:var(--ink3)}
+
+/* points of lines as targets of the rules */
+svg.eg .handle.tgt{stroke:var(--ok);stroke-dasharray:none;stroke-width:2.4;r:5}
+svg.eg .handle.tgt-src{fill:var(--accent);stroke:var(--accent);stroke-dasharray:none;r:5}
+svg.eg .handle.tgt-hot{fill:var(--ok);stroke:var(--ok);stroke-dasharray:none;r:5.5}
+.toggles.boardbar{align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--rule)}
+.toggles.boardbar .btn{padding:4px 12px;font-size:12.5px}
 </style>
 </head><body>
 <header>
   <h1>The Existential Graphs of Charles S. Peirce</h1>
-  <p class="sub">A working instrument for Peirce's diagrammatic logic: translate ordinary
-  notation into graphs, watch known proofs unfold, scribe graphs and read them back, and
-  set the rules of transformation to work on a problem of your own. Built on Don D.
-  Roberts, <cite>The Existential Graphs of Charles S. Peirce</cite> (The Hague: Mouton,
-  1973), with Peirce's MS 514 as transcribed by John Sowa.</p>
 </header>
 <main>
 <nav class="tabs" role="tablist">
@@ -424,14 +469,22 @@ footer.page b{color:var(--ink2)}
 <section class="panel on" id="p-translate">
   <div class="card" style="margin-bottom:18px">
     <h2>How to read a graph</h2>
-    <blockquote class="peirce">A nest sucks the meaning from without inwards unto its centre,
-    as a sponge absorbs water.<span class="cite">Peirce, Ms 650, quoted in Roberts 1973,
-    p. 39 n. 13</span></blockquote>
-    <div id="n-reading"></div>
+    <div class="readgrid">
+      <div class="readtext" id="n-reading"></div>
+      <aside class="readside" aria-live="polite">
+        <div class="stage rdstage" id="rd-stage"></div>
+        <p class="rdsay" id="rd-say"></p>
+        <p class="note rdhint">Click any highlighted words to see them drawn here.</p>
+      </aside>
+    </div>
   </div>
   <div class="grid two">
     <div class="card">
-      <h2>A proposition in ordinary notation</h2>
+      <h2>A proposition</h2>
+      <div class="modeswitch tmode" role="group" aria-label="how to write it">
+        <button type="button" id="t-mode-formula" class="on">Ordinary notation</button>
+        <button type="button" id="t-mode-linear">Linear notation</button>
+      </div>
       <textarea id="t-in" rows="3" spellcheck="false">Ax (Fx -> Gx)</textarea>
       <div id="t-ex" class="exwall"></div>
       <p class="note" id="t-exsay" style="min-height:1.2em"></p>
@@ -449,6 +502,7 @@ footer.page b{color:var(--ink2)}
       </div>
       <hr class="sep">
       <h2>How to write it</h2>
+      <div id="t-help-formula">
       <p class="tight"><code>~ &amp; | -&gt; &lt;-&gt;</code> for not, and, or, if-then, if-and-only-if.
       The glyphs <code>¬ ∧ ∨ ⊃ ≡</code> work too.</p>
       <p class="tight"><code>Ax</code> and <code>Ex</code> for <span class="mono">∀x</span>
@@ -458,6 +512,24 @@ footer.page b{color:var(--ink2)}
       <p class="note">Peirce allows no graph with an unoccupied hook, so a free variable
       cannot be scribed at all (Roberts p. 49). One is closed existentially for you, with
       a note saying so.</p>
+      </div>
+      <div id="t-help-linear" hidden>
+      <p class="tight">Linear notation writes down the graph itself, mark by mark, instead of
+      a formula it stands for.</p>
+      <p class="tight"><code>( )</code> is a cut. Whatever you put inside it is denied, so
+      <code>( P )</code> is not P.</p>
+      <p class="tight">Whatever is written side by side is asserted together, so <code>P Q</code>
+      is P and Q, and <code>( P ( Q ) )</code> is if P then Q.</p>
+      <p class="tight">A capital letter or a word is a spot: <code>P</code>, <code>Man</code>.</p>
+      <p class="tight">Lines of identity get small letters. <code>*x</code> puts a point of the
+      line x where you write it, and <code>F[x]</code> is a spot with its hook on x, so
+      <code>*x F[x]</code> is something is F. A spot with more hooks lists them in order:
+      <code>L[x,y]</code>.</p>
+      <p class="tight">A line named inside a cut passes through the cut, and where you first
+      name it decides how it reads: <code>( *x ( F[x] ) )</code> is everything is F.</p>
+      <p class="note"><code>x~y</code> joins two lines into one, and <code>{ P | Q }</code> is
+      short for <code>( P ( Q ) )</code>.</p>
+      </div>
     </div>
     <div>
       <div class="card">
@@ -470,7 +542,7 @@ footer.page b{color:var(--ink2)}
         <p class="reading" id="t-read"></p>
         <p class="gloss" id="t-gloss"></p>
         <div id="t-alt"></div>
-        <h3>In linear notation</h3>
+        <h3 id="t-lin-h">In linear notation</h3>
         <div class="notation" id="t-lin"></div>
         <div id="t-notes" class="note"></div>
         <div id="t-val" style="margin-top:12px"></div>
@@ -505,6 +577,8 @@ footer.page b{color:var(--ink2)}
     <p class="note" style="margin-top:0">What the marks mean. The examples above are in this
     order so that each one uses only conventions you have already seen.</p>
     <dl class="rules two-col" id="n-conv"></dl>
+    <h3 style="margin-top:14px">About the drawing</h3>
+    <div id="n-drawing"></div>
   </div>
 </section>
 
@@ -516,19 +590,18 @@ footer.page b{color:var(--ink2)}
     would listen to the rules of a new and intricate game, very closely attentive, but wide awake
     to the purpose of preparing for a lively and lightsome contest.
     <span class="cite">Peirce, quoted in Roberts 1973, p. 14</span></blockquote>
-    <p class="tight">There are three things you can do, and you can do each of them in two
-    directions. R1 erases, R2 scribes. R3 copies a graph inwards, R4 erases such a copy. R5
-    draws a double cut, R6 takes one off. A cut is a graph like any other, so the pair that
-    draws and removes it works like the other two pairs.</p>
-    <p class="note">Roberts counts five rules, treating the double cut as one rule read both
-    ways (Appendix 3, p. 138). They are numbered as six here because when you are working, they
-    are six different things to reach for. Each rule below has examples, including moves the
-    rule does not allow.</p>
-    <p class="tight" style="margin-top:12px">Peirce describes two people at work: a
-    <i>Graphist</i>, who writes down what is granted at the start, and an <i>Interpreter</i>,
-    who changes the graph by the rules to see what follows. Here you are both.
-    <span class="cite">Reasoning is nothing but the discourse of the mind to its future self
-    &mdash; Peirce, Ms 450, p. 3, quoted in Roberts 1973, p. 92</span></p>
+    <p class="tight">You are permitted to write and erase certain aspects of the graphs. There
+    are three rules for each, and they mirror one another. This is best understood with the
+    interactive examples below, but here is an overview.</p>
+    <p class="tight">You are (R1) able to erase any graph that is on an even, or positive,
+    surface. You are (R2) allowed to insert any graph you like into an odd, or negative,
+    surface.</p>
+    <p class="tight">If you have a copy of a graph, you are (R3) allowed to write it again
+    anywhere further in, in any area that its own area contains, however many cuts deep. You
+    are (R4) allowed to erase any copy that could have been made that way.</p>
+    <p class="tight">You are (R5) allowed to draw two cuts, one just inside the other, around
+    any graph, anywhere, or around nothing at all. You are (R6) allowed to take such a pair off
+    again, as long as there is nothing between the two cuts.</p>
   </div>
   <div class="card">
     <h2>The six permissions</h2>
@@ -665,28 +738,10 @@ Q -> R</textarea>
       <div class="card" style="margin-top:18px">
         <h2>Rules of manipulation</h2>
         <div id="d-moves"></div>
-      </div>
-      <div class="card" style="margin-top:18px">
-        <h2>Scribing marks by hand</h2>
-        <p class="tight">Insertion in an oddly enclosed place lets you write whatever you
-        like, and in Beta what you write may be a line of identity or a spot with hooks.
-        These draw such a graph. Click a cut to select its area, or the sheet to select the
-        sheet itself, then scribe onto the selected area.</p>
-        <div class="btnrow">
-          <button class="btn" id="d-cut">Cut</button>
-          <button class="btn" id="d-spot">Spot…</button>
-          <button class="btn" id="d-line">Line of identity</button>
-        </div>
-        <div class="btnrow">
-          <button class="btn ghost" id="d-join">Join two points</button>
-          <button class="btn ghost" id="d-del">Erase selection</button>
-          <button class="btn ghost" id="d-undo">Undo</button>
-          <button class="btn ghost" id="d-clear">Blank sheet</button>
-        </div>
-        <p class="note" id="d-hint">Selected: the sheet of assertion.</p>
-        <div class="toggles">
+        <div class="toggles boardbar">
+          <button type="button" class="btn ghost" id="d-undo">Undo</button>
           <label><input type="checkbox" id="d-shade" checked> shade odd areas</label>
-          <label><input type="checkbox" id="d-handles" checked> show line points</label>
+          <label><input type="checkbox" id="d-handles" checked> show the points of lines</label>
           <label><input type="checkbox" class="pref-colour" checked> colour the lines</label>
         </div>
       </div>
@@ -2118,9 +2173,16 @@ function applyMove(g0, mv, palette){
     case 'extend':   { const nl = addLn(g, g.nodes[mv.cut].inner); addEdge(g, mv.ln, nl); break; }
     case 'retract':  removeLn(g, mv.ln); break;
     case 'dcIn': {
+      // where the enclosed graphs stood, so the new pair is drawn there and not
+      // at the end of the row
+      const was = g.areas[mv.area].items.slice();
+      const at = mv.items.length ? Math.min(...mv.items.map(id => was.indexOf(id))) : was.length;
       const outer = addCut(g, mv.area), oa = g.nodes[outer].inner;
       const loop  = addCut(g, oa), la = g.nodes[loop].inner;
       for (const id of mv.items) moveNode(g, id, la);
+      const row = g.areas[mv.area].items.filter(x => x !== outer);
+      row.splice(Math.min(at, row.length), 0, outer);
+      g.areas[mv.area].items = row;
       // Whatever was moved, any ligature now running from the old area into it
       // has further to travel; repairEdges marks the point at which it crosses
       // each new cut. R5 is explicit that a ligature passing from outside the
@@ -2132,10 +2194,18 @@ function applyMove(g0, mv, palette){
       const n = g.nodes[mv.cut];
       const d = g.nodes[g.areas[n.inner].items[0]];
       const dest = n.area;
-      for (const id of g.areas[d.inner].items.slice()) moveNode(g, id, dest);
+      // what the pair enclosed goes back where the pair stood
+      const at = g.areas[dest].items.indexOf(mv.cut);
+      const freed = g.areas[d.inner].items.slice();
+      for (const id of freed) moveNode(g, id, dest);
       for (const l of g.areas[d.inner].lns.slice()) moveLn(g, l, dest);
       for (const l of g.areas[n.inner].lns.slice()) moveLn(g, l, dest);
       removeNode(g, mv.cut);
+      if (at >= 0){
+        const row = g.areas[dest].items.filter(x => freed.indexOf(x) < 0);
+        row.splice(Math.min(at, row.length), 0, ...freed);
+        g.areas[dest].items = row;
+      }
       break;
     }
     default: throw new Error('unknown move '+mv.op);
@@ -3448,6 +3518,7 @@ function renderGraph(g, opts){
   const wobble = opts.wobble !== false;
   const hand = !!opts.hand;
   const hl = opts.highlight || {};      // {nodeId:'add'|'del'|'move'}
+  const tint = opts.tint || {};         // {cutId: 0-3}, to tie a cut to part of a formula
 
   // The frame is the sheet as drawn. Left to itself it is the graph's own size;
   // given a frame it is that size, never smaller than the graph, with the graph
@@ -3465,9 +3536,10 @@ function renderGraph(g, opts){
       const mark = hl[id] ? ' hl-'+hl[id] : '';
       if (n.k === 'cut'){
         const d = depthOf(g, n.inner);
-        parts.push(`<path class="cut${mark}${raised}${shade && d%2===1 ? ' odd':''}" d="${
+        const tc = tint[id] !== undefined ? ' tint' + tint[id] : '';
+        parts.push(`<path class="cut${mark}${tc}${raised}${shade && d%2===1 ? ' odd':''}" d="${
           cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand)}" data-node="${n.id}" data-area="${n.inner}"/>`);
-      if (hand) parts.push(inkStroke('cut ink', cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand),
+      if (hand) parts.push(inkStroke('cut ink' + tc, cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand),
         2*(p.w + p.h), LAY.cutW, n.id));
         drawArea(n.inner);
       } else {
@@ -4243,7 +4315,8 @@ function markNodes(el, g, G, focus){
    shape first — same enclosure in the same place, same spot with the same name
    — lets the parts they have in common move rather than blink.
    ========================================================================== */
-function alignGraph(gA, gB){
+function alignGraph(gA, gB, opts){
+  opts = opts || {};
   const ligA = ligIndex(gA), ligB = ligIndex(gB);
   const node = {}, area = {}, ln = {};
   area[gB.root] = gA.root;
@@ -4337,8 +4410,30 @@ function alignGraph(gA, gB){
           scroll: n.scroll ? nid(n.scroll) : undefined }
       : { k:'spot', id: nid(x), area: aid(n.area), name: n.name, hooks: n.hooks.map(lid) };
   }
-  for (const x of Object.keys(gB.lns))
+  // lines already on screen keep their place in the order, so their lanes do too
+  const lnKeys = Object.keys(gB.lns);
+  if (opts.order !== 'target'){
+    const rankA = new Map(Object.keys(gA.lns).map((x,i) => [x,i]));
+    lnKeys.sort((p,q) => (rankA.has(lid(p)) ? rankA.get(lid(p)) : 1e9) -
+                         (rankA.has(lid(q)) ? rankA.get(lid(q)) : 1e9));
+  }
+  for (const x of lnKeys)
     h.lns[lid(x)] = { id: lid(x), area: aid(gB.lns[x].area) };
+  /* Order is not drawn: two graphs side by side say the same in either order.
+     So where an area was already on screen, the graphs it shares with the old
+     drawing keep the old order, and anything new takes the place it has in the
+     new one. Asked for the target's order instead, as the Rearrange step of
+     the proof player is, the new drawing's order is kept as it is. */
+  if (opts.order !== 'target')
+    for (const a of Object.keys(h.areas)){
+      const old = gA.areas[a];
+      if (!old) continue;
+      const items = h.areas[a].items;
+      const rank = new Map(old.items.map((x,i) => [x,i]));
+      const shared = items.filter(x => rank.has(x)).sort((p,q) => rank.get(p) - rank.get(q));
+      let k = 0;
+      h.areas[a].items = items.map(x => rank.has(x) ? shared[k++] : x);
+    }
   let e = 0;
   for (const x of Object.keys(gB.edges)){
     const E = gB.edges[x];
@@ -4558,7 +4653,7 @@ $$('nav.tabs button').forEach(b => b.onclick = () => {
 });
 // a panel that was hidden had no width to size its drawing to
 function refresh(tab){
-  if (tab === 'translate') translate(false);
+  if (tab === 'translate'){ translate(false); if (typeof rdStill === 'function') rdStill(); }
   else if (tab === 'proofs'){
     const w = $('#work-view');
     if (w && w.style.display !== 'none') drawRender();
@@ -4667,7 +4762,48 @@ const T_EXAMPLES = [
 ];
 function tOpts(){ return { shade: $('#t-shade').checked, wobble: $('#t-wobble').checked,
                            hookNumbers: $('#t-hooks').checked, colourLines: PREFS.colour, hand: PREFS.hand }; }
-const TR = { graph: null, anim: null, timer: 0 };
+const TR = { graph: null, anim: null, timer: 0, mode: 'formula' };
+
+/* Two ways to write a proposition. Ordinary notation is a formula the page
+   turns into a graph; linear notation writes the graph itself. Switching
+   carries what is in the box across, so the drawing does not change. */
+function tModeText(g, mode){
+  if (mode === 'linear') return writeEG(g, true);
+  // the sugared reading is kinder, but it collapses double cuts; use it only
+  // when it comes back as the same graph
+  const k = canonGraph(g);
+  for (const txt of [fmtFull(sugar(readGraph(g))), fmtFull(readGraph(g))]){
+    try { if (canonGraph(compileFormula(parseFormula(txt)).graph) === k) return txt; } catch(e){}
+  }
+  return fmtFull(readGraph(g));
+}
+function setTMode(mode, carry){
+  if (mode !== 'formula' && mode !== 'linear') mode = 'formula';
+  const was = TR.mode;
+  let g = null;
+  if (carry && was !== mode){
+    try { g = tGraphOf($('#t-in').value.trim(), was); } catch(e){ g = null; }
+  }
+  TR.mode = mode;
+  try { localStorage.setItem('eg-tmode', mode); } catch(e){}
+  $('#t-mode-formula').classList.toggle('on', mode === 'formula');
+  $('#t-mode-linear').classList.toggle('on', mode === 'linear');
+  $('#t-help-formula').hidden = mode !== 'formula';
+  $('#t-help-linear').hidden = mode !== 'linear';
+  $('#t-lin-h').hidden = $('#t-lin').hidden = mode === 'linear';
+  const bar = $('#t-in').closest('.editor') && $('#t-in').closest('.editor').nextElementSibling;
+  if (bar && bar.classList.contains('glyphs')) bar.hidden = mode === 'linear';
+  if (carry && was !== mode){
+    if (g) setEditorValue('#t-in', Object.keys(g.nodes).length || Object.keys(g.lns).length
+                                     ? tModeText(g, mode) : '');
+    translate(false);
+  }
+}
+// the graph a box holds, read the way the box is set to be read
+function tGraphOf(src, mode){
+  if (!src) return newGraph();
+  return mode === 'linear' ? parseEG(src) : compileFormula(parseFormula(src)).graph;
+}
 
 // Draw the new graph by moving the old one into it, so that what the change to
 // the formula does to the graph can be watched rather than guessed.
@@ -4700,7 +4836,10 @@ function translate(animate){
     $('#t-alt').innerHTML = ''; $('#t-notes').innerHTML = '';
     $('#t-val').innerHTML = ''; return; }
   let ast, r;
-  try { ast = parseFormula(src); r = compileFormula(ast); }
+  try {
+    if (TR.mode === 'linear') r = { graph: parseEG(src), notes: [] };
+    else { ast = parseFormula(src); r = compileFormula(ast); }
+  }
   catch (e){
     $('#t-err').textContent = e.message + (e.at !== undefined ? '\n' + ' '.repeat(e.at) + '↑' : '');
     return;
@@ -4726,6 +4865,8 @@ $('#t-in').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); clearTimeout(TR.timer); translate(true); }
 });
 $('#t-draw').onclick = () => { clearTimeout(TR.timer); translate(true); };
+$('#t-mode-formula').onclick = () => setTMode('formula', true);
+$('#t-mode-linear').onclick = () => setTMode('linear', true);
 ['#t-shade','#t-wobble','#t-hooks'].forEach(s => $(s).addEventListener('change', () => translate(false)));
 $('#t-ex').innerHTML = T_EXAMPLES.map((grp, gi) =>
   '<div class="chipgroup"><h3>'+esc(grp.group)+
@@ -4740,7 +4881,11 @@ $('#t-ex').onclick = ev => {
   const b = ev.target.closest('button'); if (!b) return;
   const e = T_EXAMPLES[+b.dataset.g].items[+b.dataset.i];
   $$('#t-ex button').forEach(x => x.classList.toggle('on', x === b));
-  setEditorValue('#t-in', e[0]);
+  let text = e[0];
+  if (TR.mode === 'linear' && text){
+    try { text = writeEG(compileFormula(parseFormula(text)).graph, true); } catch(err){}
+  }
+  setEditorValue('#t-in', text);
   $('#t-exsay').innerHTML = e[2] ? esc(e[2]) : '';
   clearTimeout(TR.timer); translate(true);
 };
@@ -4791,15 +4936,56 @@ function hydrateProof(p){
 function hydrateSteps(steps){ return hydrateChain(steps.map(s => s.graph)); }
 
 /* ============================== PROOFS ===================================== */
-const PF = { proof: null, i: 0, timer: null, anim: null };
+const PF = { proof: null, i: 0, timer: null, anim: null, steps: [] };
+
+/* The steps the player shows. They are the proof's own, and one more where
+   the finished drawing stands in a different order from the conclusion as it
+   is written: that step moves things into that order and does nothing else.
+   It is called Rearrange. It is not one of the rules, since where a graph
+   stands on its area says nothing, and it is not counted among the steps. */
+const REARRANGE_WHY = 'Nothing is scribed or erased. The graphs are moved into the order ' +
+  'the conclusion is written in; where a graph stands on its area makes no difference to ' +
+  'what it says.';
+function drawOrder(g){
+  const out = [];
+  (function walk(a){
+    for (const x of g.areas[a].items){ out.push(x); if (g.nodes[x].k === 'cut') walk(g.nodes[x].inner); }
+  })(g.root);
+  return out.join(' ');
+}
+function pfView(p){
+  PF.graphs = p._h.graphs.slice();
+  PF.mvs = p._h.mvs.slice();
+  PF.steps = p.steps.slice();
+  try {
+    const last = PF.graphs[PF.graphs.length-1];
+    const goal = compileFormula(parseFormula(p.goal)).graph;
+    if (canonGraph(last) === canonGraph(goal)){
+      const tidy = alignGraph(last, goal, { order: 'target' });
+      // only when every part is carried across, so that the step moves and
+      // never redraws
+      const whole = Object.keys(tidy.nodes).length === Object.keys(last.nodes).length &&
+        Object.keys(tidy.nodes).every(x => last.nodes[x]) &&
+        Object.keys(tidy.lns).every(x => last.lns[x]);
+      if (whole && drawOrder(tidy) !== drawOrder(last)){
+        PF.graphs.push(tidy);
+        PF.mvs.push(null);
+        PF.steps.push({ eg: writeEG(tidy, true), rule: 'Rearrange', why: REARRANGE_WHY, rearrange: true });
+      }
+    }
+  } catch(e){}
+  PF.frame = proofFrame(PF.graphs);
+  $('#pf-steps').innerHTML = PF.steps.map((s,k) =>
+    '<li data-k="'+k+'"'+(s.rearrange ? ' class="rearr"' : '')+'><span class="n">'+
+    (s.rearrange ? '⇄' : (k+1))+'</span><span class="r">'+
+    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+}
 // the list is built on the Prove it tab, in ui7
 function pfLoad(i){
   const p = PROOFS[i];
   PF.proof = p; PF.i = 0;
   PF.source = 'lib'; PF.found = p;
-  const h = hydrateProof(p);
-  PF.graphs = h.graphs; PF.mvs = h.mvs;
-  PF.frame = proofFrame(PF.graphs);
+  hydrateProof(p);
   $('#pf-cite').innerHTML = p.cite ? '<b>'+esc(p.cite)+'</b>' : '';
   $('#pf-note').textContent = p.note || '';
   $('#pf-kv').innerHTML =
@@ -4811,9 +4997,7 @@ function pfLoad(i){
     p.found === 'book' ? 'Each step here is the one printed in the source, and each has been checked against the rules.'
   : p.found === 'hand' ? 'This sequence was worked out for this page, not transcribed; each step has been checked against the rules.'
   : 'This sequence was found by the proof finder in this page, and each step checked against the rules.';
-  $('#pf-steps').innerHTML = p.steps.map((s,k) =>
-    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
-    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  pfView(p);
   pfShow(0);
 }
 function fmtSrc(s){ try { return fmt(parseFormula(s), 0); } catch(e){ return s; } }
@@ -4835,8 +5019,6 @@ function pfLoadFound(steps, premGraphs, goalGraph, src){
               steps: steps.map(s => ({ eg: writeEG(s.graph, true), rule: s.rule, why: s.why })) };
   p._h = hydrateSteps(steps);
   PF.proof = p; PF.i = 0;
-  PF.graphs = p._h.graphs; PF.mvs = p._h.mvs;
-  PF.frame = proofFrame(PF.graphs);
   $('#pf-cite').innerHTML = '';
   $('#pf-note').textContent = '';
   $('#pf-kv').innerHTML =
@@ -4855,9 +5037,7 @@ function pfLoadFound(steps, premGraphs, goalGraph, src){
     : mine
       ? 'This is what you did on the board, each step checked against the rules.'
       : 'Found by the proof finder in this page just now, and each step checked against the rules.';
-  $('#pf-steps').innerHTML = p.steps.map((s,k) =>
-    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
-    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  pfView(p);
   pfShow(0);
   PF.source = src || 'machine';
   // the machine's answer is kept, so the reader can come back to it after
@@ -4866,15 +5046,15 @@ function pfLoadFound(steps, premGraphs, goalGraph, src){
   if (typeof proveModes === 'function'){
     proveModes();
     // a proof turning up does not take the reader off the board
-    if (PF.source === 'machine' && $('#play-view').style.display !== 'none') proveMode('play');
-    else if (PF.source === 'machine') proveMode('work');
+    // a proof turning up puts the reader back on whichever of the two they chose
+    if (PF.source === 'machine') proveMode(PV.want);
   }
 }
 
 function pfShow(i, animate){
   const p = PF.proof; if (!p) return;
   const from = PF.i;
-  PF.i = Math.max(0, Math.min(p.steps.length-1, i));
+  PF.i = Math.max(0, Math.min(PF.steps.length-1, i));
   if (PF.anim){ PF.anim.cancel(); PF.anim = null; }
   const g = PF.graphs[PF.i];
   // the slider is labelled speed, so dragging it right must make the step
@@ -4896,7 +5076,7 @@ function pfShow(i, animate){
   } else {
     stageSvg($('#pf-stage'), g, { shade:true, wobble:true, frame: PF.frame });
   }
-  const s = p.steps[PF.i];
+  const s = PF.steps[PF.i];
   $('#pf-why').innerHTML = '<b>'+esc(s.rule ? s.rule : 'Premiss')+'</b> — '+esc(s.why)+
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
     esc(fmtFull(sugar(readGraph(g))))+'</span>';
@@ -4917,10 +5097,10 @@ function pfStop(){
 const ANIM_ON = () => !$('#pf-anim') || $('#pf-anim').checked;
 $('#pf-play').onclick = () => {
   if (PF.timer || PF.anim){ pfStop(); return; }
-  if (PF.i >= PF.proof.steps.length-1) pfShow(0);
+  if (PF.i >= PF.steps.length-1) pfShow(0);
   $('#pf-play').textContent = '❚❚ pause';
   const advance = () => {
-    if (PF.i >= PF.proof.steps.length-1){ pfStop(); return; }
+    if (PF.i >= PF.steps.length-1){ pfStop(); return; }
     pfShow(PF.i+1, true);
     // wait out the step itself, then leave the drawing standing long enough to
     // be read before the next rule is applied
@@ -4948,8 +5128,11 @@ function selArea(){
 function drawRender(){
   if (ED.anim) return;                 // let a running transformation finish
   const el = $('#d-stage');
+  // the points of the lines are shown while a rule is armed, whatever the box
+  // says, since they are what the line clauses of the rules act on
+  const armed = typeof RS !== 'undefined' && !!RS.rule && Object.keys(ED.g.lns).length > 0;
   const opts = { shade: $('#d-shade').checked, wobble: true,
-                 handles: $('#d-handles').checked, pad: 14 };
+                 handles: $('#d-handles').checked || armed || (ED.sel && ED.sel.kind === 'ln'), pad: 14 };
   let svg;
   try { svg = stageSvg(el, ED.g, opts); }
   catch(e){ $('#d-err').textContent = 'could not draw: '+e.message; return; }
@@ -4964,6 +5147,9 @@ function drawRender(){
         const sa = svg.querySelector('.sa');
         if (sa && ED.sel.id === ED.g.root) sa.setAttribute('stroke','var(--accent)');
       }
+    } else if (ED.sel.kind === 'ln'){
+      const p = svg.querySelector('.handle[data-ln="'+ED.sel.id+'"]');
+      if (p) p.classList.add('sel');
     } else {
       const p = svg.querySelector('[data-node="'+ED.sel.id+'"]');
       if (p) p.classList.add('hl-add');
@@ -4978,7 +5164,7 @@ function drawRender(){
               ED.g.nodes[id].k === 'cut' ? ED.g.nodes[id].inner : id); };
     });
     svg.querySelectorAll('.handle').forEach(h => {
-      h.onclick = ev => { ev.stopPropagation(); togglePick(h.dataset.ln); };
+      h.onclick = ev => { ev.stopPropagation(); edSel('ln', h.dataset.ln); };
       if (ED.pick.includes(h.dataset.ln)) h.classList.add('sel');
     });
     const sa = svg.querySelector('.sa');
@@ -5002,59 +5188,34 @@ function drawRender(){
       (evenlyEnclosed(ED.g, s.id) ? 'evenly' : 'oddly')+' enclosed.';
   else if (s && s.kind === 'node')
     hint = 'Selected: the spot “'+ED.g.nodes[s.id].name+'”.';
-  if (ED.pick.length) hint += '  ('+ED.pick.length+' line point'+(ED.pick.length===1?'':'s')+' picked)';
-  $('#d-hint').textContent = hint;
+  else if (s && s.kind === 'ln')
+    hint = 'Selected: a point of a line of identity.';
+  if ($('#d-hint')) $('#d-hint').textContent = hint;
 
   if (typeof drawRuleCards === 'function') drawRuleCards(); else drawMoves();
   if (typeof armSheet === 'function') armSheet(svg);
   if (!ED.quiet) syncScribeBoxes('graph');
   if (typeof puzzleCheck === 'function') puzzleCheck();
 }
-function togglePick(ln){
-  const i = ED.pick.indexOf(ln);
-  if (i >= 0) ED.pick.splice(i,1); else ED.pick.push(ln);
-  if (ED.pick.length > 2) ED.pick.shift();
-  drawRender();
-}
-$('#d-cut').onclick = () => { edPush(); addCut(ED.g, selArea()); drawRender(); };
-$('#d-spot').onclick = () => {
-  const name = prompt('The spot — a word or phrase, as Peirce writes “is a catholic”:', 'F');
-  if (name === null) return;
-  const nh = prompt('How many hooks? (0 for a proposition, 1 for “—is a man”, 2 for “—loves—”)', '0');
-  if (nh === null) return;
-  edPush(); addSpot(ED.g, selArea(), name.trim() || 'F', Math.max(0, Math.min(6, parseInt(nh)||0)));
-  drawRender();
-};
-$('#d-line').onclick = () => { edPush(); addLn(ED.g, selArea()); drawRender(); };
-$('#d-join').onclick = () => {
-  if (ED.pick.length !== 2){ alert('Pick two line points first, by clicking the small circles on the lines.'); return; }
-  const [a,b] = ED.pick;
-  const aa = ED.g.lns[a].area, ab = ED.g.lns[b].area;
-  if (!(aa === ab || placeOf(ED.g, aa) === ab || placeOf(ED.g, ab) === aa)){
-    alert('No graph may rest partly on one area and partly on another (Roberts p. 50 n. 1).\n'+
-          'Two points can be joined only on one area, or across a single cut.');
-    return;
-  }
-  edPush(); addEdge(ED.g, a, b); ED.pick = []; drawRender();
-};
-$('#d-del').onclick = () => {
-  if (!ED.sel) return;
-  edPush();
-  if (ED.sel.kind === 'node') removeNode(ED.g, ED.sel.id);
-  else if (ED.sel.id !== ED.g.root){
-    const cut = ED.g.areas[ED.sel.id].cut;
-    removeNode(ED.g, cut);
-  }
-  ED.sel = null; ED.pick = []; drawRender();
-};
-$('#d-undo').onclick = () => {
+/* The board used to carry tools for drawing by hand — a cut, a spot, a line,
+   a join, erase anything — which changed the sheet without any rule and left
+   no trace in the reader's proof. Everything they did is now a clause of one
+   of the rules and is done through its card: a typed graph or a line through
+   insertion, a join through R2, a break or a bare line taken up through R1.
+   Undo stays, since taking back a move is not a move. */
+function edUndo(){
   if (!ED.hist.length) return;
   const h = ED.hist.pop();
   ED.g = h.g; ED.sel = null; ED.pick = [];
+  if (typeof RS !== 'undefined'){ RS.rule = null; RS.src = null; RS.lnSrc = null; }
   if (h.kind === 'rule' && ED.moves > 0) ED.moves--;
   drawRender();
+}
+if ($('#d-undo')) $('#d-undo').onclick = () => {
+  edUndo();
+  if (ED.trail && ED.trail.length) ED.trail.pop();
+  if (typeof drawTrail === 'function') drawTrail();
 };
-$('#d-clear').onclick = () => { edPush(); ED.g = newGraph(); ED.sel=null; ED.pick=[]; drawRender(); };
 // Whichever box is used, the other is brought into step, so that the two
 // descriptions of the graph on the sheet always agree.
 function syncScribeBoxes(from){
@@ -5396,7 +5557,7 @@ function runProof(hard){
                   '(Roberts, Appendix 4) a proof exists. '
                 : 'Whether the inference holds is still undecided. ')+
           'Try “search harder”, or work it yourself below.</p>';
-        if (typeof proveModes === 'function'){ PF.proof = null; proveModes(); proveMode('work'); }
+        if (typeof proveModes === 'function'){ PF.proof = null; PF.found = null; proveModes(); proveMode('work'); }
       }
     };
     step(0);
@@ -5807,7 +5968,7 @@ function buildPuzzleList(){
   const hint = $('#z-hint'), again = $('#z-restart'), show = $('#z-show'), quit = $('#z-quit');
   if (hint) hint.onclick = puzzleHint;
   if (again) again.onclick = () => { if (typeof workFromBoxes === 'function'){ workFromBoxes(); drawRender(); } };
-  if (show) show.onclick = () => { if (typeof proveMode === 'function') proveMode('play'); };
+  if (show) show.onclick = () => { if (typeof proveMode === 'function'){ PV.want = 'play'; proveMode('play'); } };
   if (quit) quit.onclick = () => { ED.goal = null; $('#z-body').style.display = 'none';
                                    $('#z-note').style.display = ''; drawRender(); };
 }
@@ -6006,22 +6167,31 @@ function pfChoose(v){
     const i = +v.slice(4), p = PROOFS[i];
     setEditorValue('#v-prem', p.prem.join('\n'));
     setEditorValue('#v-goal', p.goal);
+    // filling the boxes sets a search going, which would replace the worked
+    // proof with one of its own a moment later; this one is already known
+    clearTimeout(AUTO.t);
+    VV.run++;
     $('#v-verdict').innerHTML = '';
     $('#v-booknote').innerHTML = '';
     pfLoad(i);
     AUTO.last = $('#v-prem').value.trim() + '\u0000' + $('#v-goal').value.trim();
+    // a new problem starts a clean board, whichever view is showing
+    workFromBoxes();
     proveModes();
-    // the tab opens on the board: the reader is meant to try it first
-    proveMode('work');
+    // the tab opens on the board, and after that stays on whichever of the
+    // two the reader last chose
+    proveMode(PV.want);
     return;
   }
   const [gi, ii] = v.slice(3).split('.').map(Number);
   const [prem, goal, name, note, hard] = BOOK_EXERCISES[gi].items[ii];
+  PF.proof = null; PF.found = null; PF.source = null;
   setEditorValue('#v-prem', prem || '');
   setEditorValue('#v-goal', goal);
   $('#v-booknote').innerHTML = note || '';
   pfKvFromBoxes(null);
   AUTO.last = $('#v-prem').value.trim() + '\u0000' + $('#v-goal').value.trim();
+  workFromBoxes();
   if (hard){
     // measured as beyond the search; the reader is sent straight to the board.
     // Filling the boxes has already set a search going, so it is called off.
@@ -6033,6 +6203,7 @@ function pfChoose(v){
     proveModes(); proveMode('work');
     return;
   }
+  clearTimeout(AUTO.t);                // the search is started here, once
   runProof(false);
 }
 
@@ -6041,24 +6212,38 @@ function pfChoose(v){
 /* A proof of no steps at all is still a proof: the conclusion was already
    scribed. Requiring one step is what left Automate greyed out on the first
    thing in the list. */
+/* Which of the two the reader chose. It starts on working it by hand and
+   changes only when they switch; moving between problems keeps it. Where there
+   is nothing to watch yet the board is shown meanwhile, and the choice comes
+   back as soon as a proof does. */
+const PV = { want: 'work' };
 function haveProof(){ return !!(PF.proof && PF.proof.steps && PF.proof.steps.length >= 1); }
+/* The proof the page has for this problem, found or from the list, as opposed
+   to whatever happens to be in the player. */
+function haveFound(){ return !!(PF.found && PF.found.steps && PF.found.steps.length >= 1); }
+/* Something to watch: a proof the page has, or the reader's own moves. A proof
+   worked by hand where the finder found none is as watchable as any other. */
+function canWatch(){ return haveFound() || haveTrail(); }
+// the inference the boxes hold, to tell whether the board still belongs to it
+function boxesKey(){ return $('#v-prem').value.trim() + '\u0000' + $('#v-goal').value.trim(); }
 
 function proveModes(){
-  const got = haveProof();
-  $('#pv-play').disabled = !got;
-  $('#v-searchrow').style.display = got ? 'none' : '';
-  $('#v-foundrow').style.display = got ? '' : 'none';
-  if (got){
-    const n = PF.proof.steps.length - 1;
+  const found = haveFound(), watchable = canWatch();
+  $('#pv-play').disabled = !watchable;
+  $('#v-searchrow').style.display = found ? 'none' : '';
+  $('#v-foundrow').style.display = found ? '' : 'none';
+  if (found){
+    const n = PF.found.steps.length - 1;
     $('#v-foundpill').textContent = n
       ? 'Proof found — ' + n + ' step' + (n === 1 ? '' : 's')
       : 'Proof found — the conclusion is already scribed';
   }
-  $('#pv-say').textContent = got ? '' : 'No proof found, so there is nothing to watch yet.';
-  if (!got && $('#play-view').style.display !== 'none') proveMode('work');
+  if ($('#play-view').style.display === 'none')
+    $('#pv-say').textContent = watchable ? '' : 'No proof found, so there is nothing to watch yet.';
+  if (!watchable && $('#play-view').style.display !== 'none') proveMode('work');
 }
 function proveMode(which){
-  const play = which === 'play' && haveProof();
+  const play = which === 'play' && canWatch();
   $('#play-view').style.display = play ? '' : 'none';
   $('#work-view').style.display = play ? 'none' : '';
   $('#work-side').style.display = play ? 'none' : '';
@@ -6071,14 +6256,22 @@ function proveMode(which){
        the reader will want to watch; an unfinished one is a record of trying,
        and playing it back instead of the proof would be no help at all. So a
        completed attempt is shown, and otherwise the found proof is, with the
-       attempt one click away either way. */
-    const want = trailDone() ? 'you' : (PF.found ? 'machine' : (haveTrail() ? 'you' : null));
-    if (want && PF.source !== want){
+       attempt one click away either way. Where the page has no proof of its
+       own, the reader's work is what there is. */
+    const want = trailDone() ? 'you' : (haveFound() ? 'machine' : (haveTrail() ? 'you' : null));
+    // a worked proof from the list counts as the proof to watch, just as a found one does
+    const showing = PF.source === 'lib' ? 'machine' : PF.source;
+    if (want && (showing !== want || !haveProof())){
       if (want === 'you') watchMine();
-      else { pfAdopt(PF.found); PF.source = 'machine'; }
+      else { pfAdopt(PF.found); PF.source = PF.found.id === 'found' ? 'machine' : 'lib'; }
     } else pfShow(PF.i);
     proveSource();
-  } else { workFromBoxes(); drawRender(); }
+  } else {
+    // coming back from watching leaves the board as the reader left it; it is
+    // set up afresh only if the problem itself has changed meanwhile
+    if (ED.key !== boxesKey()) workFromBoxes();
+    drawRender();
+  }
 }
 
 /* When there are two proofs to hand — the one found and the one made — the
@@ -6115,11 +6308,7 @@ function proveSource(){
 /* Putting a kept proof back into the player. */
 function pfAdopt(p){
   PF.proof = p; PF.i = 0;
-  PF.graphs = p._h.graphs; PF.mvs = p._h.mvs;
-  PF.frame = proofFrame(PF.graphs);
-  $('#pf-steps').innerHTML = p.steps.map((s,k) =>
-    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
-    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  pfView(p);
   pfShow(0);
 }
 
@@ -6134,6 +6323,7 @@ function workFromBoxes(){
   ED.g = gs.length ? juxtapose(gs) : newGraph();
   ED.sel = null; ED.pick = []; ED.hist = [{ g: cloneGraph(gs.length ? juxtapose(gs) : newGraph()), kind:'start' }];
   ED.moves = 0; ED.trail = [];
+  ED.key = boxesKey();
   if (typeof drawTrail === 'function') drawTrail();
   ED.goal = gg ? { graph: gg, canon: canonGraph(gg), reached: false } : null;
   // the proof chosen above is what the hint and the move count compare against
@@ -6154,8 +6344,8 @@ function workFromBoxes(){
   }
 }
 
-$('#pv-play').onclick = () => proveMode('play');
-$('#pv-work').onclick = () => proveMode('work');
+$('#pv-play').onclick = () => { PV.want = 'play'; proveMode('play'); };
+$('#pv-work').onclick = () => { PV.want = 'work'; proveMode('work'); };
 /* The search runs on its own: as soon as something is chosen, and again a
    moment after the boxes stop changing. Anything already found is dropped the
    instant the inference changes, so Automate never offers a proof of something
@@ -6165,7 +6355,7 @@ function autoSearch(){
   clearTimeout(AUTO.t);
   const key = $('#v-prem').value.trim() + '\u0000' + $('#v-goal').value.trim();
   if (key === AUTO.last) return;
-  PF.proof = null; PF.graphs = null;
+  PF.proof = null; PF.graphs = null; PF.found = null;
   $('#v-verdict').innerHTML = '<span class="note">looking…</span>';
   pfKvFromBoxes(null);
   proveModes();
@@ -6181,12 +6371,12 @@ function autoSearch(){
 });
 
 $('#v-again').onclick = () => {
-  PF.proof = null; PF.graphs = null;
+  PF.proof = null; PF.graphs = null; PF.found = null;
   $('#v-verdict').innerHTML = '';
   proveModes();
 };
 /* ============================================================================
-   THE FIVE PERMISSIONS, AS SIX CARDS.
+   THE PERMISSIONS, AS SIX CARDS.
 
    The old panel listed every legal move at once, which is honest but tells the
    reader nothing about which rule they are using. Here each rule has a card of
@@ -6210,12 +6400,60 @@ const RULE_CARDS = [
   ['R6',  'Double cut removed', 'R6', 'Take such a pair off, wherever one stands.']
 ];
 
-const RS = { rule: null, moves: [], pat: null, watchdog: 0, mode: 'formula', raw: '', src: null };
+const RS = { rule: null, moves: [], pat: null, watchdog: 0, mode: 'formula', raw: '', src: null,
+             lnSrc: null };
+
+/* The lines of identity, worked through the same cards. Each rule already has
+   its Beta clauses among the legal moves — R1 takes up a bare line or breaks a
+   join, R2 puts a line down or joins two, R3 branches a line or carries a loose
+   end in through a cut, R4 takes a loose end back — and what they act on is a
+   point of a line rather than a graph. So the points on the sheet are targets
+   like any graph: click one, and where a move needs a second thing named (the
+   point to join it to, the cut to carry it into) the second click names it. */
+const LINE_OPS = new Set(['delLine', 'eraseEdge', 'join', 'addLine', 'branch', 'extend', 'retract']);
+// the points of a line a move is about
+function linePoints(m){
+  const mv = m.mv;
+  switch (mv.op){
+    case 'delLine': case 'branch': case 'retract': case 'extend': return [mv.ln];
+    case 'join': return [mv.a, mv.b];
+    case 'eraseEdge': { const e = ED.g.edges[mv.edge]; return e ? [e.a, e.b] : []; }
+  }
+  return [];
+}
+function lineMovesAt(ln){
+  return RS.moves.filter(m => m.card === RS.rule && LINE_OPS.has(m.mv.op) && linePoints(m).includes(ln));
+}
+const sameTwo = (xs, a, b) => xs.length === 2 && ((xs[0] === a && xs[1] === b) || (xs[0] === b && xs[1] === a));
+/* A click on a point of a line, with a rule armed. */
+function lineClick(ln){
+  if (RS.lnSrc){
+    const src = RS.lnSrc;
+    const mine = lineMovesAt(src);
+    if (ln === src){
+      // the same point again: the move that needs nothing more, if there is one
+      const single = mine.find(m => ['branch', 'retract', 'delLine'].includes(m.mv.op));
+      if (single){ applyRuleMove(single); return; }
+      RS.lnSrc = null; drawRuleCards(); return;
+    }
+    const pair = mine.find(m => (m.mv.op === 'join' || m.mv.op === 'eraseEdge') &&
+                                sameTwo(linePoints(m), src, ln));
+    if (pair){ applyRuleMove(pair); return; }
+    RS.lnSrc = null;                         // not a partner: start from this point instead
+  }
+  const mine = lineMovesAt(ln);
+  if (!mine.length) return;
+  // a rule with only one thing it can do at this point does it
+  if (mine.length === 1){ applyRuleMove(mine[0]); return; }
+  RS.lnSrc = ln;
+  drawRuleCards();
+}
 
 /* What the selection amounts to: the graph picked, and the area it governs. */
 function selCtx(){
   const g = ED.g, s = ED.sel;
   if (!s) return { node: null, area: g.root };
+  if (s.kind === 'ln') return { node: null, ln: s.id, area: g.lns[s.id] ? g.lns[s.id].area : g.root };
   if (s.kind === 'area') {
     const cut = g.areas[s.id] && g.areas[s.id].cut;
     return { node: cut || null, area: s.id };
@@ -6240,7 +6478,10 @@ function rulePalette(){
 function ruleMoves(){
   const pal = rulePalette();
   let mvs = [];
-  try { mvs = legalMoves(ED.g, { dir:'fwd', palette: pal, beta: !isAlpha(ED.g), maxNodes: 40 }); }
+  // a Beta problem keeps its line moves even when the sheet has, for the
+  // moment, no line on it
+  const beta = !isAlpha(ED.g) || !!(ED.goal && ED.goal.graph && !isAlpha(ED.goal.graph));
+  try { mvs = legalMoves(ED.g, { dir:'fwd', palette: pal, beta, maxNodes: 40 }); }
   catch(e){ return { pal, list: [] }; }
   const list = [];
   for (const mv of mvs){
@@ -6275,6 +6516,9 @@ function ruleMoves(){
 function touchesSelection(m){
   const c = selCtx();
   const mv = m.mv;
+  // a point picked: the moves about that point, and nothing else
+  if (c.ln) return LINE_OPS.has(mv.op) && linePoints(m).includes(c.ln);
+  if (LINE_OPS.has(mv.op) && mv.op !== 'addLine') return false;
   switch (m.card){
     case 'R1':  return mv.op === 'erase' ? mv.node === c.node : true;
     case 'R2':  return mv.op === 'insert' || mv.op === 'addLine' ? mv.area === c.area : true;
@@ -6362,7 +6606,10 @@ function insertBox(){
     '<input type="text" id="rs-ins" value="'+esc(raw)+'" spellcheck="false" placeholder="'+
       (RS.mode==='lin' ? '( P )  or  *x F[x]' : '~P  or  P &amp; Q')+'">'+
     shows +
-    '<div class="btnrow"><button class="btn" id="rs-insgo"'+(g?'':' disabled')+'>Scribe it</button></div>'+
+    '<div class="btnrow"><button class="btn" id="rs-insgo"'+(g?'':' disabled')+'>Scribe it</button>'+
+      (RS.moves.some(m => m.mv.op === 'addLine' && m.mv.area === c.area)
+        ? '<button type="button" class="btn ghost" id="rs-insline">Or put down a line of identity</button>' : '')+
+    '</div>'+
     '<p class="err" id="rs-inserr">'+esc(err)+'</p></div>';
 }
 
@@ -6387,17 +6634,30 @@ function ruleSay(){
   const c = selCtx();
   const picked = c.node ? nameOf(c.node) : null;
   if (!RS.rule){
+    if (c.ln) return 'Picked: a point of a line of identity, ' + whereName(c.area) +
+      '. The rules that can act on it are marked.';
     return picked
       ? 'Picked: ' + picked + ', ' + whereName(ED.g.nodes[c.node].area) +
         '. The rules that can act on it are marked.'
-      : 'Nothing picked. Click a graph, or click a rule to see where it applies.';
+      : 'Nothing picked. Click a graph or a point of a line, or click a rule to see where it applies.';
   }
   const name = (RULE_CARDS.find(r => r[0] === RS.rule) || [])[1] || '';
+  if (RS.lnSrc){
+    const ms = lineMovesAt(RS.lnSrc), ops = new Set(ms.map(m => m.mv.op));
+    const bits = [];
+    if (ops.has('branch')) bits.push('click the point again to branch the line there');
+    if (ops.has('retract')) bits.push('click the point again to take this loose end back');
+    if (ops.has('delLine')) bits.push('click the point again to erase the line');
+    if (ops.has('extend')) bits.push('click a cut marked in green to carry the line into it');
+    if (ops.has('join')) bits.push('click another point marked in green to join the two lines');
+    if (ops.has('eraseEdge')) bits.push('click the next point along, marked in green, to break the line between them');
+    return name + ', on a point of a line. ' + bits.join('; or ').replace(/^./, c => c.toUpperCase()) + '.';
+  }
   if (RS.rule === 'R3' && !iterSource()){
-    const n = iterCandidates().length;
-    return n ? 'Iteration. First pick the graph to copy: ' + n +
-               ' can be copied, marked in green.'
-             : 'Iteration. Nothing here can be copied inwards.';
+    const n = iterCandidates().length, l = lineCandidates().length;
+    if (!n && !l) return 'Iteration. Nothing here can be copied inwards.';
+    return 'Iteration. First pick ' + [n ? 'the graph to copy' : '', l ? 'a point of a line to branch or carry inwards' : '']
+      .filter(Boolean).join(', or ') + ': marked in green.';
   }
   if (RS.rule === 'R3' && RS.src){
     const here3 = armedMoves();
@@ -6405,6 +6665,8 @@ function ruleSay(){
       here3.length + ' place' + (here3.length === 1 ? '' : 's') + ' marked in green.';
   }
   const here = armedMoves();
+  const pts = lineCandidates().length;
+  if (!here.length && pts) return name + ': pick a point of a line, marked in green.';
   if (!here.length) return name + ' has nothing to act on here.';
   const what = picked ? ' ' + picked : '';
   const verb = { R1:'Erasing', R2:'Scribing on', R3:'Iterating', R4:'Erasing the copy of',
@@ -6426,6 +6688,7 @@ function iterSource(){
 }
 function armedMoves(){
   const all = RS.moves.filter(m => m.card === RS.rule);
+  if (RS.lnSrc) return all.filter(m => LINE_OPS.has(m.mv.op) && linePoints(m).includes(RS.lnSrc));
   if (RS.rule === 'R3'){
     const src = iterSource();
     if (!src) return [];                       // nothing to copy yet
@@ -6433,7 +6696,15 @@ function armedMoves(){
     return mine.length ? mine : all;
   }
   const mine = all.filter(touchesSelection);
-  return mine.length ? mine : all;
+  // with nothing picked, the moves about points wait for a point to be clicked
+  return mine.length ? mine : all.filter(m => !LINE_OPS.has(m.mv.op) || m.mv.op === 'addLine');
+}
+// the points the armed rule could act on, before one is chosen
+function lineCandidates(){
+  const out = new Set();
+  for (const m of RS.moves)
+    if (m.card === RS.rule && LINE_OPS.has(m.mv.op)) linePoints(m).forEach(l => out.add(l));
+  return [...out];
 }
 /* With iteration armed and nothing yet chosen to copy, the graphs that could
    be copied are what the reader is choosing between. */
@@ -6453,6 +6724,18 @@ function paintTargets(){
   if (!svg) return;
   svg.querySelectorAll('.tgt,.tgt-src').forEach(e => e.classList.remove('tgt','tgt-src'));
   if (!RS.rule) return;
+  const point = (ln, cls) => { const h = svg.querySelector('.handle[data-ln="'+ln+'"]'); if (h) h.classList.add(cls); };
+  if (RS.lnSrc){
+    point(RS.lnSrc, 'tgt-src');
+    for (const m of lineMovesAt(RS.lnSrc)){
+      if (m.mv.op === 'extend'){
+        const c = svg.querySelector('[data-node="'+m.mv.cut+'"]'); if (c) c.classList.add('tgt');
+      } else linePoints(m).forEach(l => { if (l !== RS.lnSrc) point(l, 'tgt'); });
+    }
+    return;
+  }
+  // before a point is chosen, every point the rule could act on
+  if (!(ED.sel && ED.sel.kind === 'ln')) lineCandidates().forEach(l => point(l, 'tgt'));
   if (RS.rule === 'R3' && !iterSource()){
     for (const id of iterCandidates()){
       const el = svg.querySelector('[data-node="'+id+'"]');
@@ -6532,6 +6815,7 @@ function applyRuleMove(m){
   edPush('rule');
   ED.moves++;
   ED.g = h; ED.sel = null; ED.pick = []; RS.rule = null; RS.pat = null; RS.raw = ''; RS.src = null;
+  RS.lnSrc = null;
   if (typeof hintReset === 'function') hintReset();
   // what the reader has done, kept so that it can be read back and replayed
   ED.trail = ED.trail || [];
@@ -6572,21 +6856,35 @@ $('#d-moves').addEventListener('click', e => {
   const card = e.target.closest('.rulecard');
   if (card){
     const want = card.dataset.rule;
-    if (RS.rule === want){ RS.rule = null; RS.src = null; drawRuleCards(); return; }
-    RS.rule = want; RS.src = null;
+    if (RS.rule === want){ RS.rule = null; RS.src = null; RS.lnSrc = null; drawRender(); return; }
+    RS.rule = want; RS.src = null; RS.lnSrc = null;
+    // a point already picked is where the rule starts
+    if (ED.sel && ED.sel.kind === 'ln'){
+      const here = lineMovesAt(ED.sel.id);
+      if (here.length === 1){ applyRuleMove(here[0]); return; }
+      if (here.length) RS.lnSrc = ED.sel.id;
+    }
     /* If the reader has already picked a graph and the rule can do exactly one
        thing with it, there is nothing left to ask: clicking the rule does it.
        Erasing a graph, erasing a copy, taking off a double cut — none of these
        needs a second click, and demanding one for a rule that has no choice to
        make reads as the page refusing to work. Insertion always asks, because
        what to scribe is not on the sheet to be pointed at. */
-    const only = want === 'R2' ? [] : armedMoves();
-    if (ED.sel && only.length === 1){ applyRuleMove(only[0]); return; }
-    drawRuleCards();
+    const only = want === 'R2' || RS.lnSrc ? [] : armedMoves();
+    if (ED.sel && ED.sel.kind !== 'ln' && only.length === 1){ applyRuleMove(only[0]); return; }
+    // drawn again rather than only repainted: the points of the lines are shown
+    // on the sheet while a rule is armed
+    drawRender();
     return;
   }
   const mode = e.target.closest('[data-mode]');
   if (mode){ RS.mode = mode.dataset.mode; drawRuleCards(); return; }
+  if (e.target.closest('#rs-insline')){
+    const c = selCtx();
+    const m = RS.moves.find(x => x.mv.op === 'addLine' && x.mv.area === c.area);
+    if (m){ RS.raw = ''; applyRuleMove(m); }
+    return;
+  }
   if (e.target.closest('#rs-insgo')){
     const raw = ($('#rs-ins').value || '').trim();
     RS.raw = raw;
@@ -6626,7 +6924,7 @@ function armSheet(svg){
       const ms = hit(el);
       if (!ms.length) return;
       el.classList.add('tgt-hot');
-      if (RS.rule === 'R3') showArrow(svg, iterSource(), ms[0].target);
+      if (RS.rule === 'R3' && !RS.lnSrc) showArrow(svg, iterSource(), ms[0].target);
       const say = $('#rs-say');
       if (say) say.textContent = shortWhy(describeMove(ED.g, ms[0].mv, true)) + ' \u2014 click to do it.';
     };
@@ -6645,7 +6943,7 @@ function armSheet(svg){
       // usually a copy of what the reader had just clicked on.
       if (RS.rule === 'R2' && ms.length){ pickArea(el); return; }
       // iteration, armed with nothing chosen yet: this click names the graph
-      if (RS.rule === 'R3' && !iterSource()){
+      if (RS.rule === 'R3' && !RS.lnSrc && !iterSource()){
         const id = el.dataset.node;
         if (id && iterCandidates().includes(id)){ RS.src = id; drawRuleCards(); }
         return;
@@ -6653,6 +6951,31 @@ function armSheet(svg){
       if (RS.rule && ms.length){ applyRuleMove(ms[0]); return; }
       if (RS.rule){ return; }              // armed, but not a place it can act
       if (was) was(ev);
+    };
+  });
+  svg.querySelectorAll('.handle').forEach(h => {
+    const ln = h.dataset.ln;
+    h.onclick = ev => {
+      ev.stopPropagation();
+      if (RS.rule){ lineClick(ln); return; }
+      // with no rule armed a point is picked like a graph, and the rules that
+      // can act on it light up
+      edSel('ln', ln);
+    };
+    h.onmouseenter = () => {
+      if (!RS.rule) return;
+      const ms = RS.lnSrc ? lineMovesAt(RS.lnSrc).filter(m => m.mv.op !== 'extend' &&
+                   (ln === RS.lnSrc ? ['branch','retract','delLine'].includes(m.mv.op) : linePoints(m).includes(ln)))
+                          : lineMovesAt(ln);
+      if (!ms.length) return;
+      h.classList.add('tgt-hot');
+      const say = $('#rs-say');
+      if (say) say.textContent = shortWhy(describeMove(ED.g, ms[0].mv, true)) +
+        (ms.length > 1 && !RS.lnSrc ? ' Click to choose.' : ' \u2014 click to do it.');
+    };
+    h.onmouseleave = () => {
+      h.classList.remove('tgt-hot');
+      const say = $('#rs-say'); if (say) say.textContent = ruleSay();
     };
   });
   const sa = svg.querySelector('.sa');
@@ -6689,6 +7012,8 @@ function drawTrail(){
     const done = typeof trailDone === 'function' && trailDone();
     go.textContent = done ? 'Step through your proof' : 'Step through what you have so far';
   }
+  // the switch to watching opens as soon as there is a move of the reader's own to watch
+  if (typeof proveModes === 'function') proveModes();
 }
 
 function trailSteps(){
@@ -6707,7 +7032,7 @@ function watchMine(){
   return true;
 }
 if ($('#d-replay')) $('#d-replay').onclick = () => {
-  if (watchMine() && typeof proveMode === 'function') proveMode('play');
+  if (watchMine() && typeof proveMode === 'function'){ PV.want = 'play'; proveMode('play'); }
 };
 if ($('#d-undo2')) $('#d-undo2').onclick = () => {
   if (typeof edUndo === 'function') edUndo();
@@ -6715,6 +7040,176 @@ if ($('#d-undo2')) $('#d-undo2').onclick = () => {
   if (ED.trail && ED.trail.length) ED.trail.pop();
   drawTrail();
 };
+/* ============================================================================
+   HOW TO READ A GRAPH.
+   The first thing on the page. The text introduces the sheet, the graph and
+   the cut in plain words, and every example in it is a highlighted phrase:
+   click it and the small sheet beside the text draws it, step by step, the
+   parts that stay moving into place rather than being drawn again.
+
+   The steps are written here in the linear notation, which is only how the
+   page is told what to draw. The reader is never shown it on this card.
+   ========================================================================== */
+
+const RD_DEMOS = {
+  assertA:  [['', 'the blank sheet'], ['A', 'A']],
+  alsoB:    [['A', 'A'], ['A B', 'A ∧ B']],
+  cutOut:   [['A', 'A'], ['(A)', '¬A']],
+  notAandB: [['A B', 'A ∧ B'], ['(A) B', '¬A ∧ B']],
+  notBoth:  [['A B', 'A ∧ B'], ['(A B)', '¬(A ∧ B)']],
+  subgraph: [['B', 'B is a graph'], ['(B)', '¬B is a graph'],
+             ['A (B)', 'so is A ∧ ¬B'], ['(A (B))', 'and so is ¬(A ∧ ¬B)']],
+  dbl:      [['A', 'A'], ['(A)', '¬A'], ['((A))', '¬¬A, which says A']],
+  cond:     [['A', 'A'], ['A (B)', 'A ∧ ¬B'], ['(A (B))', '¬(A ∧ ¬B), that is, A ⊃ B']],
+  disj:     [['C D', 'C ∧ D'], ['(C) D', '¬C ∧ D'], ['(C) (D)', '¬C ∧ ¬D'],
+             ['((C) (D))', '¬(¬C ∧ ¬D), that is, C ∨ D']],
+  outside:  [['(A (B))', 'A ⊃ B'], ['(A (B)) (C)', '(A ⊃ B) ∧ ¬C'],
+             ['(A (B)) (C) ((D))', '(A ⊃ B) ∧ ¬C ∧ ¬¬D'],
+             ['(A (B)) ((C) ((D)))', '(A ⊃ B) ∧ (C ∨ ¬D)'],
+             ['((A (B)) ((C) ((D))))', 'TINTED']]
+};
+
+// the reading of the last example, with each part in the colour of its cuts
+const RD_TINTED =
+  '<span class="tint0">¬(</span><span class="tint1">(A ⊃ B)</span> ∧ ' +
+  '<span class="tint2">(C ∨ <span class="tint3">¬D</span>)</span><span class="tint0">)</span>';
+
+/* Which cut belongs to which part of ¬((A ⊃ B) ∧ (C ∨ ¬D)). Found by shape, so
+   it holds whatever identifiers the drawing has picked up on the way. */
+function rdTint(g){
+  const t = {};
+  const root = g.areas[g.root];
+  if (root.items.length !== 1) return t;
+  const outer = root.items[0];
+  t[outer] = 0;
+  const spotsIn = (id, direct) => {
+    const areas = direct ? [g.nodes[id].inner] : areasUnder(g, g.nodes[id].inner);
+    const names = [];
+    for (const a of areas) for (const x of g.areas[a].items)
+      if (g.nodes[x].k === 'spot') names.push(g.nodes[x].name);
+    return names;
+  };
+  const cutsUnder = id => {
+    const out = [];
+    for (const a of areasUnder(g, g.nodes[id].inner))
+      for (const x of g.areas[a].items) if (g.nodes[x].k === 'cut') out.push(x);
+    return out;
+  };
+  for (const id of g.areas[g.nodes[outer].inner].items){
+    if (g.nodes[id].k !== 'cut') continue;
+    const names = spotsIn(id, false);
+    const k = names.includes('A') ? 1 : names.includes('C') ? 2 : null;
+    if (k === null) continue;
+    t[id] = k;
+    for (const c of cutsUnder(id)) t[c] = k;
+    // the cut standing right round D is the denial in ¬D
+    if (k === 2) for (const c of cutsUnder(id))
+      if (spotsIn(c, true).includes('D')) t[c] = 3;
+  }
+  return t;
+}
+
+const RD = { g: null, anim: null, timer: 0, run: 0, tint: null, say: '' };
+function rdOpts(extra){
+  return Object.assign({ shade: true, wobble: true, colourLines: PREFS.colour,
+                         hand: PREFS.hand, maxH: 190 }, extra || {});
+}
+function rdStill(){
+  const el = $('#rd-stage');
+  if (!el || !RD.g) return;
+  stageSvg(el, RD.g, rdOpts(RD.tint ? { tint: RD.tint } : {}));
+}
+function rdSay(text){
+  const say = $('#rd-say');
+  if (!say) return;
+  say.innerHTML = text === 'TINTED' ? RD_TINTED : esc(text);
+}
+function rdStop(){
+  RD.run++;
+  clearTimeout(RD.timer);
+  if (RD.anim){ RD.anim.cancel(); RD.anim = null; }
+}
+function rdPlay(key){
+  const seq = RD_DEMOS[key];
+  const el = $('#rd-stage');
+  if (!seq || !el) return;
+  rdStop();
+  const run = RD.run;
+  $$('#n-reading .rdlink').forEach(b => b.classList.toggle('on', b.dataset.demo === key));
+  let i = -1;
+  const step = () => {
+    if (run !== RD.run) return;
+    i++;
+    if (i >= seq.length) return;
+    const [src, say] = seq[i];
+    let target = parseEG(src);
+    const last = i === seq.length - 1;
+    // the parts the two drawings share move into place instead of blinking
+    if (RD.g){ try { target = alignGraph(RD.g, target); } catch(e){} }
+    const settle = () => {
+      if (run !== RD.run) return;
+      RD.anim = null;
+      RD.g = target;
+      RD.tint = last && say === 'TINTED' ? rdTint(target) : null;
+      rdStill();
+      rdSay(say);
+      if (!last) RD.timer = setTimeout(step, 750);
+    };
+    const same = RD.g && canonGraph(RD.g) === canonGraph(target);
+    if (!RD.g || same || !window.playTransition || typeof requestAnimationFrame !== 'function'){
+      settle();
+      return;
+    }
+    RD.tint = null;
+    RD.anim = playTransition(el, RD.g, target, null, rdOpts({ markMs: 0, moveMs: 680 }), settle);
+  };
+  step();
+}
+
+$('#n-reading').innerHTML = [
+ '<p>The Existential Graphs are Peirce’s second attempt at a diagrammatic system of ',
+ 'logic. There are three main elements to this system: the sheet of assertion, graphs, ',
+ 'and cuts.</p>',
+ '<p>At their most basic, a graph is a capital letter. When it is written on the sheet of ',
+ 'assertion, it is asserted: <button type="button" class="rdlink" data-demo="assertA">writing ',
+ 'A asserts A</button>. To write A ∧ B, you <button type="button" class="rdlink" ',
+ 'data-demo="alsoB">simply also scribe B</button>. To assert the negation of A, you ',
+ '<button type="button" class="rdlink" data-demo="cutOut">cut it out</button> of the graph ',
+ 'by scribing a circle around it. So <button type="button" class="rdlink" ',
+ 'data-demo="notAandB">¬A ∧ B</button> has a cut around A alone, and ',
+ '<button type="button" class="rdlink" data-demo="notBoth">¬(A ∧ B)</button> has one cut ',
+ 'around both.</p>',
+ '<p>Note that each sub-graph is also a graph. In <button type="button" class="rdlink" ',
+ 'data-demo="subgraph">this graph</button>, B is a graph, the cut around B is a graph that ',
+ 'contains it, and the outer cut, holding A and that cut, is a graph that contains both.</p>',
+ '<p>Cuts can be combined, so just as in ordinary notation, <button type="button" ',
+ 'class="rdlink" data-demo="dbl">¬¬A is the same as A</button>. We keep track of this here ',
+ 'by shading in the negated regions.</p>',
+ '<p>Familiar expressions are made out of just these operators. So ',
+ '<button type="button" class="rdlink" data-demo="cond">A ⊃ B</button> becomes ¬(A ∧ ¬B), ',
+ 'and <button type="button" class="rdlink" data-demo="disj">C ∨ D</button> becomes ',
+ '¬(¬C ∧ ¬D). At first this may seem confusing, but you learn to recognise the various ',
+ 'graphs quickly. It has the added advantage of doing away with the need for translation ',
+ 'rules. You will see later that a number of simple proofs in ordinary notation are ',
+ 'zero-step proofs in the graphs: in writing out the premisses you have also written out ',
+ 'the conclusion.</p>',
+ '<p>Graphs can become quite involved. When reading a graph, do so from the outside in. ',
+ 'So, for example, <button type="button" class="rdlink" data-demo="outside">this graph</button> ',
+ 'is read as <span class="rdformula">', RD_TINTED, '</span>.</p>',
+ '<blockquote class="peirce">A nest sucks the meaning from without inwards unto its centre, ',
+ 'as a sponge absorbs water.<span class="cite">Peirce, Ms 650, quoted in Roberts 1973, ',
+ 'p. 39 n. 13</span></blockquote>',
+ '<p>See below for more expressions.</p>'
+].join('');
+
+$('#n-reading').addEventListener('click', e => {
+  const b = e.target.closest('.rdlink');
+  if (b) rdPlay(b.dataset.demo);
+});
+
+// the sheet starts blank: it is the first of the three things the text names
+RD.g = newGraph();
+rdSay('the blank sheet');
 /* =========================== CONVENTIONS & RULES =========================== */
 const CONVENTIONS = [
  ['C1','The sheet of assertion in all of its parts is a graph.','4.396, 397'],
@@ -6820,23 +7315,19 @@ $('#n-rules').innerHTML = RULES.map(r =>
   '<dd class="cite" style="margin-top:14px">Roberts 1973, Appendix 3, p. 138. All of them are '+
   'implemented, including clauses (a)–(d) of R3 and (a)–(c) of R4.</dd>';
 
-/* Two notes, each put where it is wanted: how to read a graph at the head of
-   the Scribe page, and how the finder works on the Prove page. */
-$('#n-reading').innerHTML = [
- '<p>Read a graph from the outside in. Peirce calls this <i>endoporeutic</i>. Everything ',
- 'written in one place is asserted together. A cut denies what is inside it. A line of ',
- 'identity counts as being wherever its least enclosed point is, so a line in an evenly ',
- 'enclosed place reads <i>some</i> and one in an oddly enclosed place reads <i>any</i> ',
- '(Roberts p. 51).</p>',
- '<p><b>Shading.</b> The shaded places are the oddly enclosed ones. Peirce shades them in ',
- 'MS 514. It is a help for the eye; nothing in the logic depends on it.</p>',
- '<p><b>Coloured lines.</b> Peirce drew in one ink. Colouring each line of identity ',
- 'differently makes it easier to see which is which where they cross. Turn it off and the ',
- 'graphs look as he drew them.</p>',
- '<p><b>Hook labels.</b> Peirce tells the hooks of a spot apart by where they sit round it: ',
- 'the first at nine o\'clock, the rest clockwise (Roberts p. 74). This page puts them all ',
- 'down the left edge instead, so the small letter names the line and the raised figure gives ',
- 'the place. That is this drawing\'s doing, not Peirce\'s.</p>'
+/* Two notes, each put where it is wanted: what the drawing does of its own
+   accord, under the conventions, and how the finder works on the Prove page.
+   How to read a graph has its own card and file, ui9-reading. */
+$('#n-drawing').innerHTML = [
+ '<p class="tight"><b>Shading.</b> The shaded places are the oddly enclosed ones. Peirce ',
+ 'shades them in MS 514. It is a help for the eye; nothing in the logic depends on it.</p>',
+ '<p class="tight"><b>Coloured lines.</b> Peirce drew in one ink. Colouring each line of ',
+ 'identity differently makes it easier to see which is which where they cross. Turn it off ',
+ 'and the graphs look as he drew them.</p>',
+ '<p class="tight"><b>Hook labels.</b> Peirce tells the hooks of a spot apart by where they ',
+ 'sit round it: the first at nine o\'clock, the rest clockwise (Roberts p. 74). This page ',
+ 'puts them all down the left edge instead, so the small letter names the line and the raised ',
+ 'figure gives the place. That is this drawing\'s doing, not Peirce\'s.</p>'
 ].join('');
 
 $('#n-finder').innerHTML = [
@@ -6884,7 +7375,7 @@ $('#n-finder').innerHTML = [
 
 /* ---- the written records -------------------------------------------------- */
 const drawPfWrit = bindWrit('pf', () => PF.proof && PF.graphs
-  ? { graphs: PF.graphs, steps: PF.proof.steps, i: PF.i,
+  ? { graphs: PF.graphs, steps: PF.steps, i: PF.i,
       onPick: k => { pfStop(); pfShow(k); } } : null);
 WRIT.pf = drawPfWrit;
 
@@ -6895,11 +7386,16 @@ enhanceEditor($('#v-goal'));
 if ($('#d-from')) enhanceEditor($('#d-from'));
 if ($('#d-lin')) enhanceEditor($('#d-lin'), { glyphs: false });
 
+// the notation the reader last wrote in
+let savedTMode = 'formula';
+try { savedTMode = localStorage.getItem('eg-tmode') || 'formula'; } catch(e){}
+setTMode(savedTMode === 'linear' ? 'linear' : 'formula', savedTMode === 'linear');
 translate(false);
+if (typeof rdStill === 'function') rdStill();
 buildProofList();
 buildPuzzleList();
+// the first proof in the list sets the board up; nothing is put over it after
 pfChoose($('#pf-sel').value || 'lib:0');
-try { ED.g = compileFormula(parseFormula('P -> Q')).graph; } catch(e){}
 drawRender();
 
 

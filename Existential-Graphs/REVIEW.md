@@ -1258,3 +1258,87 @@ A free variable cannot be scribed, so the page closes it existentially. The
 countermodel search was still reading the typed formula, so *Fa therefore Ax
 Fx* came back as having no countermodel on three individuals. It now reads the
 graphs.
+
+# Copy, linear notation, and graphs that rearranged themselves
+
+Not pushed: waiting on Niall to look at it locally.
+
+## The copy
+
+The subtitle under the page title is gone. How to read a graph now opens with
+Niall's own introduction to the sheet, graphs and cuts. Every example in it is
+a highlighted phrase that draws itself, step by step, on a small sheet beside
+the text; the last one ties each cut to its part of ¬((A ⊃ B) ∧ (C ∨ ¬D)) by
+colour. Peirce's sponge line now follows the paragraph on reading from the
+outside in, instead of opening the card. The notes on shading, coloured lines
+and hook labels moved under the conventions, as "About the drawing".
+
+The introduction to the rules on Manipulate is Niall's overview. His message
+broke off after "If you have a copy of a graph"; the rest of that paragraph and
+the R5/R6 paragraph were written to match and should be checked.
+
+## Linear notation on Scribe
+
+The proposition box has a switch between ordinary and linear notation, with
+its own short guide to the notation. Switching carries what is in the box
+across without changing the drawing: a double cut survives the trip, which the
+kinder reading back would otherwise have collapsed. The choice is remembered.
+
+## Why graphs rearranged, and what was done
+
+Graphs on an area are drawn in the order they are stored, and order means
+nothing. Three things changed it without need. Drawing a double cut put the new
+pair at the end of the row; taking one off put what it held at the end. Matching
+a new drawing to the old by shape, as the Scribe box, the reading card and the
+unresolved joints of a proof all do, kept the new graph's order rather than
+the one on screen. All three now keep what the eye already has.
+
+Measured over the thirty worked proofs and a set of formulas that differ only
+in order: 14 reorderings before, 3 after. The three left are a double cut drawn
+round two graphs that were not next to each other, which the rule itself has
+to gather.
+
+Where a finished proof stands in a different order from its conclusion as
+written, the player adds a last step, Rearrange, that only moves things into
+that order. It is set apart from the rules in the step list and is not counted
+among the steps. Beta proofs do not get one: their final drawings carry a
+different number of line points from the conclusion, so the move could not be
+shown without redrawing.
+
+## Also fixed
+
+- Choosing a worked proof set off the automatic search, which replaced the
+  book's proof with one of its own 700 ms later.
+- A leftover line at start-up put *P ⊃ Q* alone on the board over modus ponens,
+  so the premiss P was missing until the reader switched modes.
+- The switch between working a proof and watching it now stays where the reader
+  put it while they move between problems. It starts on working it by hand.
+- The `hidden` attribute did not hide elements whose class sets `display`.
+
+## Lines of identity, through the rule cards
+
+The rules already had their Beta clauses among the legal moves: R1 takes up a
+bare line or breaks a join, R2 puts a line down or joins two, R3 branches a line
+or carries a loose end in through a cut, R4 takes a loose end back. But what
+they act on is a point of a line, and the points could not be clicked as
+targets, so these moves were reachable only from the full list. Beside them sat
+a card of tools for drawing by hand, which changed the sheet under no rule and
+left no trace in the reader's proof.
+
+Now the points are targets like any graph. Arm a rule and the points it can act
+on light up; click one, and where the move needs a second thing named, the
+point to join it to or the cut to carry it into, those light up for the second
+click. A point picked with no rule armed lights the rules that can act on it.
+Insertion's box offers a line of identity alongside the typed graph. The hand
+tools are gone; Undo and the display toggles sit under the cards. Verified by
+working the instantiation of a universal premiss entirely by clicks: branch,
+carry in, join.
+
+## Watching a proof the finder did not find
+
+The switch to watching was enabled only by a proof the page had, so a Barbara
+worked by hand, which the finder cannot reach, could not be played back. It now
+opens as soon as the reader has made a move. Choosing an exercise also cleared
+nothing of the previous problem's proof, so the switch could have played a
+proof of something else; that is reset now. And coming back from watching no
+longer wipes the board, unless the problem has changed meanwhile.

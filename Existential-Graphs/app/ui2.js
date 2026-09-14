@@ -17,8 +17,11 @@ function selArea(){
 function drawRender(){
   if (ED.anim) return;                 // let a running transformation finish
   const el = $('#d-stage');
+  // the points of the lines are shown while a rule is armed, whatever the box
+  // says, since they are what the line clauses of the rules act on
+  const armed = typeof RS !== 'undefined' && !!RS.rule && Object.keys(ED.g.lns).length > 0;
   const opts = { shade: $('#d-shade').checked, wobble: true,
-                 handles: $('#d-handles').checked, pad: 14 };
+                 handles: $('#d-handles').checked || armed || (ED.sel && ED.sel.kind === 'ln'), pad: 14 };
   let svg;
   try { svg = stageSvg(el, ED.g, opts); }
   catch(e){ $('#d-err').textContent = 'could not draw: '+e.message; return; }
@@ -33,6 +36,9 @@ function drawRender(){
         const sa = svg.querySelector('.sa');
         if (sa && ED.sel.id === ED.g.root) sa.setAttribute('stroke','var(--accent)');
       }
+    } else if (ED.sel.kind === 'ln'){
+      const p = svg.querySelector('.handle[data-ln="'+ED.sel.id+'"]');
+      if (p) p.classList.add('sel');
     } else {
       const p = svg.querySelector('[data-node="'+ED.sel.id+'"]');
       if (p) p.classList.add('hl-add');
@@ -47,7 +53,7 @@ function drawRender(){
               ED.g.nodes[id].k === 'cut' ? ED.g.nodes[id].inner : id); };
     });
     svg.querySelectorAll('.handle').forEach(h => {
-      h.onclick = ev => { ev.stopPropagation(); togglePick(h.dataset.ln); };
+      h.onclick = ev => { ev.stopPropagation(); edSel('ln', h.dataset.ln); };
       if (ED.pick.includes(h.dataset.ln)) h.classList.add('sel');
     });
     const sa = svg.querySelector('.sa');
@@ -71,59 +77,34 @@ function drawRender(){
       (evenlyEnclosed(ED.g, s.id) ? 'evenly' : 'oddly')+' enclosed.';
   else if (s && s.kind === 'node')
     hint = 'Selected: the spot “'+ED.g.nodes[s.id].name+'”.';
-  if (ED.pick.length) hint += '  ('+ED.pick.length+' line point'+(ED.pick.length===1?'':'s')+' picked)';
-  $('#d-hint').textContent = hint;
+  else if (s && s.kind === 'ln')
+    hint = 'Selected: a point of a line of identity.';
+  if ($('#d-hint')) $('#d-hint').textContent = hint;
 
   if (typeof drawRuleCards === 'function') drawRuleCards(); else drawMoves();
   if (typeof armSheet === 'function') armSheet(svg);
   if (!ED.quiet) syncScribeBoxes('graph');
   if (typeof puzzleCheck === 'function') puzzleCheck();
 }
-function togglePick(ln){
-  const i = ED.pick.indexOf(ln);
-  if (i >= 0) ED.pick.splice(i,1); else ED.pick.push(ln);
-  if (ED.pick.length > 2) ED.pick.shift();
-  drawRender();
-}
-$('#d-cut').onclick = () => { edPush(); addCut(ED.g, selArea()); drawRender(); };
-$('#d-spot').onclick = () => {
-  const name = prompt('The spot — a word or phrase, as Peirce writes “is a catholic”:', 'F');
-  if (name === null) return;
-  const nh = prompt('How many hooks? (0 for a proposition, 1 for “—is a man”, 2 for “—loves—”)', '0');
-  if (nh === null) return;
-  edPush(); addSpot(ED.g, selArea(), name.trim() || 'F', Math.max(0, Math.min(6, parseInt(nh)||0)));
-  drawRender();
-};
-$('#d-line').onclick = () => { edPush(); addLn(ED.g, selArea()); drawRender(); };
-$('#d-join').onclick = () => {
-  if (ED.pick.length !== 2){ alert('Pick two line points first, by clicking the small circles on the lines.'); return; }
-  const [a,b] = ED.pick;
-  const aa = ED.g.lns[a].area, ab = ED.g.lns[b].area;
-  if (!(aa === ab || placeOf(ED.g, aa) === ab || placeOf(ED.g, ab) === aa)){
-    alert('No graph may rest partly on one area and partly on another (Roberts p. 50 n. 1).\n'+
-          'Two points can be joined only on one area, or across a single cut.');
-    return;
-  }
-  edPush(); addEdge(ED.g, a, b); ED.pick = []; drawRender();
-};
-$('#d-del').onclick = () => {
-  if (!ED.sel) return;
-  edPush();
-  if (ED.sel.kind === 'node') removeNode(ED.g, ED.sel.id);
-  else if (ED.sel.id !== ED.g.root){
-    const cut = ED.g.areas[ED.sel.id].cut;
-    removeNode(ED.g, cut);
-  }
-  ED.sel = null; ED.pick = []; drawRender();
-};
-$('#d-undo').onclick = () => {
+/* The board used to carry tools for drawing by hand — a cut, a spot, a line,
+   a join, erase anything — which changed the sheet without any rule and left
+   no trace in the reader's proof. Everything they did is now a clause of one
+   of the rules and is done through its card: a typed graph or a line through
+   insertion, a join through R2, a break or a bare line taken up through R1.
+   Undo stays, since taking back a move is not a move. */
+function edUndo(){
   if (!ED.hist.length) return;
   const h = ED.hist.pop();
   ED.g = h.g; ED.sel = null; ED.pick = [];
+  if (typeof RS !== 'undefined'){ RS.rule = null; RS.src = null; RS.lnSrc = null; }
   if (h.kind === 'rule' && ED.moves > 0) ED.moves--;
   drawRender();
+}
+if ($('#d-undo')) $('#d-undo').onclick = () => {
+  edUndo();
+  if (ED.trail && ED.trail.length) ED.trail.pop();
+  if (typeof drawTrail === 'function') drawTrail();
 };
-$('#d-clear').onclick = () => { edPush(); ED.g = newGraph(); ED.sel=null; ED.pick=[]; drawRender(); };
 // Whichever box is used, the other is brought into step, so that the two
 // descriptions of the graph on the sheet always agree.
 function syncScribeBoxes(from){
@@ -465,7 +446,7 @@ function runProof(hard){
                   '(Roberts, Appendix 4) a proof exists. '
                 : 'Whether the inference holds is still undecided. ')+
           'Try “search harder”, or work it yourself below.</p>';
-        if (typeof proveModes === 'function'){ PF.proof = null; proveModes(); proveMode('work'); }
+        if (typeof proveModes === 'function'){ PF.proof = null; PF.found = null; proveModes(); proveMode('work'); }
       }
     };
     step(0);

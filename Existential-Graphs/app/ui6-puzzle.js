@@ -43,7 +43,7 @@ function buildPuzzleList(){
   const hint = $('#z-hint'), again = $('#z-restart'), show = $('#z-show'), quit = $('#z-quit');
   if (hint) hint.onclick = puzzleHint;
   if (again) again.onclick = () => { if (typeof workFromBoxes === 'function'){ workFromBoxes(); drawRender(); } };
-  if (show) show.onclick = () => { if (typeof proveMode === 'function') proveMode('play'); };
+  if (show) show.onclick = () => { if (typeof proveMode === 'function'){ PV.want = 'play'; proveMode('play'); } };
   if (quit) quit.onclick = () => { ED.goal = null; $('#z-body').style.display = 'none';
                                    $('#z-note').style.display = ''; drawRender(); };
 }

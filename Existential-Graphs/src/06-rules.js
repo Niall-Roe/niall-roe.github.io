@@ -403,9 +403,16 @@ function applyMove(g0, mv, palette){
     case 'extend':   { const nl = addLn(g, g.nodes[mv.cut].inner); addEdge(g, mv.ln, nl); break; }
     case 'retract':  removeLn(g, mv.ln); break;
     case 'dcIn': {
+      // where the enclosed graphs stood, so the new pair is drawn there and not
+      // at the end of the row
+      const was = g.areas[mv.area].items.slice();
+      const at = mv.items.length ? Math.min(...mv.items.map(id => was.indexOf(id))) : was.length;
       const outer = addCut(g, mv.area), oa = g.nodes[outer].inner;
       const loop  = addCut(g, oa), la = g.nodes[loop].inner;
       for (const id of mv.items) moveNode(g, id, la);
+      const row = g.areas[mv.area].items.filter(x => x !== outer);
+      row.splice(Math.min(at, row.length), 0, outer);
+      g.areas[mv.area].items = row;
       // Whatever was moved, any ligature now running from the old area into it
       // has further to travel; repairEdges marks the point at which it crosses
       // each new cut. R5 is explicit that a ligature passing from outside the
@@ -417,10 +424,18 @@ function applyMove(g0, mv, palette){
       const n = g.nodes[mv.cut];
       const d = g.nodes[g.areas[n.inner].items[0]];
       const dest = n.area;
-      for (const id of g.areas[d.inner].items.slice()) moveNode(g, id, dest);
+      // what the pair enclosed goes back where the pair stood
+      const at = g.areas[dest].items.indexOf(mv.cut);
+      const freed = g.areas[d.inner].items.slice();
+      for (const id of freed) moveNode(g, id, dest);
       for (const l of g.areas[d.inner].lns.slice()) moveLn(g, l, dest);
       for (const l of g.areas[n.inner].lns.slice()) moveLn(g, l, dest);
       removeNode(g, mv.cut);
+      if (at >= 0){
+        const row = g.areas[dest].items.filter(x => freed.indexOf(x) < 0);
+        row.splice(Math.min(at, row.length), 0, ...freed);
+        g.areas[dest].items = row;
+      }
       break;
     }
     default: throw new Error('unknown move '+mv.op);

@@ -1,5 +1,5 @@
 /* ============================================================================
-   THE FIVE PERMISSIONS, AS SIX CARDS.
+   THE PERMISSIONS, AS SIX CARDS.
 
    The old panel listed every legal move at once, which is honest but tells the
    reader nothing about which rule they are using. Here each rule has a card of
@@ -23,12 +23,60 @@ const RULE_CARDS = [
   ['R6',  'Double cut removed', 'R6', 'Take such a pair off, wherever one stands.']
 ];
 
-const RS = { rule: null, moves: [], pat: null, watchdog: 0, mode: 'formula', raw: '', src: null };
+const RS = { rule: null, moves: [], pat: null, watchdog: 0, mode: 'formula', raw: '', src: null,
+             lnSrc: null };
+
+/* The lines of identity, worked through the same cards. Each rule already has
+   its Beta clauses among the legal moves — R1 takes up a bare line or breaks a
+   join, R2 puts a line down or joins two, R3 branches a line or carries a loose
+   end in through a cut, R4 takes a loose end back — and what they act on is a
+   point of a line rather than a graph. So the points on the sheet are targets
+   like any graph: click one, and where a move needs a second thing named (the
+   point to join it to, the cut to carry it into) the second click names it. */
+const LINE_OPS = new Set(['delLine', 'eraseEdge', 'join', 'addLine', 'branch', 'extend', 'retract']);
+// the points of a line a move is about
+function linePoints(m){
+  const mv = m.mv;
+  switch (mv.op){
+    case 'delLine': case 'branch': case 'retract': case 'extend': return [mv.ln];
+    case 'join': return [mv.a, mv.b];
+    case 'eraseEdge': { const e = ED.g.edges[mv.edge]; return e ? [e.a, e.b] : []; }
+  }
+  return [];
+}
+function lineMovesAt(ln){
+  return RS.moves.filter(m => m.card === RS.rule && LINE_OPS.has(m.mv.op) && linePoints(m).includes(ln));
+}
+const sameTwo = (xs, a, b) => xs.length === 2 && ((xs[0] === a && xs[1] === b) || (xs[0] === b && xs[1] === a));
+/* A click on a point of a line, with a rule armed. */
+function lineClick(ln){
+  if (RS.lnSrc){
+    const src = RS.lnSrc;
+    const mine = lineMovesAt(src);
+    if (ln === src){
+      // the same point again: the move that needs nothing more, if there is one
+      const single = mine.find(m => ['branch', 'retract', 'delLine'].includes(m.mv.op));
+      if (single){ applyRuleMove(single); return; }
+      RS.lnSrc = null; drawRuleCards(); return;
+    }
+    const pair = mine.find(m => (m.mv.op === 'join' || m.mv.op === 'eraseEdge') &&
+                                sameTwo(linePoints(m), src, ln));
+    if (pair){ applyRuleMove(pair); return; }
+    RS.lnSrc = null;                         // not a partner: start from this point instead
+  }
+  const mine = lineMovesAt(ln);
+  if (!mine.length) return;
+  // a rule with only one thing it can do at this point does it
+  if (mine.length === 1){ applyRuleMove(mine[0]); return; }
+  RS.lnSrc = ln;
+  drawRuleCards();
+}
 
 /* What the selection amounts to: the graph picked, and the area it governs. */
 function selCtx(){
   const g = ED.g, s = ED.sel;
   if (!s) return { node: null, area: g.root };
+  if (s.kind === 'ln') return { node: null, ln: s.id, area: g.lns[s.id] ? g.lns[s.id].area : g.root };
   if (s.kind === 'area') {
     const cut = g.areas[s.id] && g.areas[s.id].cut;
     return { node: cut || null, area: s.id };
@@ -53,7 +101,10 @@ function rulePalette(){
 function ruleMoves(){
   const pal = rulePalette();
   let mvs = [];
-  try { mvs = legalMoves(ED.g, { dir:'fwd', palette: pal, beta: !isAlpha(ED.g), maxNodes: 40 }); }
+  // a Beta problem keeps its line moves even when the sheet has, for the
+  // moment, no line on it
+  const beta = !isAlpha(ED.g) || !!(ED.goal && ED.goal.graph && !isAlpha(ED.goal.graph));
+  try { mvs = legalMoves(ED.g, { dir:'fwd', palette: pal, beta, maxNodes: 40 }); }
   catch(e){ return { pal, list: [] }; }
   const list = [];
   for (const mv of mvs){
@@ -88,6 +139,9 @@ function ruleMoves(){
 function touchesSelection(m){
   const c = selCtx();
   const mv = m.mv;
+  // a point picked: the moves about that point, and nothing else
+  if (c.ln) return LINE_OPS.has(mv.op) && linePoints(m).includes(c.ln);
+  if (LINE_OPS.has(mv.op) && mv.op !== 'addLine') return false;
   switch (m.card){
     case 'R1':  return mv.op === 'erase' ? mv.node === c.node : true;
     case 'R2':  return mv.op === 'insert' || mv.op === 'addLine' ? mv.area === c.area : true;
@@ -175,7 +229,10 @@ function insertBox(){
     '<input type="text" id="rs-ins" value="'+esc(raw)+'" spellcheck="false" placeholder="'+
       (RS.mode==='lin' ? '( P )  or  *x F[x]' : '~P  or  P &amp; Q')+'">'+
     shows +
-    '<div class="btnrow"><button class="btn" id="rs-insgo"'+(g?'':' disabled')+'>Scribe it</button></div>'+
+    '<div class="btnrow"><button class="btn" id="rs-insgo"'+(g?'':' disabled')+'>Scribe it</button>'+
+      (RS.moves.some(m => m.mv.op === 'addLine' && m.mv.area === c.area)
+        ? '<button type="button" class="btn ghost" id="rs-insline">Or put down a line of identity</button>' : '')+
+    '</div>'+
     '<p class="err" id="rs-inserr">'+esc(err)+'</p></div>';
 }
 
@@ -200,17 +257,30 @@ function ruleSay(){
   const c = selCtx();
   const picked = c.node ? nameOf(c.node) : null;
   if (!RS.rule){
+    if (c.ln) return 'Picked: a point of a line of identity, ' + whereName(c.area) +
+      '. The rules that can act on it are marked.';
     return picked
       ? 'Picked: ' + picked + ', ' + whereName(ED.g.nodes[c.node].area) +
         '. The rules that can act on it are marked.'
-      : 'Nothing picked. Click a graph, or click a rule to see where it applies.';
+      : 'Nothing picked. Click a graph or a point of a line, or click a rule to see where it applies.';
   }
   const name = (RULE_CARDS.find(r => r[0] === RS.rule) || [])[1] || '';
+  if (RS.lnSrc){
+    const ms = lineMovesAt(RS.lnSrc), ops = new Set(ms.map(m => m.mv.op));
+    const bits = [];
+    if (ops.has('branch')) bits.push('click the point again to branch the line there');
+    if (ops.has('retract')) bits.push('click the point again to take this loose end back');
+    if (ops.has('delLine')) bits.push('click the point again to erase the line');
+    if (ops.has('extend')) bits.push('click a cut marked in green to carry the line into it');
+    if (ops.has('join')) bits.push('click another point marked in green to join the two lines');
+    if (ops.has('eraseEdge')) bits.push('click the next point along, marked in green, to break the line between them');
+    return name + ', on a point of a line. ' + bits.join('; or ').replace(/^./, c => c.toUpperCase()) + '.';
+  }
   if (RS.rule === 'R3' && !iterSource()){
-    const n = iterCandidates().length;
-    return n ? 'Iteration. First pick the graph to copy: ' + n +
-               ' can be copied, marked in green.'
-             : 'Iteration. Nothing here can be copied inwards.';
+    const n = iterCandidates().length, l = lineCandidates().length;
+    if (!n && !l) return 'Iteration. Nothing here can be copied inwards.';
+    return 'Iteration. First pick ' + [n ? 'the graph to copy' : '', l ? 'a point of a line to branch or carry inwards' : '']
+      .filter(Boolean).join(', or ') + ': marked in green.';
   }
   if (RS.rule === 'R3' && RS.src){
     const here3 = armedMoves();
@@ -218,6 +288,8 @@ function ruleSay(){
       here3.length + ' place' + (here3.length === 1 ? '' : 's') + ' marked in green.';
   }
   const here = armedMoves();
+  const pts = lineCandidates().length;
+  if (!here.length && pts) return name + ': pick a point of a line, marked in green.';
   if (!here.length) return name + ' has nothing to act on here.';
   const what = picked ? ' ' + picked : '';
   const verb = { R1:'Erasing', R2:'Scribing on', R3:'Iterating', R4:'Erasing the copy of',
@@ -239,6 +311,7 @@ function iterSource(){
 }
 function armedMoves(){
   const all = RS.moves.filter(m => m.card === RS.rule);
+  if (RS.lnSrc) return all.filter(m => LINE_OPS.has(m.mv.op) && linePoints(m).includes(RS.lnSrc));
   if (RS.rule === 'R3'){
     const src = iterSource();
     if (!src) return [];                       // nothing to copy yet
@@ -246,7 +319,15 @@ function armedMoves(){
     return mine.length ? mine : all;
   }
   const mine = all.filter(touchesSelection);
-  return mine.length ? mine : all;
+  // with nothing picked, the moves about points wait for a point to be clicked
+  return mine.length ? mine : all.filter(m => !LINE_OPS.has(m.mv.op) || m.mv.op === 'addLine');
+}
+// the points the armed rule could act on, before one is chosen
+function lineCandidates(){
+  const out = new Set();
+  for (const m of RS.moves)
+    if (m.card === RS.rule && LINE_OPS.has(m.mv.op)) linePoints(m).forEach(l => out.add(l));
+  return [...out];
 }
 /* With iteration armed and nothing yet chosen to copy, the graphs that could
    be copied are what the reader is choosing between. */
@@ -266,6 +347,18 @@ function paintTargets(){
   if (!svg) return;
   svg.querySelectorAll('.tgt,.tgt-src').forEach(e => e.classList.remove('tgt','tgt-src'));
   if (!RS.rule) return;
+  const point = (ln, cls) => { const h = svg.querySelector('.handle[data-ln="'+ln+'"]'); if (h) h.classList.add(cls); };
+  if (RS.lnSrc){
+    point(RS.lnSrc, 'tgt-src');
+    for (const m of lineMovesAt(RS.lnSrc)){
+      if (m.mv.op === 'extend'){
+        const c = svg.querySelector('[data-node="'+m.mv.cut+'"]'); if (c) c.classList.add('tgt');
+      } else linePoints(m).forEach(l => { if (l !== RS.lnSrc) point(l, 'tgt'); });
+    }
+    return;
+  }
+  // before a point is chosen, every point the rule could act on
+  if (!(ED.sel && ED.sel.kind === 'ln')) lineCandidates().forEach(l => point(l, 'tgt'));
   if (RS.rule === 'R3' && !iterSource()){
     for (const id of iterCandidates()){
       const el = svg.querySelector('[data-node="'+id+'"]');
@@ -345,6 +438,7 @@ function applyRuleMove(m){
   edPush('rule');
   ED.moves++;
   ED.g = h; ED.sel = null; ED.pick = []; RS.rule = null; RS.pat = null; RS.raw = ''; RS.src = null;
+  RS.lnSrc = null;
   if (typeof hintReset === 'function') hintReset();
   // what the reader has done, kept so that it can be read back and replayed
   ED.trail = ED.trail || [];
@@ -385,21 +479,35 @@ $('#d-moves').addEventListener('click', e => {
   const card = e.target.closest('.rulecard');
   if (card){
     const want = card.dataset.rule;
-    if (RS.rule === want){ RS.rule = null; RS.src = null; drawRuleCards(); return; }
-    RS.rule = want; RS.src = null;
+    if (RS.rule === want){ RS.rule = null; RS.src = null; RS.lnSrc = null; drawRender(); return; }
+    RS.rule = want; RS.src = null; RS.lnSrc = null;
+    // a point already picked is where the rule starts
+    if (ED.sel && ED.sel.kind === 'ln'){
+      const here = lineMovesAt(ED.sel.id);
+      if (here.length === 1){ applyRuleMove(here[0]); return; }
+      if (here.length) RS.lnSrc = ED.sel.id;
+    }
     /* If the reader has already picked a graph and the rule can do exactly one
        thing with it, there is nothing left to ask: clicking the rule does it.
        Erasing a graph, erasing a copy, taking off a double cut — none of these
        needs a second click, and demanding one for a rule that has no choice to
        make reads as the page refusing to work. Insertion always asks, because
        what to scribe is not on the sheet to be pointed at. */
-    const only = want === 'R2' ? [] : armedMoves();
-    if (ED.sel && only.length === 1){ applyRuleMove(only[0]); return; }
-    drawRuleCards();
+    const only = want === 'R2' || RS.lnSrc ? [] : armedMoves();
+    if (ED.sel && ED.sel.kind !== 'ln' && only.length === 1){ applyRuleMove(only[0]); return; }
+    // drawn again rather than only repainted: the points of the lines are shown
+    // on the sheet while a rule is armed
+    drawRender();
     return;
   }
   const mode = e.target.closest('[data-mode]');
   if (mode){ RS.mode = mode.dataset.mode; drawRuleCards(); return; }
+  if (e.target.closest('#rs-insline')){
+    const c = selCtx();
+    const m = RS.moves.find(x => x.mv.op === 'addLine' && x.mv.area === c.area);
+    if (m){ RS.raw = ''; applyRuleMove(m); }
+    return;
+  }
   if (e.target.closest('#rs-insgo')){
     const raw = ($('#rs-ins').value || '').trim();
     RS.raw = raw;
@@ -439,7 +547,7 @@ function armSheet(svg){
       const ms = hit(el);
       if (!ms.length) return;
       el.classList.add('tgt-hot');
-      if (RS.rule === 'R3') showArrow(svg, iterSource(), ms[0].target);
+      if (RS.rule === 'R3' && !RS.lnSrc) showArrow(svg, iterSource(), ms[0].target);
       const say = $('#rs-say');
       if (say) say.textContent = shortWhy(describeMove(ED.g, ms[0].mv, true)) + ' \u2014 click to do it.';
     };
@@ -458,7 +566,7 @@ function armSheet(svg){
       // usually a copy of what the reader had just clicked on.
       if (RS.rule === 'R2' && ms.length){ pickArea(el); return; }
       // iteration, armed with nothing chosen yet: this click names the graph
-      if (RS.rule === 'R3' && !iterSource()){
+      if (RS.rule === 'R3' && !RS.lnSrc && !iterSource()){
         const id = el.dataset.node;
         if (id && iterCandidates().includes(id)){ RS.src = id; drawRuleCards(); }
         return;
@@ -466,6 +574,31 @@ function armSheet(svg){
       if (RS.rule && ms.length){ applyRuleMove(ms[0]); return; }
       if (RS.rule){ return; }              // armed, but not a place it can act
       if (was) was(ev);
+    };
+  });
+  svg.querySelectorAll('.handle').forEach(h => {
+    const ln = h.dataset.ln;
+    h.onclick = ev => {
+      ev.stopPropagation();
+      if (RS.rule){ lineClick(ln); return; }
+      // with no rule armed a point is picked like a graph, and the rules that
+      // can act on it light up
+      edSel('ln', ln);
+    };
+    h.onmouseenter = () => {
+      if (!RS.rule) return;
+      const ms = RS.lnSrc ? lineMovesAt(RS.lnSrc).filter(m => m.mv.op !== 'extend' &&
+                   (ln === RS.lnSrc ? ['branch','retract','delLine'].includes(m.mv.op) : linePoints(m).includes(ln)))
+                          : lineMovesAt(ln);
+      if (!ms.length) return;
+      h.classList.add('tgt-hot');
+      const say = $('#rs-say');
+      if (say) say.textContent = shortWhy(describeMove(ED.g, ms[0].mv, true)) +
+        (ms.length > 1 && !RS.lnSrc ? ' Click to choose.' : ' \u2014 click to do it.');
+    };
+    h.onmouseleave = () => {
+      h.classList.remove('tgt-hot');
+      const say = $('#rs-say'); if (say) say.textContent = ruleSay();
     };
   });
   const sa = svg.querySelector('.sa');
@@ -502,6 +635,8 @@ function drawTrail(){
     const done = typeof trailDone === 'function' && trailDone();
     go.textContent = done ? 'Step through your proof' : 'Step through what you have so far';
   }
+  // the switch to watching opens as soon as there is a move of the reader's own to watch
+  if (typeof proveModes === 'function') proveModes();
 }
 
 function trailSteps(){
@@ -520,7 +655,7 @@ function watchMine(){
   return true;
 }
 if ($('#d-replay')) $('#d-replay').onclick = () => {
-  if (watchMine() && typeof proveMode === 'function') proveMode('play');
+  if (watchMine() && typeof proveMode === 'function'){ PV.want = 'play'; proveMode('play'); }
 };
 if ($('#d-undo2')) $('#d-undo2').onclick = () => {
   if (typeof edUndo === 'function') edUndo();

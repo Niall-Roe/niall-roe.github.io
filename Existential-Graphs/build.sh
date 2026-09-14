@@ -20,7 +20,7 @@ cd "$(dirname "$0")"
   cat src/12-hand.js
   echo '/* --- the verified proof library --- */'
   cat src/10-library.js
-  cat app/ui0-editor.js app/ui1.js app/ui2.js app/ui4-exercises.js app/ui5-writ.js app/ui6-puzzle.js app/ui7-prove.js app/ui8-rules.js app/ui3.js
+  cat app/ui0-editor.js app/ui1.js app/ui2.js app/ui4-exercises.js app/ui5-writ.js app/ui6-puzzle.js app/ui7-prove.js app/ui8-rules.js app/ui9-reading.js app/ui3.js
   echo '</script>'
   echo '</body></html>'
 } > index.html

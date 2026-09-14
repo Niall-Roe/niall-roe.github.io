@@ -75,22 +75,31 @@ function pfChoose(v){
     const i = +v.slice(4), p = PROOFS[i];
     setEditorValue('#v-prem', p.prem.join('\n'));
     setEditorValue('#v-goal', p.goal);
+    // filling the boxes sets a search going, which would replace the worked
+    // proof with one of its own a moment later; this one is already known
+    clearTimeout(AUTO.t);
+    VV.run++;
     $('#v-verdict').innerHTML = '';
     $('#v-booknote').innerHTML = '';
     pfLoad(i);
     AUTO.last = $('#v-prem').value.trim() + '\u0000' + $('#v-goal').value.trim();
+    // a new problem starts a clean board, whichever view is showing
+    workFromBoxes();
     proveModes();
-    // the tab opens on the board: the reader is meant to try it first
-    proveMode('work');
+    // the tab opens on the board, and after that stays on whichever of the
+    // two the reader last chose
+    proveMode(PV.want);
     return;
   }
   const [gi, ii] = v.slice(3).split('.').map(Number);
   const [prem, goal, name, note, hard] = BOOK_EXERCISES[gi].items[ii];
+  PF.proof = null; PF.found = null; PF.source = null;
   setEditorValue('#v-prem', prem || '');
   setEditorValue('#v-goal', goal);
   $('#v-booknote').innerHTML = note || '';
   pfKvFromBoxes(null);
   AUTO.last = $('#v-prem').value.trim() + '\u0000' + $('#v-goal').value.trim();
+  workFromBoxes();
   if (hard){
     // measured as beyond the search; the reader is sent straight to the board.
     // Filling the boxes has already set a search going, so it is called off.
@@ -102,6 +111,7 @@ function pfChoose(v){
     proveModes(); proveMode('work');
     return;
   }
+  clearTimeout(AUTO.t);                // the search is started here, once
   runProof(false);
 }
 
@@ -110,24 +120,38 @@ function pfChoose(v){
 /* A proof of no steps at all is still a proof: the conclusion was already
    scribed. Requiring one step is what left Automate greyed out on the first
    thing in the list. */
+/* Which of the two the reader chose. It starts on working it by hand and
+   changes only when they switch; moving between problems keeps it. Where there
+   is nothing to watch yet the board is shown meanwhile, and the choice comes
+   back as soon as a proof does. */
+const PV = { want: 'work' };
 function haveProof(){ return !!(PF.proof && PF.proof.steps && PF.proof.steps.length >= 1); }
+/* The proof the page has for this problem, found or from the list, as opposed
+   to whatever happens to be in the player. */
+function haveFound(){ return !!(PF.found && PF.found.steps && PF.found.steps.length >= 1); }
+/* Something to watch: a proof the page has, or the reader's own moves. A proof
+   worked by hand where the finder found none is as watchable as any other. */
+function canWatch(){ return haveFound() || haveTrail(); }
+// the inference the boxes hold, to tell whether the board still belongs to it
+function boxesKey(){ return $('#v-prem').value.trim() + '\u0000' + $('#v-goal').value.trim(); }
 
 function proveModes(){
-  const got = haveProof();
-  $('#pv-play').disabled = !got;
-  $('#v-searchrow').style.display = got ? 'none' : '';
-  $('#v-foundrow').style.display = got ? '' : 'none';
-  if (got){
-    const n = PF.proof.steps.length - 1;
+  const found = haveFound(), watchable = canWatch();
+  $('#pv-play').disabled = !watchable;
+  $('#v-searchrow').style.display = found ? 'none' : '';
+  $('#v-foundrow').style.display = found ? '' : 'none';
+  if (found){
+    const n = PF.found.steps.length - 1;
     $('#v-foundpill').textContent = n
       ? 'Proof found — ' + n + ' step' + (n === 1 ? '' : 's')
       : 'Proof found — the conclusion is already scribed';
   }
-  $('#pv-say').textContent = got ? '' : 'No proof found, so there is nothing to watch yet.';
-  if (!got && $('#play-view').style.display !== 'none') proveMode('work');
+  if ($('#play-view').style.display === 'none')
+    $('#pv-say').textContent = watchable ? '' : 'No proof found, so there is nothing to watch yet.';
+  if (!watchable && $('#play-view').style.display !== 'none') proveMode('work');
 }
 function proveMode(which){
-  const play = which === 'play' && haveProof();
+  const play = which === 'play' && canWatch();
   $('#play-view').style.display = play ? '' : 'none';
   $('#work-view').style.display = play ? 'none' : '';
   $('#work-side').style.display = play ? 'none' : '';
@@ -140,14 +164,22 @@ function proveMode(which){
        the reader will want to watch; an unfinished one is a record of trying,
        and playing it back instead of the proof would be no help at all. So a
        completed attempt is shown, and otherwise the found proof is, with the
-       attempt one click away either way. */
-    const want = trailDone() ? 'you' : (PF.found ? 'machine' : (haveTrail() ? 'you' : null));
-    if (want && PF.source !== want){
+       attempt one click away either way. Where the page has no proof of its
+       own, the reader's work is what there is. */
+    const want = trailDone() ? 'you' : (haveFound() ? 'machine' : (haveTrail() ? 'you' : null));
+    // a worked proof from the list counts as the proof to watch, just as a found one does
+    const showing = PF.source === 'lib' ? 'machine' : PF.source;
+    if (want && (showing !== want || !haveProof())){
       if (want === 'you') watchMine();
-      else { pfAdopt(PF.found); PF.source = 'machine'; }
+      else { pfAdopt(PF.found); PF.source = PF.found.id === 'found' ? 'machine' : 'lib'; }
     } else pfShow(PF.i);
     proveSource();
-  } else { workFromBoxes(); drawRender(); }
+  } else {
+    // coming back from watching leaves the board as the reader left it; it is
+    // set up afresh only if the problem itself has changed meanwhile
+    if (ED.key !== boxesKey()) workFromBoxes();
+    drawRender();
+  }
 }
 
 /* When there are two proofs to hand — the one found and the one made — the
@@ -184,11 +216,7 @@ function proveSource(){
 /* Putting a kept proof back into the player. */
 function pfAdopt(p){
   PF.proof = p; PF.i = 0;
-  PF.graphs = p._h.graphs; PF.mvs = p._h.mvs;
-  PF.frame = proofFrame(PF.graphs);
-  $('#pf-steps').innerHTML = p.steps.map((s,k) =>
-    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
-    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  pfView(p);
   pfShow(0);
 }
 
@@ -203,6 +231,7 @@ function workFromBoxes(){
   ED.g = gs.length ? juxtapose(gs) : newGraph();
   ED.sel = null; ED.pick = []; ED.hist = [{ g: cloneGraph(gs.length ? juxtapose(gs) : newGraph()), kind:'start' }];
   ED.moves = 0; ED.trail = [];
+  ED.key = boxesKey();
   if (typeof drawTrail === 'function') drawTrail();
   ED.goal = gg ? { graph: gg, canon: canonGraph(gg), reached: false } : null;
   // the proof chosen above is what the hint and the move count compare against
@@ -223,8 +252,8 @@ function workFromBoxes(){
   }
 }
 
-$('#pv-play').onclick = () => proveMode('play');
-$('#pv-work').onclick = () => proveMode('work');
+$('#pv-play').onclick = () => { PV.want = 'play'; proveMode('play'); };
+$('#pv-work').onclick = () => { PV.want = 'work'; proveMode('work'); };
 /* The search runs on its own: as soon as something is chosen, and again a
    moment after the boxes stop changing. Anything already found is dropped the
    instant the inference changes, so Automate never offers a proof of something
@@ -234,7 +263,7 @@ function autoSearch(){
   clearTimeout(AUTO.t);
   const key = $('#v-prem').value.trim() + '\u0000' + $('#v-goal').value.trim();
   if (key === AUTO.last) return;
-  PF.proof = null; PF.graphs = null;
+  PF.proof = null; PF.graphs = null; PF.found = null;
   $('#v-verdict').innerHTML = '<span class="note">looking…</span>';
   pfKvFromBoxes(null);
   proveModes();
@@ -250,7 +279,7 @@ function autoSearch(){
 });
 
 $('#v-again').onclick = () => {
-  PF.proof = null; PF.graphs = null;
+  PF.proof = null; PF.graphs = null; PF.found = null;
   $('#v-verdict').innerHTML = '';
   proveModes();
 };

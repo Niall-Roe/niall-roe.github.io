@@ -14,6 +14,7 @@
     --shade:#2e2b24; --sheet:#232019; }
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;padding:0}
 body{background:var(--paper);color:var(--ink);font:15px/1.55 var(--sans);
   -webkit-font-smoothing:antialiased}
@@ -397,3 +398,52 @@ footer.page{max-width:1180px;margin:0 auto;padding:0 26px 40px;
   font-size:12.5px;color:var(--ink3);line-height:1.55}
 footer.page p{margin:0;border-top:1px solid var(--rule);padding-top:14px;max-width:90ch}
 footer.page b{color:var(--ink2)}
+
+/* How to read a graph: the text, and beside it a small sheet that draws
+   whatever highlighted words were last clicked */
+header h1{margin-bottom:16px}
+.readgrid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:24px;align-items:start}
+.readtext p{margin:0 0 11px;line-height:1.62;max-width:74ch}
+.readtext blockquote.peirce{max-width:66ch}
+.readside{position:sticky;top:14px;border:1px solid var(--rule);border-radius:10px;
+  padding:10px 10px 8px;background:var(--paper)}
+.rdstage{min-height:160px;display:flex;align-items:center;justify-content:center;padding:6px}
+.rdsay{font:14px/1.4 var(--serif);text-align:center;margin:9px 4px 2px;min-height:1.4em;color:var(--ink)}
+.rdhint{text-align:center;margin:2px 0 0}
+button.rdlink{appearance:none;border:0;font:inherit;color:inherit;cursor:pointer;
+  padding:0 3px;margin:0 -1px;border-radius:4px;line-height:inherit;
+  background:color-mix(in srgb,var(--accent) 11%,transparent);
+  box-shadow:inset 0 -1.5px 0 color-mix(in srgb,var(--accent) 55%,transparent)}
+button.rdlink:hover{background:color-mix(in srgb,var(--accent) 20%,transparent)}
+button.rdlink.on{background:color-mix(in srgb,var(--accent) 26%,transparent)}
+button.rdlink:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.rdformula{white-space:nowrap;font-weight:600}
+@media (max-width:860px){ .readgrid{grid-template-columns:1fr} .readside{position:static} }
+.modeswitch.tmode{margin:0 0 10px}
+
+/* a cut tied by colour to the part of a formula it stands for */
+.tint0{color:#9a2a2a} .tint1{color:#1d6b3a} .tint2{color:#2350a0} .tint3{color:#8a5a12}
+svg.eg:not(.hand) .cut.tint0, svg.eg.hand .cut.ink.tint0{stroke:#9a2a2a}
+svg.eg:not(.hand) .cut.tint1, svg.eg.hand .cut.ink.tint1{stroke:#1d6b3a}
+svg.eg:not(.hand) .cut.tint2, svg.eg.hand .cut.ink.tint2{stroke:#2350a0}
+svg.eg:not(.hand) .cut.tint3, svg.eg.hand .cut.ink.tint3{stroke:#8a5a12}
+svg.eg:not(.hand) .cut[class*="tint"]{stroke-width:2.3}
+@media (prefers-color-scheme: dark){
+  .tint0{color:#e79191} .tint1{color:#8fd0a1} .tint2{color:#94b8ec} .tint3{color:#e3b978}
+  svg.eg:not(.hand) .cut.tint0, svg.eg.hand .cut.ink.tint0{stroke:#e79191}
+  svg.eg:not(.hand) .cut.tint1, svg.eg.hand .cut.ink.tint1{stroke:#8fd0a1}
+  svg.eg:not(.hand) .cut.tint2, svg.eg.hand .cut.ink.tint2{stroke:#94b8ec}
+  svg.eg:not(.hand) .cut.tint3, svg.eg.hand .cut.ink.tint3{stroke:#e3b978}
+}
+
+/* the Rearrange step: not a rule, so it is set apart from them */
+ol.steps li.rearr .r{font-style:italic;color:var(--ink3)}
+ol.steps li.rearr .n{color:var(--ink3)}
+ol.steps li.rearr .w{color:var(--ink3)}
+
+/* points of lines as targets of the rules */
+svg.eg .handle.tgt{stroke:var(--ok);stroke-dasharray:none;stroke-width:2.4;r:5}
+svg.eg .handle.tgt-src{fill:var(--accent);stroke:var(--accent);stroke-dasharray:none;r:5}
+svg.eg .handle.tgt-hot{fill:var(--ok);stroke:var(--ok);stroke-dasharray:none;r:5.5}
+.toggles.boardbar{align-items:center;margin-top:12px;padding-top:10px;border-top:1px solid var(--rule)}
+.toggles.boardbar .btn{padding:4px 12px;font-size:12.5px}

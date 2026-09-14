@@ -103,23 +103,19 @@ $('#n-rules').innerHTML = RULES.map(r =>
   '<dd class="cite" style="margin-top:14px">Roberts 1973, Appendix 3, p. 138. All of them are '+
   'implemented, including clauses (a)–(d) of R3 and (a)–(c) of R4.</dd>';
 
-/* Two notes, each put where it is wanted: how to read a graph at the head of
-   the Scribe page, and how the finder works on the Prove page. */
-$('#n-reading').innerHTML = [
- '<p>Read a graph from the outside in. Peirce calls this <i>endoporeutic</i>. Everything ',
- 'written in one place is asserted together. A cut denies what is inside it. A line of ',
- 'identity counts as being wherever its least enclosed point is, so a line in an evenly ',
- 'enclosed place reads <i>some</i> and one in an oddly enclosed place reads <i>any</i> ',
- '(Roberts p. 51).</p>',
- '<p><b>Shading.</b> The shaded places are the oddly enclosed ones. Peirce shades them in ',
- 'MS 514. It is a help for the eye; nothing in the logic depends on it.</p>',
- '<p><b>Coloured lines.</b> Peirce drew in one ink. Colouring each line of identity ',
- 'differently makes it easier to see which is which where they cross. Turn it off and the ',
- 'graphs look as he drew them.</p>',
- '<p><b>Hook labels.</b> Peirce tells the hooks of a spot apart by where they sit round it: ',
- 'the first at nine o\'clock, the rest clockwise (Roberts p. 74). This page puts them all ',
- 'down the left edge instead, so the small letter names the line and the raised figure gives ',
- 'the place. That is this drawing\'s doing, not Peirce\'s.</p>'
+/* Two notes, each put where it is wanted: what the drawing does of its own
+   accord, under the conventions, and how the finder works on the Prove page.
+   How to read a graph has its own card and file, ui9-reading. */
+$('#n-drawing').innerHTML = [
+ '<p class="tight"><b>Shading.</b> The shaded places are the oddly enclosed ones. Peirce ',
+ 'shades them in MS 514. It is a help for the eye; nothing in the logic depends on it.</p>',
+ '<p class="tight"><b>Coloured lines.</b> Peirce drew in one ink. Colouring each line of ',
+ 'identity differently makes it easier to see which is which where they cross. Turn it off ',
+ 'and the graphs look as he drew them.</p>',
+ '<p class="tight"><b>Hook labels.</b> Peirce tells the hooks of a spot apart by where they ',
+ 'sit round it: the first at nine o\'clock, the rest clockwise (Roberts p. 74). This page ',
+ 'puts them all down the left edge instead, so the small letter names the line and the raised ',
+ 'figure gives the place. That is this drawing\'s doing, not Peirce\'s.</p>'
 ].join('');
 
 $('#n-finder').innerHTML = [
@@ -167,7 +163,7 @@ $('#n-finder').innerHTML = [
 
 /* ---- the written records -------------------------------------------------- */
 const drawPfWrit = bindWrit('pf', () => PF.proof && PF.graphs
-  ? { graphs: PF.graphs, steps: PF.proof.steps, i: PF.i,
+  ? { graphs: PF.graphs, steps: PF.steps, i: PF.i,
       onPick: k => { pfStop(); pfShow(k); } } : null);
 WRIT.pf = drawPfWrit;
 
@@ -178,11 +174,16 @@ enhanceEditor($('#v-goal'));
 if ($('#d-from')) enhanceEditor($('#d-from'));
 if ($('#d-lin')) enhanceEditor($('#d-lin'), { glyphs: false });
 
+// the notation the reader last wrote in
+let savedTMode = 'formula';
+try { savedTMode = localStorage.getItem('eg-tmode') || 'formula'; } catch(e){}
+setTMode(savedTMode === 'linear' ? 'linear' : 'formula', savedTMode === 'linear');
 translate(false);
+if (typeof rdStill === 'function') rdStill();
 buildProofList();
 buildPuzzleList();
+// the first proof in the list sets the board up; nothing is put over it after
 pfChoose($('#pf-sel').value || 'lib:0');
-try { ED.g = compileFormula(parseFormula('P -> Q')).graph; } catch(e){}
 drawRender();
 
 

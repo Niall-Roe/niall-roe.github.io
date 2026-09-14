@@ -464,7 +464,8 @@ function markNodes(el, g, G, focus){
    shape first — same enclosure in the same place, same spot with the same name
    — lets the parts they have in common move rather than blink.
    ========================================================================== */
-function alignGraph(gA, gB){
+function alignGraph(gA, gB, opts){
+  opts = opts || {};
   const ligA = ligIndex(gA), ligB = ligIndex(gB);
   const node = {}, area = {}, ln = {};
   area[gB.root] = gA.root;
@@ -558,8 +559,30 @@ function alignGraph(gA, gB){
           scroll: n.scroll ? nid(n.scroll) : undefined }
       : { k:'spot', id: nid(x), area: aid(n.area), name: n.name, hooks: n.hooks.map(lid) };
   }
-  for (const x of Object.keys(gB.lns))
+  // lines already on screen keep their place in the order, so their lanes do too
+  const lnKeys = Object.keys(gB.lns);
+  if (opts.order !== 'target'){
+    const rankA = new Map(Object.keys(gA.lns).map((x,i) => [x,i]));
+    lnKeys.sort((p,q) => (rankA.has(lid(p)) ? rankA.get(lid(p)) : 1e9) -
+                         (rankA.has(lid(q)) ? rankA.get(lid(q)) : 1e9));
+  }
+  for (const x of lnKeys)
     h.lns[lid(x)] = { id: lid(x), area: aid(gB.lns[x].area) };
+  /* Order is not drawn: two graphs side by side say the same in either order.
+     So where an area was already on screen, the graphs it shares with the old
+     drawing keep the old order, and anything new takes the place it has in the
+     new one. Asked for the target's order instead, as the Rearrange step of
+     the proof player is, the new drawing's order is kept as it is. */
+  if (opts.order !== 'target')
+    for (const a of Object.keys(h.areas)){
+      const old = gA.areas[a];
+      if (!old) continue;
+      const items = h.areas[a].items;
+      const rank = new Map(old.items.map((x,i) => [x,i]));
+      const shared = items.filter(x => rank.has(x)).sort((p,q) => rank.get(p) - rank.get(q));
+      let k = 0;
+      h.areas[a].items = items.map(x => rank.has(x) ? shared[k++] : x);
+    }
   let e = 0;
   for (const x of Object.keys(gB.edges)){
     const E = gB.edges[x];

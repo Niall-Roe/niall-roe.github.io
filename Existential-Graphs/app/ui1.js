@@ -14,7 +14,7 @@ $$('nav.tabs button').forEach(b => b.onclick = () => {
 });
 // a panel that was hidden had no width to size its drawing to
 function refresh(tab){
-  if (tab === 'translate') translate(false);
+  if (tab === 'translate'){ translate(false); if (typeof rdStill === 'function') rdStill(); }
   else if (tab === 'proofs'){
     const w = $('#work-view');
     if (w && w.style.display !== 'none') drawRender();
@@ -123,7 +123,48 @@ const T_EXAMPLES = [
 ];
 function tOpts(){ return { shade: $('#t-shade').checked, wobble: $('#t-wobble').checked,
                            hookNumbers: $('#t-hooks').checked, colourLines: PREFS.colour, hand: PREFS.hand }; }
-const TR = { graph: null, anim: null, timer: 0 };
+const TR = { graph: null, anim: null, timer: 0, mode: 'formula' };
+
+/* Two ways to write a proposition. Ordinary notation is a formula the page
+   turns into a graph; linear notation writes the graph itself. Switching
+   carries what is in the box across, so the drawing does not change. */
+function tModeText(g, mode){
+  if (mode === 'linear') return writeEG(g, true);
+  // the sugared reading is kinder, but it collapses double cuts; use it only
+  // when it comes back as the same graph
+  const k = canonGraph(g);
+  for (const txt of [fmtFull(sugar(readGraph(g))), fmtFull(readGraph(g))]){
+    try { if (canonGraph(compileFormula(parseFormula(txt)).graph) === k) return txt; } catch(e){}
+  }
+  return fmtFull(readGraph(g));
+}
+function setTMode(mode, carry){
+  if (mode !== 'formula' && mode !== 'linear') mode = 'formula';
+  const was = TR.mode;
+  let g = null;
+  if (carry && was !== mode){
+    try { g = tGraphOf($('#t-in').value.trim(), was); } catch(e){ g = null; }
+  }
+  TR.mode = mode;
+  try { localStorage.setItem('eg-tmode', mode); } catch(e){}
+  $('#t-mode-formula').classList.toggle('on', mode === 'formula');
+  $('#t-mode-linear').classList.toggle('on', mode === 'linear');
+  $('#t-help-formula').hidden = mode !== 'formula';
+  $('#t-help-linear').hidden = mode !== 'linear';
+  $('#t-lin-h').hidden = $('#t-lin').hidden = mode === 'linear';
+  const bar = $('#t-in').closest('.editor') && $('#t-in').closest('.editor').nextElementSibling;
+  if (bar && bar.classList.contains('glyphs')) bar.hidden = mode === 'linear';
+  if (carry && was !== mode){
+    if (g) setEditorValue('#t-in', Object.keys(g.nodes).length || Object.keys(g.lns).length
+                                     ? tModeText(g, mode) : '');
+    translate(false);
+  }
+}
+// the graph a box holds, read the way the box is set to be read
+function tGraphOf(src, mode){
+  if (!src) return newGraph();
+  return mode === 'linear' ? parseEG(src) : compileFormula(parseFormula(src)).graph;
+}
 
 // Draw the new graph by moving the old one into it, so that what the change to
 // the formula does to the graph can be watched rather than guessed.
@@ -156,7 +197,10 @@ function translate(animate){
     $('#t-alt').innerHTML = ''; $('#t-notes').innerHTML = '';
     $('#t-val').innerHTML = ''; return; }
   let ast, r;
-  try { ast = parseFormula(src); r = compileFormula(ast); }
+  try {
+    if (TR.mode === 'linear') r = { graph: parseEG(src), notes: [] };
+    else { ast = parseFormula(src); r = compileFormula(ast); }
+  }
   catch (e){
     $('#t-err').textContent = e.message + (e.at !== undefined ? '\n' + ' '.repeat(e.at) + '↑' : '');
     return;
@@ -182,6 +226,8 @@ $('#t-in').addEventListener('keydown', e => {
   if (e.key === 'Enter' && !e.shiftKey){ e.preventDefault(); clearTimeout(TR.timer); translate(true); }
 });
 $('#t-draw').onclick = () => { clearTimeout(TR.timer); translate(true); };
+$('#t-mode-formula').onclick = () => setTMode('formula', true);
+$('#t-mode-linear').onclick = () => setTMode('linear', true);
 ['#t-shade','#t-wobble','#t-hooks'].forEach(s => $(s).addEventListener('change', () => translate(false)));
 $('#t-ex').innerHTML = T_EXAMPLES.map((grp, gi) =>
   '<div class="chipgroup"><h3>'+esc(grp.group)+
@@ -196,7 +242,11 @@ $('#t-ex').onclick = ev => {
   const b = ev.target.closest('button'); if (!b) return;
   const e = T_EXAMPLES[+b.dataset.g].items[+b.dataset.i];
   $$('#t-ex button').forEach(x => x.classList.toggle('on', x === b));
-  setEditorValue('#t-in', e[0]);
+  let text = e[0];
+  if (TR.mode === 'linear' && text){
+    try { text = writeEG(compileFormula(parseFormula(text)).graph, true); } catch(err){}
+  }
+  setEditorValue('#t-in', text);
   $('#t-exsay').innerHTML = e[2] ? esc(e[2]) : '';
   clearTimeout(TR.timer); translate(true);
 };
@@ -247,15 +297,56 @@ function hydrateProof(p){
 function hydrateSteps(steps){ return hydrateChain(steps.map(s => s.graph)); }
 
 /* ============================== PROOFS ===================================== */
-const PF = { proof: null, i: 0, timer: null, anim: null };
+const PF = { proof: null, i: 0, timer: null, anim: null, steps: [] };
+
+/* The steps the player shows. They are the proof's own, and one more where
+   the finished drawing stands in a different order from the conclusion as it
+   is written: that step moves things into that order and does nothing else.
+   It is called Rearrange. It is not one of the rules, since where a graph
+   stands on its area says nothing, and it is not counted among the steps. */
+const REARRANGE_WHY = 'Nothing is scribed or erased. The graphs are moved into the order ' +
+  'the conclusion is written in; where a graph stands on its area makes no difference to ' +
+  'what it says.';
+function drawOrder(g){
+  const out = [];
+  (function walk(a){
+    for (const x of g.areas[a].items){ out.push(x); if (g.nodes[x].k === 'cut') walk(g.nodes[x].inner); }
+  })(g.root);
+  return out.join(' ');
+}
+function pfView(p){
+  PF.graphs = p._h.graphs.slice();
+  PF.mvs = p._h.mvs.slice();
+  PF.steps = p.steps.slice();
+  try {
+    const last = PF.graphs[PF.graphs.length-1];
+    const goal = compileFormula(parseFormula(p.goal)).graph;
+    if (canonGraph(last) === canonGraph(goal)){
+      const tidy = alignGraph(last, goal, { order: 'target' });
+      // only when every part is carried across, so that the step moves and
+      // never redraws
+      const whole = Object.keys(tidy.nodes).length === Object.keys(last.nodes).length &&
+        Object.keys(tidy.nodes).every(x => last.nodes[x]) &&
+        Object.keys(tidy.lns).every(x => last.lns[x]);
+      if (whole && drawOrder(tidy) !== drawOrder(last)){
+        PF.graphs.push(tidy);
+        PF.mvs.push(null);
+        PF.steps.push({ eg: writeEG(tidy, true), rule: 'Rearrange', why: REARRANGE_WHY, rearrange: true });
+      }
+    }
+  } catch(e){}
+  PF.frame = proofFrame(PF.graphs);
+  $('#pf-steps').innerHTML = PF.steps.map((s,k) =>
+    '<li data-k="'+k+'"'+(s.rearrange ? ' class="rearr"' : '')+'><span class="n">'+
+    (s.rearrange ? '⇄' : (k+1))+'</span><span class="r">'+
+    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+}
 // the list is built on the Prove it tab, in ui7
 function pfLoad(i){
   const p = PROOFS[i];
   PF.proof = p; PF.i = 0;
   PF.source = 'lib'; PF.found = p;
-  const h = hydrateProof(p);
-  PF.graphs = h.graphs; PF.mvs = h.mvs;
-  PF.frame = proofFrame(PF.graphs);
+  hydrateProof(p);
   $('#pf-cite').innerHTML = p.cite ? '<b>'+esc(p.cite)+'</b>' : '';
   $('#pf-note').textContent = p.note || '';
   $('#pf-kv').innerHTML =
@@ -267,9 +358,7 @@ function pfLoad(i){
     p.found === 'book' ? 'Each step here is the one printed in the source, and each has been checked against the rules.'
   : p.found === 'hand' ? 'This sequence was worked out for this page, not transcribed; each step has been checked against the rules.'
   : 'This sequence was found by the proof finder in this page, and each step checked against the rules.';
-  $('#pf-steps').innerHTML = p.steps.map((s,k) =>
-    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
-    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  pfView(p);
   pfShow(0);
 }
 function fmtSrc(s){ try { return fmt(parseFormula(s), 0); } catch(e){ return s; } }
@@ -291,8 +380,6 @@ function pfLoadFound(steps, premGraphs, goalGraph, src){
               steps: steps.map(s => ({ eg: writeEG(s.graph, true), rule: s.rule, why: s.why })) };
   p._h = hydrateSteps(steps);
   PF.proof = p; PF.i = 0;
-  PF.graphs = p._h.graphs; PF.mvs = p._h.mvs;
-  PF.frame = proofFrame(PF.graphs);
   $('#pf-cite').innerHTML = '';
   $('#pf-note').textContent = '';
   $('#pf-kv').innerHTML =
@@ -311,9 +398,7 @@ function pfLoadFound(steps, premGraphs, goalGraph, src){
     : mine
       ? 'This is what you did on the board, each step checked against the rules.'
       : 'Found by the proof finder in this page just now, and each step checked against the rules.';
-  $('#pf-steps').innerHTML = p.steps.map((s,k) =>
-    '<li data-k="'+k+'"><span class="n">'+(k+1)+'</span><span class="r">'+
-    esc(s.rule||'premiss')+'</span><span class="w">'+esc(s.why)+'</span></li>').join('');
+  pfView(p);
   pfShow(0);
   PF.source = src || 'machine';
   // the machine's answer is kept, so the reader can come back to it after
@@ -322,15 +407,15 @@ function pfLoadFound(steps, premGraphs, goalGraph, src){
   if (typeof proveModes === 'function'){
     proveModes();
     // a proof turning up does not take the reader off the board
-    if (PF.source === 'machine' && $('#play-view').style.display !== 'none') proveMode('play');
-    else if (PF.source === 'machine') proveMode('work');
+    // a proof turning up puts the reader back on whichever of the two they chose
+    if (PF.source === 'machine') proveMode(PV.want);
   }
 }
 
 function pfShow(i, animate){
   const p = PF.proof; if (!p) return;
   const from = PF.i;
-  PF.i = Math.max(0, Math.min(p.steps.length-1, i));
+  PF.i = Math.max(0, Math.min(PF.steps.length-1, i));
   if (PF.anim){ PF.anim.cancel(); PF.anim = null; }
   const g = PF.graphs[PF.i];
   // the slider is labelled speed, so dragging it right must make the step
@@ -352,7 +437,7 @@ function pfShow(i, animate){
   } else {
     stageSvg($('#pf-stage'), g, { shade:true, wobble:true, frame: PF.frame });
   }
-  const s = p.steps[PF.i];
+  const s = PF.steps[PF.i];
   $('#pf-why').innerHTML = '<b>'+esc(s.rule ? s.rule : 'Premiss')+'</b> — '+esc(s.why)+
     '<br><span class="mono" style="font-size:12px;color:var(--ink3)">'+
     esc(fmtFull(sugar(readGraph(g))))+'</span>';
@@ -373,10 +458,10 @@ function pfStop(){
 const ANIM_ON = () => !$('#pf-anim') || $('#pf-anim').checked;
 $('#pf-play').onclick = () => {
   if (PF.timer || PF.anim){ pfStop(); return; }
-  if (PF.i >= PF.proof.steps.length-1) pfShow(0);
+  if (PF.i >= PF.steps.length-1) pfShow(0);
   $('#pf-play').textContent = '❚❚ pause';
   const advance = () => {
-    if (PF.i >= PF.proof.steps.length-1){ pfStop(); return; }
+    if (PF.i >= PF.steps.length-1){ pfStop(); return; }
     pfShow(PF.i+1, true);
     // wait out the step itself, then leave the drawing standing long enough to
     // be read before the next rule is applied

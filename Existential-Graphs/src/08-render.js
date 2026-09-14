@@ -560,6 +560,7 @@ function renderGraph(g, opts){
   const wobble = opts.wobble !== false;
   const hand = !!opts.hand;
   const hl = opts.highlight || {};      // {nodeId:'add'|'del'|'move'}
+  const tint = opts.tint || {};         // {cutId: 0-3}, to tie a cut to part of a formula
 
   // The frame is the sheet as drawn. Left to itself it is the graph's own size;
   // given a frame it is that size, never smaller than the graph, with the graph
@@ -577,9 +578,10 @@ function renderGraph(g, opts){
       const mark = hl[id] ? ' hl-'+hl[id] : '';
       if (n.k === 'cut'){
         const d = depthOf(g, n.inner);
-        parts.push(`<path class="cut${mark}${raised}${shade && d%2===1 ? ' odd':''}" d="${
+        const tc = tint[id] !== undefined ? ' tint' + tint[id] : '';
+        parts.push(`<path class="cut${mark}${tc}${raised}${shade && d%2===1 ? ' odd':''}" d="${
           cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand)}" data-node="${n.id}" data-area="${n.inner}"/>`);
-      if (hand) parts.push(inkStroke('cut ink', cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand),
+      if (hand) parts.push(inkStroke('cut ink' + tc, cutPath(p.x, p.y, p.w, p.h, n.id, wobble, hand),
         2*(p.w + p.h), LAY.cutW, n.id));
         drawArea(n.inner);
       } else {

@@ -1,10 +1,5 @@
 <header>
   <h1>The Existential Graphs of Charles S. Peirce</h1>
-  <p class="sub">A working instrument for Peirce's diagrammatic logic: translate ordinary
-  notation into graphs, watch known proofs unfold, scribe graphs and read them back, and
-  set the rules of transformation to work on a problem of your own. Built on Don D.
-  Roberts, <cite>The Existential Graphs of Charles S. Peirce</cite> (The Hague: Mouton,
-  1973), with Peirce's MS 514 as transcribed by John Sowa.</p>
 </header>
 <main>
 <nav class="tabs" role="tablist">
@@ -17,14 +12,22 @@
 <section class="panel on" id="p-translate">
   <div class="card" style="margin-bottom:18px">
     <h2>How to read a graph</h2>
-    <blockquote class="peirce">A nest sucks the meaning from without inwards unto its centre,
-    as a sponge absorbs water.<span class="cite">Peirce, Ms 650, quoted in Roberts 1973,
-    p. 39 n. 13</span></blockquote>
-    <div id="n-reading"></div>
+    <div class="readgrid">
+      <div class="readtext" id="n-reading"></div>
+      <aside class="readside" aria-live="polite">
+        <div class="stage rdstage" id="rd-stage"></div>
+        <p class="rdsay" id="rd-say"></p>
+        <p class="note rdhint">Click any highlighted words to see them drawn here.</p>
+      </aside>
+    </div>
   </div>
   <div class="grid two">
     <div class="card">
-      <h2>A proposition in ordinary notation</h2>
+      <h2>A proposition</h2>
+      <div class="modeswitch tmode" role="group" aria-label="how to write it">
+        <button type="button" id="t-mode-formula" class="on">Ordinary notation</button>
+        <button type="button" id="t-mode-linear">Linear notation</button>
+      </div>
       <textarea id="t-in" rows="3" spellcheck="false">Ax (Fx -> Gx)</textarea>
       <div id="t-ex" class="exwall"></div>
       <p class="note" id="t-exsay" style="min-height:1.2em"></p>
@@ -42,6 +45,7 @@
       </div>
       <hr class="sep">
       <h2>How to write it</h2>
+      <div id="t-help-formula">
       <p class="tight"><code>~ &amp; | -&gt; &lt;-&gt;</code> for not, and, or, if-then, if-and-only-if.
       The glyphs <code>¬ ∧ ∨ ⊃ ≡</code> work too.</p>
       <p class="tight"><code>Ax</code> and <code>Ex</code> for <span class="mono">∀x</span>
@@ -51,6 +55,24 @@
       <p class="note">Peirce allows no graph with an unoccupied hook, so a free variable
       cannot be scribed at all (Roberts p. 49). One is closed existentially for you, with
       a note saying so.</p>
+      </div>
+      <div id="t-help-linear" hidden>
+      <p class="tight">Linear notation writes down the graph itself, mark by mark, instead of
+      a formula it stands for.</p>
+      <p class="tight"><code>( )</code> is a cut. Whatever you put inside it is denied, so
+      <code>( P )</code> is not P.</p>
+      <p class="tight">Whatever is written side by side is asserted together, so <code>P Q</code>
+      is P and Q, and <code>( P ( Q ) )</code> is if P then Q.</p>
+      <p class="tight">A capital letter or a word is a spot: <code>P</code>, <code>Man</code>.</p>
+      <p class="tight">Lines of identity get small letters. <code>*x</code> puts a point of the
+      line x where you write it, and <code>F[x]</code> is a spot with its hook on x, so
+      <code>*x F[x]</code> is something is F. A spot with more hooks lists them in order:
+      <code>L[x,y]</code>.</p>
+      <p class="tight">A line named inside a cut passes through the cut, and where you first
+      name it decides how it reads: <code>( *x ( F[x] ) )</code> is everything is F.</p>
+      <p class="note"><code>x~y</code> joins two lines into one, and <code>{ P | Q }</code> is
+      short for <code>( P ( Q ) )</code>.</p>
+      </div>
     </div>
     <div>
       <div class="card">
@@ -63,7 +85,7 @@
         <p class="reading" id="t-read"></p>
         <p class="gloss" id="t-gloss"></p>
         <div id="t-alt"></div>
-        <h3>In linear notation</h3>
+        <h3 id="t-lin-h">In linear notation</h3>
         <div class="notation" id="t-lin"></div>
         <div id="t-notes" class="note"></div>
         <div id="t-val" style="margin-top:12px"></div>
@@ -98,6 +120,8 @@
     <p class="note" style="margin-top:0">What the marks mean. The examples above are in this
     order so that each one uses only conventions you have already seen.</p>
     <dl class="rules two-col" id="n-conv"></dl>
+    <h3 style="margin-top:14px">About the drawing</h3>
+    <div id="n-drawing"></div>
   </div>
 </section>
 
@@ -109,19 +133,18 @@
     would listen to the rules of a new and intricate game, very closely attentive, but wide awake
     to the purpose of preparing for a lively and lightsome contest.
     <span class="cite">Peirce, quoted in Roberts 1973, p. 14</span></blockquote>
-    <p class="tight">There are three things you can do, and you can do each of them in two
-    directions. R1 erases, R2 scribes. R3 copies a graph inwards, R4 erases such a copy. R5
-    draws a double cut, R6 takes one off. A cut is a graph like any other, so the pair that
-    draws and removes it works like the other two pairs.</p>
-    <p class="note">Roberts counts five rules, treating the double cut as one rule read both
-    ways (Appendix 3, p. 138). They are numbered as six here because when you are working, they
-    are six different things to reach for. Each rule below has examples, including moves the
-    rule does not allow.</p>
-    <p class="tight" style="margin-top:12px">Peirce describes two people at work: a
-    <i>Graphist</i>, who writes down what is granted at the start, and an <i>Interpreter</i>,
-    who changes the graph by the rules to see what follows. Here you are both.
-    <span class="cite">Reasoning is nothing but the discourse of the mind to its future self
-    &mdash; Peirce, Ms 450, p. 3, quoted in Roberts 1973, p. 92</span></p>
+    <p class="tight">You are permitted to write and erase certain aspects of the graphs. There
+    are three rules for each, and they mirror one another. This is best understood with the
+    interactive examples below, but here is an overview.</p>
+    <p class="tight">You are (R1) able to erase any graph that is on an even, or positive,
+    surface. You are (R2) allowed to insert any graph you like into an odd, or negative,
+    surface.</p>
+    <p class="tight">If you have a copy of a graph, you are (R3) allowed to write it again
+    anywhere further in, in any area that its own area contains, however many cuts deep. You
+    are (R4) allowed to erase any copy that could have been made that way.</p>
+    <p class="tight">You are (R5) allowed to draw two cuts, one just inside the other, around
+    any graph, anywhere, or around nothing at all. You are (R6) allowed to take such a pair off
+    again, as long as there is nothing between the two cuts.</p>
   </div>
   <div class="card">
     <h2>The six permissions</h2>
@@ -258,28 +281,10 @@ Q -> R</textarea>
       <div class="card" style="margin-top:18px">
         <h2>Rules of manipulation</h2>
         <div id="d-moves"></div>
-      </div>
-      <div class="card" style="margin-top:18px">
-        <h2>Scribing marks by hand</h2>
-        <p class="tight">Insertion in an oddly enclosed place lets you write whatever you
-        like, and in Beta what you write may be a line of identity or a spot with hooks.
-        These draw such a graph. Click a cut to select its area, or the sheet to select the
-        sheet itself, then scribe onto the selected area.</p>
-        <div class="btnrow">
-          <button class="btn" id="d-cut">Cut</button>
-          <button class="btn" id="d-spot">Spot…</button>
-          <button class="btn" id="d-line">Line of identity</button>
-        </div>
-        <div class="btnrow">
-          <button class="btn ghost" id="d-join">Join two points</button>
-          <button class="btn ghost" id="d-del">Erase selection</button>
-          <button class="btn ghost" id="d-undo">Undo</button>
-          <button class="btn ghost" id="d-clear">Blank sheet</button>
-        </div>
-        <p class="note" id="d-hint">Selected: the sheet of assertion.</p>
-        <div class="toggles">
+        <div class="toggles boardbar">
+          <button type="button" class="btn ghost" id="d-undo">Undo</button>
           <label><input type="checkbox" id="d-shade" checked> shade odd areas</label>
-          <label><input type="checkbox" id="d-handles" checked> show line points</label>
+          <label><input type="checkbox" id="d-handles" checked> show the points of lines</label>
           <label><input type="checkbox" class="pref-colour" checked> colour the lines</label>
         </div>
       </div>
