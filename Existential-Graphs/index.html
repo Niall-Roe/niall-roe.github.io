@@ -7074,48 +7074,49 @@ const RD_DEMOS = {
   cond:     [['A', 'A'], ['A (B)', 'A ∧ ¬B'], ['(A (B))', '¬(A ∧ ¬B), that is, A ⊃ B']],
   disj:     [['C D', 'C ∧ D'], ['(C) D', '¬C ∧ D'], ['(C) (D)', '¬C ∧ ¬D'],
              ['((C) (D))', '¬(¬C ∧ ¬D), that is, C ∨ D']],
-  outside:  [['(A (B))', 'A ⊃ B'], ['(A (B)) (C)', '(A ⊃ B) ∧ ¬C'],
-             ['(A (B)) (C) ((D))', '(A ⊃ B) ∧ ¬C ∧ ¬¬D'],
-             ['(A (B)) ((C) ((D)))', '(A ⊃ B) ∧ (C ∨ ¬D)'],
-             ['((A (B)) ((C) ((D))))', 'TINTED']]
+  /* Built the way it is read: the outermost cut first, then what stands in
+     it, one level of enclosure at a time, the reading filling in as it goes. */
+  outside:  [['( )', 'HTML:<span class="tint0">¬( … )</span>'],
+             ['( ( ) ( ) )', 'HTML:<span class="tint0">¬(</span><span class="tint1">¬…</span> ∧ ' +
+                             '<span class="tint2">¬…</span><span class="tint0">)</span>'],
+             ['( ( A ( ) ) ( ( ) ( ) ) )', 'HTML:<span class="tint0">¬(</span><span class="tint1">(A ⊃ …)</span> ∧ ' +
+                             '<span class="tint2">(… ∨ …)</span><span class="tint0">)</span>'],
+             ['( ( A ( B ) ) ( ( C ) ( ( ) ) ) )', 'HTML:<span class="tint0">¬(</span><span class="tint1">(A ⊃ B)</span> ∧ ' +
+                             '<span class="tint2">(C ∨ <span class="tint3">¬…</span>)</span><span class="tint0">)</span>'],
+             ['( ( A ( B ) ) ( ( C ) ( ( D ) ) ) )', 'TINTED']]
 };
+// the examples whose cuts are coloured to match their reading at every step
+const RD_TINTS = new Set(['outside']);
 
 // the reading of the last example, with each part in the colour of its cuts
 const RD_TINTED =
   '<span class="tint0">¬(</span><span class="tint1">(A ⊃ B)</span> ∧ ' +
   '<span class="tint2">(C ∨ <span class="tint3">¬D</span>)</span><span class="tint0">)</span>';
 
-/* Which cut belongs to which part of ¬((A ⊃ B) ∧ (C ∨ ¬D)). Found by shape, so
-   it holds whatever identifiers the drawing has picked up on the way. */
+/* Which cut belongs to which part of ¬((A ⊃ B) ∧ (C ∨ ¬D)). Found by place
+   rather than by what is written inside, since while the graph is being built
+   from the outside in the inner cuts are still empty: the outer cut; in it, the
+   conditional first and the disjunction second; and in the disjunction's
+   second cut, the one that denies D. */
 function rdTint(g){
   const t = {};
-  const root = g.areas[g.root];
-  if (root.items.length !== 1) return t;
-  const outer = root.items[0];
+  const cutsIn = a => g.areas[a].items.filter(x => g.nodes[x].k === 'cut');
+  const root = cutsIn(g.root);
+  if (root.length !== 1) return t;
+  const outer = root[0];
   t[outer] = 0;
-  const spotsIn = (id, direct) => {
-    const areas = direct ? [g.nodes[id].inner] : areasUnder(g, g.nodes[id].inner);
-    const names = [];
-    for (const a of areas) for (const x of g.areas[a].items)
-      if (g.nodes[x].k === 'spot') names.push(g.nodes[x].name);
-    return names;
-  };
-  const cutsUnder = id => {
-    const out = [];
-    for (const a of areasUnder(g, g.nodes[id].inner))
-      for (const x of g.areas[a].items) if (g.nodes[x].k === 'cut') out.push(x);
-    return out;
-  };
-  for (const id of g.areas[g.nodes[outer].inner].items){
-    if (g.nodes[id].k !== 'cut') continue;
-    const names = spotsIn(id, false);
-    const k = names.includes('A') ? 1 : names.includes('C') ? 2 : null;
-    if (k === null) continue;
+  const all = (id, k) => {
     t[id] = k;
-    for (const c of cutsUnder(id)) t[c] = k;
-    // the cut standing right round D is the denial in ¬D
-    if (k === 2) for (const c of cutsUnder(id))
-      if (spotsIn(c, true).includes('D')) t[c] = 3;
+    for (const a of areasUnder(g, g.nodes[id].inner))
+      for (const x of g.areas[a].items) if (g.nodes[x].k === 'cut') t[x] = k;
+  };
+  const [cond, disj] = cutsIn(g.nodes[outer].inner);
+  if (cond) all(cond, 1);
+  if (disj){
+    all(disj, 2);
+    const second = cutsIn(g.nodes[disj].inner)[1];
+    const deny = second && cutsIn(g.nodes[second].inner)[0];
+    if (deny) all(deny, 3);
   }
   return t;
 }
@@ -7133,7 +7134,8 @@ function rdStill(){
 function rdSay(text){
   const say = $('#rd-say');
   if (!say) return;
-  say.innerHTML = text === 'TINTED' ? RD_TINTED : esc(text);
+  say.innerHTML = text === 'TINTED' ? RD_TINTED
+               : text.slice(0, 5) === 'HTML:' ? text.slice(5) : esc(text);
 }
 function rdStop(){
   RD.run++;
@@ -7161,7 +7163,7 @@ function rdPlay(key){
       if (run !== RD.run) return;
       RD.anim = null;
       RD.g = target;
-      RD.tint = last && say === 'TINTED' ? rdTint(target) : null;
+      RD.tint = RD_TINTS.has(key) ? rdTint(target) : null;
       rdStill();
       rdSay(say);
       if (!last) RD.timer = setTimeout(step, 750);
