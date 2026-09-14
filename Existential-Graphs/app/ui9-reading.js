@@ -168,3 +168,7 @@ $('#n-reading').addEventListener('click', e => {
 // the sheet starts blank: it is the first of the three things the text names
 RD.g = newGraph();
 rdSay('the blank sheet');
+
+// a sheet drawn while the card was shut had no width to size itself to, so it
+// is drawn again when the card is opened
+$('#read-card').addEventListener('toggle', () => { if ($('#read-card').open) rdStill(); });
