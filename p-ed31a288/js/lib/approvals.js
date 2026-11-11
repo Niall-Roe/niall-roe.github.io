@@ -32,6 +32,7 @@ export function card({key = null, q = ASKS[key]?.q || "", line = "", buttons = n
     : `<button type="button" class="go" data-act-ok="1">Approve</button><button type="button" class="quiet" data-act-ok="0">Not now</button>`;
   const done = st === "yes" ? "Approved" : st === "later" ? "Not now" : "";
   const ask = key || approve;
+  if (ask) return `<div class="act ask demo" role="group" aria-label="${esc(q)}"><div class="atag">${TAG}Your approval</div><div class="aq">${esc(q)}</div><div class="al">This is just a demo, so there is nothing to approve.</div></div>`;
   return `<div class="act${done ? " answered" : ""}${ask ? " ask" : ""}" ${key ? `data-act="${esc(key)}"` : ""} role="group" aria-label="${esc(ask ? `Your approval: ${q}` : q)}">
     ${ask ? `<div class="atag">${TAG}Your approval</div>` : ""}<div class="aq">${esc(q)}</div>${line ? `<div class="al">${line}</div>` : ""}${body}
     <div class="ab">${btns}</div>

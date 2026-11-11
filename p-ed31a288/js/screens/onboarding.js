@@ -1,7 +1,7 @@
 import {$, esc, on} from "../lib/dom.js";
 import {demoEnd, demoStart, get, inDemo, post} from "../lib/api.js";
 import {S, save, demo, showcase, enqueue, dequeue} from "../lib/onbstate.js";
-import {DEMO_START, demoSetup} from "../lib/onb/demodata.js";
+import {DEMO_START, demoLinked, demoSetup, demoSorting} from "../lib/onb/demodata.js";
 import {DEMO_FROM} from "../lib/demomark.js";
 import {CALM, atFolder, cellRect, darken, fadeWires, follow, fx, grid, light, outline, pipeIds, pulse, squarePipes, tok, unwire, wire} from "../lib/onb/stage.js";
 import {compare, fast, reels, search} from "../lib/onb/shows.js";
@@ -43,7 +43,7 @@ const W = {
   "r-lib": () => card(`If you'd like, you can also attach a locally running LLM to act as a librarian.`, [
     ["", `You can ask it questions about your results, have it suggest searches or related works, ${DRAFT}or group a search's results by context, each line pointing to its passage.`]],
     `<p class="k" id="lmline"></p>`),
-  confirm: () => card(`Please confirm that you are happy to:`, [],
+  confirm: () => card(`Here the app would ask you to confirm that you are happy to:`, [],
     `<p class="sm">None of your files will be changed or shared.</p><div class="acts" id="confirms"><p class="k">${loadingNote("what your files need")}</p></div>`),
   "r-when": () => `<h2 class="hd">It can take a while to read all the manuscripts.</h2>
     <p>If you'd like you can set up a schedule to have them read when your machine is idle.</p>
@@ -54,18 +54,19 @@ const W = {
       [OVDONE.has("topics") ? "✓ Topics chosen" : "Choose topics", `data-go="topics"${OVDONE.has("topics") ? ` class="done"` : ` class="go"`}`],
       [OVDONE.size === 2 ? "Next" : "Later", `data-go="r-hard" class="quiet"`]]}),
   "r-hard": () => card(`The Peirceptron is still being developed. Peirce really puts an automated reader through its paces.`, [
-    ["greek", `${DRAFT}Greek: both readers write it in Latin letters. There is space for a Greek reader.`],
-    ["other", `${DRAFT}Other scripts: the same, with space for their reader.`],
-    ["maths", `${DRAFT}Maths is read as words. There is space for a maths reader.`],
-    ["struck", `${DRAFT}A struck word with a word written above it: the readers run them together.`],
-    ["inserted", `${DRAFT}A word written above the line: the readers misplace it.`]]),
+    ["greek", `Peirce often writes in Greek, which confuses the current readers. I am training a Greek reader.`],
+    ["other", `Some of his other scripts are proving even harder.`],
+    ["maths", `Much of his writing includes mathematics, sometimes using notation of his own invention. I hope to release a mathematics reader too.`],
+    ["struck inserted", `Finally, sometimes the Peirceptron misplaces Peirce's insertions or other editorial corrections. This is also being worked on!`]]),
   "r-fix": () => card(`It comes with the tools you need to correct its mistakes.`, [
-    ["type", `${DRAFT}A wrong reading: retype it`],
-    ["line", `${DRAFT}A line missed: draw it, or stretch it`],
-    ["fig", `${DRAFT}A drawing missed: box it`],
-    ["help", `${DRAFT}Anything else: describe the problem`],
+    ["type", `If a line is misread, you can correct it.`],
+    ["line", `You can also adjust the lines themselves.`],
+    ["fig", `In addition, you can identify things like diagrams or mathematics.`],
+    ["help", `And of course there is a suggestion box where you can describe any sort of problem.`],
     ["", `These fixes are saved locally, so you only have to do them once.`]]),
-  "r-help": () => card(`However, there are two ways your fixes can help other Peirceptron users, if you'd like.`, [],
+  "r-help": () => card(`However, there are two ways your fixes can help other Peirceptron users, if you'd like.`, [
+    ["share", `Share your transcriptions with the community`],
+    ["train", `Let your transcriptions train new readers`]],
     `<p class="sm">This is all anonymous (unless you elect to share a username) and the Peirceptron does not collect any data from you aside from these corrections, should you decide to share them.</p>`),
   "r-done": () => `<h2 class="hd">Thank you!</h2><div id="doneline" class="k">${loadingNote("sorting")}</div><p class="k"><a href="settings.html#approvals">Approvals in Settings</a></p>`,
 };
@@ -133,7 +134,7 @@ let RELINK = false, EMPTY = "";
 const linkedNow = () => S.runs.length > 0 && !RELINK;
 const peirceFound = () => (S.summary?.rows || []).filter(r => r.kind !== "other").reduce((t, r) => t + (r.count ?? r.so_far ?? 0), 0);
 const OVDONE = new Set((() => { try { return JSON.parse(sessionStorage.getItem("pc_ovdone") || "[]"); } catch (e) { return []; } })());
-const hi = k => document.querySelectorAll("#say [data-b]").forEach(li => li.classList.toggle("on", !!k && li.dataset.b === k));
+const hi = k => document.querySelectorAll("#say [data-b]").forEach(li => li.classList.toggle("on", !!k && li.dataset.b.split(" ").includes(k)));
 const applies = k => !!TIDY.find(t => t.key === k)?.applies;
 const pause = ms => new Promise(r => setTimeout(r, ms));
 const BLUE = "#3d7ef0", GREEN = "#22c38a";
@@ -234,6 +235,7 @@ async function go(id, dir = 1) {
   const sc = SCM[id];
   B.dataset.sch = sc ? "1" : "";
   B.dataset.show = P.show || P.parts || P.help ? "1" : "";
+  if (inDemo() && !["start", "what", "two"].includes(id)) demoLinked();
   B.dataset.linked = linkedNow() ? "1" : ""; pdocsName();
   S.O.step = id; save({step: id});
   try { history.replaceState(null, "", "#" + id); } catch (e) {   }
@@ -303,7 +305,7 @@ async function go(id, dir = 1) {
   if (id === "topics") { post("/import/queue/start").catch(() => {}); await topics(); }
   if (id === "night") { await readItem(); await overnight(SC); }
   if (id === "r-done") { FLOURISHED = false; }
-  if (id !== "start" && (S.runs.length || P.run || ["link", "topics", "night"].includes(id))) status(); else { clearTimeout(STATUS); $("status").innerHTML = ""; $("stfail").innerHTML = ""; $("sline").textContent = ""; $("sbar").hidden = true; }
+  if (id !== "start" && demoSorting() && (S.runs.length || P.run || ["link", "topics", "night"].includes(id))) status(); else { clearTimeout(STATUS); $("status").innerHTML = ""; $("stfail").innerHTML = ""; $("sline").textContent = ""; $("sbar").hidden = true; }
   toAnswer();
   $("next").focus({preventScroll: true});
 }
@@ -338,7 +340,7 @@ const stepArrows = () => `<div class="flip" data-flip="steps"><button type="butt
 const stepKeys = P => P.parts ? P.parts.map(x => x.key) : P.steps;
 function stepUI(P) {
   const keys = stepKeys(P), say = $("say");
-  say.querySelectorAll("[data-b]").forEach(li => { const i = keys.indexOf(li.dataset.b); if (i < 0) return;
+  say.querySelectorAll("[data-b]").forEach(li => { const i = keys.indexOf(li.dataset.b.split(" ")[0]); if (i < 0) return;
     li.dataset.step = i; li.tabIndex = 0; li.setAttribute("role", "button"); li.classList.add("stepb"); });
   (say.querySelector("ul.bl") || say.querySelector("h2.hd"))?.insertAdjacentHTML("afterend", stepArrows());
   const n = keys.length, ui = {keys, at: -1, go: i => { i = Math.max(0, Math.min(n - 1, i)); ui.at = i; hi(keys[i]);
@@ -549,7 +551,7 @@ async function asks() {
 on("mouseover", ".act[data-act]", a => glow([ASKS[a.dataset.act]?.part]));
 document.addEventListener("act-answer", e => { glow([ASKS[e.detail.key]?.part]); setTimeout(toAnswer, 0); });
 function toAnswer() {
-  const n = document.querySelectorAll("#say .act.ask:not(.answered), #helpc .act.ask:not(.answered)").length, el = $("toans");
+  const n = document.querySelectorAll("#say .act.ask:not(.answered):not(.demo), #helpc .act.ask:not(.answered):not(.demo)").length, el = $("toans");
   el.hidden = !n; el.textContent = n ? `${n} approval${n === 1 ? "" : "s"} to answer, here or later in Settings` : "";
 }
 let CONFIRM = 0;
@@ -562,7 +564,7 @@ async function confirms() {
   el.innerHTML = (A == null ? failNote(new Error("What your files need did not come"), confirms) : "") +
     due.map(a => actCard({key: a.key, line: a.line + (est(a.key) ? ` · ${fmtLeft(est(a.key), "")}` : "")})).join("") + tc +
     (A && !due.length ? `<p class="k">Nothing else is needed for your files now.</p>` : "") +
-    (due.filter(a => !answers()[a.key] && !ASKS[a.key]?.net).length > 1 ? `<div class="ab"><button type="button" class="quiet" id="okall">Approve all of these${due.some(a => ASKS[a.key]?.net) ? " but the fetching" : ""}</button></div>` : "");
+    (false ? `<div class="ab"><button type="button" class="quiet" id="okall">Approve all of these${due.some(a => ASKS[a.key]?.net) ? " but the fetching" : ""}</button></div>` : "");
   el.insertAdjacentHTML("afterbegin", `<p class="k">The two readers come with the app: nothing to download.</p>`);
   toAnswer();
   if (OWN_T || /being timed|queued/.test(tc)) stops.push((t => () => clearTimeout(t))(setTimeout(() => { if (S.O.step === "confirm") confirms(); }, 5000)));
@@ -657,10 +659,10 @@ async function status() {
   }
   if (S.O.step === "link" && linkedNow()) { const b = $("say").querySelector(".big"), l = S.runs.map(r => r.label).filter(Boolean).join(" · "); if (b && l && b.textContent !== l) b.textContent = l; }
   const s = sortState();
-  $("sbar").hidden = !S.runs.length;
+  $("sbar").hidden = !S.runs.length || !demoSorting();
   $("sbarf").style.width = `${s.done ? 100 : s.total ? (100 * s.looked / s.total).toFixed(1) : 0}%`;
   if (S.O.step === "r-done") $("sline").textContent = "";
-  else if (S.runs.length && (!s.looking || performance.now() - TICK_AT > 4000)) $("sline").textContent = sortLine();
+  else if (S.runs.length && demoSorting() && (!s.looking || performance.now() - TICK_AT > 4000)) $("sline").textContent = sortLine();
   if (document.body.dataset.layout === "run") folderFigures();
   if (S.O.step === "r-done") doneState(s);
   STATUS = setTimeout(status, 2000);
@@ -708,7 +710,7 @@ if ((/[?&]demo=1\b/.test(location.search) && !backHere()) || inDemo()) {
   if (!inDemo()) demoStart(DEMO_START);
   demoSetup();
   const m = document.createElement("div"); m.className = "demomark"; m.setAttribute("role", "status");
-  m.innerHTML = `Demo setup <button type="button" data-demo-leave>Leave the demo</button>`; document.querySelector("header.brand").after(m);
+  m.innerHTML = `Demo setup`; document.querySelector("header.brand").after(m);
 }
 if (!GONE) preload();
 if (/[?&]drafts=1/.test(location.search)) document.body.classList.add("drafts");

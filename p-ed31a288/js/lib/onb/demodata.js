@@ -5,7 +5,10 @@ let ITEMS = null;
 const CLOCK = "pc_demo_clock";
 const keep = t => { try { sessionStorage.setItem(CLOCK, String(t)); } catch (e) {   } return t; };
 let FROM = (() => { try { return +sessionStorage.getItem(CLOCK) || 0; } catch (e) { return 0; } })();
-const looked = () => { FROM ||= keep(Date.now()); return Math.min(ITEMS.length, Math.floor((Date.now() - FROM) / 1000 * RATE)); };
+let ARMED = false;
+export function demoLinked() { ARMED = true; }
+export const demoSorting = () => !demoState() || !!FROM || ARMED;
+const looked = () => { if (!FROM && !ARMED) return 0; FROM ||= keep(Date.now()); return Math.min(ITEMS.length, Math.floor((Date.now() - FROM) / 1000 * RATE)); };
 async function items() {
   if (ITEMS) return ITEMS;
   let L = null; try { L = await get("/library"); } catch (e) { L = null; }
