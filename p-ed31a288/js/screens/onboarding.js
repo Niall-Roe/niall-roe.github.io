@@ -24,7 +24,7 @@ const card = (h, items, extra = "") => `<h2 class="hd">${h}</h2>${items.length ?
 const W = {
   what: `<p class="big">The Peirceptron is a collection of tools designed for Peirce scholars.</p>`,
   two: `<p class="big">It uses your library of Peirce's writings to:</p>`,
-  link: () => linkedNow() ? `<p class="big">${esc(S.runs.map(r => r.label).filter(Boolean).join(" · ") || "Your library")}</p><p class="then">Linked.</p><p class="then demo-note">The app will ask you to link your Peirce library, at which point it will get to work. This is just a demonstration, and it is pretending a library is linked. Click below to see how it works!</p><p><button type="button" class="mini" data-linkmore>Link another</button></p>`
+  link: () => linkedNow() ? `<p class="big">${esc(S.runs.map(r => r.label).filter(Boolean).join(" · ") || "Your library")}</p><p class="then">Linked.</p><p class="then demo-note">The app will ask you to link your Peirce library, at which point it will get to work. This is just a demonstration, and it is pretending a library is linked. Click below to see how it works!</p>`
     : EMPTY ? `<p class="big">Nothing of Peirce's was found in ${esc(EMPTY)}.</p><p class="then">Link another folder or Zotero collection.</p>`
     : `<p class="big">To get started, link to a folder or Zotero collection containing your Peirce library.</p><p class="then">(The Peirceptron will not alter or share anything you connect.)</p>`,
   "r-sort": () => card(`First, it sorts your library into three categories.`, [
@@ -48,11 +48,7 @@ const W = {
   "r-when": () => `<h2 class="hd">It can take a while to read all the manuscripts.</h2>
     <p>If you'd like you can set up a schedule to have them read when your machine is idle.</p>
     <p>In addition, you can prioritize MSs on certain topics of interest.</p>
-    <div class="k" id="whenline">${loadingNote("the estimate")}</div>` +
-    actCard({q: "Would you like to set up either now?", buttons: [
-      [OVDONE.has("night") ? "✓ Schedule set" : "Set a schedule", `data-go="night"${OVDONE.has("night") ? ` class="done"` : ` class="go"`}`],
-      [OVDONE.has("topics") ? "✓ Topics chosen" : "Choose topics", `data-go="topics"${OVDONE.has("topics") ? ` class="done"` : ` class="go"`}`],
-      [OVDONE.size === 2 ? "Next" : "Later", `data-go="r-hard" class="quiet"`]]}),
+    <p>Here the app would offer to set a schedule and choose topics, but this is just a demo!</p>`,
   "r-hard": () => card(`The Peirceptron is still being developed. Peirce really puts an automated reader through its paces.`, [
     ["greek", `Peirce often writes in Greek, which confuses the current readers. I am training a Greek reader.`],
     ["other", `Some of his other scripts are proving even harder.`],
@@ -68,7 +64,7 @@ const W = {
     ["share", `Share your transcriptions with the community`],
     ["train", `Let your transcriptions train new readers`]],
     `<p class="sm">This is all anonymous (unless you elect to share a username) and the Peirceptron does not collect any data from you aside from these corrections, should you decide to share them.</p>`),
-  "r-done": () => `<h2 class="hd">Thank you!</h2><div id="doneline" class="k">${loadingNote("sorting")}</div><p class="k"><a href="settings.html#approvals">Approvals in Settings</a></p>`,
+  "r-done": () => `<h2 class="hd">Thank you!</h2><div id="doneline" class="k">${loadingNote("sorting")}</div>`,
 };
 const FLIP = [
   {key: "clean", label: "Your PDFs, cleaned up", lit: ["pdf"], dur: 9000, show: () => mirror($("show"))},
@@ -478,7 +474,7 @@ async function modelsLine(kind) {
     el.innerHTML = `<div class="mrun"><span class="k">${I.source === "download" ? `Downloading ${what}` : `Unpacking ${what}`}</span><div class="bar"><span class="done" style="width:${(100 * share).toFixed(1)}%"></span></div></div>`;
     MPOLL = setTimeout(() => modelsLine(kind), 800); return;
   }
-  if (!need.length) { el.innerHTML = kind === "reading" ? `<p class="ok">Both readers are on this Mac.</p>` : ""; return; }
+  if (!need.length) { el.innerHTML = kind === "reading" ? `<p class="ok">The two readers come with the app.</p>` : ""; return; }
   const d = download(M, kind);
   if (d) { el.innerHTML = `<div class="acts">${actCard(d)}</div>`; return; }
   const fromPack = M.bundled && need.every(r => M.bundled.roles.includes(r.role));
@@ -536,8 +532,7 @@ async function lmLine() {
   const L = await get("/librarian").catch(() => null), el = $("lmline");
   if (!el || S.O.step !== "r-lib") return;
   const models = L?.models || [];
-  el.innerHTML = models.length ? `LM Studio on this Mac has ${plural(models.length, "model", "models")}. Choose one later, in Settings.`
-    : L?.lmstudio === "here" ? "LM Studio is on this Mac but not running. Choose a model later, in Settings." : "It runs with LM Studio, which is not on this Mac. Optional: set it up later, in Settings.";
+  el.innerHTML = "";
 }
 async function loadTidy() { TIDY = (await get("/import/tidy", {run: "all"}).catch(() => null)) || TIDY; }
 async function asks() {
