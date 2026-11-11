@@ -24,7 +24,7 @@ const card = (h, items, extra = "") => `<h2 class="hd">${h}</h2>${items.length ?
 const W = {
   what: `<p class="big">The Peirceptron is a collection of tools designed for Peirce scholars.</p>`,
   two: `<p class="big">It uses your library of Peirce's writings to:</p>`,
-  link: () => linkedNow() ? `<p class="big">${esc(S.runs.map(r => r.label).filter(Boolean).join(" · ") || "Your library")}</p><p class="then">Linked.</p><p><button type="button" class="mini" data-linkmore>Link another</button></p>`
+  link: () => linkedNow() ? `<p class="big">${esc(S.runs.map(r => r.label).filter(Boolean).join(" · ") || "Your library")}</p><p class="then">Linked.</p><p class="then demo-note">The app will ask you to link your Peirce library, at which point it will get to work. This is just a demonstration, and it is pretending a library is linked. Click below to see how it works!</p><p><button type="button" class="mini" data-linkmore>Link another</button></p>`
     : EMPTY ? `<p class="big">Nothing of Peirce's was found in ${esc(EMPTY)}.</p><p class="then">Link another folder or Zotero collection.</p>`
     : `<p class="big">To get started, link to a folder or Zotero collection containing your Peirce library.</p><p class="then">(The Peirceptron will not alter or share anything you connect.)</p>`,
   "r-sort": () => card(`First, it sorts your library into three categories.`, [

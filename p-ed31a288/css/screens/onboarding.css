@@ -626,6 +626,7 @@ body[data-layout="perm"][data-show="1"] .show { display: block; }
 body[data-sch="1"] .say .big { text-align: left; }
 .say ol.two { margin: 4px 0 10px; padding-left: 22px; font-size: 16px; } .say ol.two li { margin: 0 0 4px; }
 .say .then { color: var(--ink2); font-size: 14px; }
+.say .demo-note { max-width: 30em; margin: .5em 0; }
 .say .later { opacity: 0; } .say .two, .say .then { transition: opacity .7s ease-out; }
 .say.cardy h2.hd { font-size: 17px; font-weight: 650; margin: 0 0 8px; line-height: 1.3; }
 .say ul.bl { list-style: none; margin: 0; padding: 0; }
