@@ -68,7 +68,8 @@ const W = {
 };
 const FLIP = [
   {key: "clean", label: "Your PDFs, cleaned up", lit: ["pdf"], dur: 9000, show: () => mirror($("show"))},
-  {key: "index", label: "Indexed by the search tools", lit: ["st"], dur: 9000, show: sc => search($("show"), sc?.search, () => {}, tourPage(sc, "clean") || S.demo?.page, {buildOnly: true})},
+  {key: "index", label: "Indexed by the search tools", lit: ["st"], dur: 20000,
+    show: sc => search($("show"), sc?.search, () => {}, tourPage(sc, "clean") || S.demo?.page, {buildOnly: true})},
   {key: "find", label: "Searched", lit: ["st", "lib"], show: sc => loopOr(play($("show"), "meaning"), () => loopOr(play($("show"), "search"), () => search($("show"), sc?.search)))},
   {key: "cmp", label: "Versions compared", lit: ["lib"], show: sc => loopOr(play($("show"), "compare"), () => compare($("show"), sc?.compare))},
   {key: "drafts", label: "A work's drafts, in order", lit: ["lib"], show: sc => loopOr(play($("show"), "drafts"), () => draftTree($("show"), sc?.drafts))},

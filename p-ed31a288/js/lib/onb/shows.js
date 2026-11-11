@@ -3,6 +3,7 @@ import {get} from "../api.js";
 import {openPdf} from "../pdfview.js";
 export const imageUrl = stem => `api/v1/setup/image/${encodeURIComponent(stem)}.jpg`;
 import {CALM} from "./stage.js";
+import * as MM from "./meaningmap.js";
 const copyLink = cite => ` <button type="button" class="pplink" data-pp="${esc(String(cite).split(/[–-]/)[0].trim())}">your copy ›</button>`;
 on("click", ".pplink[data-pp]", async b => {
   try { const i = await get("/reference/printed-page", {cite: b.dataset.pp}); openPdf(`/api/v1/reference/printed-pdf/${i.file_id}#page=${i.pdf_page + 1}`, "Setup", `${b.dataset.pp} · your copy of the edition`); }
@@ -175,18 +176,55 @@ async function build(host, page, s, on, told) {
   say("b-meaning", "a map of meaning"); sb.classList.add("pass2"); scan.className = "sb-scan go2";
   const B = map.getBoundingClientRect(), Wd = B.width || 260, Ht = B.height || 160;
   map.setAttribute("viewBox", `0 0 ${Wd} ${Ht}`);
-  const C = [[.25, .3], [.7, .28], [.35, .72], [.75, .7]], P = [];
-  for (let i = 0; i < 36; i++) { const c = C[i % 4], a = (i * 2.4) % (2 * Math.PI), r = 6 + (i * 7) % 26; P.push([c[0] * Wd + Math.cos(a) * r, c[1] * Ht + Math.sin(a) * r * .8, RUNC[i % 4]]); }
-  for (const [x, y, col] of P) { if (!on()) return; map.insertAdjacentHTML("beforeend", `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="${col}" class="dot"/>`); await sleep(45); }
-  await sleep(600);
-  const Q = [C[1][0] * Wd + 9, C[1][1] * Ht + 4];
-  q.textContent = s.meaning_q || ""; q.classList.add("on"); await sleep(1200);
-  map.insertAdjacentHTML("beforeend", `<circle cx="${Q[0]}" cy="${Q[1]}" r="5" class="qdot"/>`);
-  const near = P.map((p, i) => [Math.hypot(p[0] - Q[0], p[1] - Q[1]), i]).sort((a, b) => a[0] - b[0]).slice(0, 5);
-  const dots = map.querySelectorAll(".dot");
-  for (const [, i] of near) { if (!on()) return; map.insertAdjacentHTML("afterbegin", `<line x1="${Q[0]}" y1="${Q[1]}" x2="${P[i][0].toFixed(1)}" y2="${P[i][1].toFixed(1)}" class="nl"/>`); dots[i].classList.add("hi"); await sleep(220); }
-  await sleep(1400);
+  if (MM.usable(s.map)) { await realMap(host, s.map, Wd, Ht, on); if (!on()) return; }
+  else {
+    const C = [[.25, .3], [.7, .28], [.35, .72], [.75, .7]], P = [];
+    for (let i = 0; i < 36; i++) { const c = C[i % 4], a = (i * 2.4) % (2 * Math.PI), r = 6 + (i * 7) % 26; P.push([c[0] * Wd + Math.cos(a) * r, c[1] * Ht + Math.sin(a) * r * .8, RUNC[i % 4]]); }
+    for (const [x, y, col] of P) { if (!on()) return; map.insertAdjacentHTML("beforeend", `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3.2" fill="${col}" class="dot"/>`); await sleep(45); }
+    await sleep(600);
+    const Q = [C[1][0] * Wd + 9, C[1][1] * Ht + 4];
+    q.textContent = s.meaning_q || ""; q.classList.add("on"); await sleep(1200);
+    map.insertAdjacentHTML("beforeend", `<circle cx="${Q[0]}" cy="${Q[1]}" r="5" class="qdot"/>`);
+    const near = P.map((p, i) => [Math.hypot(p[0] - Q[0], p[1] - Q[1]), i]).sort((a, b) => a[0] - b[0]).slice(0, 5);
+    const dots = map.querySelectorAll(".dot");
+    for (const [, i] of near) { if (!on()) return; map.insertAdjacentHTML("afterbegin", `<line x1="${Q[0]}" y1="${Q[1]}" x2="${P[i][0].toFixed(1)}" y2="${P[i][1].toFixed(1)}" class="nl"/>`); dots[i].classList.add("hi"); await sleep(220); }
+    await sleep(1400);
+  }
   say("b-local", "on this Mac, from your own files"); sb.classList.add("local"); await sleep(2600);
+}
+async function realMap(host, m, Wd, Ht, on) {
+  const map = host.querySelector(".sb-map svg"), q = host.querySelector(".sb-q"), box = host.querySelector(".sb-map");
+  const vis = host.getBoundingClientRect().bottom - map.getBoundingClientRect().top - 4;
+  if (vis > 60 && vis < Ht) Ht = vis;
+  q.textContent = m.question;
+  const F = MM.fit(m, Wd, Ht, {pad: 8, top: (q.getBoundingClientRect().height || 16) + 2}), G = MM.groups(m), N = MM.nearest(m), open = MM.opened(m);
+  const at = p => F.pts[m.points.indexOf(p)], dot = new Map();
+  for (const p of m.points) {
+    if (!on()) return;
+    map.insertAdjacentHTML("beforeend", `<circle cx="${at(p)[0].toFixed(1)}" cy="${at(p)[1].toFixed(1)}" r="3.2" fill="${RUNC[G.indexOf(p.group) % RUNC.length]}" class="dot"/>`);
+    dot.set(p, map.lastElementChild); await sleep(30);
+  }
+  await sleep(500);
+  q.classList.add("on"); await sleep(1100);
+  const [qx, qy] = F.q;
+  map.insertAdjacentHTML("beforeend", `<circle cx="${qx.toFixed(1)}" cy="${qy.toFixed(1)}" r="5" class="qdot"/>`);
+  const LH = 12, ys = MM.stack(N.map(p => at(p)[1] + 3.5), LH, 22, Ht - 4);
+  const left = Math.min(...N.map(p => at(p)[0])) - 14, side = left > 70 ? "end" : "start";
+  const lx = side === "end" ? left : Math.max(...N.map(p => at(p)[0])) + 14;
+  for (const [k, p] of N.entries()) {
+    if (!on()) return;
+    const [x, y] = at(p), ly = ys[k], ex = lx + (side === "end" ? 3 : -3);
+    map.insertAdjacentHTML("afterbegin", `<line x1="${qx.toFixed(1)}" y1="${qy.toFixed(1)}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="nl"/>`);
+    map.insertAdjacentHTML("afterbegin", `<line x1="${ex.toFixed(1)}" y1="${(ly - 3.5).toFixed(1)}" x2="${x.toFixed(1)}" y2="${y.toFixed(1)}" class="ll"/>`);
+    map.insertAdjacentHTML("beforeend", `<text x="${lx.toFixed(1)}" y="${ly.toFixed(1)}" class="nlab ${side}">${esc(p.cite)}</text>`);
+    dot.get(p).classList.add("hi"); await sleep(300);
+  }
+  await sleep(1200);
+  if (!open || !on()) return;
+  box.insertAdjacentHTML("beforeend", `<div class="sb-open"><b>${esc(open.cite)}</b> ${esc(open.excerpt)}</div>`);
+  dot.get(open).classList.add("open");
+  const card = box.lastElementChild; await sleep(30); card.classList.add("on"); await sleep(3200);
+  card.classList.remove("on"); dot.get(open).classList.remove("open"); await sleep(300);
 }
 export function search(host, s, told = () => {}, page = null, {buildOnly = false} = {}) {
   if (!s) { host.innerHTML = `<p class="cap">no example search in this library</p>`; return () => {}; }

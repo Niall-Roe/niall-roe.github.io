@@ -723,6 +723,12 @@ body.drafts i.dr { display: inline-block; width: 6px; height: 6px; border-radius
 .sb-map .qdot { fill: var(--bad); } .sb-map .nl { stroke: var(--bad); stroke-width: 1; opacity: .7; }
 .sb-q { position: absolute; right: 0; top: -2px; max-width: 70%; font: italic 12.5px/1.3 "EB Garamond", Georgia, serif; color: var(--bad); opacity: 0; transition: opacity .4s; text-align: right; }
 .sb-q.on { opacity: 1; }
+.sb-map .nlab { font-size: 10.5px; fill: var(--ink); text-anchor: end; paint-order: stroke; stroke: var(--panel); stroke-width: 3px; stroke-linejoin: round; }
+.sb-map .nlab.start { text-anchor: start; } .sb-map .ll { stroke: var(--muted); stroke-width: .6; opacity: .7; }
+.sb-map .dot.open { r: 7; stroke: var(--bad); stroke-width: 2; }
+.sb-open { position: absolute; left: 0; bottom: 0; max-width: min(100%, 360px); padding: 6px 9px; background: var(--field); border: 1px solid var(--border); border-radius: 8px;
+  font: 13px/1.35 "EB Garamond", Georgia, serif; opacity: 0; transform: translateY(4px); transition: opacity .35s, transform .35s; }
+.sb-open b { font: 600 11px/1 system-ui, sans-serif; margin-right: 4px; } .sb-open.on { opacity: 1; transform: none; }
 @keyframes sbscan { from { left: 0; opacity: 1; } to { left: 100%; opacity: 1; } }
 @keyframes sbin { from { opacity: 0; transform: translateY(3px); } to { opacity: 1; transform: none; } }
 .pdocs { position: fixed; z-index: 5; left: 14vw; top: 52%; width: 96px; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 4px;
