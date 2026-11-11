@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>THE PEIRCEPTRON</title>
+<link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon/touch-180.png">
+<style>
+@font-face { font-family: "EB Garamond"; src: url("fonts/EBGaramond-Regular.otf") format("opentype"); font-weight: 400; }
+@font-face { font-family: "EB Garamond"; src: url("fonts/EBGaramond-SemiBold.otf") format("opentype"); font-weight: 600; }
+:root { --page: #0b0b0c; --ink: #ecebe6; --muted: #85837c; --go-bg: #e8e6df; --go-ink: #0b0b0c; --ring: #1d1f24; }
+@media (prefers-color-scheme: light) {
+  :root { --page: #f9f9f7; --ink: #0b0b0b; --muted: #6e6c66; --go-bg: #0b0b0b; --go-ink: #f9f9f7; --ring: #e1e0d9; }
+}
+html, body { margin: 0; background: var(--page); color: var(--ink); }
+body { font: 18px/1.5 "EB Garamond", Georgia, serif; min-height: 100vh; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 22px; padding: 24px 16px; box-sizing: border-box; text-align: center; }
+b.brand { font: 700 15px/1 -apple-system, system-ui, sans-serif; letter-spacing: .16em; }
+img { width: 132px; height: 132px; border-radius: 50%; box-shadow: 0 0 0 6px var(--ring); }
+p { margin: 0; color: var(--muted); }
+a.go { display: inline-block; background: var(--go-bg); color: var(--go-ink); text-decoration: none; padding: 9px 22px;
+  border-radius: 8px; font: 600 15px/1.2 -apple-system, system-ui, sans-serif; }
+</style>
+</head>
+<body>
+<b class="brand">THE PEIRCEPTRON</b>
+<img src="icon/icon-512.png" alt="Charles S. Peirce">
+<p>End of the opening sequence.</p>
+<a class="go" id="again" href="onboarding.html?demo=1">Watch again</a>
+<script>
+// the copy's end (setup's Finish, Leave the demo and its Settings link open settings.html): Watch again starts the
+// demo from its first step, with nothing kept from this visit
+document.getElementById("again").addEventListener("click", function () { try { sessionStorage.clear(); } catch (e) { /* none kept */ } });
+</script>
+</body>
+</html>

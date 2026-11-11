@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<title>THE PEIRCEPTRON · Setup</title>
+<link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon/touch-180.png">
+<script src="static/shim.js"></script>
+<script src="js/lib/clientlog.js"></script>
+<script src="js/theme.js"></script>
+<link rel="stylesheet" href="css/app.css">
+<link rel="stylesheet" href="css/screens/onboarding.css">
+</head>
+<body data-nobar="1" class="onb" data-p="start" data-layout="start" data-boot="loading">
+<canvas id="grid" class="bgc" aria-hidden="true"></canvas>
+<canvas id="fx" class="bgc fx" aria-hidden="true"></canvas>
+<header class="brand"><b>THE PEIRCEPTRON</b><a class="later" id="later" href="mylibrary.html" data-skipall>Add my library later</a></header>
+<div class="say" id="say" aria-live="polite"></div>
+<div class="face" id="face">
+  <svg viewBox="0 0 200 200" class="ring" aria-hidden="true"><circle class="rt" cx="100" cy="100" r="95"/><circle class="rf" id="rf" cx="100" cy="100" r="95"/></svg>
+  <img src="icon/icon-512.png" alt="Charles S. Peirce">
+  <div class="glasses" id="glasses" aria-hidden="true"><i></i><i></i></div>
+</div>
+<p class="boot" id="boot" aria-live="polite"></p>
+<div class="pdocs" id="pdocs" aria-hidden="true"><span class="pd-f"></span><span class="pd-z"></span><b class="pd-n">Peirce_docs</b></div>
+<div class="sorted3" id="sorted3" aria-hidden="true"><div class="so3" data-k="ms"><span class="pd-f"></span><b>Manuscripts</b></div>
+  <div class="so3" data-k="lp"><span class="pd-f"></span><b>Lifetime publications</b></div><div class="so3" data-k="le"><span class="pd-f"></span><b>Later editions</b></div></div>
+<div class="twoc" id="twoc"><div class="tw-card"><h3>give a machine reading of Peirce's manuscripts</h3><div class="anim tw-box" id="tw-l"></div></div>
+  <div class="tw-card"><h3>help you organize and explore Peirce's writings</h3><div class="anim tw-box" id="tw-r"></div></div></div>
+<div class="twoc help" id="helpc"><div class="tw-card"><h3>Share your readings <span class="qm" tabindex="0" role="button" aria-label="more" title="If you have tidied up a manuscript, you can offer to share your transcription with the community. Anyone else who also has that manuscript can elect to have your reading in addition to their machine readings.">?</span></h3><div class="anim tw-box" id="hp-l"></div><div class="asks hp-ask" data-asks="share"></div></div>
+  <div class="tw-card"><h3><i class="dr" title="drafted"></i>Help train new readers <span class="qm" tabindex="0" role="button" aria-label="more" title="Your fixes can be sent back to Peirceptron HQ and used to train the processing and readers, improving readings on all MSs for all users.">?</span></h3><div class="anim tw-box" id="hp-r"></div><div class="asks hp-ask" data-asks="train"></div></div></div>
+<div class="show" id="show"></div>
+<div class="scm" id="scm" aria-hidden="true"></div>
+<div class="lk" id="lk">
+  <div class="lk-half lk-left" id="lk-left"></div>
+  <div class="lk-half lk-right" id="lk-right"></div>
+</div>
+<div class="zpop" id="zpop" role="dialog" hidden></div>
+<section class="over" id="ov-topics" hidden>
+  <h2>Read first</h2>
+  <p class="lead tlead">The Peirceptron will prioritise reading the MSs that most engage with these topics. At any time you can change the queue.</p>
+  <p class="tsum" id="tp-sum" aria-live="polite"></p>
+  <div class="tgroups" id="tp-groups"></div>
+  <div class="tp-more">
+    <label class="other">A work <input id="tp-wq" placeholder="a work by its title" aria-label="find a work by its title"></label>
+    <div id="tp-works" class="works"></div>
+    <label class="other">In your own words <input id="tp-other" placeholder="a topic not in the list" maxlength="120"></label>
+    <div class="offer" id="tp-offer" aria-live="polite"></div>
+  </div>
+  <div id="tp-list"></div>
+</section>
+<section class="over" id="ov-night" hidden>
+  <h2>When it may read</h2>
+  <p class="lead">Nothing leaves your computer, and you can set it to not read while you are using any other app. You can pause or resume readings manually at any time.</p>
+  <div class="presets"><button type="button" data-preset="nights">Nights, 23:00–07:00</button><button type="button" data-preset="weekends">Nights and weekends</button><button type="button" data-preset="always">Any time</button><button type="button" data-preset="none">Clear</button></div>
+  <div class="week" id="on-week"></div>
+  <label class="chk"><input type="checkbox" id="on-pause"> Not while I am using another app</label>
+  <label class="chk"><input type="checkbox" id="on-plug"> Only when the Mac is plugged in</label>
+  <div class="on-est"><div class="act" id="on-act" role="group" aria-label="Time 10 test pages"><div class="aq">Not timed on this Mac yet</div><div class="ab"><button type="button" id="on-test">Time 10 test pages</button></div></div><div id="on-est"></div></div>
+</section>
+<nav class="nav" id="nav"><span class="toans" id="toans" role="status" hidden></span><button type="button" id="back" hidden>Back</button><button type="button" class="go" id="next">Get started</button><button type="button" class="quiet" id="nomss" hidden>I don't have any MSs</button></nav>
+<div class="status"><div class="sbar" id="sbar" hidden><i id="sbarf"></i></div><div class="sline" id="sline" aria-live="polite"></div><div id="status" aria-live="polite"></div><div id="stfail"></div></div>
+<script type="module" src="js/screens/onboarding.js"></script>
+</body>
+</html>
