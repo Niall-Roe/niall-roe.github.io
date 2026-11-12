@@ -3,6 +3,7 @@ import {CALM, tok} from "./stage.js";
 import {blackline, compare, imageUrl, pagePlay, search, sleep} from "./shows.js";
 import {layouts, release, show as showLayout} from "./story.js";
 import {pointer} from "./tour.js";
+import {chip, marker, plan, withRefs} from "./libplay.js";
 import {COL} from "../schematic.js";
 const pause = ms => new Promise(r => setTimeout(r, ms));
 function loop(list) {
@@ -206,7 +207,9 @@ export function mirror(host) {
   }]);
 }
 export {search, compare};
-export function askLib(host, s, told = () => {}) {
+export function askLib(host, s, told = () => {}, ex = null) {
+  const P = plan(ex);
+  if (P) return askReal(host, P, told);
   if (!s?.manuscripts?.length) { host.innerHTML = `<p class="cap">no example search in this library</p>`; return () => {}; }
   const Q = `Where does Peirce talk about ${s.q}, and in what contexts?`, SEARCHES = [s.q, "abductive", "retroduction"];
   const res = [...s.manuscripts.map(h => ({cite: h.cite, text: h.text, ms: true})), ...s.editions.map(h => ({cite: h.cite}))].slice(0, 6);
@@ -244,6 +247,64 @@ export function askLib(host, s, told = () => {}) {
     if (!on()) return;
     told("group"); $q(".ak-out").innerHTML = `<p class="k">Grouped by context:</p>` + G(); await sleep(3800);
     await sleep(1500);
+  }]);
+}
+function askReal(host, P, told) {
+  const hiq = marker(P.searches);
+  host.innerHTML = `<div class="ak"><div class="ak-h"><b>Librarian</b> <span class="k">· Ask a question · example</span></div>
+    <div class="ak-q"></div><div class="ak-row"><button type="button" tabindex="-1" class="ak-p">Propose searches</button></div>
+    <div class="ak-chips"></div><div class="ak-row"><button type="button" tabindex="-1" class="ak-g" hidden>Search, then group</button></div>
+    <div class="ak-res"></div><div class="ak-out"></div></div>
+    <div class="ak-rd long" hidden><div class="ak-rdh"><b></b><span class="k">machine reading</span></div><div class="ak-rdt"></div></div>`;
+  const $q = c => host.querySelector(c), ptr = pointer(host), ak = $q(".ak");
+  const row = h => `<div class="ak-r one" data-n="${h.n}">${chip(h.n)}<b>${esc(h.citation)}</b>${h.reading ? ` <span class="k">${hiq(h.reading)}</span>` : ""}</div>`;
+  let rows = P.rows, left = P.more;
+  const more = () => left ? `<p class="k ak-more">and ${left} more</p>` : "";
+  const G = () => P.none ? `<p class="k">The model says none of these results bears on the question.</p>`
+    : P.error ? `<p class="k">${esc(P.error)}</p>`
+    : (P.lead.length ? `<p class="ak-s">${P.lead.map(x => withRefs(x.text)).join(" ")}</p>` : "") +
+      P.groups.map(g => `<div class="ak-grp"><p>${g.ok ? esc(g.name) : "<i>a group whose name was not shown</i>"} ${g.refs.map(chip).join("")}</p>${g.ss.length ? `<p class="ak-s">${g.ss.map(x => withRefs(x.text)).join(" ")}</p>` : ""}</div>`).join("");
+  const grouped = () => { ak.classList.add("grouped"); $q(".ak-out").innerHTML = `<p class="k">Grouped by context:</p>` + G(); };
+  const scrollBy = async (el, ms, on) => {
+    el.scrollTop = 0; await sleep(2500);
+    const far = el.scrollHeight - el.clientHeight, steps = Math.max(1, Math.round((ms - 4500) / 60));
+    if (far <= 0) { await sleep(ms - 2500); return; }
+    for (let i = 1; i <= steps; i++) { if (!on()) return; el.scrollTop = far * i / steps; await sleep(60); }
+    await sleep(2000);
+  };
+  if (CALM.matches) {
+    ak.classList.add("still");
+    $q(".ak-q").textContent = P.question; $q(".ak-chips").innerHTML = P.searches.map(x => `<span class="ak-c">${esc(x)}</span>`).join("");
+    $q(".ak-res").innerHTML = P.rows.map(row).join("") + more();
+    $q(".ak-out").innerHTML = `<p class="k">Grouped by context:</p>` + G(); told("still"); return () => {};
+  }
+  $q(".ak-q").textContent = P.question; $q(".ak-chips").innerHTML = P.searches.map(x => `<span class="ak-c">${esc(x)}</span>`).join("");
+  $q(".ak-g").hidden = false; $q(".ak-res").innerHTML = rows.map(row).join("") + more();
+  const opened = new Set(P.picks.map(h => h.n));
+  while (ak.scrollHeight > ak.clientHeight) {
+    const drop = [...rows].reverse().find(h => !opened.has(h.n)); if (!drop) break;
+    rows = rows.filter(h => h !== drop); left++; $q(".ak-res").innerHTML = rows.map(row).join("") + more();
+  }
+  return loop([async on => {
+    ak.hidden = false; $q(".ak-rd").hidden = true; ak.classList.remove("grouped");
+    $q(".ak-q").textContent = ""; $q(".ak-chips").innerHTML = ""; $q(".ak-res").innerHTML = ""; $q(".ak-out").innerHTML = ""; $q(".ak-g").hidden = true;
+    told("ask"); for (const ch of P.question) { if (!on()) return; $q(".ak-q").textContent += ch; await sleep(38); }
+    await sleep(500); await ptr.click($q(".ak-p")); if (!on()) return;
+    told("suggest"); for (const x of P.searches) { if (!on()) return; $q(".ak-chips").insertAdjacentHTML("beforeend", `<span class="ak-c">${esc(x)}</span>`); await sleep(450); }
+    $q(".ak-g").hidden = false; await sleep(700); await ptr.click($q(".ak-g")); if (!on()) return;
+    told("results"); for (const h of rows) { if (!on()) return; $q(".ak-res").insertAdjacentHTML("beforeend", row(h)); await sleep(300); }
+    $q(".ak-res").insertAdjacentHTML("beforeend", more());
+    await sleep(900); if (!on()) return;
+    told("open");
+    for (const h of P.picks) {
+      if (!on()) return; const r = $q(`.ak-r[data-n="${h.n}"]`); if (!r) continue;
+      await ptr.click(r); ptr.hide(); if (!on()) return;
+      $q(".ak-rd b").textContent = h.citation; $q(".ak-rdt").innerHTML = hiq(h.reading); $q(".ak-rd").hidden = false; ak.hidden = true;
+      await scrollBy($q(".ak-rdt"), 7000, on); if (!on()) return;
+      $q(".ak-rd").hidden = true; ak.hidden = false; await sleep(500);
+    }
+    if (!on()) return;
+    told("group"); grouped(); await scrollBy($q(".ak-out"), 11000, on);
   }]);
 }
 const cropOf = (p, [x0, y0, x1, y1], s) =>

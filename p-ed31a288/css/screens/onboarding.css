@@ -836,6 +836,13 @@ body[data-sch="1"] .sbar { margin-left: 0; }
 .ak-rd { animation: fadein2 .4s ease-out; }
 .ak-rdh { display: flex; gap: 10px; align-items: baseline; padding-bottom: 6px; border-bottom: 1px solid var(--rule); } .ak-rdh b { font-size: 13.5px; }
 .ak-rdt { margin-top: 12px; font: 19px/1.5 "EB Garamond", Georgia, serif; }
+.ak-more { margin: 3px 0 0; font-size: 12px; }
+.ak-out .ak-s { margin: 0 0 6px; color: var(--ink2); font-size: 12.5px; }
+.ak .ak-r.one { display: block; white-space: nowrap; }
+.ak.grouped:not([hidden]) { display: flex; flex-direction: column; } .ak.grouped .ak-out { flex: 1; min-height: 0; overflow: hidden; }
+.ak-rd.long:not([hidden]) { display: flex; flex-direction: column; } .ak-rd.long .ak-rdt { flex: 1; min-height: 0; overflow: hidden; }
+.ak.grouped .ak-chips, .ak.grouped .ak-row, .ak.grouped .ak-res { display: none; }
+.ak.still { overflow-y: auto; }
 #helpc { top: auto; height: min(330px, 40vh); bottom: calc(var(--scm-b) + var(--scm-h) + 18px); left: calc(var(--gut) + var(--lw) + 30px); }
 body[data-p="r-help"] #helpc { top: 60px; height: auto; }
 .hb { position: absolute; inset: 0; display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); gap: 8px; align-items: stretch; }

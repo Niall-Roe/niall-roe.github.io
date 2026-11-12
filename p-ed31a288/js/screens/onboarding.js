@@ -1,6 +1,6 @@
 import {$, esc, on} from "../lib/dom.js";
 import {demoEnd, demoStart, get, inDemo, post} from "../lib/api.js";
-import {S, save, demo, showcase, enqueue, dequeue} from "../lib/onbstate.js";
+import {S, save, demo, showcase, libExample, enqueue, dequeue} from "../lib/onbstate.js";
 import {DEMO_START, demoLinked, demoSetup, demoSorting} from "../lib/onb/demodata.js";
 import {DEMO_FROM} from "../lib/demomark.js";
 import {CALM, atFolder, cellRect, darken, fadeWires, follow, fx, grid, light, outline, pipeIds, pulse, squarePipes, tok, unwire, wire} from "../lib/onb/stage.js";
@@ -111,7 +111,7 @@ const PANELS = [
     {key: "read", show: sc => loopOr(play($("show"), "reader"), () => compare($("show"), sc?.compare))}]},
   {id: "r-search", run: true, parts: FLIP},
   {id: "r-lib", run: true, steps: ["ask", "suggest", "results", "group"], stepOf: {ask: "ask", suggest: "suggest", results: "results", open: "results", group: "group"},
-    show: (sc, told) => askLib($("show"), sc?.search, told)},
+    show: async (sc, told) => askLib($("show"), sc?.search, told, await libExample())},
   {id: "confirm", run: true},
   {id: "r-when", run: true},
   {id: "topics", layout: "over", over: "ov-topics", back: "r-when", next: "Done"},

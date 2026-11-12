@@ -1,6 +1,6 @@
 (function () {
   "use strict";
-  var FILES = ["/librarian", "/library", "/manuscripts/1", "/models", "/preferences", "/reading", "/session", "/setup/demo", "/setup/loops", "/setup/showcase", "/setup/topics", "/webstate"];
+  var FILES = ["/librarian", "/library", "/manuscripts/1", "/models", "/preferences", "/reading", "/session", "/setup/demo", "/setup/librarian", "/setup/loops", "/setup/showcase", "/setup/topics", "/webstate"];
   var HAVE = {};
   FILES.forEach(function (p) { HAVE[p] = true; });
   var ROOT = new URL("../", document.currentScript.src).href;

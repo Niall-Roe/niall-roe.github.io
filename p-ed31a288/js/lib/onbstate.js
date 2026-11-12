@@ -23,6 +23,11 @@ export function showcase() {
   SHOW ||= get("/setup/showcase").catch(() => { SHOW = null; return null; });
   return SHOW;
 }
+let LIBEX = null;
+export function libExample() {
+  LIBEX ||= get("/setup/librarian").catch(() => null);
+  return LIBEX;
+}
 export async function enqueue(item) { try { return await post("/import/queue", {items: [item]}); } catch (e) { toast(`Not added to the queue: ${e.message}`); return null; } }
 export async function dequeue(ref) {
   try { const Q = await get("/import/queue"), q = Q.items.find(x => x.ref === ref); if (q) await post("/import/queue/remove", {id: q.id}); } catch (e) {   }
