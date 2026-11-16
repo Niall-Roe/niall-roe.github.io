@@ -38,6 +38,10 @@ An entry with an anchor but no container is a spec, and is skipped.
 Pages are single files with nothing fetched at run time: no external scripts, styles,
 fonts or data. They must work offline, over `file://`, and inside a sandboxed iframe.
 
+**The one exception (11-16): `peirce-dictionary/`.** Peirce's Century and Baldwin dictionary entries (about 22 MB
+of text) load their data from the folder's own `data/` as needed; a single 20 MB file would be too slow to open. It works
+from the website, not over `file://`. Its page is built in CSP-Bot (branch csp-site, `htr/site_dict/`), not from `src/`.
+
 `src/03_lib.js` and `src/04_scaffold.js` are shared verbatim across papers, so anything
 written for one page runs in another. Do not fork them per paper.
 
